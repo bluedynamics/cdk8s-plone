@@ -70,9 +70,10 @@ For more have a look at the [example project](https://github.com/bluedynamics/cd
 #### PloneBaseOptions
 Interface
 ```typescript
+export interface PloneBaseOptions {
   // image
-  readonly image?: string; // the wanted plone image e.g. ghcr.io/bluedynamics/mximages-plone/mx-plone-backend:main'
-  readonly imagePullPolicy?: string; // default: IfNotPresent
+  readonly image?: string;
+  readonly imagePullPolicy?: string;
   // replicas
   readonly replicas?: number;
   readonly maxUnavailable?: number | string;
@@ -97,6 +98,7 @@ Interface
   readonly livenessPeriodSeconds?: number;
   readonly livenessSuccessThreshold?: number;
   readonly livenessFailureThreshold?: number;
+}
 ```
 
 #### PloneOptions
