@@ -71,7 +71,6 @@ For more have a look at the [example project](https://github.com/bluedynamics/cd
 Clone the repository and install the dependencies:
 
 ```bash
-```
 nvm use lts/*
 corepack enable
 npx projen
