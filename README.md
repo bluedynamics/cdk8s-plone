@@ -65,6 +65,58 @@ The manifests are stored in the `dist` directory.
 
 For more have a look at the [example project](https://github.com/bluedynamics/cdk8s-plone-example).
 
+### References
+
+#### PloneBaseOptions
+Interface
+```typescript
+  // image
+  readonly image?: string; // the wanted plone image e.g. ghcr.io/bluedynamics/mximages-plone/mx-plone-backend:main'
+  readonly imagePullPolicy?: string; // default: IfNotPresent
+  // replicas
+  readonly replicas?: number;
+  readonly maxUnavailable?: number | string;
+  readonly minAvailable?: number | string;
+  // resources
+  readonly limitCpu?: string;
+  readonly limitMemory?: string;
+  readonly requestCpu?: string;
+  readonly requestMemory?: string;
+  readonly environment?: kplus.Env;
+  // readiness Probe
+  readonly readinessEnabled?: boolean;
+  readonly readinessInitialDelaySeconds?: number;
+  readonly readinessIimeoutSeconds?: number;
+  readonly readinessPeriodSeconds?: number;
+  readonly readinessSuccessThreshold?: number;
+  readonly readinessFailureThreshold?: number;
+  // liveness Probe
+  readonly livenessEnabled?: boolean;
+  readonly livenessInitialDelaySeconds?: number;
+  readonly livenessIimeoutSeconds?: number;
+  readonly livenessPeriodSeconds?: number;
+  readonly livenessSuccessThreshold?: number;
+  readonly livenessFailureThreshold?: number;
+```
+
+#### PloneOptions
+Interface
+```typescript
+  readonly version?: string;
+  readonly siteId?: string;
+  readonly variant?: PloneVariant;
+  readonly backend?: PloneBaseOptions;
+  readonly frontend?: PloneBaseOptions;
+  readonly imagePullSecrets?: string[];
+```
+
+#### PloneVariants
+Enum
+```typescript
+  VOLTO = 'volto',
+  CLASSICUI = 'classicui', //only backend plone
+```
+
 
 ## Development
 
