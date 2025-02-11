@@ -70,6 +70,8 @@ For more have a look at the [example project](https://github.com/bluedynamics/cd
 #### PloneBaseOptions
 *Interface*
 
+[Kubernetes Documentation](https://kubernetes.io/docs/concepts/configuration/liveness-readiness-startup-probes/)
+
 - `image`(string): 
   - The used Plone image
   - e.g. `plone/plone-backend:6.1.0`
