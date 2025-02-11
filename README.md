@@ -68,7 +68,7 @@ For more have a look at the [example project](https://github.com/bluedynamics/cd
 ### References
 
 #### PloneBaseOptions
-Interface
+*Interface*
 
 - `image`(string): 
   - The used Plone image
@@ -91,7 +91,7 @@ Interface
 - `readinessFailureThreshold`(number)
 - `livenessEnabled`(boolean)
   - should be `true` for `volto`
-  - should be `false` for `classicui`
+  - should be `false` for `backend/classicui`
 - `livenessInitialDelaySeconds`(number)
 - `livenessIimeoutSeconds`(number)
 - `livenessPeriodSeconds`(number)
@@ -100,7 +100,7 @@ Interface
 
 
 #### PloneOptions
-Interface
+*Interface*
 
 - `version`(string):
   - version of your project
@@ -117,7 +117,7 @@ Interface
 - `imagePullSecrets`(string[])
 
 #### PloneVariants
-Enum
+*Enum*
 
 - VOLTO = 'volto'
 - CLASSICUI  = 'classicui' 
