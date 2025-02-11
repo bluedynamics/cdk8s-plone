@@ -72,7 +72,7 @@ For more have a look at the [example project](https://github.com/bluedynamics/cd
 
 - `image`(string): 
   - The used Plone image
-  - e.g. `ghcr.io/bluedynamics/mximages-plone/mx-plone-backend:main`
+  - e.g. `plone/plone-backend:6.1.0`
 - `imagePullPolicy`(string):
   - default `IfNotPresent`
 - `replicas`(numbers)
