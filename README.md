@@ -69,56 +69,57 @@ For more have a look at the [example project](https://github.com/bluedynamics/cd
 
 #### PloneBaseOptions
 Interface
-```typescript
-export interface PloneBaseOptions {
-  // image
-  readonly image?: string;
-  readonly imagePullPolicy?: string;
-  // replicas
-  readonly replicas?: number;
-  readonly maxUnavailable?: number | string;
-  readonly minAvailable?: number | string;
-  // resources
-  readonly limitCpu?: string;
-  readonly limitMemory?: string;
-  readonly requestCpu?: string;
-  readonly requestMemory?: string;
-  readonly environment?: kplus.Env;
-  // readiness Probe
-  readonly readinessEnabled?: boolean;
-  readonly readinessInitialDelaySeconds?: number;
-  readonly readinessIimeoutSeconds?: number;
-  readonly readinessPeriodSeconds?: number;
-  readonly readinessSuccessThreshold?: number;
-  readonly readinessFailureThreshold?: number;
-  // liveness Probe
-  readonly livenessEnabled?: boolean;
-  readonly livenessInitialDelaySeconds?: number;
-  readonly livenessIimeoutSeconds?: number;
-  readonly livenessPeriodSeconds?: number;
-  readonly livenessSuccessThreshold?: number;
-  readonly livenessFailureThreshold?: number;
-}
-```
+
+- `image`(string): 
+  - The used Plone image
+  - e.g. `ghcr.io/bluedynamics/mximages-plone/mx-plone-backend:main`
+- `imagePullPolicy`(string):
+  - default `IfNotPresent`
+- `replicas`(numbers)
+- `maxUnavailable`(number|string)
+- `minAvailable`(number|string)
+- `limitCpu`(string)
+- `limitMemory`(string)
+- `requestCpu`(string)
+- `requestMemory`(string)
+- `environment`(kplus.Env)
+- `readinessEnabled`(boolean)
+- `readinessInitialDelaySeconds`(number)
+- `readinessIimeoutSeconds`(number)
+- `readinessPeriodSeconds`(number)
+- `readinessSuccessThreshold`(number)
+- `readinessFailureThreshold`(number)
+- `livenessEnabled`(boolean)
+- `livenessInitialDelaySeconds`(number)
+- `livenessIimeoutSeconds`(number)
+- `livenessPeriodSeconds`(number)
+- `livenessSuccessThreshold`(number)
+- `livenessFailureThreshold`(number)
+
 
 #### PloneOptions
 Interface
-```typescript
-  readonly version?: string;
-  readonly siteId?: string;
-  readonly variant?: PloneVariant;
-  readonly backend?: PloneBaseOptions;
-  readonly frontend?: PloneBaseOptions;
-  readonly imagePullSecrets?: string[];
-```
+
+- `version`(string):
+  - version of your project
+- `siteId`(string):
+  - default `Plone`
+- `variant`(PloneVariant):
+  - default `PloneVariant.VOLTO`
+- `backend` (PloneBaseOptions):
+  - default `{}`
+  - needs `image` and `enviroment`
+- `frontend` (PloneBaseOptions):
+  - default `{}`
+  - needs `image` if `PloneVariant.VOLTO`
+- `imagePullSecrets`(string[])
 
 #### PloneVariants
 Enum
-```typescript
-  VOLTO = 'volto',
-  CLASSICUI = 'classicui', //only backend plone
-```
 
+- VOLTO = 'volto'
+- CLASSICUI  = 'classicui' 
+  - no frontend options/image needed
 
 ## Development
 
