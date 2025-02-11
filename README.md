@@ -157,8 +157,7 @@ builds the `Plone` Construct
 #### PloneHttpcache
 *class*
 
-uses helmchart [kube-httpcache](https://github.com/mittwald/kube-httpcache)
-builds the `PloneHttpCache` Construct
+uses helmchart [kube-httpcache](https://github.com/mittwald/kube-httpcache) and builds the `PloneHttpCache` Construct
 - `scope`(Construct)
 - `id`(string)
 - `options`(PloneHttpcacheOptions)
