@@ -90,6 +90,8 @@ Interface
 - `readinessSuccessThreshold`(number)
 - `readinessFailureThreshold`(number)
 - `livenessEnabled`(boolean)
+  - should be `true` for `volto`
+  - should be `false` for `classicui`
 - `livenessInitialDelaySeconds`(number)
 - `livenessIimeoutSeconds`(number)
 - `livenessPeriodSeconds`(number)
