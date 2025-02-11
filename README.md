@@ -65,6 +65,103 @@ The manifests are stored in the `dist` directory.
 
 For more have a look at the [example project](https://github.com/bluedynamics/cdk8s-plone-example).
 
+### References
+[Kubernetes Documentation](https://kubernetes.io/docs/concepts/configuration/liveness-readiness-startup-probes/) relevant for ressource management, readiness and liveness
+
+#### PloneBaseOptions
+*Interface*
+
+
+
+- `image`(string): 
+  - The used Plone image
+  - e.g. `plone/plone-backend:6.1.0`
+- `imagePullPolicy`(string):
+  - default `IfNotPresent`
+- `replicas`(numbers)
+- `maxUnavailable`(number|string)
+- `minAvailable`(number|string)
+- `limitCpu`(string)
+- `limitMemory`(string)
+- `requestCpu`(string)
+- `requestMemory`(string)
+- `environment`(kplus.Env)
+- `readinessEnabled`(boolean)
+- `readinessInitialDelaySeconds`(number)
+- `readinessIimeoutSeconds`(number)
+- `readinessPeriodSeconds`(number)
+- `readinessSuccessThreshold`(number)
+- `readinessFailureThreshold`(number)
+- `livenessEnabled`(boolean)
+  - should be `true` for `volto`
+  - should be `false` for `backend/classicui`
+- `livenessInitialDelaySeconds`(number)
+- `livenessIimeoutSeconds`(number)
+- `livenessPeriodSeconds`(number)
+- `livenessSuccessThreshold`(number)
+- `livenessFailureThreshold`(number)
+
+
+#### PloneOptions
+*Interface*
+
+- `version`(string):
+  - version of your project
+- `siteId`(string):
+  - default `Plone`
+- `variant`(PloneVariant):
+  - default `PloneVariant.VOLTO`
+- `backend` (PloneBaseOptions):
+  - default `{}`
+  - needs `image` and `enviroment`
+- `frontend` (PloneBaseOptions):
+  - default `{}`
+  - needs `image` if `PloneVariant.VOLTO`
+- `imagePullSecrets`(string[])
+
+#### PloneVariants
+*Enum*
+
+- VOLTO = 'volto'
+- CLASSICUI  = 'classicui' 
+  - no frontend options/image needed
+
+#### Plone
+*class*
+
+builds the `Plone` Construct
+
+- `backendServiceName`(string)
+- `frontendServiceName`(string)
+- `variant`(PloneVariant)
+  - default `Volto`
+- `siteId`(string)
+  - default `Plone`
+
+#### PloneHttpcacheOptions
+*Interface*
+
+- `plone`(Plone):
+  - Plone chart
+- `varnishVcl`{string}:
+  - varnishfile
+  - per default `varnishVclFile` should be used
+- `varnishVclFile`(string):
+  - File in config folder
+- `existingSecret`(string)
+- `limitCpu`(string)
+- `limitMemory`(string)
+- `requestCpu`(string)
+- `requestMemory`(string)
+
+#### PloneHttpcache
+*class*
+
+uses helmchart [kube-httpcache](https://github.com/mittwald/kube-httpcache) and builds the `PloneHttpCache` Construct
+- `scope`(Construct)
+- `id`(string)
+- `options`(PloneHttpcacheOptions)
+
 
 ## Development
 
