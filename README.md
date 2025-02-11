@@ -66,11 +66,12 @@ The manifests are stored in the `dist` directory.
 For more have a look at the [example project](https://github.com/bluedynamics/cdk8s-plone-example).
 
 ### References
+[Kubernetes Documentation](https://kubernetes.io/docs/concepts/configuration/liveness-readiness-startup-probes/) relevant for ressource management, readiness and liveness
 
 #### PloneBaseOptions
 *Interface*
 
-[Kubernetes Documentation](https://kubernetes.io/docs/concepts/configuration/liveness-readiness-startup-probes/)
+
 
 - `image`(string): 
   - The used Plone image
@@ -124,6 +125,44 @@ For more have a look at the [example project](https://github.com/bluedynamics/cd
 - VOLTO = 'volto'
 - CLASSICUI  = 'classicui' 
   - no frontend options/image needed
+
+#### Plone
+*class*
+
+builds the `Plone` Construct
+
+- `backendServiceName`(string)
+- `frontendServiceName`(string)
+- `variant`(PloneVariant)
+  - default `Volto`
+- `siteId`(string)
+  - default `Plone`
+
+#### PloneHttpcacheOptions
+*Interface*
+
+- `plone`(Plone):
+  - Plone chart
+- `varnishVcl`{string}:
+  - varnishfile
+  - per default `varnishVclFile` should be used
+- `varnishVclFile`(string):
+  - File in config folder
+- `existingSecret`(string)
+- `limitCpu`(string)
+- `limitMemory`(string)
+- `requestCpu`(string)
+- `requestMemory`(string)
+
+#### PloneHttpcache
+*class*
+
+uses helmchart [kube-httpcache](https://github.com/mittwald/kube-httpcache)
+builds the `PloneHttpCache` Construct
+- `scope`(Construct)
+- `id`(string)
+- `options`(PloneHttpcacheOptions)
+
 
 ## Development
 
