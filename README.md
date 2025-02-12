@@ -69,9 +69,9 @@ For more have a look at the [example project](https://github.com/bluedynamics/cd
 
 For using cdk8s-plone, we assume you already have following tools installed:
 
-* Helm – A package manager for Kubernetes, required for managing Plone/Volto deployments. There are several ways to install it see the [install section](https://helm.sh/docs/intro/install/) for Helm.
-
 * kubectl – A command-line tool for interacting with Kubernetes clusters. For deploying the Kubernetes manifest you will need a tool like this. Take a look at the [Install Tools](https://kubernetes.io/docs/tasks/tools/#kubectl) for kubectl.
+
+* (optional) Helm – A Kubernetes package manager for managing Plone/Volto deployments. This tool is optional and only needed if you generate helm charts as output with cdk8s synth - instead of pure manifests. There are several ways to install it see the [install section](https://helm.sh/docs/intro/install/) for Helm.
 
 ### References
 [Kubernetes Documentation](https://kubernetes.io/docs/concepts/configuration/liveness-readiness-startup-probes/) relevant for ressource management, readiness and liveness
