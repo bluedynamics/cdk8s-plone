@@ -486,39 +486,5 @@ exports[`defaults 1`] = `
       },
     },
   },
-  {
-    "apiVersion": "monitoring.coreos.com/v1",
-    "kind": "ServiceMonitor",
-    "metadata": {
-      "labels": {
-        "app.kubernetes.io/instance": "plone-test-httpcache-c8667035",
-        "app.kubernetes.io/managed-by": "Helm",
-        "app.kubernetes.io/name": "kube-httpcache",
-        "app.kubernetes.io/version": "v0.8.1",
-        "helm.sh/chart": "kube-httpcache-0.8.1",
-      },
-      "name": "plone-test-httpcache-c8667035-kube-httpcache",
-    },
-    "spec": {
-      "endpoints": [
-        {
-          "interval": "10s",
-          "path": "/metrics",
-          "port": "metrics",
-        },
-        {
-          "interval": "10s",
-          "path": "/metrics",
-          "port": "signaller",
-        },
-      ],
-      "selector": {
-        "matchLabels": {
-          "app.kubernetes.io/instance": "plone-test-httpcache-c8667035",
-          "app.kubernetes.io/name": "kube-httpcache",
-        },
-      },
-    },
-  },
 ]
 `;
