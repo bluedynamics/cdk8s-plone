@@ -102,10 +102,10 @@ export class PloneHttpcache extends Construct {
             },
           },
         },
-        serviceMonitor: {
+        /*serviceMonitor: {
           enabled: true,
           scrapeSignaller: true,
-        },
+        },*/
       },
     });
     const httpcacheService = httpcache.apiObjects.find((construct) => {
