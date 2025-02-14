@@ -564,6 +564,7 @@ const ploneHttpcacheOptions: PloneHttpcacheOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.limitMemory">limitMemory</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.requestCpu">requestCpu</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.requestMemory">requestMemory</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.servicemonitor">servicemonitor</a></code> | <code>boolean</code> | *No description.* |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.varnishVcl">varnishVcl</a></code> | <code>string</code> | varnishVcl. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.varnishVclFile">varnishVclFile</a></code> | <code>string</code> | varnishVclFile. |
 
@@ -632,6 +633,16 @@ public readonly requestMemory: string;
 ```
 
 - *Type:* string
+
+---
+
+##### `servicemonitor`<sup>Optional</sup> <a name="servicemonitor" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.servicemonitor"></a>
+
+```typescript
+public readonly servicemonitor: boolean;
+```
+
+- *Type:* boolean
 
 ---
 
