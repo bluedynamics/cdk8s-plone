@@ -153,6 +153,8 @@ builds the `Plone` Construct
 - `limitMemory`(string)
 - `requestCpu`(string)
 - `requestMemory`(string)
+- `servicemonitor`(string)
+  - default `false` used for metrics
 
 #### PloneHttpcache
 *class*
