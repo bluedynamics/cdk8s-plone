@@ -32,6 +32,8 @@ export interface PloneHttpcacheOptions {
   readonly limitMemory?: string;
   readonly requestCpu?: string;
   readonly requestMemory?: string;
+  // metrics
+  readonly servicemonitor?: boolean;
 }
 
 export class PloneHttpcache extends Construct {
@@ -102,10 +104,10 @@ export class PloneHttpcache extends Construct {
             },
           },
         },
-        /*serviceMonitor: {
-          enabled: true,
-          scrapeSignaller: true,
-        },*/
+        serviceMonitor: {
+          enabled: options.servicemonitor || false,
+          scrapeSignaller: options.servicemonitor || false,
+        },
       },
     });
     const httpcacheService = httpcache.apiObjects.find((construct) => {
