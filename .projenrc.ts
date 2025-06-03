@@ -1,4 +1,4 @@
-import { cdk } from 'projen';
+import { cdk, JsonPatch } from 'projen';
 import { NpmAccess } from 'projen/lib/javascript';
 
 const kplus = 'cdk8s-plus-29';
@@ -37,5 +37,12 @@ const project = new cdk.JsiiProject({
   npmProvenance: true,
   npmAccess: NpmAccess.PUBLIC,
 });
+
+
+const eslintJson = project.tryFindObjectFile('.eslintrc.json');
+if (!eslintJson) {
+  throw new Error('.eslintrc.json not found');
+}
+eslintJson.patch(JsonPatch.add('/ignorePatterns/-', 'imports/'));
 
 project.synth();

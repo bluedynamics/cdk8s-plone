@@ -8349,8 +8349,8 @@ export interface KubeMutatingWebhookConfigurationProps {
 export function toJson_KubeMutatingWebhookConfigurationProps(obj: KubeMutatingWebhookConfigurationProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'webhooks': obj.webhooks?.map(y => toJson_MutatingWebhook(y)),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    webhooks: obj.webhooks?.map(y => toJson_MutatingWebhook(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -8386,8 +8386,8 @@ export interface KubeMutatingWebhookConfigurationListProps {
 export function toJson_KubeMutatingWebhookConfigurationListProps(obj: KubeMutatingWebhookConfigurationListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeMutatingWebhookConfigurationProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeMutatingWebhookConfigurationProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -8423,8 +8423,8 @@ export interface KubeValidatingAdmissionPolicyProps {
 export function toJson_KubeValidatingAdmissionPolicyProps(obj: KubeValidatingAdmissionPolicyProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_ValidatingAdmissionPolicySpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_ValidatingAdmissionPolicySpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -8464,8 +8464,8 @@ export interface KubeValidatingAdmissionPolicyBindingProps {
 export function toJson_KubeValidatingAdmissionPolicyBindingProps(obj: KubeValidatingAdmissionPolicyBindingProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_ValidatingAdmissionPolicyBindingSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_ValidatingAdmissionPolicyBindingSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -8501,8 +8501,8 @@ export interface KubeValidatingAdmissionPolicyBindingListProps {
 export function toJson_KubeValidatingAdmissionPolicyBindingListProps(obj: KubeValidatingAdmissionPolicyBindingListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeValidatingAdmissionPolicyBindingProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeValidatingAdmissionPolicyBindingProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -8538,8 +8538,8 @@ export interface KubeValidatingAdmissionPolicyListProps {
 export function toJson_KubeValidatingAdmissionPolicyListProps(obj: KubeValidatingAdmissionPolicyListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeValidatingAdmissionPolicyProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeValidatingAdmissionPolicyProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -8575,8 +8575,8 @@ export interface KubeValidatingWebhookConfigurationProps {
 export function toJson_KubeValidatingWebhookConfigurationProps(obj: KubeValidatingWebhookConfigurationProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'webhooks': obj.webhooks?.map(y => toJson_ValidatingWebhook(y)),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    webhooks: obj.webhooks?.map(y => toJson_ValidatingWebhook(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -8612,8 +8612,8 @@ export interface KubeValidatingWebhookConfigurationListProps {
 export function toJson_KubeValidatingWebhookConfigurationListProps(obj: KubeValidatingWebhookConfigurationListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeValidatingWebhookConfigurationProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeValidatingWebhookConfigurationProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -8649,8 +8649,8 @@ export interface KubeValidatingAdmissionPolicyV1Alpha1Props {
 export function toJson_KubeValidatingAdmissionPolicyV1Alpha1Props(obj: KubeValidatingAdmissionPolicyV1Alpha1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_ValidatingAdmissionPolicySpecV1Alpha1(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_ValidatingAdmissionPolicySpecV1Alpha1(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -8690,8 +8690,8 @@ export interface KubeValidatingAdmissionPolicyBindingV1Alpha1Props {
 export function toJson_KubeValidatingAdmissionPolicyBindingV1Alpha1Props(obj: KubeValidatingAdmissionPolicyBindingV1Alpha1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_ValidatingAdmissionPolicyBindingSpecV1Alpha1(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_ValidatingAdmissionPolicyBindingSpecV1Alpha1(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -8727,8 +8727,8 @@ export interface KubeValidatingAdmissionPolicyBindingListV1Alpha1Props {
 export function toJson_KubeValidatingAdmissionPolicyBindingListV1Alpha1Props(obj: KubeValidatingAdmissionPolicyBindingListV1Alpha1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeValidatingAdmissionPolicyBindingV1Alpha1Props(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeValidatingAdmissionPolicyBindingV1Alpha1Props(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -8764,8 +8764,8 @@ export interface KubeValidatingAdmissionPolicyListV1Alpha1Props {
 export function toJson_KubeValidatingAdmissionPolicyListV1Alpha1Props(obj: KubeValidatingAdmissionPolicyListV1Alpha1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeValidatingAdmissionPolicyV1Alpha1Props(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeValidatingAdmissionPolicyV1Alpha1Props(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -8801,8 +8801,8 @@ export interface KubeValidatingAdmissionPolicyV1Beta1Props {
 export function toJson_KubeValidatingAdmissionPolicyV1Beta1Props(obj: KubeValidatingAdmissionPolicyV1Beta1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_ValidatingAdmissionPolicySpecV1Beta1(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_ValidatingAdmissionPolicySpecV1Beta1(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -8842,8 +8842,8 @@ export interface KubeValidatingAdmissionPolicyBindingV1Beta1Props {
 export function toJson_KubeValidatingAdmissionPolicyBindingV1Beta1Props(obj: KubeValidatingAdmissionPolicyBindingV1Beta1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_ValidatingAdmissionPolicyBindingSpecV1Beta1(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_ValidatingAdmissionPolicyBindingSpecV1Beta1(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -8879,8 +8879,8 @@ export interface KubeValidatingAdmissionPolicyBindingListV1Beta1Props {
 export function toJson_KubeValidatingAdmissionPolicyBindingListV1Beta1Props(obj: KubeValidatingAdmissionPolicyBindingListV1Beta1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeValidatingAdmissionPolicyBindingV1Beta1Props(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeValidatingAdmissionPolicyBindingV1Beta1Props(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -8916,8 +8916,8 @@ export interface KubeValidatingAdmissionPolicyListV1Beta1Props {
 export function toJson_KubeValidatingAdmissionPolicyListV1Beta1Props(obj: KubeValidatingAdmissionPolicyListV1Beta1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeValidatingAdmissionPolicyV1Beta1Props(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeValidatingAdmissionPolicyV1Beta1Props(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -8953,8 +8953,8 @@ export interface KubeStorageVersionV1Alpha1Props {
 export function toJson_KubeStorageVersionV1Alpha1Props(obj: KubeStorageVersionV1Alpha1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': obj.spec,
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: obj.spec,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -8990,8 +8990,8 @@ export interface KubeStorageVersionListV1Alpha1Props {
 export function toJson_KubeStorageVersionListV1Alpha1Props(obj: KubeStorageVersionListV1Alpha1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeStorageVersionV1Alpha1Props(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeStorageVersionV1Alpha1Props(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9034,9 +9034,9 @@ export interface KubeControllerRevisionProps {
 export function toJson_KubeControllerRevisionProps(obj: KubeControllerRevisionProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'data': obj.data,
-    'revision': obj.revision,
+    metadata: toJson_ObjectMeta(obj.metadata),
+    data: obj.data,
+    revision: obj.revision,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9072,8 +9072,8 @@ export interface KubeControllerRevisionListProps {
 export function toJson_KubeControllerRevisionListProps(obj: KubeControllerRevisionListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeControllerRevisionProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeControllerRevisionProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9109,8 +9109,8 @@ export interface KubeDaemonSetProps {
 export function toJson_KubeDaemonSetProps(obj: KubeDaemonSetProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_DaemonSetSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_DaemonSetSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9146,8 +9146,8 @@ export interface KubeDaemonSetListProps {
 export function toJson_KubeDaemonSetListProps(obj: KubeDaemonSetListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeDaemonSetProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeDaemonSetProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9183,8 +9183,8 @@ export interface KubeDeploymentProps {
 export function toJson_KubeDeploymentProps(obj: KubeDeploymentProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_DeploymentSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_DeploymentSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9220,8 +9220,8 @@ export interface KubeDeploymentListProps {
 export function toJson_KubeDeploymentListProps(obj: KubeDeploymentListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeDeploymentProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeDeploymentProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9257,8 +9257,8 @@ export interface KubeReplicaSetProps {
 export function toJson_KubeReplicaSetProps(obj: KubeReplicaSetProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_ReplicaSetSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_ReplicaSetSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9294,8 +9294,8 @@ export interface KubeReplicaSetListProps {
 export function toJson_KubeReplicaSetListProps(obj: KubeReplicaSetListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeReplicaSetProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeReplicaSetProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9335,8 +9335,8 @@ export interface KubeStatefulSetProps {
 export function toJson_KubeStatefulSetProps(obj: KubeStatefulSetProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_StatefulSetSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_StatefulSetSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9372,8 +9372,8 @@ export interface KubeStatefulSetListProps {
 export function toJson_KubeStatefulSetListProps(obj: KubeStatefulSetListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeStatefulSetProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeStatefulSetProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9402,7 +9402,7 @@ export interface KubeSelfSubjectReviewProps {
 export function toJson_KubeSelfSubjectReviewProps(obj: KubeSelfSubjectReviewProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
+    metadata: toJson_ObjectMeta(obj.metadata),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9438,8 +9438,8 @@ export interface KubeTokenRequestProps {
 export function toJson_KubeTokenRequestProps(obj: KubeTokenRequestProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_TokenRequestSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_TokenRequestSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9475,8 +9475,8 @@ export interface KubeTokenReviewProps {
 export function toJson_KubeTokenReviewProps(obj: KubeTokenReviewProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_TokenReviewSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_TokenReviewSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9505,7 +9505,7 @@ export interface KubeSelfSubjectReviewV1Alpha1Props {
 export function toJson_KubeSelfSubjectReviewV1Alpha1Props(obj: KubeSelfSubjectReviewV1Alpha1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
+    metadata: toJson_ObjectMeta(obj.metadata),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9534,7 +9534,7 @@ export interface KubeSelfSubjectReviewV1Beta1Props {
 export function toJson_KubeSelfSubjectReviewV1Beta1Props(obj: KubeSelfSubjectReviewV1Beta1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
+    metadata: toJson_ObjectMeta(obj.metadata),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9570,8 +9570,8 @@ export interface KubeLocalSubjectAccessReviewProps {
 export function toJson_KubeLocalSubjectAccessReviewProps(obj: KubeLocalSubjectAccessReviewProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_SubjectAccessReviewSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_SubjectAccessReviewSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9607,8 +9607,8 @@ export interface KubeSelfSubjectAccessReviewProps {
 export function toJson_KubeSelfSubjectAccessReviewProps(obj: KubeSelfSubjectAccessReviewProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_SelfSubjectAccessReviewSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_SelfSubjectAccessReviewSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9644,8 +9644,8 @@ export interface KubeSelfSubjectRulesReviewProps {
 export function toJson_KubeSelfSubjectRulesReviewProps(obj: KubeSelfSubjectRulesReviewProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_SelfSubjectRulesReviewSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_SelfSubjectRulesReviewSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9681,8 +9681,8 @@ export interface KubeSubjectAccessReviewProps {
 export function toJson_KubeSubjectAccessReviewProps(obj: KubeSubjectAccessReviewProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_SubjectAccessReviewSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_SubjectAccessReviewSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9718,8 +9718,8 @@ export interface KubeHorizontalPodAutoscalerProps {
 export function toJson_KubeHorizontalPodAutoscalerProps(obj: KubeHorizontalPodAutoscalerProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_HorizontalPodAutoscalerSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_HorizontalPodAutoscalerSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9755,8 +9755,8 @@ export interface KubeHorizontalPodAutoscalerListProps {
 export function toJson_KubeHorizontalPodAutoscalerListProps(obj: KubeHorizontalPodAutoscalerListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeHorizontalPodAutoscalerProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeHorizontalPodAutoscalerProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9792,8 +9792,8 @@ export interface KubeScaleProps {
 export function toJson_KubeScaleProps(obj: KubeScaleProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_ScaleSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_ScaleSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9829,8 +9829,8 @@ export interface KubeHorizontalPodAutoscalerV2Props {
 export function toJson_KubeHorizontalPodAutoscalerV2Props(obj: KubeHorizontalPodAutoscalerV2Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_HorizontalPodAutoscalerSpecV2(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_HorizontalPodAutoscalerSpecV2(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9866,8 +9866,8 @@ export interface KubeHorizontalPodAutoscalerListV2Props {
 export function toJson_KubeHorizontalPodAutoscalerListV2Props(obj: KubeHorizontalPodAutoscalerListV2Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeHorizontalPodAutoscalerV2Props(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeHorizontalPodAutoscalerV2Props(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9903,8 +9903,8 @@ export interface KubeCronJobProps {
 export function toJson_KubeCronJobProps(obj: KubeCronJobProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_CronJobSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_CronJobSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9940,8 +9940,8 @@ export interface KubeCronJobListProps {
 export function toJson_KubeCronJobListProps(obj: KubeCronJobListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeCronJobProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeCronJobProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -9977,8 +9977,8 @@ export interface KubeJobProps {
 export function toJson_KubeJobProps(obj: KubeJobProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_JobSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_JobSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10014,8 +10014,8 @@ export interface KubeJobListProps {
 export function toJson_KubeJobListProps(obj: KubeJobListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeJobProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeJobProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10055,8 +10055,8 @@ export interface KubeCertificateSigningRequestProps {
 export function toJson_KubeCertificateSigningRequestProps(obj: KubeCertificateSigningRequestProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_CertificateSigningRequestSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_CertificateSigningRequestSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10090,8 +10090,8 @@ export interface KubeCertificateSigningRequestListProps {
 export function toJson_KubeCertificateSigningRequestListProps(obj: KubeCertificateSigningRequestListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeCertificateSigningRequestProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeCertificateSigningRequestProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10131,8 +10131,8 @@ export interface KubeClusterTrustBundleV1Alpha1Props {
 export function toJson_KubeClusterTrustBundleV1Alpha1Props(obj: KubeClusterTrustBundleV1Alpha1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_ClusterTrustBundleSpecV1Alpha1(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_ClusterTrustBundleSpecV1Alpha1(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10168,8 +10168,8 @@ export interface KubeClusterTrustBundleListV1Alpha1Props {
 export function toJson_KubeClusterTrustBundleListV1Alpha1Props(obj: KubeClusterTrustBundleListV1Alpha1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeClusterTrustBundleV1Alpha1Props(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeClusterTrustBundleV1Alpha1Props(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10205,8 +10205,8 @@ export interface KubeLeaseProps {
 export function toJson_KubeLeaseProps(obj: KubeLeaseProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_LeaseSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_LeaseSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10242,8 +10242,8 @@ export interface KubeLeaseListProps {
 export function toJson_KubeLeaseListProps(obj: KubeLeaseListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeLeaseProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeLeaseProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10279,8 +10279,8 @@ export interface KubeBindingProps {
 export function toJson_KubeBindingProps(obj: KubeBindingProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'target': toJson_ObjectReference(obj.target),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    target: toJson_ObjectReference(obj.target),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10316,8 +10316,8 @@ export interface KubeComponentStatusProps {
 export function toJson_KubeComponentStatusProps(obj: KubeComponentStatusProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'conditions': obj.conditions?.map(y => toJson_ComponentCondition(y)),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    conditions: obj.conditions?.map(y => toJson_ComponentCondition(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10353,8 +10353,8 @@ export interface KubeComponentStatusListProps {
 export function toJson_KubeComponentStatusListProps(obj: KubeComponentStatusListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeComponentStatusProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeComponentStatusProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10404,10 +10404,10 @@ export interface KubeConfigMapProps {
 export function toJson_KubeConfigMapProps(obj: KubeConfigMapProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'binaryData': ((obj.binaryData) === undefined) ? undefined : (Object.entries(obj.binaryData).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
-    'data': ((obj.data) === undefined) ? undefined : (Object.entries(obj.data).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
-    'immutable': obj.immutable,
+    metadata: toJson_ObjectMeta(obj.metadata),
+    binaryData: ((obj.binaryData) === undefined) ? undefined : (Object.entries(obj.binaryData).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    data: ((obj.data) === undefined) ? undefined : (Object.entries(obj.data).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    immutable: obj.immutable,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10443,8 +10443,8 @@ export interface KubeConfigMapListProps {
 export function toJson_KubeConfigMapListProps(obj: KubeConfigMapListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeConfigMapProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeConfigMapProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10492,8 +10492,8 @@ export interface KubeEndpointsProps {
 export function toJson_KubeEndpointsProps(obj: KubeEndpointsProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'subsets': obj.subsets?.map(y => toJson_EndpointSubset(y)),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    subsets: obj.subsets?.map(y => toJson_EndpointSubset(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10529,8 +10529,8 @@ export interface KubeEndpointsListProps {
 export function toJson_KubeEndpointsListProps(obj: KubeEndpointsListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeEndpointsProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeEndpointsProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10657,21 +10657,21 @@ export interface KubeEventProps {
 export function toJson_KubeEventProps(obj: KubeEventProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'action': obj.action,
-    'deprecatedCount': obj.deprecatedCount,
-    'deprecatedFirstTimestamp': obj.deprecatedFirstTimestamp?.toISOString(),
-    'deprecatedLastTimestamp': obj.deprecatedLastTimestamp?.toISOString(),
-    'deprecatedSource': toJson_EventSource(obj.deprecatedSource),
-    'eventTime': obj.eventTime?.toISOString(),
-    'note': obj.note,
-    'reason': obj.reason,
-    'regarding': toJson_ObjectReference(obj.regarding),
-    'related': toJson_ObjectReference(obj.related),
-    'reportingController': obj.reportingController,
-    'reportingInstance': obj.reportingInstance,
-    'series': toJson_EventSeries(obj.series),
-    'type': obj.type,
+    metadata: toJson_ObjectMeta(obj.metadata),
+    action: obj.action,
+    deprecatedCount: obj.deprecatedCount,
+    deprecatedFirstTimestamp: obj.deprecatedFirstTimestamp?.toISOString(),
+    deprecatedLastTimestamp: obj.deprecatedLastTimestamp?.toISOString(),
+    deprecatedSource: toJson_EventSource(obj.deprecatedSource),
+    eventTime: obj.eventTime?.toISOString(),
+    note: obj.note,
+    reason: obj.reason,
+    regarding: toJson_ObjectReference(obj.regarding),
+    related: toJson_ObjectReference(obj.related),
+    reportingController: obj.reportingController,
+    reportingInstance: obj.reportingInstance,
+    series: toJson_EventSeries(obj.series),
+    type: obj.type,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10707,8 +10707,8 @@ export interface KubeEventListProps {
 export function toJson_KubeEventListProps(obj: KubeEventListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeEventProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeEventProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10744,8 +10744,8 @@ export interface KubeLimitRangeProps {
 export function toJson_KubeLimitRangeProps(obj: KubeLimitRangeProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_LimitRangeSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_LimitRangeSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10781,8 +10781,8 @@ export interface KubeLimitRangeListProps {
 export function toJson_KubeLimitRangeListProps(obj: KubeLimitRangeListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeLimitRangeProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeLimitRangeProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10818,8 +10818,8 @@ export interface KubeNamespaceProps {
 export function toJson_KubeNamespaceProps(obj: KubeNamespaceProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_NamespaceSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_NamespaceSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10855,8 +10855,8 @@ export interface KubeNamespaceListProps {
 export function toJson_KubeNamespaceListProps(obj: KubeNamespaceListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeNamespaceProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeNamespaceProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10892,8 +10892,8 @@ export interface KubeNodeProps {
 export function toJson_KubeNodeProps(obj: KubeNodeProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_NodeSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_NodeSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10929,8 +10929,8 @@ export interface KubeNodeListProps {
 export function toJson_KubeNodeListProps(obj: KubeNodeListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeNodeProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeNodeProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -10966,8 +10966,8 @@ export interface KubePersistentVolumeProps {
 export function toJson_KubePersistentVolumeProps(obj: KubePersistentVolumeProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_PersistentVolumeSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_PersistentVolumeSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11003,8 +11003,8 @@ export interface KubePersistentVolumeClaimProps {
 export function toJson_KubePersistentVolumeClaimProps(obj: KubePersistentVolumeClaimProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_PersistentVolumeClaimSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_PersistentVolumeClaimSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11040,8 +11040,8 @@ export interface KubePersistentVolumeClaimListProps {
 export function toJson_KubePersistentVolumeClaimListProps(obj: KubePersistentVolumeClaimListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubePersistentVolumeClaimProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubePersistentVolumeClaimProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11077,8 +11077,8 @@ export interface KubePersistentVolumeListProps {
 export function toJson_KubePersistentVolumeListProps(obj: KubePersistentVolumeListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubePersistentVolumeProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubePersistentVolumeProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11114,8 +11114,8 @@ export interface KubePodProps {
 export function toJson_KubePodProps(obj: KubePodProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_PodSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_PodSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11151,8 +11151,8 @@ export interface KubePodListProps {
 export function toJson_KubePodListProps(obj: KubePodListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubePodProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubePodProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11188,8 +11188,8 @@ export interface KubePodTemplateProps {
 export function toJson_KubePodTemplateProps(obj: KubePodTemplateProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'template': toJson_PodTemplateSpec(obj.template),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    template: toJson_PodTemplateSpec(obj.template),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11225,8 +11225,8 @@ export interface KubePodTemplateListProps {
 export function toJson_KubePodTemplateListProps(obj: KubePodTemplateListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubePodTemplateProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubePodTemplateProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11262,8 +11262,8 @@ export interface KubeReplicationControllerProps {
 export function toJson_KubeReplicationControllerProps(obj: KubeReplicationControllerProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_ReplicationControllerSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_ReplicationControllerSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11299,8 +11299,8 @@ export interface KubeReplicationControllerListProps {
 export function toJson_KubeReplicationControllerListProps(obj: KubeReplicationControllerListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeReplicationControllerProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeReplicationControllerProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11336,8 +11336,8 @@ export interface KubeResourceQuotaProps {
 export function toJson_KubeResourceQuotaProps(obj: KubeResourceQuotaProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_ResourceQuotaSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_ResourceQuotaSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11373,8 +11373,8 @@ export interface KubeResourceQuotaListProps {
 export function toJson_KubeResourceQuotaListProps(obj: KubeResourceQuotaListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeResourceQuotaProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeResourceQuotaProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11431,11 +11431,11 @@ export interface KubeSecretProps {
 export function toJson_KubeSecretProps(obj: KubeSecretProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'data': ((obj.data) === undefined) ? undefined : (Object.entries(obj.data).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
-    'immutable': obj.immutable,
-    'stringData': ((obj.stringData) === undefined) ? undefined : (Object.entries(obj.stringData).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
-    'type': obj.type,
+    metadata: toJson_ObjectMeta(obj.metadata),
+    data: ((obj.data) === undefined) ? undefined : (Object.entries(obj.data).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    immutable: obj.immutable,
+    stringData: ((obj.stringData) === undefined) ? undefined : (Object.entries(obj.stringData).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    type: obj.type,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11471,8 +11471,8 @@ export interface KubeSecretListProps {
 export function toJson_KubeSecretListProps(obj: KubeSecretListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeSecretProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeSecretProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11508,8 +11508,8 @@ export interface KubeServiceProps {
 export function toJson_KubeServiceProps(obj: KubeServiceProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_ServiceSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_ServiceSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11559,10 +11559,10 @@ export interface KubeServiceAccountProps {
 export function toJson_KubeServiceAccountProps(obj: KubeServiceAccountProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'automountServiceAccountToken': obj.automountServiceAccountToken,
-    'imagePullSecrets': obj.imagePullSecrets?.map(y => toJson_LocalObjectReference(y)),
-    'secrets': obj.secrets?.map(y => toJson_ObjectReference(y)),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    automountServiceAccountToken: obj.automountServiceAccountToken,
+    imagePullSecrets: obj.imagePullSecrets?.map(y => toJson_LocalObjectReference(y)),
+    secrets: obj.secrets?.map(y => toJson_ObjectReference(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11598,8 +11598,8 @@ export interface KubeServiceAccountListProps {
 export function toJson_KubeServiceAccountListProps(obj: KubeServiceAccountListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeServiceAccountProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeServiceAccountProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11635,8 +11635,8 @@ export interface KubeServiceListProps {
 export function toJson_KubeServiceListProps(obj: KubeServiceListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeServiceProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeServiceProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11686,10 +11686,10 @@ export interface KubeEndpointSliceProps {
 export function toJson_KubeEndpointSliceProps(obj: KubeEndpointSliceProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'addressType': obj.addressType,
-    'endpoints': obj.endpoints?.map(y => toJson_Endpoint(y)),
-    'ports': obj.ports?.map(y => toJson_EndpointPort(y)),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    addressType: obj.addressType,
+    endpoints: obj.endpoints?.map(y => toJson_Endpoint(y)),
+    ports: obj.ports?.map(y => toJson_EndpointPort(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11725,8 +11725,8 @@ export interface KubeEndpointSliceListProps {
 export function toJson_KubeEndpointSliceListProps(obj: KubeEndpointSliceListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeEndpointSliceProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeEndpointSliceProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11762,8 +11762,8 @@ export interface KubeFlowSchemaProps {
 export function toJson_KubeFlowSchemaProps(obj: KubeFlowSchemaProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_FlowSchemaSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_FlowSchemaSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11799,8 +11799,8 @@ export interface KubeFlowSchemaListProps {
 export function toJson_KubeFlowSchemaListProps(obj: KubeFlowSchemaListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeFlowSchemaProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeFlowSchemaProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11836,8 +11836,8 @@ export interface KubePriorityLevelConfigurationProps {
 export function toJson_KubePriorityLevelConfigurationProps(obj: KubePriorityLevelConfigurationProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_PriorityLevelConfigurationSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_PriorityLevelConfigurationSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11873,8 +11873,8 @@ export interface KubePriorityLevelConfigurationListProps {
 export function toJson_KubePriorityLevelConfigurationListProps(obj: KubePriorityLevelConfigurationListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubePriorityLevelConfigurationProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubePriorityLevelConfigurationProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11910,8 +11910,8 @@ export interface KubeFlowSchemaV1Beta3Props {
 export function toJson_KubeFlowSchemaV1Beta3Props(obj: KubeFlowSchemaV1Beta3Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_FlowSchemaSpecV1Beta3(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_FlowSchemaSpecV1Beta3(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11947,8 +11947,8 @@ export interface KubeFlowSchemaListV1Beta3Props {
 export function toJson_KubeFlowSchemaListV1Beta3Props(obj: KubeFlowSchemaListV1Beta3Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeFlowSchemaV1Beta3Props(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeFlowSchemaV1Beta3Props(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11984,8 +11984,8 @@ export interface KubePriorityLevelConfigurationV1Beta3Props {
 export function toJson_KubePriorityLevelConfigurationV1Beta3Props(obj: KubePriorityLevelConfigurationV1Beta3Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_PriorityLevelConfigurationSpecV1Beta3(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_PriorityLevelConfigurationSpecV1Beta3(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12021,8 +12021,8 @@ export interface KubePriorityLevelConfigurationListV1Beta3Props {
 export function toJson_KubePriorityLevelConfigurationListV1Beta3Props(obj: KubePriorityLevelConfigurationListV1Beta3Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubePriorityLevelConfigurationV1Beta3Props(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubePriorityLevelConfigurationV1Beta3Props(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12058,8 +12058,8 @@ export interface KubeIngressProps {
 export function toJson_KubeIngressProps(obj: KubeIngressProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_IngressSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_IngressSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12095,8 +12095,8 @@ export interface KubeIngressClassProps {
 export function toJson_KubeIngressClassProps(obj: KubeIngressClassProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_IngressClassSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_IngressClassSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12132,8 +12132,8 @@ export interface KubeIngressClassListProps {
 export function toJson_KubeIngressClassListProps(obj: KubeIngressClassListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeIngressClassProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeIngressClassProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12169,8 +12169,8 @@ export interface KubeIngressListProps {
 export function toJson_KubeIngressListProps(obj: KubeIngressListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeIngressProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeIngressProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12206,8 +12206,8 @@ export interface KubeNetworkPolicyProps {
 export function toJson_KubeNetworkPolicyProps(obj: KubeNetworkPolicyProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_NetworkPolicySpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_NetworkPolicySpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12243,8 +12243,8 @@ export interface KubeNetworkPolicyListProps {
 export function toJson_KubeNetworkPolicyListProps(obj: KubeNetworkPolicyListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeNetworkPolicyProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeNetworkPolicyProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12280,8 +12280,8 @@ export interface KubeIpAddressV1Alpha1Props {
 export function toJson_KubeIpAddressV1Alpha1Props(obj: KubeIpAddressV1Alpha1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_IpAddressSpecV1Alpha1(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_IpAddressSpecV1Alpha1(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12317,8 +12317,8 @@ export interface KubeIpAddressListV1Alpha1Props {
 export function toJson_KubeIpAddressListV1Alpha1Props(obj: KubeIpAddressListV1Alpha1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeIpAddressV1Alpha1Props(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeIpAddressV1Alpha1Props(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12354,8 +12354,8 @@ export interface KubeServiceCidrv1Alpha1Props {
 export function toJson_KubeServiceCidrv1Alpha1Props(obj: KubeServiceCidrv1Alpha1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_ServiceCidrSpecV1Alpha1(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_ServiceCidrSpecV1Alpha1(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12391,8 +12391,8 @@ export interface KubeServiceCidrListV1Alpha1Props {
 export function toJson_KubeServiceCidrListV1Alpha1Props(obj: KubeServiceCidrListV1Alpha1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeServiceCidrv1Alpha1Props(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeServiceCidrv1Alpha1Props(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12443,10 +12443,10 @@ export interface KubeRuntimeClassProps {
 export function toJson_KubeRuntimeClassProps(obj: KubeRuntimeClassProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'handler': obj.handler,
-    'overhead': toJson_Overhead(obj.overhead),
-    'scheduling': toJson_Scheduling(obj.scheduling),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    handler: obj.handler,
+    overhead: toJson_Overhead(obj.overhead),
+    scheduling: toJson_Scheduling(obj.scheduling),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12482,8 +12482,8 @@ export interface KubeRuntimeClassListProps {
 export function toJson_KubeRuntimeClassListProps(obj: KubeRuntimeClassListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeRuntimeClassProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeRuntimeClassProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12519,8 +12519,8 @@ export interface KubeEvictionProps {
 export function toJson_KubeEvictionProps(obj: KubeEvictionProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'deleteOptions': toJson_DeleteOptions(obj.deleteOptions),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    deleteOptions: toJson_DeleteOptions(obj.deleteOptions),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12556,8 +12556,8 @@ export interface KubePodDisruptionBudgetProps {
 export function toJson_KubePodDisruptionBudgetProps(obj: KubePodDisruptionBudgetProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_PodDisruptionBudgetSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_PodDisruptionBudgetSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12593,8 +12593,8 @@ export interface KubePodDisruptionBudgetListProps {
 export function toJson_KubePodDisruptionBudgetListProps(obj: KubePodDisruptionBudgetListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubePodDisruptionBudgetProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubePodDisruptionBudgetProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12637,9 +12637,9 @@ export interface KubeClusterRoleProps {
 export function toJson_KubeClusterRoleProps(obj: KubeClusterRoleProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'aggregationRule': toJson_AggregationRule(obj.aggregationRule),
-    'rules': obj.rules?.map(y => toJson_PolicyRule(y)),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    aggregationRule: toJson_AggregationRule(obj.aggregationRule),
+    rules: obj.rules?.map(y => toJson_PolicyRule(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12682,9 +12682,9 @@ export interface KubeClusterRoleBindingProps {
 export function toJson_KubeClusterRoleBindingProps(obj: KubeClusterRoleBindingProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'roleRef': toJson_RoleRef(obj.roleRef),
-    'subjects': obj.subjects?.map(y => toJson_Subject(y)),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    roleRef: toJson_RoleRef(obj.roleRef),
+    subjects: obj.subjects?.map(y => toJson_Subject(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12720,8 +12720,8 @@ export interface KubeClusterRoleBindingListProps {
 export function toJson_KubeClusterRoleBindingListProps(obj: KubeClusterRoleBindingListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeClusterRoleBindingProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeClusterRoleBindingProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12757,8 +12757,8 @@ export interface KubeClusterRoleListProps {
 export function toJson_KubeClusterRoleListProps(obj: KubeClusterRoleListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeClusterRoleProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeClusterRoleProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12794,8 +12794,8 @@ export interface KubeRoleProps {
 export function toJson_KubeRoleProps(obj: KubeRoleProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'rules': obj.rules?.map(y => toJson_PolicyRule(y)),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    rules: obj.rules?.map(y => toJson_PolicyRule(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12838,9 +12838,9 @@ export interface KubeRoleBindingProps {
 export function toJson_KubeRoleBindingProps(obj: KubeRoleBindingProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'roleRef': toJson_RoleRef(obj.roleRef),
-    'subjects': obj.subjects?.map(y => toJson_Subject(y)),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    roleRef: toJson_RoleRef(obj.roleRef),
+    subjects: obj.subjects?.map(y => toJson_Subject(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12876,8 +12876,8 @@ export interface KubeRoleBindingListProps {
 export function toJson_KubeRoleBindingListProps(obj: KubeRoleBindingListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeRoleBindingProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeRoleBindingProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12913,8 +12913,8 @@ export interface KubeRoleListProps {
 export function toJson_KubeRoleListProps(obj: KubeRoleListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeRoleProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeRoleProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12952,8 +12952,8 @@ export interface KubePodSchedulingContextV1Alpha2Props {
 export function toJson_KubePodSchedulingContextV1Alpha2Props(obj: KubePodSchedulingContextV1Alpha2Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_PodSchedulingContextSpecV1Alpha2(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_PodSchedulingContextSpecV1Alpha2(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12989,8 +12989,8 @@ export interface KubePodSchedulingContextListV1Alpha2Props {
 export function toJson_KubePodSchedulingContextListV1Alpha2Props(obj: KubePodSchedulingContextListV1Alpha2Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubePodSchedulingContextV1Alpha2Props(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubePodSchedulingContextV1Alpha2Props(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13028,8 +13028,8 @@ export interface KubeResourceClaimV1Alpha2Props {
 export function toJson_KubeResourceClaimV1Alpha2Props(obj: KubeResourceClaimV1Alpha2Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_ResourceClaimSpecV1Alpha2(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_ResourceClaimSpecV1Alpha2(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13065,8 +13065,8 @@ export interface KubeResourceClaimListV1Alpha2Props {
 export function toJson_KubeResourceClaimListV1Alpha2Props(obj: KubeResourceClaimListV1Alpha2Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeResourceClaimV1Alpha2Props(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeResourceClaimV1Alpha2Props(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13118,10 +13118,10 @@ export interface KubeResourceClaimParametersV1Alpha2Props {
 export function toJson_KubeResourceClaimParametersV1Alpha2Props(obj: KubeResourceClaimParametersV1Alpha2Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'driverRequests': obj.driverRequests?.map(y => toJson_DriverRequestsV1Alpha2(y)),
-    'generatedFrom': toJson_ResourceClaimParametersReferenceV1Alpha2(obj.generatedFrom),
-    'shareable': obj.shareable,
+    metadata: toJson_ObjectMeta(obj.metadata),
+    driverRequests: obj.driverRequests?.map(y => toJson_DriverRequestsV1Alpha2(y)),
+    generatedFrom: toJson_ResourceClaimParametersReferenceV1Alpha2(obj.generatedFrom),
+    shareable: obj.shareable,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13157,8 +13157,8 @@ export interface KubeResourceClaimParametersListV1Alpha2Props {
 export function toJson_KubeResourceClaimParametersListV1Alpha2Props(obj: KubeResourceClaimParametersListV1Alpha2Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeResourceClaimParametersV1Alpha2Props(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeResourceClaimParametersV1Alpha2Props(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13196,8 +13196,8 @@ export interface KubeResourceClaimTemplateV1Alpha2Props {
 export function toJson_KubeResourceClaimTemplateV1Alpha2Props(obj: KubeResourceClaimTemplateV1Alpha2Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_ResourceClaimTemplateSpecV1Alpha2(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_ResourceClaimTemplateSpecV1Alpha2(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13233,8 +13233,8 @@ export interface KubeResourceClaimTemplateListV1Alpha2Props {
 export function toJson_KubeResourceClaimTemplateListV1Alpha2Props(obj: KubeResourceClaimTemplateListV1Alpha2Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeResourceClaimTemplateV1Alpha2Props(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeResourceClaimTemplateV1Alpha2Props(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13297,11 +13297,11 @@ export interface KubeResourceClassV1Alpha2Props {
 export function toJson_KubeResourceClassV1Alpha2Props(obj: KubeResourceClassV1Alpha2Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'driverName': obj.driverName,
-    'parametersRef': toJson_ResourceClassParametersReferenceV1Alpha2(obj.parametersRef),
-    'structuredParameters': obj.structuredParameters,
-    'suitableNodes': toJson_NodeSelector(obj.suitableNodes),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    driverName: obj.driverName,
+    parametersRef: toJson_ResourceClassParametersReferenceV1Alpha2(obj.parametersRef),
+    structuredParameters: obj.structuredParameters,
+    suitableNodes: toJson_NodeSelector(obj.suitableNodes),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13337,8 +13337,8 @@ export interface KubeResourceClassListV1Alpha2Props {
 export function toJson_KubeResourceClassListV1Alpha2Props(obj: KubeResourceClassListV1Alpha2Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeResourceClassV1Alpha2Props(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeResourceClassV1Alpha2Props(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13388,10 +13388,10 @@ export interface KubeResourceClassParametersV1Alpha2Props {
 export function toJson_KubeResourceClassParametersV1Alpha2Props(obj: KubeResourceClassParametersV1Alpha2Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'filters': obj.filters?.map(y => toJson_ResourceFilterV1Alpha2(y)),
-    'generatedFrom': toJson_ResourceClassParametersReferenceV1Alpha2(obj.generatedFrom),
-    'vendorParameters': obj.vendorParameters?.map(y => toJson_VendorParametersV1Alpha2(y)),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    filters: obj.filters?.map(y => toJson_ResourceFilterV1Alpha2(y)),
+    generatedFrom: toJson_ResourceClassParametersReferenceV1Alpha2(obj.generatedFrom),
+    vendorParameters: obj.vendorParameters?.map(y => toJson_VendorParametersV1Alpha2(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13427,8 +13427,8 @@ export interface KubeResourceClassParametersListV1Alpha2Props {
 export function toJson_KubeResourceClassParametersListV1Alpha2Props(obj: KubeResourceClassParametersListV1Alpha2Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeResourceClassParametersV1Alpha2Props(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeResourceClassParametersV1Alpha2Props(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13480,10 +13480,10 @@ export interface KubeResourceSliceV1Alpha2Props {
 export function toJson_KubeResourceSliceV1Alpha2Props(obj: KubeResourceSliceV1Alpha2Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'driverName': obj.driverName,
-    'namedResources': toJson_NamedResourcesResourcesV1Alpha2(obj.namedResources),
-    'nodeName': obj.nodeName,
+    metadata: toJson_ObjectMeta(obj.metadata),
+    driverName: obj.driverName,
+    namedResources: toJson_NamedResourcesResourcesV1Alpha2(obj.namedResources),
+    nodeName: obj.nodeName,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13519,8 +13519,8 @@ export interface KubeResourceSliceListV1Alpha2Props {
 export function toJson_KubeResourceSliceListV1Alpha2Props(obj: KubeResourceSliceListV1Alpha2Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeResourceSliceV1Alpha2Props(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeResourceSliceV1Alpha2Props(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13578,11 +13578,11 @@ export interface KubePriorityClassProps {
 export function toJson_KubePriorityClassProps(obj: KubePriorityClassProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'description': obj.description,
-    'globalDefault': obj.globalDefault,
-    'preemptionPolicy': obj.preemptionPolicy,
-    'value': obj.value,
+    metadata: toJson_ObjectMeta(obj.metadata),
+    description: obj.description,
+    globalDefault: obj.globalDefault,
+    preemptionPolicy: obj.preemptionPolicy,
+    value: obj.value,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13618,8 +13618,8 @@ export interface KubePriorityClassListProps {
 export function toJson_KubePriorityClassListProps(obj: KubePriorityClassListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubePriorityClassProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubePriorityClassProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13655,8 +13655,8 @@ export interface KubeCsiDriverProps {
 export function toJson_KubeCsiDriverProps(obj: KubeCsiDriverProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_CsiDriverSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_CsiDriverSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13692,8 +13692,8 @@ export interface KubeCsiDriverListProps {
 export function toJson_KubeCsiDriverListProps(obj: KubeCsiDriverListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeCsiDriverProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeCsiDriverProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13729,8 +13729,8 @@ export interface KubeCsiNodeProps {
 export function toJson_KubeCsiNodeProps(obj: KubeCsiNodeProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_CsiNodeSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_CsiNodeSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13766,8 +13766,8 @@ export interface KubeCsiNodeListProps {
 export function toJson_KubeCsiNodeListProps(obj: KubeCsiNodeListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeCsiNodeProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeCsiNodeProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13840,11 +13840,11 @@ export interface KubeCsiStorageCapacityProps {
 export function toJson_KubeCsiStorageCapacityProps(obj: KubeCsiStorageCapacityProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'capacity': obj.capacity?.value,
-    'maximumVolumeSize': obj.maximumVolumeSize?.value,
-    'nodeTopology': toJson_LabelSelector(obj.nodeTopology),
-    'storageClassName': obj.storageClassName,
+    metadata: toJson_ObjectMeta(obj.metadata),
+    capacity: obj.capacity?.value,
+    maximumVolumeSize: obj.maximumVolumeSize?.value,
+    nodeTopology: toJson_LabelSelector(obj.nodeTopology),
+    storageClassName: obj.storageClassName,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13880,8 +13880,8 @@ export interface KubeCsiStorageCapacityListProps {
 export function toJson_KubeCsiStorageCapacityListProps(obj: KubeCsiStorageCapacityListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeCsiStorageCapacityProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeCsiStorageCapacityProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13962,14 +13962,14 @@ export interface KubeStorageClassProps {
 export function toJson_KubeStorageClassProps(obj: KubeStorageClassProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'allowVolumeExpansion': obj.allowVolumeExpansion,
-    'allowedTopologies': obj.allowedTopologies?.map(y => toJson_TopologySelectorTerm(y)),
-    'mountOptions': obj.mountOptions?.map(y => y),
-    'parameters': ((obj.parameters) === undefined) ? undefined : (Object.entries(obj.parameters).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
-    'provisioner': obj.provisioner,
-    'reclaimPolicy': obj.reclaimPolicy,
-    'volumeBindingMode': obj.volumeBindingMode,
+    metadata: toJson_ObjectMeta(obj.metadata),
+    allowVolumeExpansion: obj.allowVolumeExpansion,
+    allowedTopologies: obj.allowedTopologies?.map(y => toJson_TopologySelectorTerm(y)),
+    mountOptions: obj.mountOptions?.map(y => y),
+    parameters: ((obj.parameters) === undefined) ? undefined : (Object.entries(obj.parameters).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    provisioner: obj.provisioner,
+    reclaimPolicy: obj.reclaimPolicy,
+    volumeBindingMode: obj.volumeBindingMode,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -14005,8 +14005,8 @@ export interface KubeStorageClassListProps {
 export function toJson_KubeStorageClassListProps(obj: KubeStorageClassListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeStorageClassProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeStorageClassProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -14044,8 +14044,8 @@ export interface KubeVolumeAttachmentProps {
 export function toJson_KubeVolumeAttachmentProps(obj: KubeVolumeAttachmentProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_VolumeAttachmentSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_VolumeAttachmentSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -14081,8 +14081,8 @@ export interface KubeVolumeAttachmentListProps {
 export function toJson_KubeVolumeAttachmentListProps(obj: KubeVolumeAttachmentListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeVolumeAttachmentProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeVolumeAttachmentProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -14127,9 +14127,9 @@ export interface KubeVolumeAttributesClassV1Alpha1Props {
 export function toJson_KubeVolumeAttributesClassV1Alpha1Props(obj: KubeVolumeAttributesClassV1Alpha1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'driverName': obj.driverName,
-    'parameters': ((obj.parameters) === undefined) ? undefined : (Object.entries(obj.parameters).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    driverName: obj.driverName,
+    parameters: ((obj.parameters) === undefined) ? undefined : (Object.entries(obj.parameters).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -14165,8 +14165,8 @@ export interface KubeVolumeAttributesClassListV1Alpha1Props {
 export function toJson_KubeVolumeAttributesClassListV1Alpha1Props(obj: KubeVolumeAttributesClassListV1Alpha1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeVolumeAttributesClassV1Alpha1Props(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeVolumeAttributesClassV1Alpha1Props(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -14202,8 +14202,8 @@ export interface KubeStorageVersionMigrationV1Alpha1Props {
 export function toJson_KubeStorageVersionMigrationV1Alpha1Props(obj: KubeStorageVersionMigrationV1Alpha1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_StorageVersionMigrationSpecV1Alpha1(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_StorageVersionMigrationSpecV1Alpha1(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -14239,8 +14239,8 @@ export interface KubeStorageVersionMigrationListV1Alpha1Props {
 export function toJson_KubeStorageVersionMigrationListV1Alpha1Props(obj: KubeStorageVersionMigrationListV1Alpha1Props | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeStorageVersionMigrationV1Alpha1Props(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeStorageVersionMigrationV1Alpha1Props(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -14276,8 +14276,8 @@ export interface KubeCustomResourceDefinitionProps {
 export function toJson_KubeCustomResourceDefinitionProps(obj: KubeCustomResourceDefinitionProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_CustomResourceDefinitionSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_CustomResourceDefinitionSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -14313,8 +14313,8 @@ export interface KubeCustomResourceDefinitionListProps {
 export function toJson_KubeCustomResourceDefinitionListProps(obj: KubeCustomResourceDefinitionListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeCustomResourceDefinitionProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeCustomResourceDefinitionProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -14371,11 +14371,11 @@ export interface KubeStatusProps {
 export function toJson_KubeStatusProps(obj: KubeStatusProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'code': obj.code,
-    'details': toJson_StatusDetails(obj.details),
-    'message': obj.message,
-    'reason': obj.reason,
+    metadata: toJson_ListMeta(obj.metadata),
+    code: obj.code,
+    details: toJson_StatusDetails(obj.details),
+    message: obj.message,
+    reason: obj.reason,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -14411,8 +14411,8 @@ export interface KubeApiServiceProps {
 export function toJson_KubeApiServiceProps(obj: KubeApiServiceProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_ApiServiceSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_ApiServiceSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -14448,8 +14448,8 @@ export interface KubeApiServiceListProps {
 export function toJson_KubeApiServiceListProps(obj: KubeApiServiceListProps | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ListMeta(obj.metadata),
-    'items': obj.items?.map(y => toJson_KubeApiServiceProps(y)),
+    metadata: toJson_ListMeta(obj.metadata),
+    items: obj.items?.map(y => toJson_KubeApiServiceProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -14590,21 +14590,21 @@ export interface ObjectMeta {
 export function toJson_ObjectMeta(obj: ObjectMeta | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'annotations': ((obj.annotations) === undefined) ? undefined : (Object.entries(obj.annotations).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
-    'creationTimestamp': obj.creationTimestamp?.toISOString(),
-    'deletionGracePeriodSeconds': obj.deletionGracePeriodSeconds,
-    'deletionTimestamp': obj.deletionTimestamp?.toISOString(),
-    'finalizers': obj.finalizers?.map(y => y),
-    'generateName': obj.generateName,
-    'generation': obj.generation,
-    'labels': ((obj.labels) === undefined) ? undefined : (Object.entries(obj.labels).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
-    'managedFields': obj.managedFields?.map(y => toJson_ManagedFieldsEntry(y)),
-    'name': obj.name,
-    'namespace': obj.namespace,
-    'ownerReferences': obj.ownerReferences?.map(y => toJson_OwnerReference(y)),
-    'resourceVersion': obj.resourceVersion,
-    'selfLink': obj.selfLink,
-    'uid': obj.uid,
+    annotations: ((obj.annotations) === undefined) ? undefined : (Object.entries(obj.annotations).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    creationTimestamp: obj.creationTimestamp?.toISOString(),
+    deletionGracePeriodSeconds: obj.deletionGracePeriodSeconds,
+    deletionTimestamp: obj.deletionTimestamp?.toISOString(),
+    finalizers: obj.finalizers?.map(y => y),
+    generateName: obj.generateName,
+    generation: obj.generation,
+    labels: ((obj.labels) === undefined) ? undefined : (Object.entries(obj.labels).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    managedFields: obj.managedFields?.map(y => toJson_ManagedFieldsEntry(y)),
+    name: obj.name,
+    namespace: obj.namespace,
+    ownerReferences: obj.ownerReferences?.map(y => toJson_OwnerReference(y)),
+    resourceVersion: obj.resourceVersion,
+    selfLink: obj.selfLink,
+    uid: obj.uid,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -14765,18 +14765,18 @@ export interface MutatingWebhook {
 export function toJson_MutatingWebhook(obj: MutatingWebhook | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'admissionReviewVersions': obj.admissionReviewVersions?.map(y => y),
-    'clientConfig': toJson_WebhookClientConfig(obj.clientConfig),
-    'failurePolicy': obj.failurePolicy,
-    'matchConditions': obj.matchConditions?.map(y => toJson_MatchCondition(y)),
-    'matchPolicy': obj.matchPolicy,
-    'name': obj.name,
-    'namespaceSelector': toJson_LabelSelector(obj.namespaceSelector),
-    'objectSelector': toJson_LabelSelector(obj.objectSelector),
-    'reinvocationPolicy': obj.reinvocationPolicy,
-    'rules': obj.rules?.map(y => toJson_RuleWithOperations(y)),
-    'sideEffects': obj.sideEffects,
-    'timeoutSeconds': obj.timeoutSeconds,
+    admissionReviewVersions: obj.admissionReviewVersions?.map(y => y),
+    clientConfig: toJson_WebhookClientConfig(obj.clientConfig),
+    failurePolicy: obj.failurePolicy,
+    matchConditions: obj.matchConditions?.map(y => toJson_MatchCondition(y)),
+    matchPolicy: obj.matchPolicy,
+    name: obj.name,
+    namespaceSelector: toJson_LabelSelector(obj.namespaceSelector),
+    objectSelector: toJson_LabelSelector(obj.objectSelector),
+    reinvocationPolicy: obj.reinvocationPolicy,
+    rules: obj.rules?.map(y => toJson_RuleWithOperations(y)),
+    sideEffects: obj.sideEffects,
+    timeoutSeconds: obj.timeoutSeconds,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -14826,10 +14826,10 @@ export interface ListMeta {
 export function toJson_ListMeta(obj: ListMeta | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'continue': obj.continue,
-    'remainingItemCount': obj.remainingItemCount,
-    'resourceVersion': obj.resourceVersion,
-    'selfLink': obj.selfLink,
+    continue: obj.continue,
+    remainingItemCount: obj.remainingItemCount,
+    resourceVersion: obj.resourceVersion,
+    selfLink: obj.selfLink,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -14920,13 +14920,13 @@ export interface ValidatingAdmissionPolicySpec {
 export function toJson_ValidatingAdmissionPolicySpec(obj: ValidatingAdmissionPolicySpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'auditAnnotations': obj.auditAnnotations?.map(y => toJson_AuditAnnotation(y)),
-    'failurePolicy': obj.failurePolicy,
-    'matchConditions': obj.matchConditions?.map(y => toJson_MatchCondition(y)),
-    'matchConstraints': toJson_MatchResources(obj.matchConstraints),
-    'paramKind': toJson_ParamKind(obj.paramKind),
-    'validations': obj.validations?.map(y => toJson_Validation(y)),
-    'variables': obj.variables?.map(y => toJson_Variable(y)),
+    auditAnnotations: obj.auditAnnotations?.map(y => toJson_AuditAnnotation(y)),
+    failurePolicy: obj.failurePolicy,
+    matchConditions: obj.matchConditions?.map(y => toJson_MatchCondition(y)),
+    matchConstraints: toJson_MatchResources(obj.matchConstraints),
+    paramKind: toJson_ParamKind(obj.paramKind),
+    validations: obj.validations?.map(y => toJson_Validation(y)),
+    variables: obj.variables?.map(y => toJson_Variable(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -14994,10 +14994,10 @@ export interface ValidatingAdmissionPolicyBindingSpec {
 export function toJson_ValidatingAdmissionPolicyBindingSpec(obj: ValidatingAdmissionPolicyBindingSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'matchResources': toJson_MatchResources(obj.matchResources),
-    'paramRef': toJson_ParamRef(obj.paramRef),
-    'policyName': obj.policyName,
-    'validationActions': obj.validationActions?.map(y => y),
+    matchResources: toJson_MatchResources(obj.matchResources),
+    paramRef: toJson_ParamRef(obj.paramRef),
+    policyName: obj.policyName,
+    validationActions: obj.validationActions?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -15144,17 +15144,17 @@ export interface ValidatingWebhook {
 export function toJson_ValidatingWebhook(obj: ValidatingWebhook | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'admissionReviewVersions': obj.admissionReviewVersions?.map(y => y),
-    'clientConfig': toJson_WebhookClientConfig(obj.clientConfig),
-    'failurePolicy': obj.failurePolicy,
-    'matchConditions': obj.matchConditions?.map(y => toJson_MatchCondition(y)),
-    'matchPolicy': obj.matchPolicy,
-    'name': obj.name,
-    'namespaceSelector': toJson_LabelSelector(obj.namespaceSelector),
-    'objectSelector': toJson_LabelSelector(obj.objectSelector),
-    'rules': obj.rules?.map(y => toJson_RuleWithOperations(y)),
-    'sideEffects': obj.sideEffects,
-    'timeoutSeconds': obj.timeoutSeconds,
+    admissionReviewVersions: obj.admissionReviewVersions?.map(y => y),
+    clientConfig: toJson_WebhookClientConfig(obj.clientConfig),
+    failurePolicy: obj.failurePolicy,
+    matchConditions: obj.matchConditions?.map(y => toJson_MatchCondition(y)),
+    matchPolicy: obj.matchPolicy,
+    name: obj.name,
+    namespaceSelector: toJson_LabelSelector(obj.namespaceSelector),
+    objectSelector: toJson_LabelSelector(obj.objectSelector),
+    rules: obj.rules?.map(y => toJson_RuleWithOperations(y)),
+    sideEffects: obj.sideEffects,
+    timeoutSeconds: obj.timeoutSeconds,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -15245,13 +15245,13 @@ export interface ValidatingAdmissionPolicySpecV1Alpha1 {
 export function toJson_ValidatingAdmissionPolicySpecV1Alpha1(obj: ValidatingAdmissionPolicySpecV1Alpha1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'auditAnnotations': obj.auditAnnotations?.map(y => toJson_AuditAnnotationV1Alpha1(y)),
-    'failurePolicy': obj.failurePolicy,
-    'matchConditions': obj.matchConditions?.map(y => toJson_MatchConditionV1Alpha1(y)),
-    'matchConstraints': toJson_MatchResourcesV1Alpha1(obj.matchConstraints),
-    'paramKind': toJson_ParamKindV1Alpha1(obj.paramKind),
-    'validations': obj.validations?.map(y => toJson_ValidationV1Alpha1(y)),
-    'variables': obj.variables?.map(y => toJson_VariableV1Alpha1(y)),
+    auditAnnotations: obj.auditAnnotations?.map(y => toJson_AuditAnnotationV1Alpha1(y)),
+    failurePolicy: obj.failurePolicy,
+    matchConditions: obj.matchConditions?.map(y => toJson_MatchConditionV1Alpha1(y)),
+    matchConstraints: toJson_MatchResourcesV1Alpha1(obj.matchConstraints),
+    paramKind: toJson_ParamKindV1Alpha1(obj.paramKind),
+    validations: obj.validations?.map(y => toJson_ValidationV1Alpha1(y)),
+    variables: obj.variables?.map(y => toJson_VariableV1Alpha1(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -15319,10 +15319,10 @@ export interface ValidatingAdmissionPolicyBindingSpecV1Alpha1 {
 export function toJson_ValidatingAdmissionPolicyBindingSpecV1Alpha1(obj: ValidatingAdmissionPolicyBindingSpecV1Alpha1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'matchResources': toJson_MatchResourcesV1Alpha1(obj.matchResources),
-    'paramRef': toJson_ParamRefV1Alpha1(obj.paramRef),
-    'policyName': obj.policyName,
-    'validationActions': obj.validationActions?.map(y => y),
+    matchResources: toJson_MatchResourcesV1Alpha1(obj.matchResources),
+    paramRef: toJson_ParamRefV1Alpha1(obj.paramRef),
+    policyName: obj.policyName,
+    validationActions: obj.validationActions?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -15413,13 +15413,13 @@ export interface ValidatingAdmissionPolicySpecV1Beta1 {
 export function toJson_ValidatingAdmissionPolicySpecV1Beta1(obj: ValidatingAdmissionPolicySpecV1Beta1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'auditAnnotations': obj.auditAnnotations?.map(y => toJson_AuditAnnotationV1Beta1(y)),
-    'failurePolicy': obj.failurePolicy,
-    'matchConditions': obj.matchConditions?.map(y => toJson_MatchConditionV1Beta1(y)),
-    'matchConstraints': toJson_MatchResourcesV1Beta1(obj.matchConstraints),
-    'paramKind': toJson_ParamKindV1Beta1(obj.paramKind),
-    'validations': obj.validations?.map(y => toJson_ValidationV1Beta1(y)),
-    'variables': obj.variables?.map(y => toJson_VariableV1Beta1(y)),
+    auditAnnotations: obj.auditAnnotations?.map(y => toJson_AuditAnnotationV1Beta1(y)),
+    failurePolicy: obj.failurePolicy,
+    matchConditions: obj.matchConditions?.map(y => toJson_MatchConditionV1Beta1(y)),
+    matchConstraints: toJson_MatchResourcesV1Beta1(obj.matchConstraints),
+    paramKind: toJson_ParamKindV1Beta1(obj.paramKind),
+    validations: obj.validations?.map(y => toJson_ValidationV1Beta1(y)),
+    variables: obj.variables?.map(y => toJson_VariableV1Beta1(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -15487,10 +15487,10 @@ export interface ValidatingAdmissionPolicyBindingSpecV1Beta1 {
 export function toJson_ValidatingAdmissionPolicyBindingSpecV1Beta1(obj: ValidatingAdmissionPolicyBindingSpecV1Beta1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'matchResources': toJson_MatchResourcesV1Beta1(obj.matchResources),
-    'paramRef': toJson_ParamRefV1Beta1(obj.paramRef),
-    'policyName': obj.policyName,
-    'validationActions': obj.validationActions?.map(y => y),
+    matchResources: toJson_MatchResourcesV1Beta1(obj.matchResources),
+    paramRef: toJson_ParamRefV1Beta1(obj.paramRef),
+    policyName: obj.policyName,
+    validationActions: obj.validationActions?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -15549,11 +15549,11 @@ export interface DaemonSetSpec {
 export function toJson_DaemonSetSpec(obj: DaemonSetSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'minReadySeconds': obj.minReadySeconds,
-    'revisionHistoryLimit': obj.revisionHistoryLimit,
-    'selector': toJson_LabelSelector(obj.selector),
-    'template': toJson_PodTemplateSpec(obj.template),
-    'updateStrategy': toJson_DaemonSetUpdateStrategy(obj.updateStrategy),
+    minReadySeconds: obj.minReadySeconds,
+    revisionHistoryLimit: obj.revisionHistoryLimit,
+    selector: toJson_LabelSelector(obj.selector),
+    template: toJson_PodTemplateSpec(obj.template),
+    updateStrategy: toJson_DaemonSetUpdateStrategy(obj.updateStrategy),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -15635,14 +15635,14 @@ export interface DeploymentSpec {
 export function toJson_DeploymentSpec(obj: DeploymentSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'minReadySeconds': obj.minReadySeconds,
-    'paused': obj.paused,
-    'progressDeadlineSeconds': obj.progressDeadlineSeconds,
-    'replicas': obj.replicas,
-    'revisionHistoryLimit': obj.revisionHistoryLimit,
-    'selector': toJson_LabelSelector(obj.selector),
-    'strategy': toJson_DeploymentStrategy(obj.strategy),
-    'template': toJson_PodTemplateSpec(obj.template),
+    minReadySeconds: obj.minReadySeconds,
+    paused: obj.paused,
+    progressDeadlineSeconds: obj.progressDeadlineSeconds,
+    replicas: obj.replicas,
+    revisionHistoryLimit: obj.revisionHistoryLimit,
+    selector: toJson_LabelSelector(obj.selector),
+    strategy: toJson_DeploymentStrategy(obj.strategy),
+    template: toJson_PodTemplateSpec(obj.template),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -15694,10 +15694,10 @@ export interface ReplicaSetSpec {
 export function toJson_ReplicaSetSpec(obj: ReplicaSetSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'minReadySeconds': obj.minReadySeconds,
-    'replicas': obj.replicas,
-    'selector': toJson_LabelSelector(obj.selector),
-    'template': toJson_PodTemplateSpec(obj.template),
+    minReadySeconds: obj.minReadySeconds,
+    replicas: obj.replicas,
+    selector: toJson_LabelSelector(obj.selector),
+    template: toJson_PodTemplateSpec(obj.template),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -15797,17 +15797,17 @@ export interface StatefulSetSpec {
 export function toJson_StatefulSetSpec(obj: StatefulSetSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'minReadySeconds': obj.minReadySeconds,
-    'ordinals': toJson_StatefulSetOrdinals(obj.ordinals),
-    'persistentVolumeClaimRetentionPolicy': toJson_StatefulSetPersistentVolumeClaimRetentionPolicy(obj.persistentVolumeClaimRetentionPolicy),
-    'podManagementPolicy': obj.podManagementPolicy,
-    'replicas': obj.replicas,
-    'revisionHistoryLimit': obj.revisionHistoryLimit,
-    'selector': toJson_LabelSelector(obj.selector),
-    'serviceName': obj.serviceName,
-    'template': toJson_PodTemplateSpec(obj.template),
-    'updateStrategy': toJson_StatefulSetUpdateStrategy(obj.updateStrategy),
-    'volumeClaimTemplates': obj.volumeClaimTemplates?.map(y => toJson_KubePersistentVolumeClaimProps(y)),
+    minReadySeconds: obj.minReadySeconds,
+    ordinals: toJson_StatefulSetOrdinals(obj.ordinals),
+    persistentVolumeClaimRetentionPolicy: toJson_StatefulSetPersistentVolumeClaimRetentionPolicy(obj.persistentVolumeClaimRetentionPolicy),
+    podManagementPolicy: obj.podManagementPolicy,
+    replicas: obj.replicas,
+    revisionHistoryLimit: obj.revisionHistoryLimit,
+    selector: toJson_LabelSelector(obj.selector),
+    serviceName: obj.serviceName,
+    template: toJson_PodTemplateSpec(obj.template),
+    updateStrategy: toJson_StatefulSetUpdateStrategy(obj.updateStrategy),
+    volumeClaimTemplates: obj.volumeClaimTemplates?.map(y => toJson_KubePersistentVolumeClaimProps(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -15850,9 +15850,9 @@ export interface TokenRequestSpec {
 export function toJson_TokenRequestSpec(obj: TokenRequestSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'audiences': obj.audiences?.map(y => y),
-    'boundObjectRef': toJson_BoundObjectReference(obj.boundObjectRef),
-    'expirationSeconds': obj.expirationSeconds,
+    audiences: obj.audiences?.map(y => y),
+    boundObjectRef: toJson_BoundObjectReference(obj.boundObjectRef),
+    expirationSeconds: obj.expirationSeconds,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -15888,8 +15888,8 @@ export interface TokenReviewSpec {
 export function toJson_TokenReviewSpec(obj: TokenReviewSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'audiences': obj.audiences?.map(y => y),
-    'token': obj.token,
+    audiences: obj.audiences?.map(y => y),
+    token: obj.token,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -15953,12 +15953,12 @@ export interface SubjectAccessReviewSpec {
 export function toJson_SubjectAccessReviewSpec(obj: SubjectAccessReviewSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'extra': ((obj.extra) === undefined) ? undefined : (Object.entries(obj.extra).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.map(y => y) }), {})),
-    'groups': obj.groups?.map(y => y),
-    'nonResourceAttributes': toJson_NonResourceAttributes(obj.nonResourceAttributes),
-    'resourceAttributes': toJson_ResourceAttributes(obj.resourceAttributes),
-    'uid': obj.uid,
-    'user': obj.user,
+    extra: ((obj.extra) === undefined) ? undefined : (Object.entries(obj.extra).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.map(y => y) }), {})),
+    groups: obj.groups?.map(y => y),
+    nonResourceAttributes: toJson_NonResourceAttributes(obj.nonResourceAttributes),
+    resourceAttributes: toJson_ResourceAttributes(obj.resourceAttributes),
+    uid: obj.uid,
+    user: obj.user,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -15994,8 +15994,8 @@ export interface SelfSubjectAccessReviewSpec {
 export function toJson_SelfSubjectAccessReviewSpec(obj: SelfSubjectAccessReviewSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'nonResourceAttributes': toJson_NonResourceAttributes(obj.nonResourceAttributes),
-    'resourceAttributes': toJson_ResourceAttributes(obj.resourceAttributes),
+    nonResourceAttributes: toJson_NonResourceAttributes(obj.nonResourceAttributes),
+    resourceAttributes: toJson_ResourceAttributes(obj.resourceAttributes),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -16024,7 +16024,7 @@ export interface SelfSubjectRulesReviewSpec {
 export function toJson_SelfSubjectRulesReviewSpec(obj: SelfSubjectRulesReviewSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'namespace': obj.namespace,
+    namespace: obj.namespace,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -16074,10 +16074,10 @@ export interface HorizontalPodAutoscalerSpec {
 export function toJson_HorizontalPodAutoscalerSpec(obj: HorizontalPodAutoscalerSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'maxReplicas': obj.maxReplicas,
-    'minReplicas': obj.minReplicas,
-    'scaleTargetRef': toJson_CrossVersionObjectReference(obj.scaleTargetRef),
-    'targetCPUUtilizationPercentage': obj.targetCpuUtilizationPercentage,
+    maxReplicas: obj.maxReplicas,
+    minReplicas: obj.minReplicas,
+    scaleTargetRef: toJson_CrossVersionObjectReference(obj.scaleTargetRef),
+    targetCPUUtilizationPercentage: obj.targetCpuUtilizationPercentage,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -16106,7 +16106,7 @@ export interface ScaleSpec {
 export function toJson_ScaleSpec(obj: ScaleSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'replicas': obj.replicas,
+    replicas: obj.replicas,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -16163,11 +16163,11 @@ export interface HorizontalPodAutoscalerSpecV2 {
 export function toJson_HorizontalPodAutoscalerSpecV2(obj: HorizontalPodAutoscalerSpecV2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'behavior': toJson_HorizontalPodAutoscalerBehaviorV2(obj.behavior),
-    'maxReplicas': obj.maxReplicas,
-    'metrics': obj.metrics?.map(y => toJson_MetricSpecV2(y)),
-    'minReplicas': obj.minReplicas,
-    'scaleTargetRef': toJson_CrossVersionObjectReferenceV2(obj.scaleTargetRef),
+    behavior: toJson_HorizontalPodAutoscalerBehaviorV2(obj.behavior),
+    maxReplicas: obj.maxReplicas,
+    metrics: obj.metrics?.map(y => toJson_MetricSpecV2(y)),
+    minReplicas: obj.minReplicas,
+    scaleTargetRef: toJson_CrossVersionObjectReferenceV2(obj.scaleTargetRef),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -16250,14 +16250,14 @@ export interface CronJobSpec {
 export function toJson_CronJobSpec(obj: CronJobSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'concurrencyPolicy': obj.concurrencyPolicy,
-    'failedJobsHistoryLimit': obj.failedJobsHistoryLimit,
-    'jobTemplate': toJson_JobTemplateSpec(obj.jobTemplate),
-    'schedule': obj.schedule,
-    'startingDeadlineSeconds': obj.startingDeadlineSeconds,
-    'successfulJobsHistoryLimit': obj.successfulJobsHistoryLimit,
-    'suspend': obj.suspend,
-    'timeZone': obj.timeZone,
+    concurrencyPolicy: obj.concurrencyPolicy,
+    failedJobsHistoryLimit: obj.failedJobsHistoryLimit,
+    jobTemplate: toJson_JobTemplateSpec(obj.jobTemplate),
+    schedule: obj.schedule,
+    startingDeadlineSeconds: obj.startingDeadlineSeconds,
+    successfulJobsHistoryLimit: obj.successfulJobsHistoryLimit,
+    suspend: obj.suspend,
+    timeZone: obj.timeZone,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -16410,22 +16410,22 @@ export interface JobSpec {
 export function toJson_JobSpec(obj: JobSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'activeDeadlineSeconds': obj.activeDeadlineSeconds,
-    'backoffLimit': obj.backoffLimit,
-    'backoffLimitPerIndex': obj.backoffLimitPerIndex,
-    'completionMode': obj.completionMode,
-    'completions': obj.completions,
-    'managedBy': obj.managedBy,
-    'manualSelector': obj.manualSelector,
-    'maxFailedIndexes': obj.maxFailedIndexes,
-    'parallelism': obj.parallelism,
-    'podFailurePolicy': toJson_PodFailurePolicy(obj.podFailurePolicy),
-    'podReplacementPolicy': obj.podReplacementPolicy,
-    'selector': toJson_LabelSelector(obj.selector),
-    'successPolicy': toJson_SuccessPolicy(obj.successPolicy),
-    'suspend': obj.suspend,
-    'template': toJson_PodTemplateSpec(obj.template),
-    'ttlSecondsAfterFinished': obj.ttlSecondsAfterFinished,
+    activeDeadlineSeconds: obj.activeDeadlineSeconds,
+    backoffLimit: obj.backoffLimit,
+    backoffLimitPerIndex: obj.backoffLimitPerIndex,
+    completionMode: obj.completionMode,
+    completions: obj.completions,
+    managedBy: obj.managedBy,
+    manualSelector: obj.manualSelector,
+    maxFailedIndexes: obj.maxFailedIndexes,
+    parallelism: obj.parallelism,
+    podFailurePolicy: toJson_PodFailurePolicy(obj.podFailurePolicy),
+    podReplacementPolicy: obj.podReplacementPolicy,
+    selector: toJson_LabelSelector(obj.selector),
+    successPolicy: toJson_SuccessPolicy(obj.successPolicy),
+    suspend: obj.suspend,
+    template: toJson_PodTemplateSpec(obj.template),
+    ttlSecondsAfterFinished: obj.ttlSecondsAfterFinished,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -16547,14 +16547,14 @@ export interface CertificateSigningRequestSpec {
 export function toJson_CertificateSigningRequestSpec(obj: CertificateSigningRequestSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'expirationSeconds': obj.expirationSeconds,
-    'extra': ((obj.extra) === undefined) ? undefined : (Object.entries(obj.extra).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.map(y => y) }), {})),
-    'groups': obj.groups?.map(y => y),
-    'request': obj.request,
-    'signerName': obj.signerName,
-    'uid': obj.uid,
-    'usages': obj.usages?.map(y => y),
-    'username': obj.username,
+    expirationSeconds: obj.expirationSeconds,
+    extra: ((obj.extra) === undefined) ? undefined : (Object.entries(obj.extra).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.map(y => y) }), {})),
+    groups: obj.groups?.map(y => y),
+    request: obj.request,
+    signerName: obj.signerName,
+    uid: obj.uid,
+    usages: obj.usages?.map(y => y),
+    username: obj.username,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -16602,8 +16602,8 @@ export interface ClusterTrustBundleSpecV1Alpha1 {
 export function toJson_ClusterTrustBundleSpecV1Alpha1(obj: ClusterTrustBundleSpecV1Alpha1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'signerName': obj.signerName,
-    'trustBundle': obj.trustBundle,
+    signerName: obj.signerName,
+    trustBundle: obj.trustBundle,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -16660,11 +16660,11 @@ export interface LeaseSpec {
 export function toJson_LeaseSpec(obj: LeaseSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'acquireTime': obj.acquireTime?.toISOString(),
-    'holderIdentity': obj.holderIdentity,
-    'leaseDurationSeconds': obj.leaseDurationSeconds,
-    'leaseTransitions': obj.leaseTransitions,
-    'renewTime': obj.renewTime?.toISOString(),
+    acquireTime: obj.acquireTime?.toISOString(),
+    holderIdentity: obj.holderIdentity,
+    leaseDurationSeconds: obj.leaseDurationSeconds,
+    leaseTransitions: obj.leaseTransitions,
+    renewTime: obj.renewTime?.toISOString(),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -16735,13 +16735,13 @@ export interface ObjectReference {
 export function toJson_ObjectReference(obj: ObjectReference | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiVersion': obj.apiVersion,
-    'fieldPath': obj.fieldPath,
-    'kind': obj.kind,
-    'name': obj.name,
-    'namespace': obj.namespace,
-    'resourceVersion': obj.resourceVersion,
-    'uid': obj.uid,
+    apiVersion: obj.apiVersion,
+    fieldPath: obj.fieldPath,
+    kind: obj.kind,
+    name: obj.name,
+    namespace: obj.namespace,
+    resourceVersion: obj.resourceVersion,
+    uid: obj.uid,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -16791,10 +16791,10 @@ export interface ComponentCondition {
 export function toJson_ComponentCondition(obj: ComponentCondition | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'error': obj.error,
-    'message': obj.message,
-    'status': obj.status,
-    'type': obj.type,
+    error: obj.error,
+    message: obj.message,
+    status: obj.status,
+    type: obj.type,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -16847,9 +16847,9 @@ export interface EndpointSubset {
 export function toJson_EndpointSubset(obj: EndpointSubset | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'addresses': obj.addresses?.map(y => toJson_EndpointAddress(y)),
-    'notReadyAddresses': obj.notReadyAddresses?.map(y => toJson_EndpointAddress(y)),
-    'ports': obj.ports?.map(y => toJson_EndpointPort(y)),
+    addresses: obj.addresses?.map(y => toJson_EndpointAddress(y)),
+    notReadyAddresses: obj.notReadyAddresses?.map(y => toJson_EndpointAddress(y)),
+    ports: obj.ports?.map(y => toJson_EndpointPort(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -16885,8 +16885,8 @@ export interface EventSource {
 export function toJson_EventSource(obj: EventSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'component': obj.component,
-    'host': obj.host,
+    component: obj.component,
+    host: obj.host,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -16922,8 +16922,8 @@ export interface EventSeries {
 export function toJson_EventSeries(obj: EventSeries | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'count': obj.count,
-    'lastObservedTime': obj.lastObservedTime?.toISOString(),
+    count: obj.count,
+    lastObservedTime: obj.lastObservedTime?.toISOString(),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -16952,7 +16952,7 @@ export interface LimitRangeSpec {
 export function toJson_LimitRangeSpec(obj: LimitRangeSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'limits': obj.limits?.map(y => toJson_LimitRangeItem(y)),
+    limits: obj.limits?.map(y => toJson_LimitRangeItem(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -16981,7 +16981,7 @@ export interface NamespaceSpec {
 export function toJson_NamespaceSpec(obj: NamespaceSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'finalizers': obj.finalizers?.map(y => y),
+    finalizers: obj.finalizers?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -17052,13 +17052,13 @@ export interface NodeSpec {
 export function toJson_NodeSpec(obj: NodeSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'configSource': toJson_NodeConfigSource(obj.configSource),
-    'externalID': obj.externalId,
-    'podCIDR': obj.podCidr,
-    'podCIDRs': obj.podCidRs?.map(y => y),
-    'providerID': obj.providerId,
-    'taints': obj.taints?.map(y => toJson_Taint(y)),
-    'unschedulable': obj.unschedulable,
+    configSource: toJson_NodeConfigSource(obj.configSource),
+    externalID: obj.externalId,
+    podCIDR: obj.podCidr,
+    podCIDRs: obj.podCidRs?.map(y => y),
+    providerID: obj.providerId,
+    taints: obj.taints?.map(y => toJson_Taint(y)),
+    unschedulable: obj.unschedulable,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -17297,37 +17297,37 @@ export interface PersistentVolumeSpec {
 export function toJson_PersistentVolumeSpec(obj: PersistentVolumeSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'accessModes': obj.accessModes?.map(y => y),
-    'awsElasticBlockStore': toJson_AwsElasticBlockStoreVolumeSource(obj.awsElasticBlockStore),
-    'azureDisk': toJson_AzureDiskVolumeSource(obj.azureDisk),
-    'azureFile': toJson_AzureFilePersistentVolumeSource(obj.azureFile),
-    'capacity': ((obj.capacity) === undefined) ? undefined : (Object.entries(obj.capacity).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
-    'cephfs': toJson_CephFsPersistentVolumeSource(obj.cephfs),
-    'cinder': toJson_CinderPersistentVolumeSource(obj.cinder),
-    'claimRef': toJson_ObjectReference(obj.claimRef),
-    'csi': toJson_CsiPersistentVolumeSource(obj.csi),
-    'fc': toJson_FcVolumeSource(obj.fc),
-    'flexVolume': toJson_FlexPersistentVolumeSource(obj.flexVolume),
-    'flocker': toJson_FlockerVolumeSource(obj.flocker),
-    'gcePersistentDisk': toJson_GcePersistentDiskVolumeSource(obj.gcePersistentDisk),
-    'glusterfs': toJson_GlusterfsPersistentVolumeSource(obj.glusterfs),
-    'hostPath': toJson_HostPathVolumeSource(obj.hostPath),
-    'iscsi': toJson_IscsiPersistentVolumeSource(obj.iscsi),
-    'local': toJson_LocalVolumeSource(obj.local),
-    'mountOptions': obj.mountOptions?.map(y => y),
-    'nfs': toJson_NfsVolumeSource(obj.nfs),
-    'nodeAffinity': toJson_VolumeNodeAffinity(obj.nodeAffinity),
-    'persistentVolumeReclaimPolicy': obj.persistentVolumeReclaimPolicy,
-    'photonPersistentDisk': toJson_PhotonPersistentDiskVolumeSource(obj.photonPersistentDisk),
-    'portworxVolume': toJson_PortworxVolumeSource(obj.portworxVolume),
-    'quobyte': toJson_QuobyteVolumeSource(obj.quobyte),
-    'rbd': toJson_RbdPersistentVolumeSource(obj.rbd),
-    'scaleIO': toJson_ScaleIoPersistentVolumeSource(obj.scaleIo),
-    'storageClassName': obj.storageClassName,
-    'storageos': toJson_StorageOsPersistentVolumeSource(obj.storageos),
-    'volumeAttributesClassName': obj.volumeAttributesClassName,
-    'volumeMode': obj.volumeMode,
-    'vsphereVolume': toJson_VsphereVirtualDiskVolumeSource(obj.vsphereVolume),
+    accessModes: obj.accessModes?.map(y => y),
+    awsElasticBlockStore: toJson_AwsElasticBlockStoreVolumeSource(obj.awsElasticBlockStore),
+    azureDisk: toJson_AzureDiskVolumeSource(obj.azureDisk),
+    azureFile: toJson_AzureFilePersistentVolumeSource(obj.azureFile),
+    capacity: ((obj.capacity) === undefined) ? undefined : (Object.entries(obj.capacity).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    cephfs: toJson_CephFsPersistentVolumeSource(obj.cephfs),
+    cinder: toJson_CinderPersistentVolumeSource(obj.cinder),
+    claimRef: toJson_ObjectReference(obj.claimRef),
+    csi: toJson_CsiPersistentVolumeSource(obj.csi),
+    fc: toJson_FcVolumeSource(obj.fc),
+    flexVolume: toJson_FlexPersistentVolumeSource(obj.flexVolume),
+    flocker: toJson_FlockerVolumeSource(obj.flocker),
+    gcePersistentDisk: toJson_GcePersistentDiskVolumeSource(obj.gcePersistentDisk),
+    glusterfs: toJson_GlusterfsPersistentVolumeSource(obj.glusterfs),
+    hostPath: toJson_HostPathVolumeSource(obj.hostPath),
+    iscsi: toJson_IscsiPersistentVolumeSource(obj.iscsi),
+    local: toJson_LocalVolumeSource(obj.local),
+    mountOptions: obj.mountOptions?.map(y => y),
+    nfs: toJson_NfsVolumeSource(obj.nfs),
+    nodeAffinity: toJson_VolumeNodeAffinity(obj.nodeAffinity),
+    persistentVolumeReclaimPolicy: obj.persistentVolumeReclaimPolicy,
+    photonPersistentDisk: toJson_PhotonPersistentDiskVolumeSource(obj.photonPersistentDisk),
+    portworxVolume: toJson_PortworxVolumeSource(obj.portworxVolume),
+    quobyte: toJson_QuobyteVolumeSource(obj.quobyte),
+    rbd: toJson_RbdPersistentVolumeSource(obj.rbd),
+    scaleIO: toJson_ScaleIoPersistentVolumeSource(obj.scaleIo),
+    storageClassName: obj.storageClassName,
+    storageos: toJson_StorageOsPersistentVolumeSource(obj.storageos),
+    volumeAttributesClassName: obj.volumeAttributesClassName,
+    volumeMode: obj.volumeMode,
+    vsphereVolume: toJson_VsphereVirtualDiskVolumeSource(obj.vsphereVolume),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -17419,15 +17419,15 @@ export interface PersistentVolumeClaimSpec {
 export function toJson_PersistentVolumeClaimSpec(obj: PersistentVolumeClaimSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'accessModes': obj.accessModes?.map(y => y),
-    'dataSource': toJson_TypedLocalObjectReference(obj.dataSource),
-    'dataSourceRef': toJson_TypedObjectReference(obj.dataSourceRef),
-    'resources': toJson_VolumeResourceRequirements(obj.resources),
-    'selector': toJson_LabelSelector(obj.selector),
-    'storageClassName': obj.storageClassName,
-    'volumeAttributesClassName': obj.volumeAttributesClassName,
-    'volumeMode': obj.volumeMode,
-    'volumeName': obj.volumeName,
+    accessModes: obj.accessModes?.map(y => y),
+    dataSource: toJson_TypedLocalObjectReference(obj.dataSource),
+    dataSourceRef: toJson_TypedObjectReference(obj.dataSourceRef),
+    resources: toJson_VolumeResourceRequirements(obj.resources),
+    selector: toJson_LabelSelector(obj.selector),
+    storageClassName: obj.storageClassName,
+    volumeAttributesClassName: obj.volumeAttributesClassName,
+    volumeMode: obj.volumeMode,
+    volumeName: obj.volumeName,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -17744,45 +17744,45 @@ export interface PodSpec {
 export function toJson_PodSpec(obj: PodSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'activeDeadlineSeconds': obj.activeDeadlineSeconds,
-    'affinity': toJson_Affinity(obj.affinity),
-    'automountServiceAccountToken': obj.automountServiceAccountToken,
-    'containers': obj.containers?.map(y => toJson_Container(y)),
-    'dnsConfig': toJson_PodDnsConfig(obj.dnsConfig),
-    'dnsPolicy': obj.dnsPolicy,
-    'enableServiceLinks': obj.enableServiceLinks,
-    'ephemeralContainers': obj.ephemeralContainers?.map(y => toJson_EphemeralContainer(y)),
-    'hostAliases': obj.hostAliases?.map(y => toJson_HostAlias(y)),
-    'hostIPC': obj.hostIpc,
-    'hostNetwork': obj.hostNetwork,
-    'hostPID': obj.hostPid,
-    'hostUsers': obj.hostUsers,
-    'hostname': obj.hostname,
-    'imagePullSecrets': obj.imagePullSecrets?.map(y => toJson_LocalObjectReference(y)),
-    'initContainers': obj.initContainers?.map(y => toJson_Container(y)),
-    'nodeName': obj.nodeName,
-    'nodeSelector': ((obj.nodeSelector) === undefined) ? undefined : (Object.entries(obj.nodeSelector).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
-    'os': toJson_PodOs(obj.os),
-    'overhead': ((obj.overhead) === undefined) ? undefined : (Object.entries(obj.overhead).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
-    'preemptionPolicy': obj.preemptionPolicy,
-    'priority': obj.priority,
-    'priorityClassName': obj.priorityClassName,
-    'readinessGates': obj.readinessGates?.map(y => toJson_PodReadinessGate(y)),
-    'resourceClaims': obj.resourceClaims?.map(y => toJson_PodResourceClaim(y)),
-    'restartPolicy': obj.restartPolicy,
-    'runtimeClassName': obj.runtimeClassName,
-    'schedulerName': obj.schedulerName,
-    'schedulingGates': obj.schedulingGates?.map(y => toJson_PodSchedulingGate(y)),
-    'securityContext': toJson_PodSecurityContext(obj.securityContext),
-    'serviceAccount': obj.serviceAccount,
-    'serviceAccountName': obj.serviceAccountName,
-    'setHostnameAsFQDN': obj.setHostnameAsFqdn,
-    'shareProcessNamespace': obj.shareProcessNamespace,
-    'subdomain': obj.subdomain,
-    'terminationGracePeriodSeconds': obj.terminationGracePeriodSeconds,
-    'tolerations': obj.tolerations?.map(y => toJson_Toleration(y)),
-    'topologySpreadConstraints': obj.topologySpreadConstraints?.map(y => toJson_TopologySpreadConstraint(y)),
-    'volumes': obj.volumes?.map(y => toJson_Volume(y)),
+    activeDeadlineSeconds: obj.activeDeadlineSeconds,
+    affinity: toJson_Affinity(obj.affinity),
+    automountServiceAccountToken: obj.automountServiceAccountToken,
+    containers: obj.containers?.map(y => toJson_Container(y)),
+    dnsConfig: toJson_PodDnsConfig(obj.dnsConfig),
+    dnsPolicy: obj.dnsPolicy,
+    enableServiceLinks: obj.enableServiceLinks,
+    ephemeralContainers: obj.ephemeralContainers?.map(y => toJson_EphemeralContainer(y)),
+    hostAliases: obj.hostAliases?.map(y => toJson_HostAlias(y)),
+    hostIPC: obj.hostIpc,
+    hostNetwork: obj.hostNetwork,
+    hostPID: obj.hostPid,
+    hostUsers: obj.hostUsers,
+    hostname: obj.hostname,
+    imagePullSecrets: obj.imagePullSecrets?.map(y => toJson_LocalObjectReference(y)),
+    initContainers: obj.initContainers?.map(y => toJson_Container(y)),
+    nodeName: obj.nodeName,
+    nodeSelector: ((obj.nodeSelector) === undefined) ? undefined : (Object.entries(obj.nodeSelector).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    os: toJson_PodOs(obj.os),
+    overhead: ((obj.overhead) === undefined) ? undefined : (Object.entries(obj.overhead).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    preemptionPolicy: obj.preemptionPolicy,
+    priority: obj.priority,
+    priorityClassName: obj.priorityClassName,
+    readinessGates: obj.readinessGates?.map(y => toJson_PodReadinessGate(y)),
+    resourceClaims: obj.resourceClaims?.map(y => toJson_PodResourceClaim(y)),
+    restartPolicy: obj.restartPolicy,
+    runtimeClassName: obj.runtimeClassName,
+    schedulerName: obj.schedulerName,
+    schedulingGates: obj.schedulingGates?.map(y => toJson_PodSchedulingGate(y)),
+    securityContext: toJson_PodSecurityContext(obj.securityContext),
+    serviceAccount: obj.serviceAccount,
+    serviceAccountName: obj.serviceAccountName,
+    setHostnameAsFQDN: obj.setHostnameAsFqdn,
+    shareProcessNamespace: obj.shareProcessNamespace,
+    subdomain: obj.subdomain,
+    terminationGracePeriodSeconds: obj.terminationGracePeriodSeconds,
+    tolerations: obj.tolerations?.map(y => toJson_Toleration(y)),
+    topologySpreadConstraints: obj.topologySpreadConstraints?.map(y => toJson_TopologySpreadConstraint(y)),
+    volumes: obj.volumes?.map(y => toJson_Volume(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -17818,8 +17818,8 @@ export interface PodTemplateSpec {
 export function toJson_PodTemplateSpec(obj: PodTemplateSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_PodSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_PodSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -17871,10 +17871,10 @@ export interface ReplicationControllerSpec {
 export function toJson_ReplicationControllerSpec(obj: ReplicationControllerSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'minReadySeconds': obj.minReadySeconds,
-    'replicas': obj.replicas,
-    'selector': ((obj.selector) === undefined) ? undefined : (Object.entries(obj.selector).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
-    'template': toJson_PodTemplateSpec(obj.template),
+    minReadySeconds: obj.minReadySeconds,
+    replicas: obj.replicas,
+    selector: ((obj.selector) === undefined) ? undefined : (Object.entries(obj.selector).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    template: toJson_PodTemplateSpec(obj.template),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -17917,9 +17917,9 @@ export interface ResourceQuotaSpec {
 export function toJson_ResourceQuotaSpec(obj: ResourceQuotaSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'hard': ((obj.hard) === undefined) ? undefined : (Object.entries(obj.hard).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
-    'scopeSelector': toJson_ScopeSelector(obj.scopeSelector),
-    'scopes': obj.scopes?.map(y => y),
+    hard: ((obj.hard) === undefined) ? undefined : (Object.entries(obj.hard).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    scopeSelector: toJson_ScopeSelector(obj.scopeSelector),
+    scopes: obj.scopes?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -18088,26 +18088,26 @@ export interface ServiceSpec {
 export function toJson_ServiceSpec(obj: ServiceSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'allocateLoadBalancerNodePorts': obj.allocateLoadBalancerNodePorts,
-    'clusterIP': obj.clusterIp,
-    'clusterIPs': obj.clusterIPs?.map(y => y),
-    'externalIPs': obj.externalIPs?.map(y => y),
-    'externalName': obj.externalName,
-    'externalTrafficPolicy': obj.externalTrafficPolicy,
-    'healthCheckNodePort': obj.healthCheckNodePort,
-    'internalTrafficPolicy': obj.internalTrafficPolicy,
-    'ipFamilies': obj.ipFamilies?.map(y => y),
-    'ipFamilyPolicy': obj.ipFamilyPolicy,
-    'loadBalancerClass': obj.loadBalancerClass,
-    'loadBalancerIP': obj.loadBalancerIp,
-    'loadBalancerSourceRanges': obj.loadBalancerSourceRanges?.map(y => y),
-    'ports': obj.ports?.map(y => toJson_ServicePort(y)),
-    'publishNotReadyAddresses': obj.publishNotReadyAddresses,
-    'selector': ((obj.selector) === undefined) ? undefined : (Object.entries(obj.selector).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
-    'sessionAffinity': obj.sessionAffinity,
-    'sessionAffinityConfig': toJson_SessionAffinityConfig(obj.sessionAffinityConfig),
-    'trafficDistribution': obj.trafficDistribution,
-    'type': obj.type,
+    allocateLoadBalancerNodePorts: obj.allocateLoadBalancerNodePorts,
+    clusterIP: obj.clusterIp,
+    clusterIPs: obj.clusterIPs?.map(y => y),
+    externalIPs: obj.externalIPs?.map(y => y),
+    externalName: obj.externalName,
+    externalTrafficPolicy: obj.externalTrafficPolicy,
+    healthCheckNodePort: obj.healthCheckNodePort,
+    internalTrafficPolicy: obj.internalTrafficPolicy,
+    ipFamilies: obj.ipFamilies?.map(y => y),
+    ipFamilyPolicy: obj.ipFamilyPolicy,
+    loadBalancerClass: obj.loadBalancerClass,
+    loadBalancerIP: obj.loadBalancerIp,
+    loadBalancerSourceRanges: obj.loadBalancerSourceRanges?.map(y => y),
+    ports: obj.ports?.map(y => toJson_ServicePort(y)),
+    publishNotReadyAddresses: obj.publishNotReadyAddresses,
+    selector: ((obj.selector) === undefined) ? undefined : (Object.entries(obj.selector).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    sessionAffinity: obj.sessionAffinity,
+    sessionAffinityConfig: toJson_SessionAffinityConfig(obj.sessionAffinityConfig),
+    trafficDistribution: obj.trafficDistribution,
+    type: obj.type,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -18136,7 +18136,7 @@ export interface LocalObjectReference {
 export function toJson_LocalObjectReference(obj: LocalObjectReference | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -18214,14 +18214,14 @@ export interface Endpoint {
 export function toJson_Endpoint(obj: Endpoint | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'addresses': obj.addresses?.map(y => y),
-    'conditions': toJson_EndpointConditions(obj.conditions),
-    'deprecatedTopology': ((obj.deprecatedTopology) === undefined) ? undefined : (Object.entries(obj.deprecatedTopology).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
-    'hints': toJson_EndpointHints(obj.hints),
-    'hostname': obj.hostname,
-    'nodeName': obj.nodeName,
-    'targetRef': toJson_ObjectReference(obj.targetRef),
-    'zone': obj.zone,
+    addresses: obj.addresses?.map(y => y),
+    conditions: toJson_EndpointConditions(obj.conditions),
+    deprecatedTopology: ((obj.deprecatedTopology) === undefined) ? undefined : (Object.entries(obj.deprecatedTopology).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    hints: toJson_EndpointHints(obj.hints),
+    hostname: obj.hostname,
+    nodeName: obj.nodeName,
+    targetRef: toJson_ObjectReference(obj.targetRef),
+    zone: obj.zone,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -18281,10 +18281,10 @@ export interface EndpointPort {
 export function toJson_EndpointPort(obj: EndpointPort | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'appProtocol': obj.appProtocol,
-    'name': obj.name,
-    'port': obj.port,
-    'protocol': obj.protocol,
+    appProtocol: obj.appProtocol,
+    name: obj.name,
+    port: obj.port,
+    protocol: obj.protocol,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -18334,10 +18334,10 @@ export interface FlowSchemaSpec {
 export function toJson_FlowSchemaSpec(obj: FlowSchemaSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'distinguisherMethod': toJson_FlowDistinguisherMethod(obj.distinguisherMethod),
-    'matchingPrecedence': obj.matchingPrecedence,
-    'priorityLevelConfiguration': toJson_PriorityLevelConfigurationReference(obj.priorityLevelConfiguration),
-    'rules': obj.rules?.map(y => toJson_PolicyRulesWithSubjects(y)),
+    distinguisherMethod: toJson_FlowDistinguisherMethod(obj.distinguisherMethod),
+    matchingPrecedence: obj.matchingPrecedence,
+    priorityLevelConfiguration: toJson_PriorityLevelConfigurationReference(obj.priorityLevelConfiguration),
+    rules: obj.rules?.map(y => toJson_PolicyRulesWithSubjects(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -18380,9 +18380,9 @@ export interface PriorityLevelConfigurationSpec {
 export function toJson_PriorityLevelConfigurationSpec(obj: PriorityLevelConfigurationSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'exempt': toJson_ExemptPriorityLevelConfiguration(obj.exempt),
-    'limited': toJson_LimitedPriorityLevelConfiguration(obj.limited),
-    'type': obj.type,
+    exempt: toJson_ExemptPriorityLevelConfiguration(obj.exempt),
+    limited: toJson_LimitedPriorityLevelConfiguration(obj.limited),
+    type: obj.type,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -18432,10 +18432,10 @@ export interface FlowSchemaSpecV1Beta3 {
 export function toJson_FlowSchemaSpecV1Beta3(obj: FlowSchemaSpecV1Beta3 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'distinguisherMethod': toJson_FlowDistinguisherMethodV1Beta3(obj.distinguisherMethod),
-    'matchingPrecedence': obj.matchingPrecedence,
-    'priorityLevelConfiguration': toJson_PriorityLevelConfigurationReferenceV1Beta3(obj.priorityLevelConfiguration),
-    'rules': obj.rules?.map(y => toJson_PolicyRulesWithSubjectsV1Beta3(y)),
+    distinguisherMethod: toJson_FlowDistinguisherMethodV1Beta3(obj.distinguisherMethod),
+    matchingPrecedence: obj.matchingPrecedence,
+    priorityLevelConfiguration: toJson_PriorityLevelConfigurationReferenceV1Beta3(obj.priorityLevelConfiguration),
+    rules: obj.rules?.map(y => toJson_PolicyRulesWithSubjectsV1Beta3(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -18478,9 +18478,9 @@ export interface PriorityLevelConfigurationSpecV1Beta3 {
 export function toJson_PriorityLevelConfigurationSpecV1Beta3(obj: PriorityLevelConfigurationSpecV1Beta3 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'exempt': toJson_ExemptPriorityLevelConfigurationV1Beta3(obj.exempt),
-    'limited': toJson_LimitedPriorityLevelConfigurationV1Beta3(obj.limited),
-    'type': obj.type,
+    exempt: toJson_ExemptPriorityLevelConfigurationV1Beta3(obj.exempt),
+    limited: toJson_LimitedPriorityLevelConfigurationV1Beta3(obj.limited),
+    type: obj.type,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -18530,10 +18530,10 @@ export interface IngressSpec {
 export function toJson_IngressSpec(obj: IngressSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'defaultBackend': toJson_IngressBackend(obj.defaultBackend),
-    'ingressClassName': obj.ingressClassName,
-    'rules': obj.rules?.map(y => toJson_IngressRule(y)),
-    'tls': obj.tls?.map(y => toJson_IngressTls(y)),
+    defaultBackend: toJson_IngressBackend(obj.defaultBackend),
+    ingressClassName: obj.ingressClassName,
+    rules: obj.rules?.map(y => toJson_IngressRule(y)),
+    tls: obj.tls?.map(y => toJson_IngressTls(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -18569,8 +18569,8 @@ export interface IngressClassSpec {
 export function toJson_IngressClassSpec(obj: IngressClassSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'controller': obj.controller,
-    'parameters': toJson_IngressClassParametersReference(obj.parameters),
+    controller: obj.controller,
+    parameters: toJson_IngressClassParametersReference(obj.parameters),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -18620,10 +18620,10 @@ export interface NetworkPolicySpec {
 export function toJson_NetworkPolicySpec(obj: NetworkPolicySpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'egress': obj.egress?.map(y => toJson_NetworkPolicyEgressRule(y)),
-    'ingress': obj.ingress?.map(y => toJson_NetworkPolicyIngressRule(y)),
-    'podSelector': toJson_LabelSelector(obj.podSelector),
-    'policyTypes': obj.policyTypes?.map(y => y),
+    egress: obj.egress?.map(y => toJson_NetworkPolicyEgressRule(y)),
+    ingress: obj.ingress?.map(y => toJson_NetworkPolicyIngressRule(y)),
+    podSelector: toJson_LabelSelector(obj.podSelector),
+    policyTypes: obj.policyTypes?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -18652,7 +18652,7 @@ export interface IpAddressSpecV1Alpha1 {
 export function toJson_IpAddressSpecV1Alpha1(obj: IpAddressSpecV1Alpha1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'parentRef': toJson_ParentReferenceV1Alpha1(obj.parentRef),
+    parentRef: toJson_ParentReferenceV1Alpha1(obj.parentRef),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -18681,7 +18681,7 @@ export interface ServiceCidrSpecV1Alpha1 {
 export function toJson_ServiceCidrSpecV1Alpha1(obj: ServiceCidrSpecV1Alpha1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'cidrs': obj.cidrs?.map(y => y),
+    cidrs: obj.cidrs?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -18710,7 +18710,7 @@ export interface Overhead {
 export function toJson_Overhead(obj: Overhead | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'podFixed': ((obj.podFixed) === undefined) ? undefined : (Object.entries(obj.podFixed).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    podFixed: ((obj.podFixed) === undefined) ? undefined : (Object.entries(obj.podFixed).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -18746,8 +18746,8 @@ export interface Scheduling {
 export function toJson_Scheduling(obj: Scheduling | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'nodeSelector': ((obj.nodeSelector) === undefined) ? undefined : (Object.entries(obj.nodeSelector).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
-    'tolerations': obj.tolerations?.map(y => toJson_Toleration(y)),
+    nodeSelector: ((obj.nodeSelector) === undefined) ? undefined : (Object.entries(obj.nodeSelector).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    tolerations: obj.tolerations?.map(y => toJson_Toleration(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -18819,13 +18819,13 @@ export interface DeleteOptions {
 export function toJson_DeleteOptions(obj: DeleteOptions | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiVersion': obj.apiVersion,
-    'dryRun': obj.dryRun?.map(y => y),
-    'gracePeriodSeconds': obj.gracePeriodSeconds,
-    'kind': obj.kind,
-    'orphanDependents': obj.orphanDependents,
-    'preconditions': toJson_Preconditions(obj.preconditions),
-    'propagationPolicy': obj.propagationPolicy,
+    apiVersion: obj.apiVersion,
+    dryRun: obj.dryRun?.map(y => y),
+    gracePeriodSeconds: obj.gracePeriodSeconds,
+    kind: obj.kind,
+    orphanDependents: obj.orphanDependents,
+    preconditions: toJson_Preconditions(obj.preconditions),
+    propagationPolicy: obj.propagationPolicy,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -18885,10 +18885,10 @@ export interface PodDisruptionBudgetSpec {
 export function toJson_PodDisruptionBudgetSpec(obj: PodDisruptionBudgetSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'maxUnavailable': obj.maxUnavailable?.value,
-    'minAvailable': obj.minAvailable?.value,
-    'selector': toJson_LabelSelector(obj.selector),
-    'unhealthyPodEvictionPolicy': obj.unhealthyPodEvictionPolicy,
+    maxUnavailable: obj.maxUnavailable?.value,
+    minAvailable: obj.minAvailable?.value,
+    selector: toJson_LabelSelector(obj.selector),
+    unhealthyPodEvictionPolicy: obj.unhealthyPodEvictionPolicy,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -18917,7 +18917,7 @@ export interface AggregationRule {
 export function toJson_AggregationRule(obj: AggregationRule | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'clusterRoleSelectors': obj.clusterRoleSelectors?.map(y => toJson_LabelSelector(y)),
+    clusterRoleSelectors: obj.clusterRoleSelectors?.map(y => toJson_LabelSelector(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -18974,11 +18974,11 @@ export interface PolicyRule {
 export function toJson_PolicyRule(obj: PolicyRule | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiGroups': obj.apiGroups?.map(y => y),
-    'nonResourceURLs': obj.nonResourceUrLs?.map(y => y),
-    'resourceNames': obj.resourceNames?.map(y => y),
-    'resources': obj.resources?.map(y => y),
-    'verbs': obj.verbs?.map(y => y),
+    apiGroups: obj.apiGroups?.map(y => y),
+    nonResourceURLs: obj.nonResourceUrLs?.map(y => y),
+    resourceNames: obj.resourceNames?.map(y => y),
+    resources: obj.resources?.map(y => y),
+    verbs: obj.verbs?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -19021,9 +19021,9 @@ export interface RoleRef {
 export function toJson_RoleRef(obj: RoleRef | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiGroup': obj.apiGroup,
-    'kind': obj.kind,
-    'name': obj.name,
+    apiGroup: obj.apiGroup,
+    kind: obj.kind,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -19074,10 +19074,10 @@ export interface Subject {
 export function toJson_Subject(obj: Subject | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiGroup': obj.apiGroup,
-    'kind': obj.kind,
-    'name': obj.name,
-    'namespace': obj.namespace,
+    apiGroup: obj.apiGroup,
+    kind: obj.kind,
+    name: obj.name,
+    namespace: obj.namespace,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -19115,8 +19115,8 @@ export interface PodSchedulingContextSpecV1Alpha2 {
 export function toJson_PodSchedulingContextSpecV1Alpha2(obj: PodSchedulingContextSpecV1Alpha2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'potentialNodes': obj.potentialNodes?.map(y => y),
-    'selectedNode': obj.selectedNode,
+    potentialNodes: obj.potentialNodes?.map(y => y),
+    selectedNode: obj.selectedNode,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -19161,9 +19161,9 @@ export interface ResourceClaimSpecV1Alpha2 {
 export function toJson_ResourceClaimSpecV1Alpha2(obj: ResourceClaimSpecV1Alpha2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'allocationMode': obj.allocationMode,
-    'parametersRef': toJson_ResourceClaimParametersReferenceV1Alpha2(obj.parametersRef),
-    'resourceClassName': obj.resourceClassName,
+    allocationMode: obj.allocationMode,
+    parametersRef: toJson_ResourceClaimParametersReferenceV1Alpha2(obj.parametersRef),
+    resourceClassName: obj.resourceClassName,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -19206,9 +19206,9 @@ export interface DriverRequestsV1Alpha2 {
 export function toJson_DriverRequestsV1Alpha2(obj: DriverRequestsV1Alpha2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'driverName': obj.driverName,
-    'requests': obj.requests?.map(y => toJson_ResourceRequestV1Alpha2(y)),
-    'vendorParameters': obj.vendorParameters,
+    driverName: obj.driverName,
+    requests: obj.requests?.map(y => toJson_ResourceRequestV1Alpha2(y)),
+    vendorParameters: obj.vendorParameters,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -19251,9 +19251,9 @@ export interface ResourceClaimParametersReferenceV1Alpha2 {
 export function toJson_ResourceClaimParametersReferenceV1Alpha2(obj: ResourceClaimParametersReferenceV1Alpha2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiGroup': obj.apiGroup,
-    'kind': obj.kind,
-    'name': obj.name,
+    apiGroup: obj.apiGroup,
+    kind: obj.kind,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -19289,8 +19289,8 @@ export interface ResourceClaimTemplateSpecV1Alpha2 {
 export function toJson_ResourceClaimTemplateSpecV1Alpha2(obj: ResourceClaimTemplateSpecV1Alpha2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_ResourceClaimSpecV1Alpha2(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_ResourceClaimSpecV1Alpha2(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -19340,10 +19340,10 @@ export interface ResourceClassParametersReferenceV1Alpha2 {
 export function toJson_ResourceClassParametersReferenceV1Alpha2(obj: ResourceClassParametersReferenceV1Alpha2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiGroup': obj.apiGroup,
-    'kind': obj.kind,
-    'name': obj.name,
-    'namespace': obj.namespace,
+    apiGroup: obj.apiGroup,
+    kind: obj.kind,
+    name: obj.name,
+    namespace: obj.namespace,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -19372,7 +19372,7 @@ export interface NodeSelector {
 export function toJson_NodeSelector(obj: NodeSelector | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'nodeSelectorTerms': obj.nodeSelectorTerms?.map(y => toJson_NodeSelectorTerm(y)),
+    nodeSelectorTerms: obj.nodeSelectorTerms?.map(y => toJson_NodeSelectorTerm(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -19408,8 +19408,8 @@ export interface ResourceFilterV1Alpha2 {
 export function toJson_ResourceFilterV1Alpha2(obj: ResourceFilterV1Alpha2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'driverName': obj.driverName,
-    'namedResources': toJson_NamedResourcesFilterV1Alpha2(obj.namedResources),
+    driverName: obj.driverName,
+    namedResources: toJson_NamedResourcesFilterV1Alpha2(obj.namedResources),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -19445,8 +19445,8 @@ export interface VendorParametersV1Alpha2 {
 export function toJson_VendorParametersV1Alpha2(obj: VendorParametersV1Alpha2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'driverName': obj.driverName,
-    'parameters': obj.parameters,
+    driverName: obj.driverName,
+    parameters: obj.parameters,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -19475,7 +19475,7 @@ export interface NamedResourcesResourcesV1Alpha2 {
 export function toJson_NamedResourcesResourcesV1Alpha2(obj: NamedResourcesResourcesV1Alpha2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'instances': obj.instances?.map(y => toJson_NamedResourcesInstanceV1Alpha2(y)),
+    instances: obj.instances?.map(y => toJson_NamedResourcesInstanceV1Alpha2(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -19599,14 +19599,14 @@ export interface CsiDriverSpec {
 export function toJson_CsiDriverSpec(obj: CsiDriverSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'attachRequired': obj.attachRequired,
-    'fsGroupPolicy': obj.fsGroupPolicy,
-    'podInfoOnMount': obj.podInfoOnMount,
-    'requiresRepublish': obj.requiresRepublish,
-    'seLinuxMount': obj.seLinuxMount,
-    'storageCapacity': obj.storageCapacity,
-    'tokenRequests': obj.tokenRequests?.map(y => toJson_TokenRequest(y)),
-    'volumeLifecycleModes': obj.volumeLifecycleModes?.map(y => y),
+    attachRequired: obj.attachRequired,
+    fsGroupPolicy: obj.fsGroupPolicy,
+    podInfoOnMount: obj.podInfoOnMount,
+    requiresRepublish: obj.requiresRepublish,
+    seLinuxMount: obj.seLinuxMount,
+    storageCapacity: obj.storageCapacity,
+    tokenRequests: obj.tokenRequests?.map(y => toJson_TokenRequest(y)),
+    volumeLifecycleModes: obj.volumeLifecycleModes?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -19635,7 +19635,7 @@ export interface CsiNodeSpec {
 export function toJson_CsiNodeSpec(obj: CsiNodeSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'drivers': obj.drivers?.map(y => toJson_CsiNodeDriver(y)),
+    drivers: obj.drivers?.map(y => toJson_CsiNodeDriver(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -19685,8 +19685,8 @@ export interface LabelSelector {
 export function toJson_LabelSelector(obj: LabelSelector | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'matchExpressions': obj.matchExpressions?.map(y => toJson_LabelSelectorRequirement(y)),
-    'matchLabels': ((obj.matchLabels) === undefined) ? undefined : (Object.entries(obj.matchLabels).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    matchExpressions: obj.matchExpressions?.map(y => toJson_LabelSelectorRequirement(y)),
+    matchLabels: ((obj.matchLabels) === undefined) ? undefined : (Object.entries(obj.matchLabels).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -19715,7 +19715,7 @@ export interface TopologySelectorTerm {
 export function toJson_TopologySelectorTerm(obj: TopologySelectorTerm | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'matchLabelExpressions': obj.matchLabelExpressions?.map(y => toJson_TopologySelectorLabelRequirement(y)),
+    matchLabelExpressions: obj.matchLabelExpressions?.map(y => toJson_TopologySelectorLabelRequirement(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -19758,9 +19758,9 @@ export interface VolumeAttachmentSpec {
 export function toJson_VolumeAttachmentSpec(obj: VolumeAttachmentSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'attacher': obj.attacher,
-    'nodeName': obj.nodeName,
-    'source': toJson_VolumeAttachmentSource(obj.source),
+    attacher: obj.attacher,
+    nodeName: obj.nodeName,
+    source: toJson_VolumeAttachmentSource(obj.source),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -19796,8 +19796,8 @@ export interface StorageVersionMigrationSpecV1Alpha1 {
 export function toJson_StorageVersionMigrationSpecV1Alpha1(obj: StorageVersionMigrationSpecV1Alpha1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'continueToken': obj.continueToken,
-    'resource': toJson_GroupVersionResourceV1Alpha1(obj.resource),
+    continueToken: obj.continueToken,
+    resource: toJson_GroupVersionResourceV1Alpha1(obj.resource),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -19861,12 +19861,12 @@ export interface CustomResourceDefinitionSpec {
 export function toJson_CustomResourceDefinitionSpec(obj: CustomResourceDefinitionSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'conversion': toJson_CustomResourceConversion(obj.conversion),
-    'group': obj.group,
-    'names': toJson_CustomResourceDefinitionNames(obj.names),
-    'preserveUnknownFields': obj.preserveUnknownFields,
-    'scope': obj.scope,
-    'versions': obj.versions?.map(y => toJson_CustomResourceDefinitionVersion(y)),
+    conversion: toJson_CustomResourceConversion(obj.conversion),
+    group: obj.group,
+    names: toJson_CustomResourceDefinitionNames(obj.names),
+    preserveUnknownFields: obj.preserveUnknownFields,
+    scope: obj.scope,
+    versions: obj.versions?.map(y => toJson_CustomResourceDefinitionVersion(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -19930,12 +19930,12 @@ export interface StatusDetails {
 export function toJson_StatusDetails(obj: StatusDetails | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'causes': obj.causes?.map(y => toJson_StatusCause(y)),
-    'group': obj.group,
-    'kind': obj.kind,
-    'name': obj.name,
-    'retryAfterSeconds': obj.retryAfterSeconds,
-    'uid': obj.uid,
+    causes: obj.causes?.map(y => toJson_StatusCause(y)),
+    group: obj.group,
+    kind: obj.kind,
+    name: obj.name,
+    retryAfterSeconds: obj.retryAfterSeconds,
+    uid: obj.uid,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -20006,13 +20006,13 @@ export interface ApiServiceSpec {
 export function toJson_ApiServiceSpec(obj: ApiServiceSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'caBundle': obj.caBundle,
-    'group': obj.group,
-    'groupPriorityMinimum': obj.groupPriorityMinimum,
-    'insecureSkipTLSVerify': obj.insecureSkipTlsVerify,
-    'service': toJson_ServiceReference(obj.service),
-    'version': obj.version,
-    'versionPriority': obj.versionPriority,
+    caBundle: obj.caBundle,
+    group: obj.group,
+    groupPriorityMinimum: obj.groupPriorityMinimum,
+    insecureSkipTLSVerify: obj.insecureSkipTlsVerify,
+    service: toJson_ServiceReference(obj.service),
+    version: obj.version,
+    versionPriority: obj.versionPriority,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -20083,13 +20083,13 @@ export interface ManagedFieldsEntry {
 export function toJson_ManagedFieldsEntry(obj: ManagedFieldsEntry | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiVersion': obj.apiVersion,
-    'fieldsType': obj.fieldsType,
-    'fieldsV1': obj.fieldsV1,
-    'manager': obj.manager,
-    'operation': obj.operation,
-    'subresource': obj.subresource,
-    'time': obj.time?.toISOString(),
+    apiVersion: obj.apiVersion,
+    fieldsType: obj.fieldsType,
+    fieldsV1: obj.fieldsV1,
+    manager: obj.manager,
+    operation: obj.operation,
+    subresource: obj.subresource,
+    time: obj.time?.toISOString(),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -20154,12 +20154,12 @@ export interface OwnerReference {
 export function toJson_OwnerReference(obj: OwnerReference | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiVersion': obj.apiVersion,
-    'blockOwnerDeletion': obj.blockOwnerDeletion,
-    'controller': obj.controller,
-    'kind': obj.kind,
-    'name': obj.name,
-    'uid': obj.uid,
+    apiVersion: obj.apiVersion,
+    blockOwnerDeletion: obj.blockOwnerDeletion,
+    controller: obj.controller,
+    kind: obj.kind,
+    name: obj.name,
+    uid: obj.uid,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -20214,9 +20214,9 @@ export interface WebhookClientConfig {
 export function toJson_WebhookClientConfig(obj: WebhookClientConfig | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'caBundle': obj.caBundle,
-    'service': toJson_ServiceReference(obj.service),
-    'url': obj.url,
+    caBundle: obj.caBundle,
+    service: toJson_ServiceReference(obj.service),
+    url: obj.url,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -20262,8 +20262,8 @@ export interface MatchCondition {
 export function toJson_MatchCondition(obj: MatchCondition | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'expression': obj.expression,
-    'name': obj.name,
+    expression: obj.expression,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -20327,11 +20327,11 @@ export interface RuleWithOperations {
 export function toJson_RuleWithOperations(obj: RuleWithOperations | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiGroups': obj.apiGroups?.map(y => y),
-    'apiVersions': obj.apiVersions?.map(y => y),
-    'operations': obj.operations?.map(y => y),
-    'resources': obj.resources?.map(y => y),
-    'scope': obj.scope,
+    apiGroups: obj.apiGroups?.map(y => y),
+    apiVersions: obj.apiVersions?.map(y => y),
+    operations: obj.operations?.map(y => y),
+    resources: obj.resources?.map(y => y),
+    scope: obj.scope,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -20377,8 +20377,8 @@ export interface AuditAnnotation {
 export function toJson_AuditAnnotation(obj: AuditAnnotation | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'key': obj.key,
-    'valueExpression': obj.valueExpression,
+    key: obj.key,
+    valueExpression: obj.valueExpression,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -20474,11 +20474,11 @@ export interface MatchResources {
 export function toJson_MatchResources(obj: MatchResources | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'excludeResourceRules': obj.excludeResourceRules?.map(y => toJson_NamedRuleWithOperations(y)),
-    'matchPolicy': obj.matchPolicy,
-    'namespaceSelector': toJson_LabelSelector(obj.namespaceSelector),
-    'objectSelector': toJson_LabelSelector(obj.objectSelector),
-    'resourceRules': obj.resourceRules?.map(y => toJson_NamedRuleWithOperations(y)),
+    excludeResourceRules: obj.excludeResourceRules?.map(y => toJson_NamedRuleWithOperations(y)),
+    matchPolicy: obj.matchPolicy,
+    namespaceSelector: toJson_LabelSelector(obj.namespaceSelector),
+    objectSelector: toJson_LabelSelector(obj.objectSelector),
+    resourceRules: obj.resourceRules?.map(y => toJson_NamedRuleWithOperations(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -20514,8 +20514,8 @@ export interface ParamKind {
 export function toJson_ParamKind(obj: ParamKind | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiVersion': obj.apiVersion,
-    'kind': obj.kind,
+    apiVersion: obj.apiVersion,
+    kind: obj.kind,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -20590,10 +20590,10 @@ export interface Validation {
 export function toJson_Validation(obj: Validation | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'expression': obj.expression,
-    'message': obj.message,
-    'messageExpression': obj.messageExpression,
-    'reason': obj.reason,
+    expression: obj.expression,
+    message: obj.message,
+    messageExpression: obj.messageExpression,
+    reason: obj.reason,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -20629,8 +20629,8 @@ export interface Variable {
 export function toJson_Variable(obj: Variable | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'expression': obj.expression,
-    'name': obj.name,
+    expression: obj.expression,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -20698,10 +20698,10 @@ export interface ParamRef {
 export function toJson_ParamRef(obj: ParamRef | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
-    'namespace': obj.namespace,
-    'parameterNotFoundAction': obj.parameterNotFoundAction,
-    'selector': toJson_LabelSelector(obj.selector),
+    name: obj.name,
+    namespace: obj.namespace,
+    parameterNotFoundAction: obj.parameterNotFoundAction,
+    selector: toJson_LabelSelector(obj.selector),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -20747,8 +20747,8 @@ export interface AuditAnnotationV1Alpha1 {
 export function toJson_AuditAnnotationV1Alpha1(obj: AuditAnnotationV1Alpha1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'key': obj.key,
-    'valueExpression': obj.valueExpression,
+    key: obj.key,
+    valueExpression: obj.valueExpression,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -20792,8 +20792,8 @@ export interface MatchConditionV1Alpha1 {
 export function toJson_MatchConditionV1Alpha1(obj: MatchConditionV1Alpha1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'expression': obj.expression,
-    'name': obj.name,
+    expression: obj.expression,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -20889,11 +20889,11 @@ export interface MatchResourcesV1Alpha1 {
 export function toJson_MatchResourcesV1Alpha1(obj: MatchResourcesV1Alpha1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'excludeResourceRules': obj.excludeResourceRules?.map(y => toJson_NamedRuleWithOperationsV1Alpha1(y)),
-    'matchPolicy': obj.matchPolicy,
-    'namespaceSelector': toJson_LabelSelector(obj.namespaceSelector),
-    'objectSelector': toJson_LabelSelector(obj.objectSelector),
-    'resourceRules': obj.resourceRules?.map(y => toJson_NamedRuleWithOperationsV1Alpha1(y)),
+    excludeResourceRules: obj.excludeResourceRules?.map(y => toJson_NamedRuleWithOperationsV1Alpha1(y)),
+    matchPolicy: obj.matchPolicy,
+    namespaceSelector: toJson_LabelSelector(obj.namespaceSelector),
+    objectSelector: toJson_LabelSelector(obj.objectSelector),
+    resourceRules: obj.resourceRules?.map(y => toJson_NamedRuleWithOperationsV1Alpha1(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -20929,8 +20929,8 @@ export interface ParamKindV1Alpha1 {
 export function toJson_ParamKindV1Alpha1(obj: ParamKindV1Alpha1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiVersion': obj.apiVersion,
-    'kind': obj.kind,
+    apiVersion: obj.apiVersion,
+    kind: obj.kind,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -21005,10 +21005,10 @@ export interface ValidationV1Alpha1 {
 export function toJson_ValidationV1Alpha1(obj: ValidationV1Alpha1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'expression': obj.expression,
-    'message': obj.message,
-    'messageExpression': obj.messageExpression,
-    'reason': obj.reason,
+    expression: obj.expression,
+    message: obj.message,
+    messageExpression: obj.messageExpression,
+    reason: obj.reason,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -21044,8 +21044,8 @@ export interface VariableV1Alpha1 {
 export function toJson_VariableV1Alpha1(obj: VariableV1Alpha1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'expression': obj.expression,
-    'name': obj.name,
+    expression: obj.expression,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -21110,10 +21110,10 @@ export interface ParamRefV1Alpha1 {
 export function toJson_ParamRefV1Alpha1(obj: ParamRefV1Alpha1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
-    'namespace': obj.namespace,
-    'parameterNotFoundAction': obj.parameterNotFoundAction,
-    'selector': toJson_LabelSelector(obj.selector),
+    name: obj.name,
+    namespace: obj.namespace,
+    parameterNotFoundAction: obj.parameterNotFoundAction,
+    selector: toJson_LabelSelector(obj.selector),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -21159,8 +21159,8 @@ export interface AuditAnnotationV1Beta1 {
 export function toJson_AuditAnnotationV1Beta1(obj: AuditAnnotationV1Beta1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'key': obj.key,
-    'valueExpression': obj.valueExpression,
+    key: obj.key,
+    valueExpression: obj.valueExpression,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -21206,8 +21206,8 @@ export interface MatchConditionV1Beta1 {
 export function toJson_MatchConditionV1Beta1(obj: MatchConditionV1Beta1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'expression': obj.expression,
-    'name': obj.name,
+    expression: obj.expression,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -21303,11 +21303,11 @@ export interface MatchResourcesV1Beta1 {
 export function toJson_MatchResourcesV1Beta1(obj: MatchResourcesV1Beta1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'excludeResourceRules': obj.excludeResourceRules?.map(y => toJson_NamedRuleWithOperationsV1Beta1(y)),
-    'matchPolicy': obj.matchPolicy,
-    'namespaceSelector': toJson_LabelSelector(obj.namespaceSelector),
-    'objectSelector': toJson_LabelSelector(obj.objectSelector),
-    'resourceRules': obj.resourceRules?.map(y => toJson_NamedRuleWithOperationsV1Beta1(y)),
+    excludeResourceRules: obj.excludeResourceRules?.map(y => toJson_NamedRuleWithOperationsV1Beta1(y)),
+    matchPolicy: obj.matchPolicy,
+    namespaceSelector: toJson_LabelSelector(obj.namespaceSelector),
+    objectSelector: toJson_LabelSelector(obj.objectSelector),
+    resourceRules: obj.resourceRules?.map(y => toJson_NamedRuleWithOperationsV1Beta1(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -21343,8 +21343,8 @@ export interface ParamKindV1Beta1 {
 export function toJson_ParamKindV1Beta1(obj: ParamKindV1Beta1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiVersion': obj.apiVersion,
-    'kind': obj.kind,
+    apiVersion: obj.apiVersion,
+    kind: obj.kind,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -21419,10 +21419,10 @@ export interface ValidationV1Beta1 {
 export function toJson_ValidationV1Beta1(obj: ValidationV1Beta1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'expression': obj.expression,
-    'message': obj.message,
-    'messageExpression': obj.messageExpression,
-    'reason': obj.reason,
+    expression: obj.expression,
+    message: obj.message,
+    messageExpression: obj.messageExpression,
+    reason: obj.reason,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -21458,8 +21458,8 @@ export interface VariableV1Beta1 {
 export function toJson_VariableV1Beta1(obj: VariableV1Beta1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'expression': obj.expression,
-    'name': obj.name,
+    expression: obj.expression,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -21527,10 +21527,10 @@ export interface ParamRefV1Beta1 {
 export function toJson_ParamRefV1Beta1(obj: ParamRefV1Beta1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
-    'namespace': obj.namespace,
-    'parameterNotFoundAction': obj.parameterNotFoundAction,
-    'selector': toJson_LabelSelector(obj.selector),
+    name: obj.name,
+    namespace: obj.namespace,
+    parameterNotFoundAction: obj.parameterNotFoundAction,
+    selector: toJson_LabelSelector(obj.selector),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -21567,8 +21567,8 @@ export interface DaemonSetUpdateStrategy {
 export function toJson_DaemonSetUpdateStrategy(obj: DaemonSetUpdateStrategy | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'rollingUpdate': toJson_RollingUpdateDaemonSet(obj.rollingUpdate),
-    'type': obj.type,
+    rollingUpdate: toJson_RollingUpdateDaemonSet(obj.rollingUpdate),
+    type: obj.type,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -21605,8 +21605,8 @@ export interface DeploymentStrategy {
 export function toJson_DeploymentStrategy(obj: DeploymentStrategy | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'rollingUpdate': toJson_RollingUpdateDeployment(obj.rollingUpdate),
-    'type': obj.type,
+    rollingUpdate: toJson_RollingUpdateDeployment(obj.rollingUpdate),
+    type: obj.type,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -21638,7 +21638,7 @@ export interface StatefulSetOrdinals {
 export function toJson_StatefulSetOrdinals(obj: StatefulSetOrdinals | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'start': obj.start,
+    start: obj.start,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -21674,8 +21674,8 @@ export interface StatefulSetPersistentVolumeClaimRetentionPolicy {
 export function toJson_StatefulSetPersistentVolumeClaimRetentionPolicy(obj: StatefulSetPersistentVolumeClaimRetentionPolicy | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'whenDeleted': obj.whenDeleted,
-    'whenScaled': obj.whenScaled,
+    whenDeleted: obj.whenDeleted,
+    whenScaled: obj.whenScaled,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -21712,8 +21712,8 @@ export interface StatefulSetUpdateStrategy {
 export function toJson_StatefulSetUpdateStrategy(obj: StatefulSetUpdateStrategy | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'rollingUpdate': toJson_RollingUpdateStatefulSetStrategy(obj.rollingUpdate),
-    'type': obj.type,
+    rollingUpdate: toJson_RollingUpdateStatefulSetStrategy(obj.rollingUpdate),
+    type: obj.type,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -21763,10 +21763,10 @@ export interface BoundObjectReference {
 export function toJson_BoundObjectReference(obj: BoundObjectReference | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiVersion': obj.apiVersion,
-    'kind': obj.kind,
-    'name': obj.name,
-    'uid': obj.uid,
+    apiVersion: obj.apiVersion,
+    kind: obj.kind,
+    name: obj.name,
+    uid: obj.uid,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -21802,8 +21802,8 @@ export interface NonResourceAttributes {
 export function toJson_NonResourceAttributes(obj: NonResourceAttributes | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'path': obj.path,
-    'verb': obj.verb,
+    path: obj.path,
+    verb: obj.verb,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -21874,13 +21874,13 @@ export interface ResourceAttributes {
 export function toJson_ResourceAttributes(obj: ResourceAttributes | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'group': obj.group,
-    'name': obj.name,
-    'namespace': obj.namespace,
-    'resource': obj.resource,
-    'subresource': obj.subresource,
-    'verb': obj.verb,
-    'version': obj.version,
+    group: obj.group,
+    name: obj.name,
+    namespace: obj.namespace,
+    resource: obj.resource,
+    subresource: obj.subresource,
+    verb: obj.verb,
+    version: obj.version,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -21923,9 +21923,9 @@ export interface CrossVersionObjectReference {
 export function toJson_CrossVersionObjectReference(obj: CrossVersionObjectReference | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiVersion': obj.apiVersion,
-    'kind': obj.kind,
-    'name': obj.name,
+    apiVersion: obj.apiVersion,
+    kind: obj.kind,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -21964,8 +21964,8 @@ export interface HorizontalPodAutoscalerBehaviorV2 {
 export function toJson_HorizontalPodAutoscalerBehaviorV2(obj: HorizontalPodAutoscalerBehaviorV2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'scaleDown': toJson_HpaScalingRulesV2(obj.scaleDown),
-    'scaleUp': toJson_HpaScalingRulesV2(obj.scaleUp),
+    scaleDown: toJson_HpaScalingRulesV2(obj.scaleDown),
+    scaleUp: toJson_HpaScalingRulesV2(obj.scaleUp),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -22029,12 +22029,12 @@ export interface MetricSpecV2 {
 export function toJson_MetricSpecV2(obj: MetricSpecV2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'containerResource': toJson_ContainerResourceMetricSourceV2(obj.containerResource),
-    'external': toJson_ExternalMetricSourceV2(obj.external),
-    'object': toJson_ObjectMetricSourceV2(obj.object),
-    'pods': toJson_PodsMetricSourceV2(obj.pods),
-    'resource': toJson_ResourceMetricSourceV2(obj.resource),
-    'type': obj.type,
+    containerResource: toJson_ContainerResourceMetricSourceV2(obj.containerResource),
+    external: toJson_ExternalMetricSourceV2(obj.external),
+    object: toJson_ObjectMetricSourceV2(obj.object),
+    pods: toJson_PodsMetricSourceV2(obj.pods),
+    resource: toJson_ResourceMetricSourceV2(obj.resource),
+    type: obj.type,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -22077,9 +22077,9 @@ export interface CrossVersionObjectReferenceV2 {
 export function toJson_CrossVersionObjectReferenceV2(obj: CrossVersionObjectReferenceV2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiVersion': obj.apiVersion,
-    'kind': obj.kind,
-    'name': obj.name,
+    apiVersion: obj.apiVersion,
+    kind: obj.kind,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -22115,8 +22115,8 @@ export interface JobTemplateSpec {
 export function toJson_JobTemplateSpec(obj: JobTemplateSpec | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_JobSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_JobSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -22145,7 +22145,7 @@ export interface PodFailurePolicy {
 export function toJson_PodFailurePolicy(obj: PodFailurePolicy | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'rules': obj.rules?.map(y => toJson_PodFailurePolicyRule(y)),
+    rules: obj.rules?.map(y => toJson_PodFailurePolicyRule(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -22174,7 +22174,7 @@ export interface SuccessPolicy {
 export function toJson_SuccessPolicy(obj: SuccessPolicy | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'rules': obj.rules?.map(y => toJson_SuccessPolicyRule(y)),
+    rules: obj.rules?.map(y => toJson_SuccessPolicyRule(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -22224,10 +22224,10 @@ export interface EndpointAddress {
 export function toJson_EndpointAddress(obj: EndpointAddress | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'hostname': obj.hostname,
-    'ip': obj.ip,
-    'nodeName': obj.nodeName,
-    'targetRef': toJson_ObjectReference(obj.targetRef),
+    hostname: obj.hostname,
+    ip: obj.ip,
+    nodeName: obj.nodeName,
+    targetRef: toJson_ObjectReference(obj.targetRef),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -22291,12 +22291,12 @@ export interface LimitRangeItem {
 export function toJson_LimitRangeItem(obj: LimitRangeItem | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'default': ((obj.default) === undefined) ? undefined : (Object.entries(obj.default).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
-    'defaultRequest': ((obj.defaultRequest) === undefined) ? undefined : (Object.entries(obj.defaultRequest).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
-    'max': ((obj.max) === undefined) ? undefined : (Object.entries(obj.max).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
-    'maxLimitRequestRatio': ((obj.maxLimitRequestRatio) === undefined) ? undefined : (Object.entries(obj.maxLimitRequestRatio).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
-    'min': ((obj.min) === undefined) ? undefined : (Object.entries(obj.min).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
-    'type': obj.type,
+    default: ((obj.default) === undefined) ? undefined : (Object.entries(obj.default).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    defaultRequest: ((obj.defaultRequest) === undefined) ? undefined : (Object.entries(obj.defaultRequest).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    max: ((obj.max) === undefined) ? undefined : (Object.entries(obj.max).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    maxLimitRequestRatio: ((obj.maxLimitRequestRatio) === undefined) ? undefined : (Object.entries(obj.maxLimitRequestRatio).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    min: ((obj.min) === undefined) ? undefined : (Object.entries(obj.min).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    type: obj.type,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -22325,7 +22325,7 @@ export interface NodeConfigSource {
 export function toJson_NodeConfigSource(obj: NodeConfigSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'configMap': toJson_ConfigMapNodeConfigSource(obj.configMap),
+    configMap: toJson_ConfigMapNodeConfigSource(obj.configMap),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -22375,10 +22375,10 @@ export interface Taint {
 export function toJson_Taint(obj: Taint | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'effect': obj.effect,
-    'key': obj.key,
-    'timeAdded': obj.timeAdded?.toISOString(),
-    'value': obj.value,
+    effect: obj.effect,
+    key: obj.key,
+    timeAdded: obj.timeAdded?.toISOString(),
+    value: obj.value,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -22430,10 +22430,10 @@ export interface AwsElasticBlockStoreVolumeSource {
 export function toJson_AwsElasticBlockStoreVolumeSource(obj: AwsElasticBlockStoreVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'fsType': obj.fsType,
-    'partition': obj.partition,
-    'readOnly': obj.readOnly,
-    'volumeID': obj.volumeId,
+    fsType: obj.fsType,
+    partition: obj.partition,
+    readOnly: obj.readOnly,
+    volumeID: obj.volumeId,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -22498,12 +22498,12 @@ export interface AzureDiskVolumeSource {
 export function toJson_AzureDiskVolumeSource(obj: AzureDiskVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'cachingMode': obj.cachingMode,
-    'diskName': obj.diskName,
-    'diskURI': obj.diskUri,
-    'fsType': obj.fsType,
-    'kind': obj.kind,
-    'readOnly': obj.readOnly,
+    cachingMode: obj.cachingMode,
+    diskName: obj.diskName,
+    diskURI: obj.diskUri,
+    fsType: obj.fsType,
+    kind: obj.kind,
+    readOnly: obj.readOnly,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -22553,10 +22553,10 @@ export interface AzureFilePersistentVolumeSource {
 export function toJson_AzureFilePersistentVolumeSource(obj: AzureFilePersistentVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'readOnly': obj.readOnly,
-    'secretName': obj.secretName,
-    'secretNamespace': obj.secretNamespace,
-    'shareName': obj.shareName,
+    readOnly: obj.readOnly,
+    secretName: obj.secretName,
+    secretNamespace: obj.secretNamespace,
+    shareName: obj.shareName,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -22621,12 +22621,12 @@ export interface CephFsPersistentVolumeSource {
 export function toJson_CephFsPersistentVolumeSource(obj: CephFsPersistentVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'monitors': obj.monitors?.map(y => y),
-    'path': obj.path,
-    'readOnly': obj.readOnly,
-    'secretFile': obj.secretFile,
-    'secretRef': toJson_SecretReference(obj.secretRef),
-    'user': obj.user,
+    monitors: obj.monitors?.map(y => y),
+    path: obj.path,
+    readOnly: obj.readOnly,
+    secretFile: obj.secretFile,
+    secretRef: toJson_SecretReference(obj.secretRef),
+    user: obj.user,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -22677,10 +22677,10 @@ export interface CinderPersistentVolumeSource {
 export function toJson_CinderPersistentVolumeSource(obj: CinderPersistentVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'fsType': obj.fsType,
-    'readOnly': obj.readOnly,
-    'secretRef': toJson_SecretReference(obj.secretRef),
-    'volumeID': obj.volumeId,
+    fsType: obj.fsType,
+    readOnly: obj.readOnly,
+    secretRef: toJson_SecretReference(obj.secretRef),
+    volumeID: obj.volumeId,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -22773,16 +22773,16 @@ export interface CsiPersistentVolumeSource {
 export function toJson_CsiPersistentVolumeSource(obj: CsiPersistentVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'controllerExpandSecretRef': toJson_SecretReference(obj.controllerExpandSecretRef),
-    'controllerPublishSecretRef': toJson_SecretReference(obj.controllerPublishSecretRef),
-    'driver': obj.driver,
-    'fsType': obj.fsType,
-    'nodeExpandSecretRef': toJson_SecretReference(obj.nodeExpandSecretRef),
-    'nodePublishSecretRef': toJson_SecretReference(obj.nodePublishSecretRef),
-    'nodeStageSecretRef': toJson_SecretReference(obj.nodeStageSecretRef),
-    'readOnly': obj.readOnly,
-    'volumeAttributes': ((obj.volumeAttributes) === undefined) ? undefined : (Object.entries(obj.volumeAttributes).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
-    'volumeHandle': obj.volumeHandle,
+    controllerExpandSecretRef: toJson_SecretReference(obj.controllerExpandSecretRef),
+    controllerPublishSecretRef: toJson_SecretReference(obj.controllerPublishSecretRef),
+    driver: obj.driver,
+    fsType: obj.fsType,
+    nodeExpandSecretRef: toJson_SecretReference(obj.nodeExpandSecretRef),
+    nodePublishSecretRef: toJson_SecretReference(obj.nodePublishSecretRef),
+    nodeStageSecretRef: toJson_SecretReference(obj.nodeStageSecretRef),
+    readOnly: obj.readOnly,
+    volumeAttributes: ((obj.volumeAttributes) === undefined) ? undefined : (Object.entries(obj.volumeAttributes).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    volumeHandle: obj.volumeHandle,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -22840,11 +22840,11 @@ export interface FcVolumeSource {
 export function toJson_FcVolumeSource(obj: FcVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'fsType': obj.fsType,
-    'lun': obj.lun,
-    'readOnly': obj.readOnly,
-    'targetWWNs': obj.targetWwNs?.map(y => y),
-    'wwids': obj.wwids?.map(y => y),
+    fsType: obj.fsType,
+    lun: obj.lun,
+    readOnly: obj.readOnly,
+    targetWWNs: obj.targetWwNs?.map(y => y),
+    wwids: obj.wwids?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -22901,11 +22901,11 @@ export interface FlexPersistentVolumeSource {
 export function toJson_FlexPersistentVolumeSource(obj: FlexPersistentVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'driver': obj.driver,
-    'fsType': obj.fsType,
-    'options': ((obj.options) === undefined) ? undefined : (Object.entries(obj.options).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
-    'readOnly': obj.readOnly,
-    'secretRef': toJson_SecretReference(obj.secretRef),
+    driver: obj.driver,
+    fsType: obj.fsType,
+    options: ((obj.options) === undefined) ? undefined : (Object.entries(obj.options).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    readOnly: obj.readOnly,
+    secretRef: toJson_SecretReference(obj.secretRef),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -22941,8 +22941,8 @@ export interface FlockerVolumeSource {
 export function toJson_FlockerVolumeSource(obj: FlockerVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'datasetName': obj.datasetName,
-    'datasetUUID': obj.datasetUuid,
+    datasetName: obj.datasetName,
+    datasetUUID: obj.datasetUuid,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -22995,10 +22995,10 @@ export interface GcePersistentDiskVolumeSource {
 export function toJson_GcePersistentDiskVolumeSource(obj: GcePersistentDiskVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'fsType': obj.fsType,
-    'partition': obj.partition,
-    'pdName': obj.pdName,
-    'readOnly': obj.readOnly,
+    fsType: obj.fsType,
+    partition: obj.partition,
+    pdName: obj.pdName,
+    readOnly: obj.readOnly,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -23049,10 +23049,10 @@ export interface GlusterfsPersistentVolumeSource {
 export function toJson_GlusterfsPersistentVolumeSource(obj: GlusterfsPersistentVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'endpoints': obj.endpoints,
-    'endpointsNamespace': obj.endpointsNamespace,
-    'path': obj.path,
-    'readOnly': obj.readOnly,
+    endpoints: obj.endpoints,
+    endpointsNamespace: obj.endpointsNamespace,
+    path: obj.path,
+    readOnly: obj.readOnly,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -23089,8 +23089,8 @@ export interface HostPathVolumeSource {
 export function toJson_HostPathVolumeSource(obj: HostPathVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'path': obj.path,
-    'type': obj.type,
+    path: obj.path,
+    type: obj.type,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -23191,17 +23191,17 @@ export interface IscsiPersistentVolumeSource {
 export function toJson_IscsiPersistentVolumeSource(obj: IscsiPersistentVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'chapAuthDiscovery': obj.chapAuthDiscovery,
-    'chapAuthSession': obj.chapAuthSession,
-    'fsType': obj.fsType,
-    'initiatorName': obj.initiatorName,
-    'iqn': obj.iqn,
-    'iscsiInterface': obj.iscsiInterface,
-    'lun': obj.lun,
-    'portals': obj.portals?.map(y => y),
-    'readOnly': obj.readOnly,
-    'secretRef': toJson_SecretReference(obj.secretRef),
-    'targetPortal': obj.targetPortal,
+    chapAuthDiscovery: obj.chapAuthDiscovery,
+    chapAuthSession: obj.chapAuthSession,
+    fsType: obj.fsType,
+    initiatorName: obj.initiatorName,
+    iqn: obj.iqn,
+    iscsiInterface: obj.iscsiInterface,
+    lun: obj.lun,
+    portals: obj.portals?.map(y => y),
+    readOnly: obj.readOnly,
+    secretRef: toJson_SecretReference(obj.secretRef),
+    targetPortal: obj.targetPortal,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -23237,8 +23237,8 @@ export interface LocalVolumeSource {
 export function toJson_LocalVolumeSource(obj: LocalVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'fsType': obj.fsType,
-    'path': obj.path,
+    fsType: obj.fsType,
+    path: obj.path,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -23282,9 +23282,9 @@ export interface NfsVolumeSource {
 export function toJson_NfsVolumeSource(obj: NfsVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'path': obj.path,
-    'readOnly': obj.readOnly,
-    'server': obj.server,
+    path: obj.path,
+    readOnly: obj.readOnly,
+    server: obj.server,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -23313,7 +23313,7 @@ export interface VolumeNodeAffinity {
 export function toJson_VolumeNodeAffinity(obj: VolumeNodeAffinity | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'required': toJson_NodeSelector(obj.required),
+    required: toJson_NodeSelector(obj.required),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -23349,8 +23349,8 @@ export interface PhotonPersistentDiskVolumeSource {
 export function toJson_PhotonPersistentDiskVolumeSource(obj: PhotonPersistentDiskVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'fsType': obj.fsType,
-    'pdID': obj.pdId,
+    fsType: obj.fsType,
+    pdID: obj.pdId,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -23393,9 +23393,9 @@ export interface PortworxVolumeSource {
 export function toJson_PortworxVolumeSource(obj: PortworxVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'fsType': obj.fsType,
-    'readOnly': obj.readOnly,
-    'volumeID': obj.volumeId,
+    fsType: obj.fsType,
+    readOnly: obj.readOnly,
+    volumeID: obj.volumeId,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -23462,12 +23462,12 @@ export interface QuobyteVolumeSource {
 export function toJson_QuobyteVolumeSource(obj: QuobyteVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'group': obj.group,
-    'readOnly': obj.readOnly,
-    'registry': obj.registry,
-    'tenant': obj.tenant,
-    'user': obj.user,
-    'volume': obj.volume,
+    group: obj.group,
+    readOnly: obj.readOnly,
+    registry: obj.registry,
+    tenant: obj.tenant,
+    user: obj.user,
+    volume: obj.volume,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -23550,14 +23550,14 @@ export interface RbdPersistentVolumeSource {
 export function toJson_RbdPersistentVolumeSource(obj: RbdPersistentVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'fsType': obj.fsType,
-    'image': obj.image,
-    'keyring': obj.keyring,
-    'monitors': obj.monitors?.map(y => y),
-    'pool': obj.pool,
-    'readOnly': obj.readOnly,
-    'secretRef': toJson_SecretReference(obj.secretRef),
-    'user': obj.user,
+    fsType: obj.fsType,
+    image: obj.image,
+    keyring: obj.keyring,
+    monitors: obj.monitors?.map(y => y),
+    pool: obj.pool,
+    readOnly: obj.readOnly,
+    secretRef: toJson_SecretReference(obj.secretRef),
+    user: obj.user,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -23651,16 +23651,16 @@ export interface ScaleIoPersistentVolumeSource {
 export function toJson_ScaleIoPersistentVolumeSource(obj: ScaleIoPersistentVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'fsType': obj.fsType,
-    'gateway': obj.gateway,
-    'protectionDomain': obj.protectionDomain,
-    'readOnly': obj.readOnly,
-    'secretRef': toJson_SecretReference(obj.secretRef),
-    'sslEnabled': obj.sslEnabled,
-    'storageMode': obj.storageMode,
-    'storagePool': obj.storagePool,
-    'system': obj.system,
-    'volumeName': obj.volumeName,
+    fsType: obj.fsType,
+    gateway: obj.gateway,
+    protectionDomain: obj.protectionDomain,
+    readOnly: obj.readOnly,
+    secretRef: toJson_SecretReference(obj.secretRef),
+    sslEnabled: obj.sslEnabled,
+    storageMode: obj.storageMode,
+    storagePool: obj.storagePool,
+    system: obj.system,
+    volumeName: obj.volumeName,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -23717,11 +23717,11 @@ export interface StorageOsPersistentVolumeSource {
 export function toJson_StorageOsPersistentVolumeSource(obj: StorageOsPersistentVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'fsType': obj.fsType,
-    'readOnly': obj.readOnly,
-    'secretRef': toJson_ObjectReference(obj.secretRef),
-    'volumeName': obj.volumeName,
-    'volumeNamespace': obj.volumeNamespace,
+    fsType: obj.fsType,
+    readOnly: obj.readOnly,
+    secretRef: toJson_ObjectReference(obj.secretRef),
+    volumeName: obj.volumeName,
+    volumeNamespace: obj.volumeNamespace,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -23771,10 +23771,10 @@ export interface VsphereVirtualDiskVolumeSource {
 export function toJson_VsphereVirtualDiskVolumeSource(obj: VsphereVirtualDiskVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'fsType': obj.fsType,
-    'storagePolicyID': obj.storagePolicyId,
-    'storagePolicyName': obj.storagePolicyName,
-    'volumePath': obj.volumePath,
+    fsType: obj.fsType,
+    storagePolicyID: obj.storagePolicyId,
+    storagePolicyName: obj.storagePolicyName,
+    volumePath: obj.volumePath,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -23817,9 +23817,9 @@ export interface TypedLocalObjectReference {
 export function toJson_TypedLocalObjectReference(obj: TypedLocalObjectReference | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiGroup': obj.apiGroup,
-    'kind': obj.kind,
-    'name': obj.name,
+    apiGroup: obj.apiGroup,
+    kind: obj.kind,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -23867,10 +23867,10 @@ export interface TypedObjectReference {
 export function toJson_TypedObjectReference(obj: TypedObjectReference | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiGroup': obj.apiGroup,
-    'kind': obj.kind,
-    'name': obj.name,
-    'namespace': obj.namespace,
+    apiGroup: obj.apiGroup,
+    kind: obj.kind,
+    name: obj.name,
+    namespace: obj.namespace,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -23906,8 +23906,8 @@ export interface VolumeResourceRequirements {
 export function toJson_VolumeResourceRequirements(obj: VolumeResourceRequirements | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'limits': ((obj.limits) === undefined) ? undefined : (Object.entries(obj.limits).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
-    'requests': ((obj.requests) === undefined) ? undefined : (Object.entries(obj.requests).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    limits: ((obj.limits) === undefined) ? undefined : (Object.entries(obj.limits).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    requests: ((obj.requests) === undefined) ? undefined : (Object.entries(obj.requests).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -23950,9 +23950,9 @@ export interface Affinity {
 export function toJson_Affinity(obj: Affinity | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'nodeAffinity': toJson_NodeAffinity(obj.nodeAffinity),
-    'podAffinity': toJson_PodAffinity(obj.podAffinity),
-    'podAntiAffinity': toJson_PodAntiAffinity(obj.podAntiAffinity),
+    nodeAffinity: toJson_NodeAffinity(obj.nodeAffinity),
+    podAffinity: toJson_PodAffinity(obj.podAffinity),
+    podAntiAffinity: toJson_PodAntiAffinity(obj.podAntiAffinity),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -24148,30 +24148,30 @@ export interface Container {
 export function toJson_Container(obj: Container | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'args': obj.args?.map(y => y),
-    'command': obj.command?.map(y => y),
-    'env': obj.env?.map(y => toJson_EnvVar(y)),
-    'envFrom': obj.envFrom?.map(y => toJson_EnvFromSource(y)),
-    'image': obj.image,
-    'imagePullPolicy': obj.imagePullPolicy,
-    'lifecycle': toJson_Lifecycle(obj.lifecycle),
-    'livenessProbe': toJson_Probe(obj.livenessProbe),
-    'name': obj.name,
-    'ports': obj.ports?.map(y => toJson_ContainerPort(y)),
-    'readinessProbe': toJson_Probe(obj.readinessProbe),
-    'resizePolicy': obj.resizePolicy?.map(y => toJson_ContainerResizePolicy(y)),
-    'resources': toJson_ResourceRequirements(obj.resources),
-    'restartPolicy': obj.restartPolicy,
-    'securityContext': toJson_SecurityContext(obj.securityContext),
-    'startupProbe': toJson_Probe(obj.startupProbe),
-    'stdin': obj.stdin,
-    'stdinOnce': obj.stdinOnce,
-    'terminationMessagePath': obj.terminationMessagePath,
-    'terminationMessagePolicy': obj.terminationMessagePolicy,
-    'tty': obj.tty,
-    'volumeDevices': obj.volumeDevices?.map(y => toJson_VolumeDevice(y)),
-    'volumeMounts': obj.volumeMounts?.map(y => toJson_VolumeMount(y)),
-    'workingDir': obj.workingDir,
+    args: obj.args?.map(y => y),
+    command: obj.command?.map(y => y),
+    env: obj.env?.map(y => toJson_EnvVar(y)),
+    envFrom: obj.envFrom?.map(y => toJson_EnvFromSource(y)),
+    image: obj.image,
+    imagePullPolicy: obj.imagePullPolicy,
+    lifecycle: toJson_Lifecycle(obj.lifecycle),
+    livenessProbe: toJson_Probe(obj.livenessProbe),
+    name: obj.name,
+    ports: obj.ports?.map(y => toJson_ContainerPort(y)),
+    readinessProbe: toJson_Probe(obj.readinessProbe),
+    resizePolicy: obj.resizePolicy?.map(y => toJson_ContainerResizePolicy(y)),
+    resources: toJson_ResourceRequirements(obj.resources),
+    restartPolicy: obj.restartPolicy,
+    securityContext: toJson_SecurityContext(obj.securityContext),
+    startupProbe: toJson_Probe(obj.startupProbe),
+    stdin: obj.stdin,
+    stdinOnce: obj.stdinOnce,
+    terminationMessagePath: obj.terminationMessagePath,
+    terminationMessagePolicy: obj.terminationMessagePolicy,
+    tty: obj.tty,
+    volumeDevices: obj.volumeDevices?.map(y => toJson_VolumeDevice(y)),
+    volumeMounts: obj.volumeMounts?.map(y => toJson_VolumeMount(y)),
+    workingDir: obj.workingDir,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -24214,9 +24214,9 @@ export interface PodDnsConfig {
 export function toJson_PodDnsConfig(obj: PodDnsConfig | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'nameservers': obj.nameservers?.map(y => y),
-    'options': obj.options?.map(y => toJson_PodDnsConfigOption(y)),
-    'searches': obj.searches?.map(y => y),
+    nameservers: obj.nameservers?.map(y => y),
+    options: obj.options?.map(y => toJson_PodDnsConfigOption(y)),
+    searches: obj.searches?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -24423,31 +24423,31 @@ export interface EphemeralContainer {
 export function toJson_EphemeralContainer(obj: EphemeralContainer | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'args': obj.args?.map(y => y),
-    'command': obj.command?.map(y => y),
-    'env': obj.env?.map(y => toJson_EnvVar(y)),
-    'envFrom': obj.envFrom?.map(y => toJson_EnvFromSource(y)),
-    'image': obj.image,
-    'imagePullPolicy': obj.imagePullPolicy,
-    'lifecycle': toJson_Lifecycle(obj.lifecycle),
-    'livenessProbe': toJson_Probe(obj.livenessProbe),
-    'name': obj.name,
-    'ports': obj.ports?.map(y => toJson_ContainerPort(y)),
-    'readinessProbe': toJson_Probe(obj.readinessProbe),
-    'resizePolicy': obj.resizePolicy?.map(y => toJson_ContainerResizePolicy(y)),
-    'resources': toJson_ResourceRequirements(obj.resources),
-    'restartPolicy': obj.restartPolicy,
-    'securityContext': toJson_SecurityContext(obj.securityContext),
-    'startupProbe': toJson_Probe(obj.startupProbe),
-    'stdin': obj.stdin,
-    'stdinOnce': obj.stdinOnce,
-    'targetContainerName': obj.targetContainerName,
-    'terminationMessagePath': obj.terminationMessagePath,
-    'terminationMessagePolicy': obj.terminationMessagePolicy,
-    'tty': obj.tty,
-    'volumeDevices': obj.volumeDevices?.map(y => toJson_VolumeDevice(y)),
-    'volumeMounts': obj.volumeMounts?.map(y => toJson_VolumeMount(y)),
-    'workingDir': obj.workingDir,
+    args: obj.args?.map(y => y),
+    command: obj.command?.map(y => y),
+    env: obj.env?.map(y => toJson_EnvVar(y)),
+    envFrom: obj.envFrom?.map(y => toJson_EnvFromSource(y)),
+    image: obj.image,
+    imagePullPolicy: obj.imagePullPolicy,
+    lifecycle: toJson_Lifecycle(obj.lifecycle),
+    livenessProbe: toJson_Probe(obj.livenessProbe),
+    name: obj.name,
+    ports: obj.ports?.map(y => toJson_ContainerPort(y)),
+    readinessProbe: toJson_Probe(obj.readinessProbe),
+    resizePolicy: obj.resizePolicy?.map(y => toJson_ContainerResizePolicy(y)),
+    resources: toJson_ResourceRequirements(obj.resources),
+    restartPolicy: obj.restartPolicy,
+    securityContext: toJson_SecurityContext(obj.securityContext),
+    startupProbe: toJson_Probe(obj.startupProbe),
+    stdin: obj.stdin,
+    stdinOnce: obj.stdinOnce,
+    targetContainerName: obj.targetContainerName,
+    terminationMessagePath: obj.terminationMessagePath,
+    terminationMessagePolicy: obj.terminationMessagePolicy,
+    tty: obj.tty,
+    volumeDevices: obj.volumeDevices?.map(y => toJson_VolumeDevice(y)),
+    volumeMounts: obj.volumeMounts?.map(y => toJson_VolumeMount(y)),
+    workingDir: obj.workingDir,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -24483,8 +24483,8 @@ export interface HostAlias {
 export function toJson_HostAlias(obj: HostAlias | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'hostnames': obj.hostnames?.map(y => y),
-    'ip': obj.ip,
+    hostnames: obj.hostnames?.map(y => y),
+    ip: obj.ip,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -24513,7 +24513,7 @@ export interface PodOs {
 export function toJson_PodOs(obj: PodOs | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -24542,7 +24542,7 @@ export interface PodReadinessGate {
 export function toJson_PodReadinessGate(obj: PodReadinessGate | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'conditionType': obj.conditionType,
+    conditionType: obj.conditionType,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -24578,8 +24578,8 @@ export interface PodResourceClaim {
 export function toJson_PodResourceClaim(obj: PodResourceClaim | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
-    'source': toJson_ClaimSource(obj.source),
+    name: obj.name,
+    source: toJson_ClaimSource(obj.source),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -24608,7 +24608,7 @@ export interface PodSchedulingGate {
 export function toJson_PodSchedulingGate(obj: PodSchedulingGate | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -24712,17 +24712,17 @@ export interface PodSecurityContext {
 export function toJson_PodSecurityContext(obj: PodSecurityContext | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'appArmorProfile': toJson_AppArmorProfile(obj.appArmorProfile),
-    'fsGroup': obj.fsGroup,
-    'fsGroupChangePolicy': obj.fsGroupChangePolicy,
-    'runAsGroup': obj.runAsGroup,
-    'runAsNonRoot': obj.runAsNonRoot,
-    'runAsUser': obj.runAsUser,
-    'seLinuxOptions': toJson_SeLinuxOptions(obj.seLinuxOptions),
-    'seccompProfile': toJson_SeccompProfile(obj.seccompProfile),
-    'supplementalGroups': obj.supplementalGroups?.map(y => y),
-    'sysctls': obj.sysctls?.map(y => toJson_Sysctl(y)),
-    'windowsOptions': toJson_WindowsSecurityContextOptions(obj.windowsOptions),
+    appArmorProfile: toJson_AppArmorProfile(obj.appArmorProfile),
+    fsGroup: obj.fsGroup,
+    fsGroupChangePolicy: obj.fsGroupChangePolicy,
+    runAsGroup: obj.runAsGroup,
+    runAsNonRoot: obj.runAsNonRoot,
+    runAsUser: obj.runAsUser,
+    seLinuxOptions: toJson_SeLinuxOptions(obj.seLinuxOptions),
+    seccompProfile: toJson_SeccompProfile(obj.seccompProfile),
+    supplementalGroups: obj.supplementalGroups?.map(y => y),
+    sysctls: obj.sysctls?.map(y => toJson_Sysctl(y)),
+    windowsOptions: toJson_WindowsSecurityContextOptions(obj.windowsOptions),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -24780,11 +24780,11 @@ export interface Toleration {
 export function toJson_Toleration(obj: Toleration | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'effect': obj.effect,
-    'key': obj.key,
-    'operator': obj.operator,
-    'tolerationSeconds': obj.tolerationSeconds,
-    'value': obj.value,
+    effect: obj.effect,
+    key: obj.key,
+    operator: obj.operator,
+    tolerationSeconds: obj.tolerationSeconds,
+    value: obj.value,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -24873,14 +24873,14 @@ export interface TopologySpreadConstraint {
 export function toJson_TopologySpreadConstraint(obj: TopologySpreadConstraint | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'labelSelector': toJson_LabelSelector(obj.labelSelector),
-    'matchLabelKeys': obj.matchLabelKeys?.map(y => y),
-    'maxSkew': obj.maxSkew,
-    'minDomains': obj.minDomains,
-    'nodeAffinityPolicy': obj.nodeAffinityPolicy,
-    'nodeTaintsPolicy': obj.nodeTaintsPolicy,
-    'topologyKey': obj.topologyKey,
-    'whenUnsatisfiable': obj.whenUnsatisfiable,
+    labelSelector: toJson_LabelSelector(obj.labelSelector),
+    matchLabelKeys: obj.matchLabelKeys?.map(y => y),
+    maxSkew: obj.maxSkew,
+    minDomains: obj.minDomains,
+    nodeAffinityPolicy: obj.nodeAffinityPolicy,
+    nodeTaintsPolicy: obj.nodeTaintsPolicy,
+    topologyKey: obj.topologyKey,
+    whenUnsatisfiable: obj.whenUnsatisfiable,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -25125,36 +25125,36 @@ export interface Volume {
 export function toJson_Volume(obj: Volume | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'awsElasticBlockStore': toJson_AwsElasticBlockStoreVolumeSource(obj.awsElasticBlockStore),
-    'azureDisk': toJson_AzureDiskVolumeSource(obj.azureDisk),
-    'azureFile': toJson_AzureFileVolumeSource(obj.azureFile),
-    'cephfs': toJson_CephFsVolumeSource(obj.cephfs),
-    'cinder': toJson_CinderVolumeSource(obj.cinder),
-    'configMap': toJson_ConfigMapVolumeSource(obj.configMap),
-    'csi': toJson_CsiVolumeSource(obj.csi),
-    'downwardAPI': toJson_DownwardApiVolumeSource(obj.downwardApi),
-    'emptyDir': toJson_EmptyDirVolumeSource(obj.emptyDir),
-    'ephemeral': toJson_EphemeralVolumeSource(obj.ephemeral),
-    'fc': toJson_FcVolumeSource(obj.fc),
-    'flexVolume': toJson_FlexVolumeSource(obj.flexVolume),
-    'flocker': toJson_FlockerVolumeSource(obj.flocker),
-    'gcePersistentDisk': toJson_GcePersistentDiskVolumeSource(obj.gcePersistentDisk),
-    'gitRepo': toJson_GitRepoVolumeSource(obj.gitRepo),
-    'glusterfs': toJson_GlusterfsVolumeSource(obj.glusterfs),
-    'hostPath': toJson_HostPathVolumeSource(obj.hostPath),
-    'iscsi': toJson_IscsiVolumeSource(obj.iscsi),
-    'name': obj.name,
-    'nfs': toJson_NfsVolumeSource(obj.nfs),
-    'persistentVolumeClaim': toJson_PersistentVolumeClaimVolumeSource(obj.persistentVolumeClaim),
-    'photonPersistentDisk': toJson_PhotonPersistentDiskVolumeSource(obj.photonPersistentDisk),
-    'portworxVolume': toJson_PortworxVolumeSource(obj.portworxVolume),
-    'projected': toJson_ProjectedVolumeSource(obj.projected),
-    'quobyte': toJson_QuobyteVolumeSource(obj.quobyte),
-    'rbd': toJson_RbdVolumeSource(obj.rbd),
-    'scaleIO': toJson_ScaleIoVolumeSource(obj.scaleIo),
-    'secret': toJson_SecretVolumeSource(obj.secret),
-    'storageos': toJson_StorageOsVolumeSource(obj.storageos),
-    'vsphereVolume': toJson_VsphereVirtualDiskVolumeSource(obj.vsphereVolume),
+    awsElasticBlockStore: toJson_AwsElasticBlockStoreVolumeSource(obj.awsElasticBlockStore),
+    azureDisk: toJson_AzureDiskVolumeSource(obj.azureDisk),
+    azureFile: toJson_AzureFileVolumeSource(obj.azureFile),
+    cephfs: toJson_CephFsVolumeSource(obj.cephfs),
+    cinder: toJson_CinderVolumeSource(obj.cinder),
+    configMap: toJson_ConfigMapVolumeSource(obj.configMap),
+    csi: toJson_CsiVolumeSource(obj.csi),
+    downwardAPI: toJson_DownwardApiVolumeSource(obj.downwardApi),
+    emptyDir: toJson_EmptyDirVolumeSource(obj.emptyDir),
+    ephemeral: toJson_EphemeralVolumeSource(obj.ephemeral),
+    fc: toJson_FcVolumeSource(obj.fc),
+    flexVolume: toJson_FlexVolumeSource(obj.flexVolume),
+    flocker: toJson_FlockerVolumeSource(obj.flocker),
+    gcePersistentDisk: toJson_GcePersistentDiskVolumeSource(obj.gcePersistentDisk),
+    gitRepo: toJson_GitRepoVolumeSource(obj.gitRepo),
+    glusterfs: toJson_GlusterfsVolumeSource(obj.glusterfs),
+    hostPath: toJson_HostPathVolumeSource(obj.hostPath),
+    iscsi: toJson_IscsiVolumeSource(obj.iscsi),
+    name: obj.name,
+    nfs: toJson_NfsVolumeSource(obj.nfs),
+    persistentVolumeClaim: toJson_PersistentVolumeClaimVolumeSource(obj.persistentVolumeClaim),
+    photonPersistentDisk: toJson_PhotonPersistentDiskVolumeSource(obj.photonPersistentDisk),
+    portworxVolume: toJson_PortworxVolumeSource(obj.portworxVolume),
+    projected: toJson_ProjectedVolumeSource(obj.projected),
+    quobyte: toJson_QuobyteVolumeSource(obj.quobyte),
+    rbd: toJson_RbdVolumeSource(obj.rbd),
+    scaleIO: toJson_ScaleIoVolumeSource(obj.scaleIo),
+    secret: toJson_SecretVolumeSource(obj.secret),
+    storageos: toJson_StorageOsVolumeSource(obj.storageos),
+    vsphereVolume: toJson_VsphereVirtualDiskVolumeSource(obj.vsphereVolume),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -25183,7 +25183,7 @@ export interface ScopeSelector {
 export function toJson_ScopeSelector(obj: ScopeSelector | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'matchExpressions': obj.matchExpressions?.map(y => toJson_ScopedResourceSelectorRequirement(y)),
+    matchExpressions: obj.matchExpressions?.map(y => toJson_ScopedResourceSelectorRequirement(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -25257,12 +25257,12 @@ export interface ServicePort {
 export function toJson_ServicePort(obj: ServicePort | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'appProtocol': obj.appProtocol,
-    'name': obj.name,
-    'nodePort': obj.nodePort,
-    'port': obj.port,
-    'protocol': obj.protocol,
-    'targetPort': obj.targetPort?.value,
+    appProtocol: obj.appProtocol,
+    name: obj.name,
+    nodePort: obj.nodePort,
+    port: obj.port,
+    protocol: obj.protocol,
+    targetPort: obj.targetPort?.value,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -25291,7 +25291,7 @@ export interface SessionAffinityConfig {
 export function toJson_SessionAffinityConfig(obj: SessionAffinityConfig | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'clientIP': toJson_ClientIpConfig(obj.clientIp),
+    clientIP: toJson_ClientIpConfig(obj.clientIp),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -25334,9 +25334,9 @@ export interface EndpointConditions {
 export function toJson_EndpointConditions(obj: EndpointConditions | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'ready': obj.ready,
-    'serving': obj.serving,
-    'terminating': obj.terminating,
+    ready: obj.ready,
+    serving: obj.serving,
+    terminating: obj.terminating,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -25365,7 +25365,7 @@ export interface EndpointHints {
 export function toJson_EndpointHints(obj: EndpointHints | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'forZones': obj.forZones?.map(y => toJson_ForZone(y)),
+    forZones: obj.forZones?.map(y => toJson_ForZone(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -25394,7 +25394,7 @@ export interface FlowDistinguisherMethod {
 export function toJson_FlowDistinguisherMethod(obj: FlowDistinguisherMethod | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'type': obj.type,
+    type: obj.type,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -25423,7 +25423,7 @@ export interface PriorityLevelConfigurationReference {
 export function toJson_PriorityLevelConfigurationReference(obj: PriorityLevelConfigurationReference | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -25466,9 +25466,9 @@ export interface PolicyRulesWithSubjects {
 export function toJson_PolicyRulesWithSubjects(obj: PolicyRulesWithSubjects | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'nonResourceRules': obj.nonResourceRules?.map(y => toJson_NonResourcePolicyRule(y)),
-    'resourceRules': obj.resourceRules?.map(y => toJson_ResourcePolicyRule(y)),
-    'subjects': obj.subjects?.map(y => toJson_Subject(y)),
+    nonResourceRules: obj.nonResourceRules?.map(y => toJson_NonResourcePolicyRule(y)),
+    resourceRules: obj.resourceRules?.map(y => toJson_ResourcePolicyRule(y)),
+    subjects: obj.subjects?.map(y => toJson_Subject(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -25510,8 +25510,8 @@ export interface ExemptPriorityLevelConfiguration {
 export function toJson_ExemptPriorityLevelConfiguration(obj: ExemptPriorityLevelConfiguration | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'lendablePercent': obj.lendablePercent,
-    'nominalConcurrencyShares': obj.nominalConcurrencyShares,
+    lendablePercent: obj.lendablePercent,
+    nominalConcurrencyShares: obj.nominalConcurrencyShares,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -25577,10 +25577,10 @@ export interface LimitedPriorityLevelConfiguration {
 export function toJson_LimitedPriorityLevelConfiguration(obj: LimitedPriorityLevelConfiguration | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'borrowingLimitPercent': obj.borrowingLimitPercent,
-    'lendablePercent': obj.lendablePercent,
-    'limitResponse': toJson_LimitResponse(obj.limitResponse),
-    'nominalConcurrencyShares': obj.nominalConcurrencyShares,
+    borrowingLimitPercent: obj.borrowingLimitPercent,
+    lendablePercent: obj.lendablePercent,
+    limitResponse: toJson_LimitResponse(obj.limitResponse),
+    nominalConcurrencyShares: obj.nominalConcurrencyShares,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -25609,7 +25609,7 @@ export interface FlowDistinguisherMethodV1Beta3 {
 export function toJson_FlowDistinguisherMethodV1Beta3(obj: FlowDistinguisherMethodV1Beta3 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'type': obj.type,
+    type: obj.type,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -25638,7 +25638,7 @@ export interface PriorityLevelConfigurationReferenceV1Beta3 {
 export function toJson_PriorityLevelConfigurationReferenceV1Beta3(obj: PriorityLevelConfigurationReferenceV1Beta3 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -25681,9 +25681,9 @@ export interface PolicyRulesWithSubjectsV1Beta3 {
 export function toJson_PolicyRulesWithSubjectsV1Beta3(obj: PolicyRulesWithSubjectsV1Beta3 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'nonResourceRules': obj.nonResourceRules?.map(y => toJson_NonResourcePolicyRuleV1Beta3(y)),
-    'resourceRules': obj.resourceRules?.map(y => toJson_ResourcePolicyRuleV1Beta3(y)),
-    'subjects': obj.subjects?.map(y => toJson_SubjectV1Beta3(y)),
+    nonResourceRules: obj.nonResourceRules?.map(y => toJson_NonResourcePolicyRuleV1Beta3(y)),
+    resourceRules: obj.resourceRules?.map(y => toJson_ResourcePolicyRuleV1Beta3(y)),
+    subjects: obj.subjects?.map(y => toJson_SubjectV1Beta3(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -25725,8 +25725,8 @@ export interface ExemptPriorityLevelConfigurationV1Beta3 {
 export function toJson_ExemptPriorityLevelConfigurationV1Beta3(obj: ExemptPriorityLevelConfigurationV1Beta3 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'lendablePercent': obj.lendablePercent,
-    'nominalConcurrencyShares': obj.nominalConcurrencyShares,
+    lendablePercent: obj.lendablePercent,
+    nominalConcurrencyShares: obj.nominalConcurrencyShares,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -25788,10 +25788,10 @@ export interface LimitedPriorityLevelConfigurationV1Beta3 {
 export function toJson_LimitedPriorityLevelConfigurationV1Beta3(obj: LimitedPriorityLevelConfigurationV1Beta3 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'borrowingLimitPercent': obj.borrowingLimitPercent,
-    'lendablePercent': obj.lendablePercent,
-    'limitResponse': toJson_LimitResponseV1Beta3(obj.limitResponse),
-    'nominalConcurrencyShares': obj.nominalConcurrencyShares,
+    borrowingLimitPercent: obj.borrowingLimitPercent,
+    lendablePercent: obj.lendablePercent,
+    limitResponse: toJson_LimitResponseV1Beta3(obj.limitResponse),
+    nominalConcurrencyShares: obj.nominalConcurrencyShares,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -25827,8 +25827,8 @@ export interface IngressBackend {
 export function toJson_IngressBackend(obj: IngressBackend | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'resource': toJson_TypedLocalObjectReference(obj.resource),
-    'service': toJson_IngressServiceBackend(obj.service),
+    resource: toJson_TypedLocalObjectReference(obj.resource),
+    service: toJson_IngressServiceBackend(obj.service),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -25869,8 +25869,8 @@ export interface IngressRule {
 export function toJson_IngressRule(obj: IngressRule | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'host': obj.host,
-    'http': toJson_HttpIngressRuleValue(obj.http),
+    host: obj.host,
+    http: toJson_HttpIngressRuleValue(obj.http),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -25907,8 +25907,8 @@ export interface IngressTls {
 export function toJson_IngressTls(obj: IngressTls | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'hosts': obj.hosts?.map(y => y),
-    'secretName': obj.secretName,
+    hosts: obj.hosts?.map(y => y),
+    secretName: obj.secretName,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -25965,11 +25965,11 @@ export interface IngressClassParametersReference {
 export function toJson_IngressClassParametersReference(obj: IngressClassParametersReference | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiGroup': obj.apiGroup,
-    'kind': obj.kind,
-    'name': obj.name,
-    'namespace': obj.namespace,
-    'scope': obj.scope,
+    apiGroup: obj.apiGroup,
+    kind: obj.kind,
+    name: obj.name,
+    namespace: obj.namespace,
+    scope: obj.scope,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -26005,8 +26005,8 @@ export interface NetworkPolicyEgressRule {
 export function toJson_NetworkPolicyEgressRule(obj: NetworkPolicyEgressRule | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'ports': obj.ports?.map(y => toJson_NetworkPolicyPort(y)),
-    'to': obj.to?.map(y => toJson_NetworkPolicyPeer(y)),
+    ports: obj.ports?.map(y => toJson_NetworkPolicyPort(y)),
+    to: obj.to?.map(y => toJson_NetworkPolicyPeer(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -26042,8 +26042,8 @@ export interface NetworkPolicyIngressRule {
 export function toJson_NetworkPolicyIngressRule(obj: NetworkPolicyIngressRule | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'from': obj.from?.map(y => toJson_NetworkPolicyPeer(y)),
-    'ports': obj.ports?.map(y => toJson_NetworkPolicyPort(y)),
+    from: obj.from?.map(y => toJson_NetworkPolicyPeer(y)),
+    ports: obj.ports?.map(y => toJson_NetworkPolicyPort(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -26093,10 +26093,10 @@ export interface ParentReferenceV1Alpha1 {
 export function toJson_ParentReferenceV1Alpha1(obj: ParentReferenceV1Alpha1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'group': obj.group,
-    'name': obj.name,
-    'namespace': obj.namespace,
-    'resource': obj.resource,
+    group: obj.group,
+    name: obj.name,
+    namespace: obj.namespace,
+    resource: obj.resource,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -26142,8 +26142,8 @@ export interface Preconditions {
 export function toJson_Preconditions(obj: Preconditions | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'resourceVersion': obj.resourceVersion,
-    'uid': obj.uid,
+    resourceVersion: obj.resourceVersion,
+    uid: obj.uid,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -26193,8 +26193,8 @@ export interface ResourceRequestV1Alpha2 {
 export function toJson_ResourceRequestV1Alpha2(obj: ResourceRequestV1Alpha2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'namedResources': toJson_NamedResourcesRequestV1Alpha2(obj.namedResources),
-    'vendorParameters': obj.vendorParameters,
+    namedResources: toJson_NamedResourcesRequestV1Alpha2(obj.namedResources),
+    vendorParameters: obj.vendorParameters,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -26230,8 +26230,8 @@ export interface NodeSelectorTerm {
 export function toJson_NodeSelectorTerm(obj: NodeSelectorTerm | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'matchExpressions': obj.matchExpressions?.map(y => toJson_NodeSelectorRequirement(y)),
-    'matchFields': obj.matchFields?.map(y => toJson_NodeSelectorRequirement(y)),
+    matchExpressions: obj.matchExpressions?.map(y => toJson_NodeSelectorRequirement(y)),
+    matchFields: obj.matchFields?.map(y => toJson_NodeSelectorRequirement(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -26265,7 +26265,7 @@ export interface NamedResourcesFilterV1Alpha2 {
 export function toJson_NamedResourcesFilterV1Alpha2(obj: NamedResourcesFilterV1Alpha2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'selector': obj.selector,
+    selector: obj.selector,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -26301,8 +26301,8 @@ export interface NamedResourcesInstanceV1Alpha2 {
 export function toJson_NamedResourcesInstanceV1Alpha2(obj: NamedResourcesInstanceV1Alpha2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'attributes': obj.attributes?.map(y => toJson_NamedResourcesAttributeV1Alpha2(y)),
-    'name': obj.name,
+    attributes: obj.attributes?.map(y => toJson_NamedResourcesAttributeV1Alpha2(y)),
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -26338,8 +26338,8 @@ export interface TokenRequest {
 export function toJson_TokenRequest(obj: TokenRequest | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'audience': obj.audience,
-    'expirationSeconds': obj.expirationSeconds,
+    audience: obj.audience,
+    expirationSeconds: obj.expirationSeconds,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -26389,10 +26389,10 @@ export interface CsiNodeDriver {
 export function toJson_CsiNodeDriver(obj: CsiNodeDriver | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'allocatable': toJson_VolumeNodeResources(obj.allocatable),
-    'name': obj.name,
-    'nodeID': obj.nodeId,
-    'topologyKeys': obj.topologyKeys?.map(y => y),
+    allocatable: toJson_VolumeNodeResources(obj.allocatable),
+    name: obj.name,
+    nodeID: obj.nodeId,
+    topologyKeys: obj.topologyKeys?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -26435,9 +26435,9 @@ export interface LabelSelectorRequirement {
 export function toJson_LabelSelectorRequirement(obj: LabelSelectorRequirement | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'key': obj.key,
-    'operator': obj.operator,
-    'values': obj.values?.map(y => y),
+    key: obj.key,
+    operator: obj.operator,
+    values: obj.values?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -26473,8 +26473,8 @@ export interface TopologySelectorLabelRequirement {
 export function toJson_TopologySelectorLabelRequirement(obj: TopologySelectorLabelRequirement | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'key': obj.key,
-    'values': obj.values?.map(y => y),
+    key: obj.key,
+    values: obj.values?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -26510,8 +26510,8 @@ export interface VolumeAttachmentSource {
 export function toJson_VolumeAttachmentSource(obj: VolumeAttachmentSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'inlineVolumeSpec': toJson_PersistentVolumeSpec(obj.inlineVolumeSpec),
-    'persistentVolumeName': obj.persistentVolumeName,
+    inlineVolumeSpec: toJson_PersistentVolumeSpec(obj.inlineVolumeSpec),
+    persistentVolumeName: obj.persistentVolumeName,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -26554,9 +26554,9 @@ export interface GroupVersionResourceV1Alpha1 {
 export function toJson_GroupVersionResourceV1Alpha1(obj: GroupVersionResourceV1Alpha1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'group': obj.group,
-    'resource': obj.resource,
-    'version': obj.version,
+    group: obj.group,
+    resource: obj.resource,
+    version: obj.version,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -26593,8 +26593,8 @@ export interface CustomResourceConversion {
 export function toJson_CustomResourceConversion(obj: CustomResourceConversion | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'strategy': obj.strategy,
-    'webhook': toJson_WebhookConversion(obj.webhook),
+    strategy: obj.strategy,
+    webhook: toJson_WebhookConversion(obj.webhook),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -26660,12 +26660,12 @@ export interface CustomResourceDefinitionNames {
 export function toJson_CustomResourceDefinitionNames(obj: CustomResourceDefinitionNames | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'categories': obj.categories?.map(y => y),
-    'kind': obj.kind,
-    'listKind': obj.listKind,
-    'plural': obj.plural,
-    'shortNames': obj.shortNames?.map(y => y),
-    'singular': obj.singular,
+    categories: obj.categories?.map(y => y),
+    kind: obj.kind,
+    listKind: obj.listKind,
+    plural: obj.plural,
+    shortNames: obj.shortNames?.map(y => y),
+    singular: obj.singular,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -26751,15 +26751,15 @@ export interface CustomResourceDefinitionVersion {
 export function toJson_CustomResourceDefinitionVersion(obj: CustomResourceDefinitionVersion | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'additionalPrinterColumns': obj.additionalPrinterColumns?.map(y => toJson_CustomResourceColumnDefinition(y)),
-    'deprecated': obj.deprecated,
-    'deprecationWarning': obj.deprecationWarning,
-    'name': obj.name,
-    'schema': toJson_CustomResourceValidation(obj.schema),
-    'selectableFields': obj.selectableFields?.map(y => toJson_SelectableField(y)),
-    'served': obj.served,
-    'storage': obj.storage,
-    'subresources': toJson_CustomResourceSubresources(obj.subresources),
+    additionalPrinterColumns: obj.additionalPrinterColumns?.map(y => toJson_CustomResourceColumnDefinition(y)),
+    deprecated: obj.deprecated,
+    deprecationWarning: obj.deprecationWarning,
+    name: obj.name,
+    schema: toJson_CustomResourceValidation(obj.schema),
+    selectableFields: obj.selectableFields?.map(y => toJson_SelectableField(y)),
+    served: obj.served,
+    storage: obj.storage,
+    subresources: toJson_CustomResourceSubresources(obj.subresources),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -26806,9 +26806,9 @@ export interface StatusCause {
 export function toJson_StatusCause(obj: StatusCause | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'field': obj.field,
-    'message': obj.message,
-    'reason': obj.reason,
+    field: obj.field,
+    message: obj.message,
+    reason: obj.reason,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -26859,10 +26859,10 @@ export interface ServiceReference {
 export function toJson_ServiceReference(obj: ServiceReference | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
-    'namespace': obj.namespace,
-    'path': obj.path,
-    'port': obj.port,
+    name: obj.name,
+    namespace: obj.namespace,
+    path: obj.path,
+    port: obj.port,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -26933,12 +26933,12 @@ export interface NamedRuleWithOperations {
 export function toJson_NamedRuleWithOperations(obj: NamedRuleWithOperations | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiGroups': obj.apiGroups?.map(y => y),
-    'apiVersions': obj.apiVersions?.map(y => y),
-    'operations': obj.operations?.map(y => y),
-    'resourceNames': obj.resourceNames?.map(y => y),
-    'resources': obj.resources?.map(y => y),
-    'scope': obj.scope,
+    apiGroups: obj.apiGroups?.map(y => y),
+    apiVersions: obj.apiVersions?.map(y => y),
+    operations: obj.operations?.map(y => y),
+    resourceNames: obj.resourceNames?.map(y => y),
+    resources: obj.resources?.map(y => y),
+    scope: obj.scope,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27009,12 +27009,12 @@ export interface NamedRuleWithOperationsV1Alpha1 {
 export function toJson_NamedRuleWithOperationsV1Alpha1(obj: NamedRuleWithOperationsV1Alpha1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiGroups': obj.apiGroups?.map(y => y),
-    'apiVersions': obj.apiVersions?.map(y => y),
-    'operations': obj.operations?.map(y => y),
-    'resourceNames': obj.resourceNames?.map(y => y),
-    'resources': obj.resources?.map(y => y),
-    'scope': obj.scope,
+    apiGroups: obj.apiGroups?.map(y => y),
+    apiVersions: obj.apiVersions?.map(y => y),
+    operations: obj.operations?.map(y => y),
+    resourceNames: obj.resourceNames?.map(y => y),
+    resources: obj.resources?.map(y => y),
+    scope: obj.scope,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27085,12 +27085,12 @@ export interface NamedRuleWithOperationsV1Beta1 {
 export function toJson_NamedRuleWithOperationsV1Beta1(obj: NamedRuleWithOperationsV1Beta1 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiGroups': obj.apiGroups?.map(y => y),
-    'apiVersions': obj.apiVersions?.map(y => y),
-    'operations': obj.operations?.map(y => y),
-    'resourceNames': obj.resourceNames?.map(y => y),
-    'resources': obj.resources?.map(y => y),
-    'scope': obj.scope,
+    apiGroups: obj.apiGroups?.map(y => y),
+    apiVersions: obj.apiVersions?.map(y => y),
+    operations: obj.operations?.map(y => y),
+    resourceNames: obj.resourceNames?.map(y => y),
+    resources: obj.resources?.map(y => y),
+    scope: obj.scope,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27126,8 +27126,8 @@ export interface RollingUpdateDaemonSet {
 export function toJson_RollingUpdateDaemonSet(obj: RollingUpdateDaemonSet | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'maxSurge': obj.maxSurge?.value,
-    'maxUnavailable': obj.maxUnavailable?.value,
+    maxSurge: obj.maxSurge?.value,
+    maxUnavailable: obj.maxUnavailable?.value,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27165,8 +27165,8 @@ export interface RollingUpdateDeployment {
 export function toJson_RollingUpdateDeployment(obj: RollingUpdateDeployment | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'maxSurge': obj.maxSurge?.value,
-    'maxUnavailable': obj.maxUnavailable?.value,
+    maxSurge: obj.maxSurge?.value,
+    maxUnavailable: obj.maxUnavailable?.value,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27203,8 +27203,8 @@ export interface RollingUpdateStatefulSetStrategy {
 export function toJson_RollingUpdateStatefulSetStrategy(obj: RollingUpdateStatefulSetStrategy | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'maxUnavailable': obj.maxUnavailable?.value,
-    'partition': obj.partition,
+    maxUnavailable: obj.maxUnavailable?.value,
+    partition: obj.partition,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27247,9 +27247,9 @@ export interface HpaScalingRulesV2 {
 export function toJson_HpaScalingRulesV2(obj: HpaScalingRulesV2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'policies': obj.policies?.map(y => toJson_HpaScalingPolicyV2(y)),
-    'selectPolicy': obj.selectPolicy,
-    'stabilizationWindowSeconds': obj.stabilizationWindowSeconds,
+    policies: obj.policies?.map(y => toJson_HpaScalingPolicyV2(y)),
+    selectPolicy: obj.selectPolicy,
+    stabilizationWindowSeconds: obj.stabilizationWindowSeconds,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27292,9 +27292,9 @@ export interface ContainerResourceMetricSourceV2 {
 export function toJson_ContainerResourceMetricSourceV2(obj: ContainerResourceMetricSourceV2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'container': obj.container,
-    'name': obj.name,
-    'target': toJson_MetricTargetV2(obj.target),
+    container: obj.container,
+    name: obj.name,
+    target: toJson_MetricTargetV2(obj.target),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27330,8 +27330,8 @@ export interface ExternalMetricSourceV2 {
 export function toJson_ExternalMetricSourceV2(obj: ExternalMetricSourceV2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metric': toJson_MetricIdentifierV2(obj.metric),
-    'target': toJson_MetricTargetV2(obj.target),
+    metric: toJson_MetricIdentifierV2(obj.metric),
+    target: toJson_MetricTargetV2(obj.target),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27374,9 +27374,9 @@ export interface ObjectMetricSourceV2 {
 export function toJson_ObjectMetricSourceV2(obj: ObjectMetricSourceV2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'describedObject': toJson_CrossVersionObjectReferenceV2(obj.describedObject),
-    'metric': toJson_MetricIdentifierV2(obj.metric),
-    'target': toJson_MetricTargetV2(obj.target),
+    describedObject: toJson_CrossVersionObjectReferenceV2(obj.describedObject),
+    metric: toJson_MetricIdentifierV2(obj.metric),
+    target: toJson_MetricTargetV2(obj.target),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27412,8 +27412,8 @@ export interface PodsMetricSourceV2 {
 export function toJson_PodsMetricSourceV2(obj: PodsMetricSourceV2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metric': toJson_MetricIdentifierV2(obj.metric),
-    'target': toJson_MetricTargetV2(obj.target),
+    metric: toJson_MetricIdentifierV2(obj.metric),
+    target: toJson_MetricTargetV2(obj.target),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27449,8 +27449,8 @@ export interface ResourceMetricSourceV2 {
 export function toJson_ResourceMetricSourceV2(obj: ResourceMetricSourceV2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
-    'target': toJson_MetricTargetV2(obj.target),
+    name: obj.name,
+    target: toJson_MetricTargetV2(obj.target),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27505,9 +27505,9 @@ export interface PodFailurePolicyRule {
 export function toJson_PodFailurePolicyRule(obj: PodFailurePolicyRule | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'action': obj.action,
-    'onExitCodes': toJson_PodFailurePolicyOnExitCodesRequirement(obj.onExitCodes),
-    'onPodConditions': obj.onPodConditions?.map(y => toJson_PodFailurePolicyOnPodConditionsPattern(y)),
+    action: obj.action,
+    onExitCodes: toJson_PodFailurePolicyOnExitCodesRequirement(obj.onExitCodes),
+    onPodConditions: obj.onPodConditions?.map(y => toJson_PodFailurePolicyOnPodConditionsPattern(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27543,8 +27543,8 @@ export interface SuccessPolicyRule {
 export function toJson_SuccessPolicyRule(obj: SuccessPolicyRule | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'succeededCount': obj.succeededCount,
-    'succeededIndexes': obj.succeededIndexes,
+    succeededCount: obj.succeededCount,
+    succeededIndexes: obj.succeededIndexes,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27601,11 +27601,11 @@ export interface ConfigMapNodeConfigSource {
 export function toJson_ConfigMapNodeConfigSource(obj: ConfigMapNodeConfigSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'kubeletConfigKey': obj.kubeletConfigKey,
-    'name': obj.name,
-    'namespace': obj.namespace,
-    'resourceVersion': obj.resourceVersion,
-    'uid': obj.uid,
+    kubeletConfigKey: obj.kubeletConfigKey,
+    name: obj.name,
+    namespace: obj.namespace,
+    resourceVersion: obj.resourceVersion,
+    uid: obj.uid,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27641,8 +27641,8 @@ export interface SecretReference {
 export function toJson_SecretReference(obj: SecretReference | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
-    'namespace': obj.namespace,
+    name: obj.name,
+    namespace: obj.namespace,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27678,8 +27678,8 @@ export interface NodeAffinity {
 export function toJson_NodeAffinity(obj: NodeAffinity | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'preferredDuringSchedulingIgnoredDuringExecution': obj.preferredDuringSchedulingIgnoredDuringExecution?.map(y => toJson_PreferredSchedulingTerm(y)),
-    'requiredDuringSchedulingIgnoredDuringExecution': toJson_NodeSelector(obj.requiredDuringSchedulingIgnoredDuringExecution),
+    preferredDuringSchedulingIgnoredDuringExecution: obj.preferredDuringSchedulingIgnoredDuringExecution?.map(y => toJson_PreferredSchedulingTerm(y)),
+    requiredDuringSchedulingIgnoredDuringExecution: toJson_NodeSelector(obj.requiredDuringSchedulingIgnoredDuringExecution),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27715,8 +27715,8 @@ export interface PodAffinity {
 export function toJson_PodAffinity(obj: PodAffinity | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'preferredDuringSchedulingIgnoredDuringExecution': obj.preferredDuringSchedulingIgnoredDuringExecution?.map(y => toJson_WeightedPodAffinityTerm(y)),
-    'requiredDuringSchedulingIgnoredDuringExecution': obj.requiredDuringSchedulingIgnoredDuringExecution?.map(y => toJson_PodAffinityTerm(y)),
+    preferredDuringSchedulingIgnoredDuringExecution: obj.preferredDuringSchedulingIgnoredDuringExecution?.map(y => toJson_WeightedPodAffinityTerm(y)),
+    requiredDuringSchedulingIgnoredDuringExecution: obj.requiredDuringSchedulingIgnoredDuringExecution?.map(y => toJson_PodAffinityTerm(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27752,8 +27752,8 @@ export interface PodAntiAffinity {
 export function toJson_PodAntiAffinity(obj: PodAntiAffinity | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'preferredDuringSchedulingIgnoredDuringExecution': obj.preferredDuringSchedulingIgnoredDuringExecution?.map(y => toJson_WeightedPodAffinityTerm(y)),
-    'requiredDuringSchedulingIgnoredDuringExecution': obj.requiredDuringSchedulingIgnoredDuringExecution?.map(y => toJson_PodAffinityTerm(y)),
+    preferredDuringSchedulingIgnoredDuringExecution: obj.preferredDuringSchedulingIgnoredDuringExecution?.map(y => toJson_WeightedPodAffinityTerm(y)),
+    requiredDuringSchedulingIgnoredDuringExecution: obj.requiredDuringSchedulingIgnoredDuringExecution?.map(y => toJson_PodAffinityTerm(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27797,9 +27797,9 @@ export interface EnvVar {
 export function toJson_EnvVar(obj: EnvVar | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
-    'value': obj.value,
-    'valueFrom': toJson_EnvVarSource(obj.valueFrom),
+    name: obj.name,
+    value: obj.value,
+    valueFrom: toJson_EnvVarSource(obj.valueFrom),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27842,9 +27842,9 @@ export interface EnvFromSource {
 export function toJson_EnvFromSource(obj: EnvFromSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'configMapRef': toJson_ConfigMapEnvSource(obj.configMapRef),
-    'prefix': obj.prefix,
-    'secretRef': toJson_SecretEnvSource(obj.secretRef),
+    configMapRef: toJson_ConfigMapEnvSource(obj.configMapRef),
+    prefix: obj.prefix,
+    secretRef: toJson_SecretEnvSource(obj.secretRef),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27880,8 +27880,8 @@ export interface Lifecycle {
 export function toJson_Lifecycle(obj: Lifecycle | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'postStart': toJson_LifecycleHandler(obj.postStart),
-    'preStop': toJson_LifecycleHandler(obj.preStop),
+    postStart: toJson_LifecycleHandler(obj.postStart),
+    preStop: toJson_LifecycleHandler(obj.preStop),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -27977,16 +27977,16 @@ export interface Probe {
 export function toJson_Probe(obj: Probe | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'exec': toJson_ExecAction(obj.exec),
-    'failureThreshold': obj.failureThreshold,
-    'grpc': toJson_GrpcAction(obj.grpc),
-    'httpGet': toJson_HttpGetAction(obj.httpGet),
-    'initialDelaySeconds': obj.initialDelaySeconds,
-    'periodSeconds': obj.periodSeconds,
-    'successThreshold': obj.successThreshold,
-    'tcpSocket': toJson_TcpSocketAction(obj.tcpSocket),
-    'terminationGracePeriodSeconds': obj.terminationGracePeriodSeconds,
-    'timeoutSeconds': obj.timeoutSeconds,
+    exec: toJson_ExecAction(obj.exec),
+    failureThreshold: obj.failureThreshold,
+    grpc: toJson_GrpcAction(obj.grpc),
+    httpGet: toJson_HttpGetAction(obj.httpGet),
+    initialDelaySeconds: obj.initialDelaySeconds,
+    periodSeconds: obj.periodSeconds,
+    successThreshold: obj.successThreshold,
+    tcpSocket: toJson_TcpSocketAction(obj.tcpSocket),
+    terminationGracePeriodSeconds: obj.terminationGracePeriodSeconds,
+    timeoutSeconds: obj.timeoutSeconds,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -28044,11 +28044,11 @@ export interface ContainerPort {
 export function toJson_ContainerPort(obj: ContainerPort | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'containerPort': obj.containerPort,
-    'hostIP': obj.hostIp,
-    'hostPort': obj.hostPort,
-    'name': obj.name,
-    'protocol': obj.protocol,
+    containerPort: obj.containerPort,
+    hostIP: obj.hostIp,
+    hostPort: obj.hostPort,
+    name: obj.name,
+    protocol: obj.protocol,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -28084,8 +28084,8 @@ export interface ContainerResizePolicy {
 export function toJson_ContainerResizePolicy(obj: ContainerResizePolicy | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'resourceName': obj.resourceName,
-    'restartPolicy': obj.restartPolicy,
+    resourceName: obj.resourceName,
+    restartPolicy: obj.restartPolicy,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -28132,9 +28132,9 @@ export interface ResourceRequirements {
 export function toJson_ResourceRequirements(obj: ResourceRequirements | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'claims': obj.claims?.map(y => toJson_ResourceClaim(y)),
-    'limits': ((obj.limits) === undefined) ? undefined : (Object.entries(obj.limits).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
-    'requests': ((obj.requests) === undefined) ? undefined : (Object.entries(obj.requests).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    claims: obj.claims?.map(y => toJson_ResourceClaim(y)),
+    limits: ((obj.limits) === undefined) ? undefined : (Object.entries(obj.limits).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    requests: ((obj.requests) === undefined) ? undefined : (Object.entries(obj.requests).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -28244,18 +28244,18 @@ export interface SecurityContext {
 export function toJson_SecurityContext(obj: SecurityContext | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'allowPrivilegeEscalation': obj.allowPrivilegeEscalation,
-    'appArmorProfile': toJson_AppArmorProfile(obj.appArmorProfile),
-    'capabilities': toJson_Capabilities(obj.capabilities),
-    'privileged': obj.privileged,
-    'procMount': obj.procMount,
-    'readOnlyRootFilesystem': obj.readOnlyRootFilesystem,
-    'runAsGroup': obj.runAsGroup,
-    'runAsNonRoot': obj.runAsNonRoot,
-    'runAsUser': obj.runAsUser,
-    'seLinuxOptions': toJson_SeLinuxOptions(obj.seLinuxOptions),
-    'seccompProfile': toJson_SeccompProfile(obj.seccompProfile),
-    'windowsOptions': toJson_WindowsSecurityContextOptions(obj.windowsOptions),
+    allowPrivilegeEscalation: obj.allowPrivilegeEscalation,
+    appArmorProfile: toJson_AppArmorProfile(obj.appArmorProfile),
+    capabilities: toJson_Capabilities(obj.capabilities),
+    privileged: obj.privileged,
+    procMount: obj.procMount,
+    readOnlyRootFilesystem: obj.readOnlyRootFilesystem,
+    runAsGroup: obj.runAsGroup,
+    runAsNonRoot: obj.runAsNonRoot,
+    runAsUser: obj.runAsUser,
+    seLinuxOptions: toJson_SeLinuxOptions(obj.seLinuxOptions),
+    seccompProfile: toJson_SeccompProfile(obj.seccompProfile),
+    windowsOptions: toJson_WindowsSecurityContextOptions(obj.windowsOptions),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -28291,8 +28291,8 @@ export interface VolumeDevice {
 export function toJson_VolumeDevice(obj: VolumeDevice | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'devicePath': obj.devicePath,
-    'name': obj.name,
+    devicePath: obj.devicePath,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -28374,13 +28374,13 @@ export interface VolumeMount {
 export function toJson_VolumeMount(obj: VolumeMount | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'mountPath': obj.mountPath,
-    'mountPropagation': obj.mountPropagation,
-    'name': obj.name,
-    'readOnly': obj.readOnly,
-    'recursiveReadOnly': obj.recursiveReadOnly,
-    'subPath': obj.subPath,
-    'subPathExpr': obj.subPathExpr,
+    mountPath: obj.mountPath,
+    mountPropagation: obj.mountPropagation,
+    name: obj.name,
+    readOnly: obj.readOnly,
+    recursiveReadOnly: obj.recursiveReadOnly,
+    subPath: obj.subPath,
+    subPathExpr: obj.subPathExpr,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -28414,8 +28414,8 @@ export interface PodDnsConfigOption {
 export function toJson_PodDnsConfigOption(obj: PodDnsConfigOption | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
-    'value': obj.value,
+    name: obj.name,
+    value: obj.value,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -28457,8 +28457,8 @@ export interface ClaimSource {
 export function toJson_ClaimSource(obj: ClaimSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'resourceClaimName': obj.resourceClaimName,
-    'resourceClaimTemplateName': obj.resourceClaimTemplateName,
+    resourceClaimName: obj.resourceClaimName,
+    resourceClaimTemplateName: obj.resourceClaimTemplateName,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -28497,8 +28497,8 @@ export interface AppArmorProfile {
 export function toJson_AppArmorProfile(obj: AppArmorProfile | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'localhostProfile': obj.localhostProfile,
-    'type': obj.type,
+    localhostProfile: obj.localhostProfile,
+    type: obj.type,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -28548,10 +28548,10 @@ export interface SeLinuxOptions {
 export function toJson_SeLinuxOptions(obj: SeLinuxOptions | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'level': obj.level,
-    'role': obj.role,
-    'type': obj.type,
-    'user': obj.user,
+    level: obj.level,
+    role: obj.role,
+    type: obj.type,
+    user: obj.user,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -28589,8 +28589,8 @@ export interface SeccompProfile {
 export function toJson_SeccompProfile(obj: SeccompProfile | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'localhostProfile': obj.localhostProfile,
-    'type': obj.type,
+    localhostProfile: obj.localhostProfile,
+    type: obj.type,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -28626,8 +28626,8 @@ export interface Sysctl {
 export function toJson_Sysctl(obj: Sysctl | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
-    'value': obj.value,
+    name: obj.name,
+    value: obj.value,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -28678,10 +28678,10 @@ export interface WindowsSecurityContextOptions {
 export function toJson_WindowsSecurityContextOptions(obj: WindowsSecurityContextOptions | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'gmsaCredentialSpec': obj.gmsaCredentialSpec,
-    'gmsaCredentialSpecName': obj.gmsaCredentialSpecName,
-    'hostProcess': obj.hostProcess,
-    'runAsUserName': obj.runAsUserName,
+    gmsaCredentialSpec: obj.gmsaCredentialSpec,
+    gmsaCredentialSpecName: obj.gmsaCredentialSpecName,
+    hostProcess: obj.hostProcess,
+    runAsUserName: obj.runAsUserName,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -28724,9 +28724,9 @@ export interface AzureFileVolumeSource {
 export function toJson_AzureFileVolumeSource(obj: AzureFileVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'readOnly': obj.readOnly,
-    'secretName': obj.secretName,
-    'shareName': obj.shareName,
+    readOnly: obj.readOnly,
+    secretName: obj.secretName,
+    shareName: obj.shareName,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -28791,12 +28791,12 @@ export interface CephFsVolumeSource {
 export function toJson_CephFsVolumeSource(obj: CephFsVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'monitors': obj.monitors?.map(y => y),
-    'path': obj.path,
-    'readOnly': obj.readOnly,
-    'secretFile': obj.secretFile,
-    'secretRef': toJson_LocalObjectReference(obj.secretRef),
-    'user': obj.user,
+    monitors: obj.monitors?.map(y => y),
+    path: obj.path,
+    readOnly: obj.readOnly,
+    secretFile: obj.secretFile,
+    secretRef: toJson_LocalObjectReference(obj.secretRef),
+    user: obj.user,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -28846,10 +28846,10 @@ export interface CinderVolumeSource {
 export function toJson_CinderVolumeSource(obj: CinderVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'fsType': obj.fsType,
-    'readOnly': obj.readOnly,
-    'secretRef': toJson_LocalObjectReference(obj.secretRef),
-    'volumeID': obj.volumeId,
+    fsType: obj.fsType,
+    readOnly: obj.readOnly,
+    secretRef: toJson_LocalObjectReference(obj.secretRef),
+    volumeID: obj.volumeId,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -28902,10 +28902,10 @@ export interface ConfigMapVolumeSource {
 export function toJson_ConfigMapVolumeSource(obj: ConfigMapVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'defaultMode': obj.defaultMode,
-    'items': obj.items?.map(y => toJson_KeyToPath(y)),
-    'name': obj.name,
-    'optional': obj.optional,
+    defaultMode: obj.defaultMode,
+    items: obj.items?.map(y => toJson_KeyToPath(y)),
+    name: obj.name,
+    optional: obj.optional,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -28963,11 +28963,11 @@ export interface CsiVolumeSource {
 export function toJson_CsiVolumeSource(obj: CsiVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'driver': obj.driver,
-    'fsType': obj.fsType,
-    'nodePublishSecretRef': toJson_LocalObjectReference(obj.nodePublishSecretRef),
-    'readOnly': obj.readOnly,
-    'volumeAttributes': ((obj.volumeAttributes) === undefined) ? undefined : (Object.entries(obj.volumeAttributes).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    driver: obj.driver,
+    fsType: obj.fsType,
+    nodePublishSecretRef: toJson_LocalObjectReference(obj.nodePublishSecretRef),
+    readOnly: obj.readOnly,
+    volumeAttributes: ((obj.volumeAttributes) === undefined) ? undefined : (Object.entries(obj.volumeAttributes).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -29004,8 +29004,8 @@ export interface DownwardApiVolumeSource {
 export function toJson_DownwardApiVolumeSource(obj: DownwardApiVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'defaultMode': obj.defaultMode,
-    'items': obj.items?.map(y => toJson_DownwardApiVolumeFile(y)),
+    defaultMode: obj.defaultMode,
+    items: obj.items?.map(y => toJson_DownwardApiVolumeFile(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -29041,8 +29041,8 @@ export interface EmptyDirVolumeSource {
 export function toJson_EmptyDirVolumeSource(obj: EmptyDirVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'medium': obj.medium,
-    'sizeLimit': obj.sizeLimit?.value,
+    medium: obj.medium,
+    sizeLimit: obj.sizeLimit?.value,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -29077,7 +29077,7 @@ export interface EphemeralVolumeSource {
 export function toJson_EphemeralVolumeSource(obj: EphemeralVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'volumeClaimTemplate': toJson_PersistentVolumeClaimTemplate(obj.volumeClaimTemplate),
+    volumeClaimTemplate: toJson_PersistentVolumeClaimTemplate(obj.volumeClaimTemplate),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -29134,11 +29134,11 @@ export interface FlexVolumeSource {
 export function toJson_FlexVolumeSource(obj: FlexVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'driver': obj.driver,
-    'fsType': obj.fsType,
-    'options': ((obj.options) === undefined) ? undefined : (Object.entries(obj.options).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
-    'readOnly': obj.readOnly,
-    'secretRef': toJson_LocalObjectReference(obj.secretRef),
+    driver: obj.driver,
+    fsType: obj.fsType,
+    options: ((obj.options) === undefined) ? undefined : (Object.entries(obj.options).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    readOnly: obj.readOnly,
+    secretRef: toJson_LocalObjectReference(obj.secretRef),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -29183,9 +29183,9 @@ export interface GitRepoVolumeSource {
 export function toJson_GitRepoVolumeSource(obj: GitRepoVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'directory': obj.directory,
-    'repository': obj.repository,
-    'revision': obj.revision,
+    directory: obj.directory,
+    repository: obj.repository,
+    revision: obj.revision,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -29229,9 +29229,9 @@ export interface GlusterfsVolumeSource {
 export function toJson_GlusterfsVolumeSource(obj: GlusterfsVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'endpoints': obj.endpoints,
-    'path': obj.path,
-    'readOnly': obj.readOnly,
+    endpoints: obj.endpoints,
+    path: obj.path,
+    readOnly: obj.readOnly,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -29332,17 +29332,17 @@ export interface IscsiVolumeSource {
 export function toJson_IscsiVolumeSource(obj: IscsiVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'chapAuthDiscovery': obj.chapAuthDiscovery,
-    'chapAuthSession': obj.chapAuthSession,
-    'fsType': obj.fsType,
-    'initiatorName': obj.initiatorName,
-    'iqn': obj.iqn,
-    'iscsiInterface': obj.iscsiInterface,
-    'lun': obj.lun,
-    'portals': obj.portals?.map(y => y),
-    'readOnly': obj.readOnly,
-    'secretRef': toJson_LocalObjectReference(obj.secretRef),
-    'targetPortal': obj.targetPortal,
+    chapAuthDiscovery: obj.chapAuthDiscovery,
+    chapAuthSession: obj.chapAuthSession,
+    fsType: obj.fsType,
+    initiatorName: obj.initiatorName,
+    iqn: obj.iqn,
+    iscsiInterface: obj.iscsiInterface,
+    lun: obj.lun,
+    portals: obj.portals?.map(y => y),
+    readOnly: obj.readOnly,
+    secretRef: toJson_LocalObjectReference(obj.secretRef),
+    targetPortal: obj.targetPortal,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -29378,8 +29378,8 @@ export interface PersistentVolumeClaimVolumeSource {
 export function toJson_PersistentVolumeClaimVolumeSource(obj: PersistentVolumeClaimVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'claimName': obj.claimName,
-    'readOnly': obj.readOnly,
+    claimName: obj.claimName,
+    readOnly: obj.readOnly,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -29415,8 +29415,8 @@ export interface ProjectedVolumeSource {
 export function toJson_ProjectedVolumeSource(obj: ProjectedVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'defaultMode': obj.defaultMode,
-    'sources': obj.sources?.map(y => toJson_VolumeProjection(y)),
+    defaultMode: obj.defaultMode,
+    sources: obj.sources?.map(y => toJson_VolumeProjection(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -29499,14 +29499,14 @@ export interface RbdVolumeSource {
 export function toJson_RbdVolumeSource(obj: RbdVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'fsType': obj.fsType,
-    'image': obj.image,
-    'keyring': obj.keyring,
-    'monitors': obj.monitors?.map(y => y),
-    'pool': obj.pool,
-    'readOnly': obj.readOnly,
-    'secretRef': toJson_LocalObjectReference(obj.secretRef),
-    'user': obj.user,
+    fsType: obj.fsType,
+    image: obj.image,
+    keyring: obj.keyring,
+    monitors: obj.monitors?.map(y => y),
+    pool: obj.pool,
+    readOnly: obj.readOnly,
+    secretRef: toJson_LocalObjectReference(obj.secretRef),
+    user: obj.user,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -29601,16 +29601,16 @@ export interface ScaleIoVolumeSource {
 export function toJson_ScaleIoVolumeSource(obj: ScaleIoVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'fsType': obj.fsType,
-    'gateway': obj.gateway,
-    'protectionDomain': obj.protectionDomain,
-    'readOnly': obj.readOnly,
-    'secretRef': toJson_LocalObjectReference(obj.secretRef),
-    'sslEnabled': obj.sslEnabled,
-    'storageMode': obj.storageMode,
-    'storagePool': obj.storagePool,
-    'system': obj.system,
-    'volumeName': obj.volumeName,
+    fsType: obj.fsType,
+    gateway: obj.gateway,
+    protectionDomain: obj.protectionDomain,
+    readOnly: obj.readOnly,
+    secretRef: toJson_LocalObjectReference(obj.secretRef),
+    sslEnabled: obj.sslEnabled,
+    storageMode: obj.storageMode,
+    storagePool: obj.storagePool,
+    system: obj.system,
+    volumeName: obj.volumeName,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -29663,10 +29663,10 @@ export interface SecretVolumeSource {
 export function toJson_SecretVolumeSource(obj: SecretVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'defaultMode': obj.defaultMode,
-    'items': obj.items?.map(y => toJson_KeyToPath(y)),
-    'optional': obj.optional,
-    'secretName': obj.secretName,
+    defaultMode: obj.defaultMode,
+    items: obj.items?.map(y => toJson_KeyToPath(y)),
+    optional: obj.optional,
+    secretName: obj.secretName,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -29723,11 +29723,11 @@ export interface StorageOsVolumeSource {
 export function toJson_StorageOsVolumeSource(obj: StorageOsVolumeSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'fsType': obj.fsType,
-    'readOnly': obj.readOnly,
-    'secretRef': toJson_LocalObjectReference(obj.secretRef),
-    'volumeName': obj.volumeName,
-    'volumeNamespace': obj.volumeNamespace,
+    fsType: obj.fsType,
+    readOnly: obj.readOnly,
+    secretRef: toJson_LocalObjectReference(obj.secretRef),
+    volumeName: obj.volumeName,
+    volumeNamespace: obj.volumeNamespace,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -29770,9 +29770,9 @@ export interface ScopedResourceSelectorRequirement {
 export function toJson_ScopedResourceSelectorRequirement(obj: ScopedResourceSelectorRequirement | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'operator': obj.operator,
-    'scopeName': obj.scopeName,
-    'values': obj.values?.map(y => y),
+    operator: obj.operator,
+    scopeName: obj.scopeName,
+    values: obj.values?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -29801,7 +29801,7 @@ export interface ClientIpConfig {
 export function toJson_ClientIpConfig(obj: ClientIpConfig | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'timeoutSeconds': obj.timeoutSeconds,
+    timeoutSeconds: obj.timeoutSeconds,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -29830,7 +29830,7 @@ export interface ForZone {
 export function toJson_ForZone(obj: ForZone | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -29872,8 +29872,8 @@ export interface NonResourcePolicyRule {
 export function toJson_NonResourcePolicyRule(obj: NonResourcePolicyRule | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'nonResourceURLs': obj.nonResourceUrLs?.map(y => y),
-    'verbs': obj.verbs?.map(y => y),
+    nonResourceURLs: obj.nonResourceUrLs?.map(y => y),
+    verbs: obj.verbs?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -29930,11 +29930,11 @@ export interface ResourcePolicyRule {
 export function toJson_ResourcePolicyRule(obj: ResourcePolicyRule | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiGroups': obj.apiGroups?.map(y => y),
-    'clusterScope': obj.clusterScope,
-    'namespaces': obj.namespaces?.map(y => y),
-    'resources': obj.resources?.map(y => y),
-    'verbs': obj.verbs?.map(y => y),
+    apiGroups: obj.apiGroups?.map(y => y),
+    clusterScope: obj.clusterScope,
+    namespaces: obj.namespaces?.map(y => y),
+    resources: obj.resources?.map(y => y),
+    verbs: obj.verbs?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -29970,8 +29970,8 @@ export interface LimitResponse {
 export function toJson_LimitResponse(obj: LimitResponse | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'queuing': toJson_QueuingConfiguration(obj.queuing),
-    'type': obj.type,
+    queuing: toJson_QueuingConfiguration(obj.queuing),
+    type: obj.type,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30013,8 +30013,8 @@ export interface NonResourcePolicyRuleV1Beta3 {
 export function toJson_NonResourcePolicyRuleV1Beta3(obj: NonResourcePolicyRuleV1Beta3 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'nonResourceURLs': obj.nonResourceUrLs?.map(y => y),
-    'verbs': obj.verbs?.map(y => y),
+    nonResourceURLs: obj.nonResourceUrLs?.map(y => y),
+    verbs: obj.verbs?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30071,11 +30071,11 @@ export interface ResourcePolicyRuleV1Beta3 {
 export function toJson_ResourcePolicyRuleV1Beta3(obj: ResourcePolicyRuleV1Beta3 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiGroups': obj.apiGroups?.map(y => y),
-    'clusterScope': obj.clusterScope,
-    'namespaces': obj.namespaces?.map(y => y),
-    'resources': obj.resources?.map(y => y),
-    'verbs': obj.verbs?.map(y => y),
+    apiGroups: obj.apiGroups?.map(y => y),
+    clusterScope: obj.clusterScope,
+    namespaces: obj.namespaces?.map(y => y),
+    resources: obj.resources?.map(y => y),
+    verbs: obj.verbs?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30125,10 +30125,10 @@ export interface SubjectV1Beta3 {
 export function toJson_SubjectV1Beta3(obj: SubjectV1Beta3 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'group': toJson_GroupSubjectV1Beta3(obj.group),
-    'kind': obj.kind,
-    'serviceAccount': toJson_ServiceAccountSubjectV1Beta3(obj.serviceAccount),
-    'user': toJson_UserSubjectV1Beta3(obj.user),
+    group: toJson_GroupSubjectV1Beta3(obj.group),
+    kind: obj.kind,
+    serviceAccount: toJson_ServiceAccountSubjectV1Beta3(obj.serviceAccount),
+    user: toJson_UserSubjectV1Beta3(obj.user),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30164,8 +30164,8 @@ export interface LimitResponseV1Beta3 {
 export function toJson_LimitResponseV1Beta3(obj: LimitResponseV1Beta3 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'queuing': toJson_QueuingConfigurationV1Beta3(obj.queuing),
-    'type': obj.type,
+    queuing: toJson_QueuingConfigurationV1Beta3(obj.queuing),
+    type: obj.type,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30201,8 +30201,8 @@ export interface IngressServiceBackend {
 export function toJson_IngressServiceBackend(obj: IngressServiceBackend | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
-    'port': toJson_ServiceBackendPort(obj.port),
+    name: obj.name,
+    port: toJson_ServiceBackendPort(obj.port),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30231,7 +30231,7 @@ export interface HttpIngressRuleValue {
 export function toJson_HttpIngressRuleValue(obj: HttpIngressRuleValue | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'paths': obj.paths?.map(y => toJson_HttpIngressPath(y)),
+    paths: obj.paths?.map(y => toJson_HttpIngressPath(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30274,9 +30274,9 @@ export interface NetworkPolicyPort {
 export function toJson_NetworkPolicyPort(obj: NetworkPolicyPort | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'endPort': obj.endPort,
-    'port': obj.port?.value,
-    'protocol': obj.protocol,
+    endPort: obj.endPort,
+    port: obj.port?.value,
+    protocol: obj.protocol,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30323,9 +30323,9 @@ export interface NetworkPolicyPeer {
 export function toJson_NetworkPolicyPeer(obj: NetworkPolicyPeer | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'ipBlock': toJson_IpBlock(obj.ipBlock),
-    'namespaceSelector': toJson_LabelSelector(obj.namespaceSelector),
-    'podSelector': toJson_LabelSelector(obj.podSelector),
+    ipBlock: toJson_IpBlock(obj.ipBlock),
+    namespaceSelector: toJson_LabelSelector(obj.namespaceSelector),
+    podSelector: toJson_LabelSelector(obj.podSelector),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30359,7 +30359,7 @@ export interface NamedResourcesRequestV1Alpha2 {
 export function toJson_NamedResourcesRequestV1Alpha2(obj: NamedResourcesRequestV1Alpha2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'selector': obj.selector,
+    selector: obj.selector,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30402,9 +30402,9 @@ export interface NodeSelectorRequirement {
 export function toJson_NodeSelectorRequirement(obj: NodeSelectorRequirement | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'key': obj.key,
-    'operator': obj.operator,
-    'values': obj.values?.map(y => y),
+    key: obj.key,
+    operator: obj.operator,
+    values: obj.values?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30482,14 +30482,14 @@ export interface NamedResourcesAttributeV1Alpha2 {
 export function toJson_NamedResourcesAttributeV1Alpha2(obj: NamedResourcesAttributeV1Alpha2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'bool': obj.bool,
-    'int': obj.int,
-    'intSlice': toJson_NamedResourcesIntSliceV1Alpha2(obj.intSlice),
-    'name': obj.name,
-    'quantity': obj.quantity?.value,
-    'string': obj.string,
-    'stringSlice': toJson_NamedResourcesStringSliceV1Alpha2(obj.stringSlice),
-    'version': obj.version,
+    bool: obj.bool,
+    int: obj.int,
+    intSlice: toJson_NamedResourcesIntSliceV1Alpha2(obj.intSlice),
+    name: obj.name,
+    quantity: obj.quantity?.value,
+    string: obj.string,
+    stringSlice: toJson_NamedResourcesStringSliceV1Alpha2(obj.stringSlice),
+    version: obj.version,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30518,7 +30518,7 @@ export interface VolumeNodeResources {
 export function toJson_VolumeNodeResources(obj: VolumeNodeResources | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'count': obj.count,
+    count: obj.count,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30554,8 +30554,8 @@ export interface WebhookConversion {
 export function toJson_WebhookConversion(obj: WebhookConversion | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'clientConfig': toJson_WebhookClientConfig(obj.clientConfig),
-    'conversionReviewVersions': obj.conversionReviewVersions?.map(y => y),
+    clientConfig: toJson_WebhookClientConfig(obj.clientConfig),
+    conversionReviewVersions: obj.conversionReviewVersions?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30619,12 +30619,12 @@ export interface CustomResourceColumnDefinition {
 export function toJson_CustomResourceColumnDefinition(obj: CustomResourceColumnDefinition | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'description': obj.description,
-    'format': obj.format,
-    'jsonPath': obj.jsonPath,
-    'name': obj.name,
-    'priority': obj.priority,
-    'type': obj.type,
+    description: obj.description,
+    format: obj.format,
+    jsonPath: obj.jsonPath,
+    name: obj.name,
+    priority: obj.priority,
+    type: obj.type,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30653,7 +30653,7 @@ export interface CustomResourceValidation {
 export function toJson_CustomResourceValidation(obj: CustomResourceValidation | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'openAPIV3Schema': toJson_JsonSchemaProps(obj.openApiv3Schema),
+    openAPIV3Schema: toJson_JsonSchemaProps(obj.openApiv3Schema),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30682,7 +30682,7 @@ export interface SelectableField {
 export function toJson_SelectableField(obj: SelectableField | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'jsonPath': obj.jsonPath,
+    jsonPath: obj.jsonPath,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30718,8 +30718,8 @@ export interface CustomResourceSubresources {
 export function toJson_CustomResourceSubresources(obj: CustomResourceSubresources | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'scale': toJson_CustomResourceSubresourceScale(obj.scale),
-    'status': obj.status,
+    scale: toJson_CustomResourceSubresourceScale(obj.scale),
+    status: obj.status,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30762,9 +30762,9 @@ export interface HpaScalingPolicyV2 {
 export function toJson_HpaScalingPolicyV2(obj: HpaScalingPolicyV2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'periodSeconds': obj.periodSeconds,
-    'type': obj.type,
-    'value': obj.value,
+    periodSeconds: obj.periodSeconds,
+    type: obj.type,
+    value: obj.value,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30814,10 +30814,10 @@ export interface MetricTargetV2 {
 export function toJson_MetricTargetV2(obj: MetricTargetV2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'averageUtilization': obj.averageUtilization,
-    'averageValue': obj.averageValue?.value,
-    'type': obj.type,
-    'value': obj.value?.value,
+    averageUtilization: obj.averageUtilization,
+    averageValue: obj.averageValue?.value,
+    type: obj.type,
+    value: obj.value?.value,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30853,8 +30853,8 @@ export interface MetricIdentifierV2 {
 export function toJson_MetricIdentifierV2(obj: MetricIdentifierV2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
-    'selector': toJson_LabelSelector(obj.selector),
+    name: obj.name,
+    selector: toJson_LabelSelector(obj.selector),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30905,9 +30905,9 @@ export interface PodFailurePolicyOnExitCodesRequirement {
 export function toJson_PodFailurePolicyOnExitCodesRequirement(obj: PodFailurePolicyOnExitCodesRequirement | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'containerName': obj.containerName,
-    'operator': obj.operator,
-    'values': obj.values?.map(y => y),
+    containerName: obj.containerName,
+    operator: obj.operator,
+    values: obj.values?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30944,8 +30944,8 @@ export interface PodFailurePolicyOnPodConditionsPattern {
 export function toJson_PodFailurePolicyOnPodConditionsPattern(obj: PodFailurePolicyOnPodConditionsPattern | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'status': obj.status,
-    'type': obj.type,
+    status: obj.status,
+    type: obj.type,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -30981,8 +30981,8 @@ export interface PreferredSchedulingTerm {
 export function toJson_PreferredSchedulingTerm(obj: PreferredSchedulingTerm | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'preference': toJson_NodeSelectorTerm(obj.preference),
-    'weight': obj.weight,
+    preference: toJson_NodeSelectorTerm(obj.preference),
+    weight: obj.weight,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31018,8 +31018,8 @@ export interface WeightedPodAffinityTerm {
 export function toJson_WeightedPodAffinityTerm(obj: WeightedPodAffinityTerm | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'podAffinityTerm': toJson_PodAffinityTerm(obj.podAffinityTerm),
-    'weight': obj.weight,
+    podAffinityTerm: toJson_PodAffinityTerm(obj.podAffinityTerm),
+    weight: obj.weight,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31083,12 +31083,12 @@ export interface PodAffinityTerm {
 export function toJson_PodAffinityTerm(obj: PodAffinityTerm | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'labelSelector': toJson_LabelSelector(obj.labelSelector),
-    'matchLabelKeys': obj.matchLabelKeys?.map(y => y),
-    'mismatchLabelKeys': obj.mismatchLabelKeys?.map(y => y),
-    'namespaceSelector': toJson_LabelSelector(obj.namespaceSelector),
-    'namespaces': obj.namespaces?.map(y => y),
-    'topologyKey': obj.topologyKey,
+    labelSelector: toJson_LabelSelector(obj.labelSelector),
+    matchLabelKeys: obj.matchLabelKeys?.map(y => y),
+    mismatchLabelKeys: obj.mismatchLabelKeys?.map(y => y),
+    namespaceSelector: toJson_LabelSelector(obj.namespaceSelector),
+    namespaces: obj.namespaces?.map(y => y),
+    topologyKey: obj.topologyKey,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31138,10 +31138,10 @@ export interface EnvVarSource {
 export function toJson_EnvVarSource(obj: EnvVarSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'configMapKeyRef': toJson_ConfigMapKeySelector(obj.configMapKeyRef),
-    'fieldRef': toJson_ObjectFieldSelector(obj.fieldRef),
-    'resourceFieldRef': toJson_ResourceFieldSelector(obj.resourceFieldRef),
-    'secretKeyRef': toJson_SecretKeySelector(obj.secretKeyRef),
+    configMapKeyRef: toJson_ConfigMapKeySelector(obj.configMapKeyRef),
+    fieldRef: toJson_ObjectFieldSelector(obj.fieldRef),
+    resourceFieldRef: toJson_ResourceFieldSelector(obj.resourceFieldRef),
+    secretKeyRef: toJson_SecretKeySelector(obj.secretKeyRef),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31179,8 +31179,8 @@ export interface ConfigMapEnvSource {
 export function toJson_ConfigMapEnvSource(obj: ConfigMapEnvSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
-    'optional': obj.optional,
+    name: obj.name,
+    optional: obj.optional,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31218,8 +31218,8 @@ export interface SecretEnvSource {
 export function toJson_SecretEnvSource(obj: SecretEnvSource | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
-    'optional': obj.optional,
+    name: obj.name,
+    optional: obj.optional,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31269,10 +31269,10 @@ export interface LifecycleHandler {
 export function toJson_LifecycleHandler(obj: LifecycleHandler | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'exec': toJson_ExecAction(obj.exec),
-    'httpGet': toJson_HttpGetAction(obj.httpGet),
-    'sleep': toJson_SleepAction(obj.sleep),
-    'tcpSocket': toJson_TcpSocketAction(obj.tcpSocket),
+    exec: toJson_ExecAction(obj.exec),
+    httpGet: toJson_HttpGetAction(obj.httpGet),
+    sleep: toJson_SleepAction(obj.sleep),
+    tcpSocket: toJson_TcpSocketAction(obj.tcpSocket),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31301,7 +31301,7 @@ export interface ExecAction {
 export function toJson_ExecAction(obj: ExecAction | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'command': obj.command?.map(y => y),
+    command: obj.command?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31337,8 +31337,8 @@ export interface GrpcAction {
 export function toJson_GrpcAction(obj: GrpcAction | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'port': obj.port,
-    'service': obj.service,
+    port: obj.port,
+    service: obj.service,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31396,11 +31396,11 @@ export interface HttpGetAction {
 export function toJson_HttpGetAction(obj: HttpGetAction | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'host': obj.host,
-    'httpHeaders': obj.httpHeaders?.map(y => toJson_HttpHeader(y)),
-    'path': obj.path,
-    'port': obj.port?.value,
-    'scheme': obj.scheme,
+    host: obj.host,
+    httpHeaders: obj.httpHeaders?.map(y => toJson_HttpHeader(y)),
+    path: obj.path,
+    port: obj.port?.value,
+    scheme: obj.scheme,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31436,8 +31436,8 @@ export interface TcpSocketAction {
 export function toJson_TcpSocketAction(obj: TcpSocketAction | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'host': obj.host,
-    'port': obj.port?.value,
+    host: obj.host,
+    port: obj.port?.value,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31466,7 +31466,7 @@ export interface ResourceClaim {
 export function toJson_ResourceClaim(obj: ResourceClaim | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31502,8 +31502,8 @@ export interface Capabilities {
 export function toJson_Capabilities(obj: Capabilities | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'add': obj.add?.map(y => y),
-    'drop': obj.drop?.map(y => y),
+    add: obj.add?.map(y => y),
+    drop: obj.drop?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31546,9 +31546,9 @@ export interface KeyToPath {
 export function toJson_KeyToPath(obj: KeyToPath | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'key': obj.key,
-    'mode': obj.mode,
-    'path': obj.path,
+    key: obj.key,
+    mode: obj.mode,
+    path: obj.path,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31598,10 +31598,10 @@ export interface DownwardApiVolumeFile {
 export function toJson_DownwardApiVolumeFile(obj: DownwardApiVolumeFile | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'fieldRef': toJson_ObjectFieldSelector(obj.fieldRef),
-    'mode': obj.mode,
-    'path': obj.path,
-    'resourceFieldRef': toJson_ResourceFieldSelector(obj.resourceFieldRef),
+    fieldRef: toJson_ObjectFieldSelector(obj.fieldRef),
+    mode: obj.mode,
+    path: obj.path,
+    resourceFieldRef: toJson_ResourceFieldSelector(obj.resourceFieldRef),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31637,8 +31637,8 @@ export interface PersistentVolumeClaimTemplate {
 export function toJson_PersistentVolumeClaimTemplate(obj: PersistentVolumeClaimTemplate | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'metadata': toJson_ObjectMeta(obj.metadata),
-    'spec': toJson_PersistentVolumeClaimSpec(obj.spec),
+    metadata: toJson_ObjectMeta(obj.metadata),
+    spec: toJson_PersistentVolumeClaimSpec(obj.spec),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31701,11 +31701,11 @@ export interface VolumeProjection {
 export function toJson_VolumeProjection(obj: VolumeProjection | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'clusterTrustBundle': toJson_ClusterTrustBundleProjection(obj.clusterTrustBundle),
-    'configMap': toJson_ConfigMapProjection(obj.configMap),
-    'downwardAPI': toJson_DownwardApiProjection(obj.downwardApi),
-    'secret': toJson_SecretProjection(obj.secret),
-    'serviceAccountToken': toJson_ServiceAccountTokenProjection(obj.serviceAccountToken),
+    clusterTrustBundle: toJson_ClusterTrustBundleProjection(obj.clusterTrustBundle),
+    configMap: toJson_ConfigMapProjection(obj.configMap),
+    downwardAPI: toJson_DownwardApiProjection(obj.downwardApi),
+    secret: toJson_SecretProjection(obj.secret),
+    serviceAccountToken: toJson_ServiceAccountTokenProjection(obj.serviceAccountToken),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31748,9 +31748,9 @@ export interface QueuingConfiguration {
 export function toJson_QueuingConfiguration(obj: QueuingConfiguration | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'handSize': obj.handSize,
-    'queueLengthLimit': obj.queueLengthLimit,
-    'queues': obj.queues,
+    handSize: obj.handSize,
+    queueLengthLimit: obj.queueLengthLimit,
+    queues: obj.queues,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31779,7 +31779,7 @@ export interface GroupSubjectV1Beta3 {
 export function toJson_GroupSubjectV1Beta3(obj: GroupSubjectV1Beta3 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31815,8 +31815,8 @@ export interface ServiceAccountSubjectV1Beta3 {
 export function toJson_ServiceAccountSubjectV1Beta3(obj: ServiceAccountSubjectV1Beta3 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
-    'namespace': obj.namespace,
+    name: obj.name,
+    namespace: obj.namespace,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31845,7 +31845,7 @@ export interface UserSubjectV1Beta3 {
 export function toJson_UserSubjectV1Beta3(obj: UserSubjectV1Beta3 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
+    name: obj.name,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31888,9 +31888,9 @@ export interface QueuingConfigurationV1Beta3 {
 export function toJson_QueuingConfigurationV1Beta3(obj: QueuingConfigurationV1Beta3 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'handSize': obj.handSize,
-    'queueLengthLimit': obj.queueLengthLimit,
-    'queues': obj.queues,
+    handSize: obj.handSize,
+    queueLengthLimit: obj.queueLengthLimit,
+    queues: obj.queues,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31926,8 +31926,8 @@ export interface ServiceBackendPort {
 export function toJson_ServiceBackendPort(obj: ServiceBackendPort | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
-    'number': obj.number,
+    name: obj.name,
+    number: obj.number,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -31980,9 +31980,9 @@ export interface HttpIngressPath {
 export function toJson_HttpIngressPath(obj: HttpIngressPath | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'backend': toJson_IngressBackend(obj.backend),
-    'path': obj.path,
-    'pathType': obj.pathType,
+    backend: toJson_IngressBackend(obj.backend),
+    path: obj.path,
+    pathType: obj.pathType,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -32018,8 +32018,8 @@ export interface IpBlock {
 export function toJson_IpBlock(obj: IpBlock | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'cidr': obj.cidr,
-    'except': obj.except?.map(y => y),
+    cidr: obj.cidr,
+    except: obj.except?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -32048,7 +32048,7 @@ export interface NamedResourcesIntSliceV1Alpha2 {
 export function toJson_NamedResourcesIntSliceV1Alpha2(obj: NamedResourcesIntSliceV1Alpha2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'ints': obj.ints?.map(y => y),
+    ints: obj.ints?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -32077,7 +32077,7 @@ export interface NamedResourcesStringSliceV1Alpha2 {
 export function toJson_NamedResourcesStringSliceV1Alpha2(obj: NamedResourcesStringSliceV1Alpha2 | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'strings': obj.strings?.map(y => y),
+    strings: obj.strings?.map(y => y),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -32459,9 +32459,9 @@ export interface CustomResourceSubresourceScale {
 export function toJson_CustomResourceSubresourceScale(obj: CustomResourceSubresourceScale | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'labelSelectorPath': obj.labelSelectorPath,
-    'specReplicasPath': obj.specReplicasPath,
-    'statusReplicasPath': obj.statusReplicasPath,
+    labelSelectorPath: obj.labelSelectorPath,
+    specReplicasPath: obj.specReplicasPath,
+    statusReplicasPath: obj.statusReplicasPath,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -32504,9 +32504,9 @@ export interface ConfigMapKeySelector {
 export function toJson_ConfigMapKeySelector(obj: ConfigMapKeySelector | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'key': obj.key,
-    'name': obj.name,
-    'optional': obj.optional,
+    key: obj.key,
+    name: obj.name,
+    optional: obj.optional,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -32542,8 +32542,8 @@ export interface ObjectFieldSelector {
 export function toJson_ObjectFieldSelector(obj: ObjectFieldSelector | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'apiVersion': obj.apiVersion,
-    'fieldPath': obj.fieldPath,
+    apiVersion: obj.apiVersion,
+    fieldPath: obj.fieldPath,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -32586,9 +32586,9 @@ export interface ResourceFieldSelector {
 export function toJson_ResourceFieldSelector(obj: ResourceFieldSelector | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'containerName': obj.containerName,
-    'divisor': obj.divisor?.value,
-    'resource': obj.resource,
+    containerName: obj.containerName,
+    divisor: obj.divisor?.value,
+    resource: obj.resource,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -32631,9 +32631,9 @@ export interface SecretKeySelector {
 export function toJson_SecretKeySelector(obj: SecretKeySelector | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'key': obj.key,
-    'name': obj.name,
-    'optional': obj.optional,
+    key: obj.key,
+    name: obj.name,
+    optional: obj.optional,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -32662,7 +32662,7 @@ export interface SleepAction {
 export function toJson_SleepAction(obj: SleepAction | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'seconds': obj.seconds,
+    seconds: obj.seconds,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -32698,8 +32698,8 @@ export interface HttpHeader {
 export function toJson_HttpHeader(obj: HttpHeader | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'name': obj.name,
-    'value': obj.value,
+    name: obj.name,
+    value: obj.value,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -32756,11 +32756,11 @@ export interface ClusterTrustBundleProjection {
 export function toJson_ClusterTrustBundleProjection(obj: ClusterTrustBundleProjection | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'labelSelector': toJson_LabelSelector(obj.labelSelector),
-    'name': obj.name,
-    'optional': obj.optional,
-    'path': obj.path,
-    'signerName': obj.signerName,
+    labelSelector: toJson_LabelSelector(obj.labelSelector),
+    name: obj.name,
+    optional: obj.optional,
+    path: obj.path,
+    signerName: obj.signerName,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -32805,9 +32805,9 @@ export interface ConfigMapProjection {
 export function toJson_ConfigMapProjection(obj: ConfigMapProjection | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'items': obj.items?.map(y => toJson_KeyToPath(y)),
-    'name': obj.name,
-    'optional': obj.optional,
+    items: obj.items?.map(y => toJson_KeyToPath(y)),
+    name: obj.name,
+    optional: obj.optional,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -32836,7 +32836,7 @@ export interface DownwardApiProjection {
 export function toJson_DownwardApiProjection(obj: DownwardApiProjection | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'items': obj.items?.map(y => toJson_DownwardApiVolumeFile(y)),
+    items: obj.items?.map(y => toJson_DownwardApiVolumeFile(y)),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -32881,9 +32881,9 @@ export interface SecretProjection {
 export function toJson_SecretProjection(obj: SecretProjection | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'items': obj.items?.map(y => toJson_KeyToPath(y)),
-    'name': obj.name,
-    'optional': obj.optional,
+    items: obj.items?.map(y => toJson_KeyToPath(y)),
+    name: obj.name,
+    optional: obj.optional,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -32927,9 +32927,9 @@ export interface ServiceAccountTokenProjection {
 export function toJson_ServiceAccountTokenProjection(obj: ServiceAccountTokenProjection | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'audience': obj.audience,
-    'expirationSeconds': obj.expirationSeconds,
-    'path': obj.path,
+    audience: obj.audience,
+    expirationSeconds: obj.expirationSeconds,
+    path: obj.path,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -32961,8 +32961,8 @@ export interface ExternalDocumentation {
 export function toJson_ExternalDocumentation(obj: ExternalDocumentation | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'description': obj.description,
-    'url': obj.url,
+    description: obj.description,
+    url: obj.url,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -33064,12 +33064,12 @@ export interface ValidationRule {
 export function toJson_ValidationRule(obj: ValidationRule | undefined): Record<string, any> | undefined {
   if (obj === undefined) { return undefined; }
   const result = {
-    'fieldPath': obj.fieldPath,
-    'message': obj.message,
-    'messageExpression': obj.messageExpression,
-    'optionalOldSelf': obj.optionalOldSelf,
-    'reason': obj.reason,
-    'rule': obj.rule,
+    fieldPath: obj.fieldPath,
+    message: obj.message,
+    messageExpression: obj.messageExpression,
+    optionalOldSelf: obj.optionalOldSelf,
+    reason: obj.reason,
+    rule: obj.rule,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
