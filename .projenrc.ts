@@ -1,8 +1,8 @@
 import { cdk, JsonPatch } from 'projen';
 import { NpmAccess } from 'projen/lib/javascript';
 
-const kplus = 'cdk8s-plus-29';
-const constructs = 'constructs@^10.0.0';
+const kplus = 'cdk8s-plus-30';
+const constructs = 'constructs@^10.0.3';
 const project = new cdk.JsiiProject({
   // majorVersion: 1,
   author: 'Jens W. Klein',

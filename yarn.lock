@@ -1534,10 +1534,10 @@ case@^1.6.3:
   resolved "https://registry.npmjs.org/case/-/case-1.6.3.tgz"
   integrity sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==
 
-cdk8s-plus-29@^2.6.0:
-  version "2.6.0"
-  resolved "https://registry.npmjs.org/cdk8s-plus-29/-/cdk8s-plus-29-2.6.0.tgz"
-  integrity sha512-H8JuwF+6ZQCHrlPHstTwNGsQ0MRE9qpJDUKlrMDJAgEJSiBUa3Qeca609TuVN07/7Mxj2kFmVkvVjUeGZa0N9Q==
+cdk8s-plus-30@^2.4.5:
+  version "2.4.5"
+  resolved "https://registry.yarnpkg.com/cdk8s-plus-30/-/cdk8s-plus-30-2.4.5.tgz#d5a5b777eab8ce4dfa4aeff28794b3b25c75a9cb"
+  integrity sha512-PIZNzbDWdvXYBep4sUeHgWOcZ/B8N8angpHGDKUqaBPoKEkcIFnjqIyk7aUz8UPdaP6cIAOsB42IBMaSlEK9jA==
   dependencies:
     minimatch "^3.1.2"
 
@@ -1724,6 +1724,11 @@ constructs@^10.0.0:
   version "10.0.0"
   resolved "https://registry.npmjs.org/constructs/-/constructs-10.0.0.tgz"
   integrity sha512-MIwjmrXZpM9RtwyrSD4HotDIQl8HTdIefQhU+MU1asvtSyVN3kK8kjeUOWMFb+fdyT4RX3QvvcaaPBluLEX1SA==
+
+constructs@^10.0.3:
+  version "10.4.2"
+  resolved "https://registry.yarnpkg.com/constructs/-/constructs-10.4.2.tgz#e875a78bef932cca12ea63965969873a25c1c132"
+  integrity sha512-wsNxBlAott2qg8Zv87q3eYZYgheb9lchtBfjHzzLHtXbttwSrHPs1NNQbBrmbb1YZvYg2+Vh0Dor76w4mFxJkA==
 
 conventional-changelog-angular@^6.0.0:
   version "6.0.0"
