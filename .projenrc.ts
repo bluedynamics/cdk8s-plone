@@ -8,7 +8,7 @@ const project = new cdk.JsiiProject({
   author: 'Jens W. Klein',
   authorAddress: 'jk@kleinundpartner.at',
   defaultReleaseBranch: 'main',
-  jsiiVersion: '~5.5.0',
+  jsiiVersion: '~5.8.0',
   name: '@bluedynamics/cdk8s-plone',
   projenrcTs: true,
   repositoryUrl: 'https://github.com/bluedynamics/cdk8s-plone.git',
@@ -25,7 +25,7 @@ const project = new cdk.JsiiProject({
   devDeps: [
     constructs, // this is ignored by projen
     kplus,
-    'yaml@^2.6.0',
+    'yaml@^2.8.0',
   ],
   publishToPypi: {
     distName: 'cdk8s-plone',
