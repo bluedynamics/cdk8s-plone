@@ -299,7 +299,7 @@ const ploneBaseOptions: PloneBaseOptions = { ... }
 
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
-| <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.environment">environment</a></code> | <code>cdk8s-plus-29.Env</code> | *No description.* |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.environment">environment</a></code> | <code>cdk8s-plus-30.Env</code> | *No description.* |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.image">image</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.imagePullPolicy">imagePullPolicy</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.limitCpu">limitCpu</a></code> | <code>string</code> | *No description.* |
@@ -330,7 +330,7 @@ const ploneBaseOptions: PloneBaseOptions = { ... }
 public readonly environment: Env;
 ```
 
-- *Type:* cdk8s-plus-29.Env
+- *Type:* cdk8s-plus-30.Env
 
 ---
 

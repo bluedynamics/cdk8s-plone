@@ -24,7 +24,7 @@
       "type": "build"
     },
     {
-      "name": "cdk8s-plus-29",
+      "name": "cdk8s-plus-30",
       "type": "build"
     },
     {
@@ -34,7 +34,7 @@
     },
     {
       "name": "constructs",
-      "version": "^10.0.0",
+      "version": "^10.0.3",
       "type": "build"
     },
     {
@@ -74,12 +74,12 @@
     },
     {
       "name": "jsii-rosetta",
-      "version": "~5.5.0",
+      "version": "~5.8.0",
       "type": "build"
     },
     {
       "name": "jsii",
-      "version": "~5.5.0",
+      "version": "~5.8.0",
       "type": "build"
     },
     {
@@ -100,16 +100,16 @@
     },
     {
       "name": "yaml",
-      "version": "^2.6.0",
+      "version": "^2.8.0",
       "type": "build"
     },
     {
-      "name": "cdk8s-plus-29",
+      "name": "cdk8s-plus-30",
       "type": "peer"
     },
     {
       "name": "constructs",
-      "version": "^10.0.0",
+      "version": "^10.0.3",
       "type": "peer"
     },
     {
@@ -117,12 +117,12 @@
       "type": "runtime"
     },
     {
-      "name": "cdk8s-plus-29",
+      "name": "cdk8s-plus-30",
       "type": "runtime"
     },
     {
       "name": "constructs",
-      "version": "^10.0.0",
+      "version": "^10.0.3",
       "type": "runtime"
     }
   ],
