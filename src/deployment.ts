@@ -1,6 +1,6 @@
 // import { log } from 'console';
 import { Names } from 'cdk8s';
-import * as kplus from 'cdk8s-plus-29';
+import * as kplus from 'cdk8s-plus-30';
 import { Construct } from 'constructs';
 import * as k8s from './imports/k8s';
 import { PlonePDB, PlonePDBOptions } from './pdb';
