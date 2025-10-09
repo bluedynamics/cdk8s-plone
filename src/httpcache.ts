@@ -65,6 +65,12 @@ export interface PloneHttpcacheOptions {
    * @default false
    */
   readonly servicemonitor?: boolean;
+
+  /**
+   * Number of Varnish pod replicas to run.
+   * @default 2
+   */
+  readonly replicas?: number;
 }
 
 /**
@@ -111,7 +117,7 @@ export class PloneHttpcache extends Construct {
       repo: 'https://helm.mittwald.de',
       chart: 'kube-httpcache',
       values: {
-        replicaCount: 2,
+        replicaCount: options.replicas ?? 2,
         cache: {
           // need to looks at the frontendWatch, do we need it?
           frontendWatch: false,
