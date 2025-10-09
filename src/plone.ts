@@ -137,6 +137,7 @@ export class Plone extends Construct {
       },
       targetPort: backendPort,
       selectorLabel: { app: Names.toLabelValue(backendDeployment) },
+      portName: 'backend-http',
     });
     this.backendServiceName = backendService.name;
 
@@ -217,6 +218,7 @@ export class Plone extends Construct {
         },
         targetPort: frontendPort,
         selectorLabel: { app: Names.toLabelValue(frontendDeployment) },
+        portName: 'frontend-http',
       });
       this.frontendServiceName = frontendService.name;
     }

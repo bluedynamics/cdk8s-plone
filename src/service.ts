@@ -19,6 +19,12 @@ export interface PloneServiceOptions {
    * @default - none
    */
   readonly labels?: { [name: string]: string };
+
+  /**
+   * Port name for the service.
+   * @default - 'http'
+   */
+  readonly portName?: string;
 }
 
 export class PloneService extends Construct {
@@ -41,7 +47,7 @@ export class PloneService extends Construct {
         labels: service_labels,
       },
       spec: {
-        ports: [{ port: options.targetPort, targetPort: targetPort, name: 'backend-http' }],
+        ports: [{ port: options.targetPort, targetPort: targetPort, name: options.portName ?? 'http' }],
         selector: selectorLabel,
       },
     };
