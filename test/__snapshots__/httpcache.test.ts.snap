@@ -213,7 +213,7 @@ exports[`defaults 1`] = `
     "spec": {
       "ports": [
         {
-          "name": "backend-http",
+          "name": "frontend-http",
           "port": 3000,
           "targetPort": 3000,
         },
