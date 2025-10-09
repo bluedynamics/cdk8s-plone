@@ -156,6 +156,29 @@ export interface PloneBaseOptions {
    * @default 3
    */
   readonly livenessFailureThreshold?: number;
+
+  /**
+   * Annotations to add to the Deployment metadata.
+   * @example { 'deployment.kubernetes.io/revision': '1' }
+   * @default - no additional annotations
+   */
+  readonly annotations?: { [name: string]: string };
+
+  /**
+   * Annotations to add to the Pod template metadata.
+   * Common for Prometheus, Istio, backup policies, etc.
+   * @example { 'prometheus.io/scrape': 'true', 'prometheus.io/port': '8080' }
+   * @default - no additional annotations
+   */
+  readonly podAnnotations?: { [name: string]: string };
+
+  /**
+   * Annotations to add to the Service metadata.
+   * Common for external-dns, load balancers, service mesh, etc.
+   * @example { 'external-dns.alpha.kubernetes.io/hostname': 'plone.example.com' }
+   * @default - no additional annotations
+   */
+  readonly serviceAnnotations?: { [name: string]: string };
 }
 /**
  * Plone deployment variants.
@@ -304,6 +327,8 @@ export class Plone extends Construct {
       },
       port: backendPort,
       environment: backend.environment,
+      annotations: backend.annotations,
+      podAnnotations: backend.podAnnotations,
     };
 
     // Probing
@@ -343,6 +368,7 @@ export class Plone extends Construct {
       targetPort: backendPort,
       selectorLabel: { app: Names.toLabelValue(backendDeployment) },
       portName: 'backend-http',
+      annotations: backend.serviceAnnotations,
     });
     this.backendServiceName = backendService.name;
 
@@ -384,6 +410,8 @@ export class Plone extends Construct {
         },
         port: frontendPort,
         environment: frontendEnvironment,
+        annotations: frontend.annotations,
+        podAnnotations: frontend.podAnnotations,
       };
 
       // Probing
@@ -424,6 +452,7 @@ export class Plone extends Construct {
         targetPort: frontendPort,
         selectorLabel: { app: Names.toLabelValue(frontendDeployment) },
         portName: 'frontend-http',
+        annotations: frontend.serviceAnnotations,
       });
       this.frontendServiceName = frontendService.name;
     }

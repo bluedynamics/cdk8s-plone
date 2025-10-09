@@ -25,6 +25,15 @@ export interface PloneServiceOptions {
    * @default - 'http'
    */
   readonly portName?: string;
+
+  /**
+   * Annotations to add to the Service metadata.
+   * Common annotations include: external-dns config, load balancer settings,
+   * service mesh configuration, etc.
+   * @example { 'external-dns.alpha.kubernetes.io/hostname': 'plone.example.com' }
+   * @default - no additional annotations
+   */
+  readonly annotations?: { [name: string]: string };
 }
 
 /**
@@ -55,6 +64,7 @@ export class PloneService extends Construct {
     const serviceOpts: k8s.KubeServiceProps = {
       metadata: {
         labels: service_labels,
+        annotations: options.annotations,
       },
       spec: {
         ports: [{ port: options.targetPort, targetPort: targetPort, name: options.portName ?? 'http' }],

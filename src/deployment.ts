@@ -88,6 +88,23 @@ export interface PloneDeploymentOptions {
   readonly labels?: { [name: string]: string };
 
   /**
+   * Annotations to add to the Deployment metadata.
+   * Common annotations include: deployment timestamps, change tracking, etc.
+   * @example { 'deployment.kubernetes.io/revision': '1' }
+   * @default - no additional annotations
+   */
+  readonly annotations?: { [name: string]: string };
+
+  /**
+   * Annotations to add to the Pod template metadata.
+   * Common annotations include: Prometheus scraping config, Istio config,
+   * backup policies, logging configurations, etc.
+   * @example { 'prometheus.io/scrape': 'true', 'prometheus.io/port': '8080' }
+   * @default - no additional annotations
+   */
+  readonly podAnnotations?: { [name: string]: string };
+
+  /**
    * Additional container specification overrides.
    * Advanced use only - merges with generated container spec.
    * @default - undefined
@@ -178,6 +195,7 @@ export class PloneDeployment extends Construct {
     const deploymentOptions: k8s.KubeDeploymentProps = {
       metadata: {
         labels: deploymentLabels,
+        annotations: options.annotations,
       },
       spec: {
         replicas,
@@ -185,7 +203,10 @@ export class PloneDeployment extends Construct {
           matchLabels: label,
         },
         template: {
-          metadata: { labels: template_labels },
+          metadata: {
+            labels: template_labels,
+            annotations: options.podAnnotations,
+          },
           spec: {
             imagePullSecrets: (image.imagePullSecrets ?? []).map((name) => ({ name: name })),
             containers: [
