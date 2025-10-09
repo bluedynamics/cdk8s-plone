@@ -1,4 +1,4 @@
-import { cdk, JsonPatch } from 'projen';
+import { cdk, JsonPatch, github } from 'projen';
 import { NpmAccess } from 'projen/lib/javascript';
 
 const kplus = 'cdk8s-plus-30';
@@ -36,6 +36,14 @@ const project = new cdk.JsiiProject({
   // },
   npmProvenance: true,
   npmAccess: NpmAccess.PUBLIC,
+  depsUpgradeOptions: {
+    workflowOptions: {
+      permissions: {
+        contents: github.workflows.JobPermission.WRITE,
+        pullRequests: github.workflows.JobPermission.WRITE,
+      },
+    },
+  },
 });
 
 
@@ -44,5 +52,14 @@ if (!eslintJson) {
   throw new Error('.eslintrc.json not found');
 }
 eslintJson.patch(JsonPatch.add('/ignorePatterns/-', 'imports/'));
+
+// Fix upgrade workflow permissions for PR job
+const upgradeMain = project.tryFindObjectFile('.github/workflows/upgrade-main.yml');
+if (upgradeMain) {
+  upgradeMain.addOverride('jobs.pr.permissions.pull-requests', 'write');
+  upgradeMain.addOverride('jobs.pr.permissions.contents', 'write');
+  // Use built-in GITHUB_TOKEN instead of PROJEN_GITHUB_TOKEN secret
+  upgradeMain.addOverride('jobs.pr.steps.4.with.token', '${{ github.token }}');
+}
 
 project.synth();
