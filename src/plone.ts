@@ -23,7 +23,7 @@ export interface PloneBaseOptions {
   // readiness Probe
   readonly readinessEnabled?: boolean;
   readonly readinessInitialDelaySeconds?: number;
-  readonly readinessIimeoutSeconds?: number;
+  readonly readinessTimeoutSeconds?: number;
   readonly readinessPeriodSeconds?: number;
   readonly readinessSuccessThreshold?: number;
   readonly readinessFailureThreshold?: number;
@@ -120,7 +120,7 @@ export class Plone extends Construct {
       backendOptions.readinessProbe = {
         httpGet: backendActionHttpGet,
         initialDelaySeconds: backend.readinessInitialDelaySeconds ?? 10,
-        timeoutSeconds: backend.readinessIimeoutSeconds ?? 15,
+        timeoutSeconds: backend.readinessTimeoutSeconds ?? 15,
         periodSeconds: backend.readinessPeriodSeconds ?? 10,
         successThreshold: backend.readinessSuccessThreshold ?? 1,
         failureThreshold: backend.readinessFailureThreshold ?? 3,
@@ -199,7 +199,7 @@ export class Plone extends Construct {
         frontendOptions.readinessProbe = {
           httpGet: frontendActionHttpGet,
           initialDelaySeconds: frontend.readinessInitialDelaySeconds ?? 10,
-          timeoutSeconds: frontend.readinessIimeoutSeconds ?? 15,
+          timeoutSeconds: frontend.readinessTimeoutSeconds ?? 15,
           periodSeconds: frontend.readinessPeriodSeconds ?? 10,
           successThreshold: frontend.readinessSuccessThreshold ?? 1,
           failureThreshold: frontend.readinessFailureThreshold ?? 3,
