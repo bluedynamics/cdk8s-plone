@@ -1,27 +1,42 @@
 import { Construct } from 'constructs';
 import * as k8s from './imports/k8s';
 
+/**
+ * Configuration options for PodDisruptionBudget.
+ */
 export interface PlonePDBOptions {
   /**
-   * maxUnavailable specification
-   * @default - none
+   * Maximum number or percentage of pods that can be unavailable during voluntary disruptions.
+   * Can be an absolute number (e.g., 1) or a percentage (e.g., '50%').
+   * Cannot be used together with minAvailable.
+   * @example 1 or '25%'
+   * @default - not set (defaults to minAvailable=1 if neither is specified)
    */
   readonly maxUnavailable?: number | string;
 
   /**
-   * minAvailable specification.
-   * default only set if maxUnavailable is not set.
-   * @default 1
+   * Minimum number or percentage of pods that must remain available during voluntary disruptions.
+   * Can be an absolute number (e.g., 1) or a percentage (e.g., '50%').
+   * Cannot be used together with maxUnavailable.
+   * @example 2 or '50%'
+   * @default 1 (if maxUnavailable is not set)
    */
   readonly minAvailable?: number | string;
 
   /**
-   * Extra labels to associate with resources.
-   * @default - none
+   * Additional Kubernetes labels for the PodDisruptionBudget.
+   * @default - standard Plone labels only
    */
   readonly labels?: { [name: string]: string };
 }
 
+/**
+ * PlonePDB creates a Kubernetes PodDisruptionBudget for high availability.
+ *
+ * This is an internal construct used by PloneDeployment.
+ * It ensures a minimum number of pods remain available during voluntary
+ * disruptions like node drains or cluster upgrades.
+ */
 export class PlonePDB extends Construct {
 
   constructor(scope: Construct, id: string, selectorLabel: { [name: string]: string }, options: PlonePDBOptions) {

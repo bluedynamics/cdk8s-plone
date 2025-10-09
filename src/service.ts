@@ -27,8 +27,18 @@ export interface PloneServiceOptions {
   readonly portName?: string;
 }
 
+/**
+ * PloneService creates a Kubernetes Service for accessing Plone pods.
+ *
+ * This is an internal construct used by the Plone class.
+ * It creates a ClusterIP service that routes traffic to the backend
+ * or frontend deployment pods.
+ */
 export class PloneService extends Construct {
-
+  /**
+   * The name of the created Kubernetes service.
+   * Can be used to reference this service from other resources.
+   */
   public name: string;
 
   constructor(scope: Construct, id: string, options: PloneServiceOptions) {

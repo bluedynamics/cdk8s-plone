@@ -4,40 +4,92 @@ import { Helm } from 'cdk8s';
 import { Construct } from 'constructs';
 import { Plone } from './plone';
 
+/**
+ * Configuration options for PloneHttpcache (Varnish caching layer).
+ */
 export interface PloneHttpcacheOptions {
   /**
-   * plone chart
-   * @default - none
+   * The Plone construct to attach the HTTP cache to.
+   * The cache will automatically connect to the backend and frontend services.
    */
   readonly plone: Plone;
 
-  /** varnishVcl
-   * @default - file in config folder
+  /**
+   * Varnish VCL configuration as a string.
+   * If provided, this takes precedence over varnishVclFile.
+   * @default - loaded from varnishVclFile or default config file
    */
   readonly varnishVcl?: string;
 
-  /** varnishVclFile
-   * @default - undefined
+  /**
+   * Path to a Varnish VCL configuration file.
+   * If not provided, uses the default VCL file included in the library.
+   * @default - uses default config/varnish.tpl.vcl
    */
   readonly varnishVclFile?: string | undefined;
 
-  /** existingSecret - Read admin credentials from user provided secret
-   * @default - undefined
-  */
+  /**
+   * Name of an existing Kubernetes secret containing Varnish admin credentials.
+   * The secret should be created separately in the same namespace.
+   * @default - undefined (no existing secret)
+   */
   readonly existingSecret?: string;
 
-
-  // resources
+  /**
+   * CPU limit for Varnish pods.
+   * @default '500m'
+   */
   readonly limitCpu?: string;
+
+  /**
+   * Memory limit for Varnish pods.
+   * @default '500Mi'
+   */
   readonly limitMemory?: string;
+
+  /**
+   * CPU request for Varnish pods.
+   * @default '100m'
+   */
   readonly requestCpu?: string;
+
+  /**
+   * Memory request for Varnish pods.
+   * @default '100Mi'
+   */
   readonly requestMemory?: string;
-  // metrics
+
+  /**
+   * Enable Prometheus ServiceMonitor for metrics collection.
+   * Requires Prometheus Operator to be installed in the cluster.
+   * @default false
+   */
   readonly servicemonitor?: boolean;
 }
 
+/**
+ * PloneHttpcache construct for deploying Varnish HTTP caching layer.
+ *
+ * Uses the mittwald/kube-httpcache Helm chart to deploy Varnish as a
+ * caching proxy in front of Plone backend and/or frontend services.
+ *
+ * The cache automatically connects to the Plone services and provides
+ * HTTP cache invalidation capabilities.
+ *
+ * @example
+ * ```typescript
+ * const plone = new Plone(chart, 'plone');
+ * const cache = new PloneHttpcache(chart, 'cache', {
+ *   plone: plone,
+ *   existingSecret: 'varnish-secret',
+ * });
+ * ```
+ */
 export class PloneHttpcache extends Construct {
-
+  /**
+   * Name of the Varnish service created by the Helm chart.
+   * Use this to reference the cache service from ingress or other constructs.
+   */
   public readonly httpcacheServiceName: string;
 
   constructor(scope: Construct, id: string, options: PloneHttpcacheOptions) {

@@ -5,113 +5,129 @@ import { Construct } from 'constructs';
 import * as k8s from './imports/k8s';
 import { PlonePDB, PlonePDBOptions } from './pdb';
 
+/**
+ * Container image configuration options.
+ */
 export interface PloneImageOptions {
   /**
-   * Specify a custom image for Plone .
-   * @default ""
+   * Container image name and tag.
+   * @example 'plone/plone-backend:6.0.10'
+   * @default 'plone/plone-backend:latest'
    */
   readonly image?: string;
 
   /**
-   * Specify Secret to pull image .
-   * @default ""
+   * Names of Kubernetes secrets for pulling private images.
+   * @default []
    */
   readonly imagePullSecrets?: string[];
 
   /**
-   * Specify Pull Policy .
-   * @default ""
+   * Image pull policy (Always, IfNotPresent, Never).
+   * @default 'IfNotPresent'
    */
   readonly imagePullPolicy?: string;
 }
 
+/**
+ * Configuration options for PloneDeployment.
+ */
 export interface PloneDeploymentOptions {
   /**
-   * Specify a custom image for Plone .
-   * @default "plone/plone-backend:latest"
+   * Container image configuration.
+   * @default 'plone/plone-backend:latest'
    */
   readonly image?: PloneImageOptions;
 
   /**
-   * Specify an environment for Plone .
-   * @default - none
-  */
+   * Environment variables for the container.
+   * Use cdk8s-plus-30 Env to define variables and sources.
+   * @default - no additional environment variables
+   */
   readonly environment?: kplus.Env;
 
   /**
- * Number of replicas.
- * @default 2
- */
+   * Number of pod replicas to run.
+   * @default 2
+   */
   readonly replicas?: number;
 
   /**
- * CPU limit
- * @default 1
- */
+   * CPU limit for the container.
+   * @default '1000m'
+   */
   readonly limitCpu?: string;
 
   /**
- * memory limit
- * @default 1
- */
+   * Memory limit for the container.
+   * @default '1Gi'
+   */
   readonly limitMemory?: string;
 
   /**
- * CPU request
- * @default 1
- */
+   * CPU request for the container.
+   * @default '200m'
+   */
   readonly requestCpu?: string;
 
   /**
- * memory request
- * @default 1
- */
+   * Memory request for the container.
+   * @default '300Mi'
+   */
   readonly requestMemory?: string;
 
   /**
-   * Port number.
+   * Container port number to expose.
    */
   readonly port: number;
 
   /**
-   * Extra labels to associate with resources.
-   * @default - none
+   * Additional Kubernetes labels for the deployment.
+   * @default - standard Plone labels only
    */
   readonly labels?: { [name: string]: string };
 
   /**
-   * Extra container spec to use for ploencontainer.
-   * @default - []
+   * Additional container specification overrides.
+   * Advanced use only - merges with generated container spec.
+   * @default - undefined
    */
   readonly ploneContainer?: k8s.Container;
 
   /**
-   * Sidecar container spec to associate with resources.
-   * @default - []
+   * Sidecar containers to run alongside the main container.
+   * @example [{ name: 'log-forwarder', image: 'fluentd:latest' }]
+   * @default []
    */
   readonly sidecars?: k8s.Container[];
 
   /**
-   * Create a PodDisruptionBugdet for the deployment?
-   * If given
-   * @default - none
+   * PodDisruptionBudget configuration for high availability.
+   * If provided, creates a PDB with the specified constraints.
+   * @default - no PDB created
    */
   readonly pdb?: PlonePDBOptions;
 
   /**
-   * Liveness Probe for the pod.
-   * @default - generated
+   * Liveness probe configuration for the container.
+   * @default - undefined (no liveness probe)
    */
   livenessProbe?: k8s.Probe;
 
   /**
-   * Readiness Probe for the pod.
-   * @default - generated
+   * Readiness probe configuration for the container.
+   * @default - undefined (no readiness probe)
    */
   readinessProbe?: k8s.Probe;
-
 }
 
+/**
+ * PloneDeployment creates a Kubernetes Deployment for Plone containers.
+ *
+ * This is an internal construct used by the Plone class.
+ * It creates a Deployment with configurable replicas, resources, probes,
+ * and an optional PodDisruptionBudget.
+ */
 export class PloneDeployment extends Construct {
 
   constructor(scope: Construct, id: string, options: PloneDeploymentOptions) {
