@@ -30,7 +30,7 @@ export interface PloneBaseOptions {
   // liveness Probe
   readonly livenessEnabled?: boolean;
   readonly livenessInitialDelaySeconds?: number;
-  readonly livenessIimeoutSeconds?: number;
+  readonly livenessTimeoutSeconds?: number;
   readonly livenessPeriodSeconds?: number;
   readonly livenessSuccessThreshold?: number;
   readonly livenessFailureThreshold?: number;
@@ -110,7 +110,7 @@ export class Plone extends Construct {
       backendOptions.livenessProbe = {
         httpGet: backendActionHttpGet,
         initialDelaySeconds: backend.livenessInitialDelaySeconds ?? 30,
-        timeoutSeconds: backend.livenessIimeoutSeconds ?? 5,
+        timeoutSeconds: backend.livenessTimeoutSeconds ?? 5,
         periodSeconds: backend.livenessPeriodSeconds ?? 10,
         successThreshold: backend.livenessSuccessThreshold ?? 1,
         failureThreshold: backend.livenessFailureThreshold ?? 3,
@@ -189,7 +189,7 @@ export class Plone extends Construct {
         frontendOptions.livenessProbe = {
           httpGet: frontendActionHttpGet,
           initialDelaySeconds: frontend.livenessInitialDelaySeconds ?? 30,
-          timeoutSeconds: frontend.livenessIimeoutSeconds ?? 5,
+          timeoutSeconds: frontend.livenessTimeoutSeconds ?? 5,
           periodSeconds: frontend.livenessPeriodSeconds ?? 10,
           successThreshold: frontend.livenessSuccessThreshold ?? 1,
           failureThreshold: frontend.livenessFailureThreshold ?? 3,
