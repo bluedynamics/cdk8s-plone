@@ -256,7 +256,6 @@ export interface PloneOptions {
  * - CLASSICUI: Traditional server-side rendered Plone
  *
  * @example
- * ```typescript
  * new Plone(chart, 'my-plone', {
  *   variant: PloneVariant.VOLTO,
  *   backend: {
@@ -267,7 +266,6 @@ export interface PloneOptions {
  *     image: 'plone/plone-frontend:16.0.0',
  *   },
  * });
- * ```
  */
 export class Plone extends Construct {
   /**

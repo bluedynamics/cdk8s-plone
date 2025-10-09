@@ -83,13 +83,11 @@ export interface PloneHttpcacheOptions {
  * HTTP cache invalidation capabilities.
  *
  * @example
- * ```typescript
  * const plone = new Plone(chart, 'plone');
  * const cache = new PloneHttpcache(chart, 'cache', {
  *   plone: plone,
  *   existingSecret: 'varnish-secret',
  * });
- * ```
  */
 export class PloneHttpcache extends Construct {
   /**
