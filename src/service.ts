@@ -19,10 +19,35 @@ export interface PloneServiceOptions {
    * @default - none
    */
   readonly labels?: { [name: string]: string };
+
+  /**
+   * Port name for the service.
+   * @default - 'http'
+   */
+  readonly portName?: string;
+
+  /**
+   * Annotations to add to the Service metadata.
+   * Common annotations include: external-dns config, load balancer settings,
+   * service mesh configuration, etc.
+   * @example { 'external-dns.alpha.kubernetes.io/hostname': 'plone.example.com' }
+   * @default - no additional annotations
+   */
+  readonly annotations?: { [name: string]: string };
 }
 
+/**
+ * PloneService creates a Kubernetes Service for accessing Plone pods.
+ *
+ * This is an internal construct used by the Plone class.
+ * It creates a ClusterIP service that routes traffic to the backend
+ * or frontend deployment pods.
+ */
 export class PloneService extends Construct {
-
+  /**
+   * The name of the created Kubernetes service.
+   * Can be used to reference this service from other resources.
+   */
   public name: string;
 
   constructor(scope: Construct, id: string, options: PloneServiceOptions) {
@@ -39,9 +64,10 @@ export class PloneService extends Construct {
     const serviceOpts: k8s.KubeServiceProps = {
       metadata: {
         labels: service_labels,
+        annotations: options.annotations,
       },
       spec: {
-        ports: [{ port: options.targetPort, targetPort: targetPort, name: 'backend-http' }],
+        ports: [{ port: options.targetPort, targetPort: targetPort, name: options.portName ?? 'http' }],
         selector: selectorLabel,
       },
     };

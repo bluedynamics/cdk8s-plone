@@ -1,181 +1,201 @@
-# CMS Plone Chart for CDK8S
+# CDK8S Plone
 
-This chart provides a library to bootstrap a Plone deployment on a Kubernetes cluster using the [CDK8S](https://cdk8s.io) framework.
+A CDK8S library for deploying Plone CMS to Kubernetes.
 
-It provides
-- Backend (as API with `plone.volto` or as Classic-UI)
-- Frontend (Plone-Volto, a ReactJS based user interface)
-- Varnish using kube-httpcache. It includes a way to invalidate varnish cluster (optional)
+This library provides constructs to bootstrap a Plone deployment on a Kubernetes cluster using the [CDK8S](https://cdk8s.io) framework.
+
+## Features
+
+- **Backend**: Plone backend (API with `plone.volto` or Classic-UI)
+- **Frontend**: Plone Volto (modern React-based user interface)
+- **Varnish Caching**: Optional HTTP caching layer using [kube-httpcache](https://github.com/mittwald/kube-httpcache) with cluster-wide cache invalidation
+- **High Availability**: Configurable replicas with PodDisruptionBudgets
+- **Multi-language Support**: Published to npm (TypeScript/JavaScript) and PyPI (Python)
 
 
-### Typescript
+## Installation
 
-To use this library, create a new CDK8S project (or use an existing one)
+### TypeScript/JavaScript
+
+Create a new CDK8S project (or use an existing one):
 
 ```bash
 cdk8s init typescript-app
 ```
 
-Then add the following dependency to `package.json`:
+Install the library:
 
-```json
-{
-  "dependencies": {
-    "@bluedynamics/cdk8s-plone": "*"
-  }
-}
+```bash
+npm install @bluedynamics/cdk8s-plone
 ```
-Run `npm install` to install [cdk8s-plone](https://www.npmjs.com/package/@bluedynamics/cdk8s-plone).
+
+Package: [@bluedynamics/cdk8s-plone](https://www.npmjs.com/package/@bluedynamics/cdk8s-plone)
 
 ### Python
 
-Todo: Document in details how to install.
+Create a new CDK8S project:
 
 ```bash
 cdk8s init python-app
 ```
 
-Python package name is [cdk8s-plone](https://pypi.org/project/cdk8s-plone/).
-
-
-## Usage
-
-With `cdk8s-cli` installed, create a new project:
+Install the library:
 
 ```bash
-cdk8s sythn
+pip install cdk8s-plone
 ```
 
-Add the following code to your `main.ts`:
+Package: [cdk8s-plone](https://pypi.org/project/cdk8s-plone/)
+
+
+## Quick Start
+
+### Basic Plone Deployment
 
 ```typescript
-...
-import { Plone } from '@bluedynamics/cdk8s-plone';
-...
-    super(scope, id, props);
+import { App, Chart } from 'cdk8s';
+import { Plone, PloneVariant } from '@bluedynamics/cdk8s-plone';
 
-    // define resources here
-    new Plone(this, 'Plone', {});
-...
+const app = new App();
+const chart = new Chart(app, 'PloneDeployment');
+
+new Plone(chart, 'my-plone', {
+  variant: PloneVariant.VOLTO,
+  backend: {
+    image: 'plone/plone-backend:6.0.10',
+    replicas: 3,
+  },
+  frontend: {
+    image: 'plone/plone-frontend:16.0.0',
+    replicas: 2,
+  },
+});
+
+app.synth();
 ```
 
-Run `npm run build ` to generate the Kubernetes manifests.
-The manifests are stored in the `dist` directory.
+### With Varnish HTTP Cache
 
-For more have a look at the [example project](https://github.com/bluedynamics/cdk8s-plone-example).
+```typescript
+import { PloneHttpcache } from '@bluedynamics/cdk8s-plone';
 
-### Prerequisites
+const plone = new Plone(chart, 'my-plone', {
+  variant: PloneVariant.VOLTO,
+  backend: { image: 'plone/plone-backend:6.0.10' },
+  frontend: { image: 'plone/plone-frontend:16.0.0' },
+});
 
-For using cdk8s-plone, we assume you already have following tools installed:
+new PloneHttpcache(chart, 'cache', {
+  plone: plone,
+  existingSecret: 'varnish-secret',
+  replicas: 2,
+});
+```
 
-* kubectl – A command-line tool for interacting with Kubernetes clusters. For deploying the Kubernetes manifest you will need a tool like this. Take a look at the [Install Tools](https://kubernetes.io/docs/tasks/tools/#kubectl) for kubectl.
+### Generate Kubernetes Manifests
 
-* (optional) Helm – A Kubernetes package manager for managing Plone/Volto deployments. This tool is optional and only needed if you generate helm charts as output with cdk8s synth - instead of pure manifests. There are several ways to install it see the [install section](https://helm.sh/docs/intro/install/) for Helm.
+```bash
+cdk8s synth
+```
 
+The manifests are stored in the `dist/` directory.
 
-### References
-[Kubernetes Documentation](https://kubernetes.io/docs/concepts/configuration/liveness-readiness-startup-probes/) relevant for ressource management, readiness and liveness
+For a complete example, see the [example project](https://github.com/bluedynamics/cdk8s-plone-example).
 
-#### PloneBaseOptions
-*Interface*
+## Prerequisites
 
-
-
-- `image`(string): 
-  - The used Plone image
-  - e.g. `plone/plone-backend:6.1.0`
-- `imagePullPolicy`(string):
-  - default `IfNotPresent`
-- `replicas`(numbers)
-- `maxUnavailable`(number|string)
-- `minAvailable`(number|string)
-- `limitCpu`(string)
-- `limitMemory`(string)
-- `requestCpu`(string)
-- `requestMemory`(string)
-- `environment`(kplus.Env)
-- `readinessEnabled`(boolean)
-- `readinessInitialDelaySeconds`(number)
-- `readinessIimeoutSeconds`(number)
-- `readinessPeriodSeconds`(number)
-- `readinessSuccessThreshold`(number)
-- `readinessFailureThreshold`(number)
-- `livenessEnabled`(boolean)
-  - should be `true` for `volto`
-  - should be `false` for `backend/classicui`
-- `livenessInitialDelaySeconds`(number)
-- `livenessIimeoutSeconds`(number)
-- `livenessPeriodSeconds`(number)
-- `livenessSuccessThreshold`(number)
-- `livenessFailureThreshold`(number)
+- **kubectl** - Command-line tool for deploying Kubernetes manifests. [Install kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
+- **Helm** (optional) - Only needed if generating Helm charts. [Install Helm](https://helm.sh/docs/intro/install/)
+- **Node.js** - For TypeScript/JavaScript development
+- **Python 3.8+** - For Python development
 
 
-#### PloneOptions
-*Interface*
+## API Documentation
 
-- `version`(string):
-  - version of your project
-- `siteId`(string):
-  - default `Plone`
-- `variant`(PloneVariant):
-  - default `PloneVariant.VOLTO`
-- `backend` (PloneBaseOptions):
-  - default `{}`
-  - needs `image` and `enviroment`
-- `frontend` (PloneBaseOptions):
-  - default `{}`
-  - needs `image` if `PloneVariant.VOLTO`
-- `imagePullSecrets`(string[])
+For complete API documentation, see [API.md](./API.md).
 
-#### PloneVariants
-*Enum*
+### Key Constructs
 
-- VOLTO = 'volto'
-- CLASSICUI  = 'classicui' 
-  - no frontend options/image needed
+#### `Plone`
 
-#### Plone
-*class*
+Main construct for deploying Plone CMS. Supports two variants:
+- **VOLTO**: Modern React frontend with REST API backend (default)
+- **CLASSICUI**: Traditional server-side rendered Plone
 
-builds the `Plone` Construct
+Properties:
+- `backendServiceName` - Name of the backend Kubernetes service
+- `frontendServiceName` - Name of the frontend service (VOLTO only)
+- `variant` - Deployment variant (VOLTO or CLASSICUI)
+- `siteId` - Plone site ID in ZODB (default: 'Plone')
 
-- `backendServiceName`(string)
-- `frontendServiceName`(string)
-- `variant`(PloneVariant)
-  - default `Volto`
-- `siteId`(string)
-  - default `Plone`
+#### `PloneHttpcache`
 
-#### PloneHttpcacheOptions
-*Interface*
+Varnish HTTP caching layer using the [kube-httpcache](https://github.com/mittwald/kube-httpcache) Helm chart.
 
-- `plone`(Plone):
-  - Plone chart
-- `varnishVcl`{string}:
-  - varnishfile
-  - per default `varnishVclFile` should be used
-- `varnishVclFile`(string):
-  - File in config folder
-- `existingSecret`(string)
-- `limitCpu`(string)
-- `limitMemory`(string)
-- `requestCpu`(string)
-- `requestMemory`(string)
-- `servicemonitor`(string)
-  - default `false` used for metrics
+Properties:
+- `httpcacheServiceName` - Name of the Varnish service
 
-#### PloneHttpcache
-*class*
+### Configuration Options
 
-uses helmchart [kube-httpcache](https://github.com/mittwald/kube-httpcache) and builds the `PloneHttpCache` Construct
-- `scope`(Construct)
-- `id`(string)
-- `options`(PloneHttpcacheOptions)
+#### `PloneOptions`
+
+- `version` - Version of your project
+- `siteId` - Plone site ID (default: 'Plone')
+- `variant` - PloneVariant.VOLTO or PloneVariant.CLASSICUI (default: VOLTO)
+- `backend` - Backend configuration (PloneBaseOptions)
+- `frontend` - Frontend configuration (PloneBaseOptions, required for VOLTO)
+- `imagePullSecrets` - Image pull secrets for private registries
+
+#### `PloneBaseOptions`
+
+Configuration for backend or frontend:
+
+**Container:**
+- `image` - Container image (e.g., 'plone/plone-backend:6.0.10')
+- `imagePullPolicy` - Pull policy (default: 'IfNotPresent')
+- `replicas` - Number of replicas (default: 2)
+- `environment` - Environment variables (cdk8s-plus-30.Env)
+
+**Resources:**
+- `requestCpu` / `limitCpu` - CPU requests/limits
+- `requestMemory` / `limitMemory` - Memory requests/limits
+
+**High Availability:**
+- `minAvailable` - Min pods during updates (for PodDisruptionBudget)
+- `maxUnavailable` - Max unavailable pods during updates
+
+**Health Probes:**
+- `readinessEnabled` - Enable readiness probe (default: true)
+- `readinessInitialDelaySeconds` / `readinessTimeoutSeconds` / `readinessPeriodSeconds`
+- `readinessSuccessThreshold` / `readinessFailureThreshold`
+- `livenessEnabled` - Enable liveness probe (default: false, recommended true for frontend)
+- `livenessInitialDelaySeconds` / `livenessTimeoutSeconds` / `livenessPeriodSeconds`
+- `livenessSuccessThreshold` / `livenessFailureThreshold`
+
+**Annotations:**
+- `annotations` - Deployment metadata annotations
+- `podAnnotations` - Pod template annotations (e.g., for Prometheus)
+- `serviceAnnotations` - Service annotations (e.g., for external-dns)
+
+#### `PloneHttpcacheOptions`
+
+- `plone` - Plone construct to attach cache to (required)
+- `varnishVcl` - VCL configuration as string
+- `varnishVclFile` - Path to VCL configuration file
+- `existingSecret` - Kubernetes secret for Varnish admin credentials
+- `replicas` - Number of Varnish replicas (default: 2)
+- `requestCpu` / `limitCpu` - CPU resources
+- `requestMemory` / `limitMemory` - Memory resources
+- `servicemonitor` - Enable Prometheus ServiceMonitor (default: false)
 
 
 ## Development
 
-Clone the repository and install the dependencies:
+This project uses [Projen](https://projen.io/) to manage project configuration. **Do not edit generated files directly.**
+
+### Setup
+
+Clone the repository and install dependencies:
 
 ```bash
 nvm use lts/*
@@ -183,11 +203,42 @@ corepack enable
 npx projen
 ```
 
-Then run the following command to run the test:
+### Common Commands
 
 ```bash
+# Run tests
 npx projen test
+
+# Run tests in watch mode
+npx projen test:watch
+
+# Build (compile TypeScript + generate JSII bindings)
+npx projen build
+
+# Lint
+npx projen eslint
+
+# Generate API documentation
+npx projen docgen
+
+# Package for distribution
+npx projen package-all
 ```
 
-## ToDo
-- [ ] Option to enable Servicemonitor
+### Making Changes
+
+1. Edit `.projenrc.ts` for project configuration changes
+2. Run `npx projen` to regenerate project files
+3. Make code changes in `src/`
+4. Run tests and update snapshots if needed: `npx projen test -- -u`
+
+## References
+
+- [CDK8S Documentation](https://cdk8s.io/)
+- [Kubernetes Probes Documentation](https://kubernetes.io/docs/concepts/configuration/liveness-readiness-startup-probes/)
+- [kube-httpcache Helm Chart](https://github.com/mittwald/kube-httpcache)
+- [Example Project](https://github.com/bluedynamics/cdk8s-plone-example)
+
+## License
+
+See [LICENSE](./LICENSE) file.
