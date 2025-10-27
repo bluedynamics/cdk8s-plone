@@ -809,7 +809,9 @@ const ploneHttpcacheOptions: PloneHttpcacheOptions = { ... }
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.plone">plone</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.Plone">Plone</a></code> | The Plone construct to attach the HTTP cache to. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.chartVersion">chartVersion</a></code> | <code>string</code> | Version of the kube-httpcache Helm chart to use. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.existingSecret">existingSecret</a></code> | <code>string</code> | Name of an existing Kubernetes secret containing Varnish admin credentials. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.exporterEnabled">exporterEnabled</a></code> | <code>boolean</code> | Enable the Prometheus exporter for Varnish metrics. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.limitCpu">limitCpu</a></code> | <code>string</code> | CPU limit for Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.limitMemory">limitMemory</a></code> | <code>string</code> | Memory limit for Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.replicas">replicas</a></code> | <code>number</code> | Number of Varnish pod replicas to run. |
@@ -835,6 +837,21 @@ The cache will automatically connect to the backend and frontend services.
 
 ---
 
+##### `chartVersion`<sup>Optional</sup> <a name="chartVersion" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.chartVersion"></a>
+
+```typescript
+public readonly chartVersion: string;
+```
+
+- *Type:* string
+- *Default:* undefined (latest)
+
+Version of the kube-httpcache Helm chart to use.
+
+If not specified, the latest version from the repository will be used.
+
+---
+
 ##### `existingSecret`<sup>Optional</sup> <a name="existingSecret" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.existingSecret"></a>
 
 ```typescript
@@ -847,6 +864,21 @@ public readonly existingSecret: string;
 Name of an existing Kubernetes secret containing Varnish admin credentials.
 
 The secret should be created separately in the same namespace.
+
+---
+
+##### `exporterEnabled`<sup>Optional</sup> <a name="exporterEnabled" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.exporterEnabled"></a>
+
+```typescript
+public readonly exporterEnabled: boolean;
+```
+
+- *Type:* boolean
+- *Default:* true
+
+Enable the Prometheus exporter for Varnish metrics.
+
+When enabled, the exporter sidecar container will be deployed alongside Varnish.
 
 ---
 

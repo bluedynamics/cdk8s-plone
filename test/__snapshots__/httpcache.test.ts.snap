@@ -488,3 +488,447 @@ exports[`defaults 1`] = `
   },
 ]
 `;
+
+exports[`with exporter disabled 1`] = `
+[
+  {
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/component": "backend",
+        "app.kubernetes.io/name": "plone-backend-deployment",
+      },
+      "name": "plone-backend-deployment-c8eff9e3",
+    },
+    "spec": {
+      "replicas": 2,
+      "selector": {
+        "matchLabels": {
+          "app": "plone-backend-c8acbe0a",
+        },
+      },
+      "template": {
+        "metadata": {
+          "labels": {
+            "app": "plone-backend-c8acbe0a",
+            "app.kubernetes.io/component": "backend",
+            "app.kubernetes.io/managed-by": "cdk8s-plone",
+            "app.kubernetes.io/name": "plone-backend",
+            "app.kubernetes.io/part-of": "plone",
+            "app.kubernetes.io/version": "undefined",
+          },
+        },
+        "spec": {
+          "containers": [
+            {
+              "env": [],
+              "envFrom": [],
+              "image": "plone/plone-backend:latest",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "backend-container",
+              "readinessProbe": {
+                "failureThreshold": 3,
+                "httpGet": {
+                  "path": "/",
+                  "port": 8080,
+                },
+                "initialDelaySeconds": 10,
+                "periodSeconds": 10,
+                "successThreshold": 1,
+                "timeoutSeconds": 15,
+              },
+              "resources": {
+                "limits": {
+                  "cpu": "500m",
+                  "memory": "512Mi",
+                },
+                "requests": {
+                  "cpu": "200m",
+                  "memory": "256Mi",
+                },
+              },
+            },
+          ],
+          "imagePullSecrets": [],
+        },
+      },
+    },
+  },
+  {
+    "apiVersion": "policy/v1",
+    "kind": "PodDisruptionBudget",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/managed-by": "cdk8s-plone",
+        "app.kubernetes.io/part-of": "plone",
+      },
+      "name": "plone-backend-pdb-c8b4facc",
+    },
+    "spec": {
+      "minAvailable": 1,
+      "selector": {
+        "matchLabels": {
+          "app": "plone-backend-c8acbe0a",
+        },
+      },
+    },
+  },
+  {
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/component": "service",
+        "app.kubernetes.io/managed-by": "cdk8s-plone",
+        "app.kubernetes.io/name": "plone-backend-service",
+        "app.kubernetes.io/part-of": "plone",
+      },
+      "name": "plone-backend-service-c87548c4",
+    },
+    "spec": {
+      "ports": [
+        {
+          "name": "backend-http",
+          "port": 8080,
+          "targetPort": 8080,
+        },
+      ],
+      "selector": {
+        "app": "plone-backend-c8acbe0a",
+      },
+    },
+  },
+  {
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/component": "frontend",
+        "app.kubernetes.io/name": "plone-frontend-deployment",
+      },
+      "name": "plone-frontend-deployment-c8fc8a4d",
+    },
+    "spec": {
+      "replicas": 2,
+      "selector": {
+        "matchLabels": {
+          "app": "plone-frontend-c88fef5c",
+        },
+      },
+      "template": {
+        "metadata": {
+          "labels": {
+            "app": "plone-frontend-c88fef5c",
+            "app.kubernetes.io/component": "frontend",
+            "app.kubernetes.io/managed-by": "cdk8s-plone",
+            "app.kubernetes.io/name": "plone-frontend",
+            "app.kubernetes.io/part-of": "plone",
+            "app.kubernetes.io/version": "undefined",
+          },
+        },
+        "spec": {
+          "containers": [
+            {
+              "env": [
+                {
+                  "name": "RAZZLE_INTERNAL_API_PATH",
+                  "value": "http://plone-backend-service-c87548c4:8080/Plone",
+                },
+              ],
+              "envFrom": [],
+              "image": "plone/plone-frontend:latest",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "frontend-container",
+              "readinessProbe": {
+                "failureThreshold": 3,
+                "httpGet": {
+                  "path": "/",
+                  "port": 3000,
+                },
+                "initialDelaySeconds": 10,
+                "periodSeconds": 10,
+                "successThreshold": 1,
+                "timeoutSeconds": 15,
+              },
+              "resources": {
+                "limits": {
+                  "cpu": "500m",
+                  "memory": "1Gi",
+                },
+                "requests": {
+                  "cpu": "200m",
+                  "memory": "256Mi",
+                },
+              },
+            },
+          ],
+          "imagePullSecrets": [],
+        },
+      },
+    },
+  },
+  {
+    "apiVersion": "policy/v1",
+    "kind": "PodDisruptionBudget",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/managed-by": "cdk8s-plone",
+        "app.kubernetes.io/part-of": "plone",
+      },
+      "name": "plone-frontend-pdb-c8e94afa",
+    },
+    "spec": {
+      "minAvailable": 1,
+      "selector": {
+        "matchLabels": {
+          "app": "plone-frontend-c88fef5c",
+        },
+      },
+    },
+  },
+  {
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/component": "service",
+        "app.kubernetes.io/managed-by": "cdk8s-plone",
+        "app.kubernetes.io/name": "plone-frontend-service",
+        "app.kubernetes.io/part-of": "plone",
+      },
+      "name": "plone-frontend-service-c87c3840",
+    },
+    "spec": {
+      "ports": [
+        {
+          "name": "frontend-http",
+          "port": 3000,
+          "targetPort": 3000,
+        },
+      ],
+      "selector": {
+        "app": "plone-frontend-c88fef5c",
+      },
+    },
+  },
+  {
+    "apiVersion": "policy/v1",
+    "kind": "PodDisruptionBudget",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/instance": "plone-test-httpcache-c8667035",
+        "app.kubernetes.io/managed-by": "Helm",
+        "app.kubernetes.io/name": "kube-httpcache",
+        "app.kubernetes.io/version": "v0.9.1",
+        "helm.sh/chart": "kube-httpcache-0.9.1",
+      },
+      "name": "plone-test-httpcache-c8667035-kube-httpcache",
+    },
+    "spec": {
+      "maxUnavailable": 1,
+      "selector": {
+        "matchLabels": {
+          "app.kubernetes.io/instance": "plone-test-httpcache-c8667035",
+          "app.kubernetes.io/name": "kube-httpcache",
+        },
+      },
+    },
+  },
+  {
+    "apiVersion": "v1",
+    "kind": "ServiceAccount",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/instance": "plone-test-httpcache-c8667035",
+        "app.kubernetes.io/managed-by": "Helm",
+        "app.kubernetes.io/name": "kube-httpcache",
+        "app.kubernetes.io/version": "v0.9.1",
+        "helm.sh/chart": "kube-httpcache-0.9.1",
+      },
+      "name": "plone-test-httpcache-c8667035-kube-httpcache",
+    },
+  },
+  {
+    "apiVersion": "v1",
+    "data": {
+      "default.vcl.tmpl": "test
+",
+    },
+    "kind": "ConfigMap",
+    "metadata": {
+      "name": "plone-test-httpcache-c8667035-kube-httpcache",
+    },
+  },
+  {
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/instance": "plone-test-httpcache-c8667035",
+        "app.kubernetes.io/managed-by": "Helm",
+        "app.kubernetes.io/name": "kube-httpcache",
+        "app.kubernetes.io/version": "v0.9.1",
+        "helm.sh/chart": "kube-httpcache-0.9.1",
+      },
+      "name": "plone-test-httpcache-c8667035-kube-httpcache",
+    },
+    "spec": {
+      "ports": [
+        {
+          "name": "http",
+          "port": 80,
+          "protocol": "TCP",
+          "targetPort": 8080,
+        },
+        {
+          "name": "signaller",
+          "port": 8090,
+          "targetPort": 8090,
+        },
+      ],
+      "selector": {
+        "app.kubernetes.io/instance": "plone-test-httpcache-c8667035",
+        "app.kubernetes.io/name": "kube-httpcache",
+      },
+      "type": "ClusterIP",
+    },
+  },
+  {
+    "apiVersion": "apps/v1",
+    "kind": "StatefulSet",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/instance": "plone-test-httpcache-c8667035",
+        "app.kubernetes.io/managed-by": "Helm",
+        "app.kubernetes.io/name": "kube-httpcache",
+        "app.kubernetes.io/version": "v0.9.1",
+        "helm.sh/chart": "kube-httpcache-0.9.1",
+      },
+      "name": "plone-test-httpcache-c8667035-kube-httpcache",
+    },
+    "spec": {
+      "replicas": 2,
+      "selector": {
+        "matchLabels": {
+          "app.kubernetes.io/instance": "plone-test-httpcache-c8667035",
+          "app.kubernetes.io/name": "kube-httpcache",
+        },
+      },
+      "serviceName": "plone-test-httpcache-c8667035-kube-httpcache",
+      "template": {
+        "metadata": {
+          "labels": {
+            "app.kubernetes.io/instance": "plone-test-httpcache-c8667035",
+            "app.kubernetes.io/name": "kube-httpcache",
+          },
+        },
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "-admin-addr=0.0.0.0",
+                "-admin-port=6083",
+                "-signaller-enable",
+                "-signaller-port=8090",
+                "-frontend-port=8080",
+                "-frontend-watch=false",
+                "-frontend-namespace=$(NAMESPACE)",
+                "-frontend-service=plone-test-httpcache-c8667035-kube-httpcache",
+                "-backend-watch=false",
+                "-backend-namespace=$(NAMESPACE)",
+                "-backend-service=backend-service",
+                "-varnish-secret-file=/etc/varnish/k8s-secret/secret",
+                "-varnish-vcl-template=/etc/varnish/tmpl/default.vcl.tmpl",
+                "-varnish-storage=malloc,128M",
+                "-varnish-vcl-template-poll",
+              ],
+              "env": [
+                {
+                  "name": "NAMESPACE",
+                  "valueFrom": {
+                    "fieldRef": {
+                      "fieldPath": "metadata.namespace",
+                    },
+                  },
+                },
+                {
+                  "name": "BACKEND_SERVICE_NAME",
+                  "value": "plone-backend-service-c87548c4",
+                },
+                {
+                  "name": "BACKEND_SERVICE_PORT",
+                  "value": "8080",
+                },
+                {
+                  "name": "BACKEND_SITE_ID",
+                  "value": "Plone",
+                },
+                {
+                  "name": "FRONTEND_SERVICE_NAME",
+                  "value": "plone-frontend-service-c87c3840",
+                },
+                {
+                  "name": "FRONTEND_SERVICE_PORT",
+                  "value": "3000",
+                },
+              ],
+              "image": "quay.io/mittwald/kube-httpcache:stable",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "kube-httpcache",
+              "resources": {
+                "limits": {
+                  "cpu": "500m",
+                  "memory": "500Mi",
+                },
+                "requests": {
+                  "cpu": "100m",
+                  "memory": "100Mi",
+                },
+              },
+              "securityContext": {},
+              "volumeMounts": [
+                {
+                  "mountPath": "/etc/varnish/tmpl",
+                  "name": "template",
+                },
+                {
+                  "mountPath": "/etc/varnish/k8s-secret",
+                  "name": "secret",
+                },
+                {
+                  "mountPath": "/var/lib/varnish",
+                  "name": "var",
+                },
+              ],
+            },
+          ],
+          "nodeSelector": {
+            "kubernetes.io/arch": "amd64",
+          },
+          "securityContext": {},
+          "serviceAccountName": "plone-test-httpcache-c8667035-kube-httpcache",
+          "volumes": [
+            {
+              "configMap": {
+                "name": "plone-test-httpcache-c8667035-kube-httpcache",
+              },
+              "name": "template",
+            },
+            {
+              "name": "secret",
+              "secret": {
+                "secretName": "testsecret",
+              },
+            },
+            {
+              "emptyDir": {},
+              "name": "var",
+            },
+          ],
+        },
+      },
+    },
+  },
+]
+`;

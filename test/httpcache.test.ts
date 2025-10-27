@@ -18,3 +18,25 @@ test('defaults', () => {
   // THEN
   expect(Testing.synth(chart)).toMatchSnapshot();
 });
+
+test('with exporter disabled', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const plone = new Plone(chart, 'plone');
+
+  // WHEN
+  new PloneHttpcache(
+    chart,
+    'test',
+    {
+      plone: plone,
+      varnishVcl: 'test',
+      existingSecret: 'testsecret',
+      exporterEnabled: false,
+    },
+  );
+
+  // THEN
+  expect(Testing.synth(chart)).toMatchSnapshot();
+});
