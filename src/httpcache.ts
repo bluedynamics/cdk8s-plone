@@ -67,6 +67,20 @@ export interface PloneHttpcacheOptions {
   readonly servicemonitor?: boolean;
 
   /**
+   * Enable the Prometheus exporter for Varnish metrics.
+   * When enabled, the exporter sidecar container will be deployed alongside Varnish.
+   * @default true
+   */
+  readonly exporterEnabled?: boolean;
+
+  /**
+   * Version of the kube-httpcache Helm chart to use.
+   * If not specified, the latest version from the repository will be used.
+   * @default undefined (latest)
+   */
+  readonly chartVersion?: string;
+
+  /**
    * Number of Varnish pod replicas to run.
    * @default 2
    */
@@ -114,6 +128,7 @@ export class PloneHttpcache extends Construct {
       // see https://github.com/mittwald/kube-httpcache/chart
       repo: 'https://helm.mittwald.de',
       chart: 'kube-httpcache',
+      version: options.chartVersion,
       values: {
         replicaCount: options.replicas ?? 2,
         cache: {
@@ -148,7 +163,7 @@ export class PloneHttpcache extends Construct {
           enabled: false,
         },
         exporter: {
-          enabled: true,
+          enabled: options.exporterEnabled ?? true,
           resources: {
             limits: {
               cpu: '100m',
