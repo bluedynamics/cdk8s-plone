@@ -809,6 +809,7 @@ const ploneHttpcacheOptions: PloneHttpcacheOptions = { ... }
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.plone">plone</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.Plone">Plone</a></code> | The Plone construct to attach the HTTP cache to. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.appVersion">appVersion</a></code> | <code>string</code> | Version of the kube-httpcache Container Image to use. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.chartVersion">chartVersion</a></code> | <code>string</code> | Version of the kube-httpcache Helm chart to use. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.existingSecret">existingSecret</a></code> | <code>string</code> | Name of an existing Kubernetes secret containing Varnish admin credentials. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.exporterEnabled">exporterEnabled</a></code> | <code>boolean</code> | Enable the Prometheus exporter for Varnish metrics. |
@@ -834,6 +835,21 @@ public readonly plone: Plone;
 The Plone construct to attach the HTTP cache to.
 
 The cache will automatically connect to the backend and frontend services.
+
+---
+
+##### `appVersion`<sup>Optional</sup> <a name="appVersion" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.appVersion"></a>
+
+```typescript
+public readonly appVersion: string;
+```
+
+- *Type:* string
+- *Default:* undefined (chartVersion = with each chart release there is an image release too )
+
+Version of the kube-httpcache Container Image to use.
+
+If not specified, the latest version from the repository will be used.
 
 ---
 
