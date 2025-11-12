@@ -40,6 +40,104 @@ This project uses a Pull Request workflow:
 - `refactor/` - Code refactoring
 - `test/` - Test additions or changes
 
+## Working with Worktrees
+
+**Recommended for parallel development and multi-instance work**
+
+Git worktrees allow you to work on multiple branches simultaneously without switching contexts. This is especially useful when:
+- Multiple Claude Code instances are working on different features
+- You need to switch between features frequently
+- You want to keep branches completely isolated
+
+### Setting Up Worktrees
+
+**Create a worktree for each feature branch:**
+
+```bash
+# From the main repository
+git worktree add ../cdk8s-plone-feature-name feature/feature-name
+
+# For existing branches
+git worktree add ../cdk8s-plone-docs docs/diataxis-sphinx-skeleton
+
+# For new branches
+git worktree add -b feat/new-feature ../cdk8s-plone-new-feature
+```
+
+**Directory structure with worktrees:**
+```
+~/ws/cdev/
+├── cdk8s-plone/              # Main repository (usually on main branch)
+├── cdk8s-plone-docs/         # Worktree for documentation work
+├── cdk8s-plone-frontend/     # Worktree for frontend features
+└── cdk8s-plone-monitoring/   # Worktree for monitoring features
+```
+
+### Working with Worktrees
+
+**List all worktrees:**
+```bash
+git worktree list
+```
+
+**Remove a worktree when done:**
+```bash
+# Delete the worktree directory first
+rm -rf ../cdk8s-plone-feature-name
+
+# Then prune the worktree reference
+git worktree prune
+```
+
+**Switch between worktrees:**
+```bash
+# Simply cd to the worktree directory
+cd ../cdk8s-plone-docs
+
+# Each worktree is an independent working directory
+# with its own checked out branch
+```
+
+### Worktree Best Practices
+
+1. **One feature per worktree**: Keep each worktree focused on a single feature or task
+2. **Clean up after merge**: Remove worktrees once their branches are merged
+3. **Use descriptive directory names**: Name worktrees after their branch or feature
+4. **Regular git fetch**: Run `git fetch` in any worktree to update all branch references
+5. **Avoid nested worktrees**: Don't create worktrees inside other worktrees
+
+### Example Workflow with Worktrees
+
+```bash
+# Setup: Create worktree for documentation work
+cd ~/ws/cdev/cdk8s-plone
+git worktree add -b docs/add-tutorial ../cdk8s-plone-docs
+
+# Work: Make changes in the worktree
+cd ../cdk8s-plone-docs
+# ... make documentation changes ...
+git add . && git commit -m "docs: add new tutorial"
+git push -u origin docs/add-tutorial
+
+# Create PR using gh CLI
+gh pr create --title "Add new tutorial" --body "..."
+
+# Cleanup: After PR is merged
+cd ~/ws/cdev/cdk8s-plone
+git fetch
+git pull  # Update main branch
+rm -rf ../cdk8s-plone-docs
+git worktree prune
+```
+
+### Benefits of Worktrees
+
+- ✅ **No branch switching**: Keep different features in separate directories
+- ✅ **Parallel work**: Multiple Claude instances can work independently
+- ✅ **Clean state**: Each worktree maintains its own working directory state
+- ✅ **Fast context switching**: Just `cd` between directories
+- ✅ **No uncommitted changes conflicts**: Each worktree is isolated
+
 ## Project Structure
 
 ```
