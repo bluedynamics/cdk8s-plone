@@ -1,9 +1,10 @@
-import { ApiObject, Names } from 'cdk8s';
+import { Names } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-30';
 import { Construct } from 'constructs';
 import { PloneDeployment, PloneDeploymentOptions } from './deployment';
 import { IntOrString } from './imports/k8s';
 import * as k8s from './imports/k8s';
+import { ServiceMonitor, ServiceMonitorSpecEndpointsTargetPort } from './imports/monitoring.coreos.com';
 import { PloneService } from './service';
 
 /**
@@ -506,11 +507,11 @@ export class Plone extends Construct {
     config: { port: string | number; path: string },
   ): void {
     const portName = typeof config.port === 'string' ? config.port : undefined;
-    const portNumber = typeof config.port === 'number' ? config.port : undefined;
+    const portNumber = typeof config.port === 'number'
+      ? ServiceMonitorSpecEndpointsTargetPort.fromNumber(config.port)
+      : undefined;
 
-    new ApiObject(this, `servicemonitor-${id}`, {
-      apiVersion: 'monitoring.coreos.com/v1',
-      kind: 'ServiceMonitor',
+    new ServiceMonitor(this, `servicemonitor-${id}`, {
       metadata: {
         name: `${service.name}-monitor`,
         labels: {
