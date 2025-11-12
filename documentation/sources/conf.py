@@ -86,7 +86,7 @@ html_theme_options = {
 }
 
 # Logo configuration (Shibuya uses different approach)
-html_logo = "_static/plone-logo.svg"
+html_logo = "_static/kup6s-icon-plone.svg"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

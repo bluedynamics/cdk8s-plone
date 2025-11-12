@@ -1,6 +1,6 @@
 # cdk8s-plone Documentation
 
-```{image} _static/plone-logo.svg
+```{image} _static/kup6s-icon-plone.svg
 :alt: cdk8s-plone logo
 :width: 200px
 :align: center
