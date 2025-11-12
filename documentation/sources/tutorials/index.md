@@ -25,9 +25,8 @@ These tutorials will teach you how to:
 maxdepth: 1
 titlesonly: true
 ---
+01-quick-start
 ```
-
-*Tutorials will be added in future releases.*
 
 ## Before you start
 

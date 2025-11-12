@@ -16,9 +16,9 @@ Explanation guides clarify and illuminate particular topics. They broaden the un
 maxdepth: 1
 titlesonly: true
 ---
+features
+architecture
 ```
-
-*Architecture and concept guides will be added in future releases.*
 
 ## Key Topics
 

@@ -74,18 +74,19 @@ This documentation follows the [Diátaxis framework](https://diataxis.fr/), orga
 ## Quick Links
 
 ### Getting Started
-- Quick Start - Deploy your first Plone instance
-- Setup Prerequisites - Prepare cluster infrastructure
+- [Quick Start](tutorials/01-quick-start.md) - Deploy your first Plone instance
+- [Setup Prerequisites](how-to/setup-prerequisites.md) - Prepare cluster infrastructure
+- [Features Overview](explanation/features.md) - Explore capabilities
+
+### Configuration
+- [Configuration Options](reference/configuration-options.md) - Complete configuration reference
+- [Architecture Overview](explanation/architecture.md) - High-level design
 
 ### Common Tasks
-- Configure Backend - Customize Plone backend settings
-- Configure Frontend - Customize Plone frontend settings
-- Manage Storage - Configure persistent volumes
-
-### Architecture
-- Architecture Overview - High-level design
-- Component Specifications - Technical specifications
-- Configuration Options - Complete API reference
+- Scale Resources - Adjust CPU and memory limits (coming soon)
+- Configure Monitoring - Set up Prometheus metrics (coming soon)
+- Configure Ingress - Expose your Plone site (coming soon)
+- Backup and Restore - Protect your data (coming soon)
 
 ## Table of Contents
 

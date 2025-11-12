@@ -24,9 +24,8 @@ Reference guides provide detailed technical information about cdk8s-plone's API,
 maxdepth: 1
 titlesonly: true
 ---
+configuration-options
 ```
-
-*Configuration reference will be added in future releases.*
 
 ## Component Specifications
 

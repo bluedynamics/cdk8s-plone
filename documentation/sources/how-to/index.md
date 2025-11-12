@@ -18,9 +18,8 @@ How-to guides are recipes that take you through the steps involved in addressing
 maxdepth: 1
 titlesonly: true
 ---
+setup-prerequisites
 ```
-
-*Prerequisite guides will be added in future releases.*
 
 ## Configuration
 
