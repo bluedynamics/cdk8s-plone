@@ -98,8 +98,7 @@ graph TB
     end
 
     subgraph "Data Layer"
-        PVC[Persistent Volume]
-        DB[(External Database<br/>Optional)]
+        DB[(External Database<br/>PostgreSQL/MySQL/Oracle<br/>with RelStorage)]
     end
 
     Client --> Ingress
@@ -117,13 +116,9 @@ graph TB
     BackendSvc --> Backend2
     BackendSvc --> Backend3
 
-    Backend1 --> PVC
-    Backend2 --> PVC
-    Backend3 --> PVC
-
-    Backend1 -.optional.-> DB
-    Backend2 -.optional.-> DB
-    Backend3 -.optional.-> DB
+    Backend1 --> DB
+    Backend2 --> DB
+    Backend3 --> DB
 ```
 
 ## Component Responsibilities
@@ -133,19 +128,19 @@ graph TB
 **Responsibilities:**
 - Plone REST API
 - Content management
-- ZODB storage
+- ZODB with RelStorage (external database)
 - Search indexing
 - Workflow engine
 
 **Resources:**
 - CPU: Compute-intensive operations (catalog queries, indexing)
 - Memory: ZODB cache, Python processes
-- Storage: ZODB filestorage or blobstorage
+- Storage: Delegated to external database (PostgreSQL/MySQL/Oracle)
 
 **Scaling:**
-- Horizontal: Add replicas for read scalability
+- Horizontal: Add replicas for read scalability with RelStorage
 - Vertical: Increase resources for large catalogs
-- Shared storage required for multi-replica deployments
+- External database handles storage and multi-writer scenarios
 
 ### Frontend (Volto)
 
@@ -288,9 +283,11 @@ For a typical Volto deployment, cdk8s-plone creates:
 - Enable health probes
 
 **Database:**
-- Consider external PostgreSQL for RelStorage
+- External database required (PostgreSQL, MySQL, or Oracle)
+- Uses RelStorage for ZODB persistence
 - Enables true multi-writer deployments
 - Better backup and recovery options
+- MySQL derivatives (MariaDB, Percona) and Oracle are supported but untested
 
 ### Monitoring
 
