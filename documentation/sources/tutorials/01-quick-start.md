@@ -138,7 +138,6 @@ Now that you have a basic Plone deployment:
 
 - **Configure resources**: See [Scale Resources](../how-to/scale-resources.md) to adjust CPU and memory
 - **Add monitoring**: Configure [Prometheus metrics](../how-to/configure-monitoring.md)
-- **Set up ingress**: Expose your site with [Ingress configuration](../how-to/configure-ingress.md)
 - **Explore variants**: Learn about [Classic UI vs Volto](../explanation/plone-variants.md)
 
 ## Troubleshooting

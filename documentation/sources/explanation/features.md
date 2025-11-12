@@ -340,12 +340,10 @@ new PloneHttpcache(chart, 'cache', {
 
 Features planned for future releases:
 
-- **Ingress Support**: Built-in ingress configuration
-- **TLS Management**: Automatic certificate handling
 - **Backup Integration**: Automated backup configurations
 - **Monitoring Dashboards**: Pre-built Grafana dashboards
-- **Multi-Site Support**: Multiple Plone sites in one deployment
-- **External Database**: RelStorage with PostgreSQL support
+
+**Note:** Ingress and TLS management are intentionally out of scope - these should be handled by your cluster's ingress controller and cert-manager. RelStorage with PostgreSQL is already supported through external database configuration (separation of concerns).
 
 ## See Also
 

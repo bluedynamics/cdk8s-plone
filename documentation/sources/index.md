@@ -85,7 +85,6 @@ This documentation follows the [Diátaxis framework](https://diataxis.fr/), orga
 ### Common Tasks
 - Scale Resources - Adjust CPU and memory limits (coming soon)
 - Configure Monitoring - Set up Prometheus metrics (coming soon)
-- Configure Ingress - Expose your Plone site (coming soon)
 - Backup and Restore - Protect your data (coming soon)
 
 ## Table of Contents
