@@ -1,0 +1,6 @@
+language: typescript
+app: npx ts-node main.ts
+imports:
+  - k8s
+  - https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.24/config/crd/bases/postgresql.cnpg.io_clusters.yaml
+  - https://raw.githubusercontent.com/traefik/traefik/v3.2/docs/content/reference/dynamic-configuration/traefik.io_middlewares.yaml
