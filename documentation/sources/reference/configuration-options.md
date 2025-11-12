@@ -24,7 +24,7 @@ new Plone(chart, 'my-plone', {
   variant: PloneVariant.VOLTO,
   siteId: 'MySite',
   backend: {
-    image: 'plone/plone-backend:6.0.10',
+    image: 'plone/plone-backend:6.1.3',
     replicas: 3,
   },
   frontend: {
@@ -93,7 +93,7 @@ Configuration for backend or frontend components.
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
-| `image` | `string` | Yes | - | Container image (e.g., 'plone/plone-backend:6.0.10') |
+| `image` | `string` | Yes | - | Container image (e.g., 'plone/plone-backend:6.1.3') |
 | `imagePullPolicy` | `string` | No | `'IfNotPresent'` | Image pull policy |
 | `replicas` | `number` | No | `2` | Number of pod replicas |
 | `environment` | `Env` | No | - | Environment variables (cdk8s-plus-30.Env) |
@@ -103,7 +103,7 @@ Configuration for backend or frontend components.
 import { Env } from 'cdk8s-plus-30';
 
 backend: {
-  image: 'plone/plone-backend:6.0.10',
+  image: 'plone/plone-backend:6.1.3',
   replicas: 3,
   imagePullPolicy: 'Always',
   environment: {
@@ -127,7 +127,7 @@ backend: {
 **Example:**
 ```typescript
 backend: {
-  image: 'plone/plone-backend:6.0.10',
+  image: 'plone/plone-backend:6.1.3',
   requestCpu: '500m',
   limitCpu: '2',
   requestMemory: '512Mi',
@@ -145,7 +145,7 @@ backend: {
 **Example:**
 ```typescript
 backend: {
-  image: 'plone/plone-backend:6.0.10',
+  image: 'plone/plone-backend:6.1.3',
   replicas: 5,
   minAvailable: 3,  // At least 3 pods must be available during updates
 }
@@ -165,7 +165,7 @@ backend: {
 **Example:**
 ```typescript
 backend: {
-  image: 'plone/plone-backend:6.0.10',
+  image: 'plone/plone-backend:6.1.3',
   readinessEnabled: true,
   readinessInitialDelaySeconds: 10,
   readinessTimeoutSeconds: 5,
@@ -208,7 +208,7 @@ frontend: {
 **Example:**
 ```typescript
 backend: {
-  image: 'plone/plone-backend:6.0.10',
+  image: 'plone/plone-backend:6.1.3',
   podAnnotations: {
     'prometheus.io/scrape': 'true',
     'prometheus.io/port': '8080',
@@ -317,7 +317,7 @@ const plone = new Plone(chart, 'my-plone', {
   imagePullSecrets: ['registry-secret'],
 
   backend: {
-    image: 'plone/plone-backend:6.0.10',
+    image: 'plone/plone-backend:6.1.3',
     replicas: 3,
     requestCpu: '500m',
     limitCpu: '2',

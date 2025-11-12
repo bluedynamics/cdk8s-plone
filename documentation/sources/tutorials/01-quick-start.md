@@ -56,7 +56,7 @@ const chart = new Chart(app, 'PloneDeployment');
 new Plone(chart, 'my-plone', {
   variant: PloneVariant.VOLTO,
   backend: {
-    image: 'plone/plone-backend:6.0.10',
+    image: 'plone/plone-backend:6.1.3',
     replicas: 3,
   },
   frontend: {
@@ -119,7 +119,7 @@ import { PloneHttpcache } from '@bluedynamics/cdk8s-plone';
 
 const plone = new Plone(chart, 'my-plone', {
   variant: PloneVariant.VOLTO,
-  backend: { image: 'plone/plone-backend:6.0.10' },
+  backend: { image: 'plone/plone-backend:6.1.3' },
   frontend: { image: 'plone/plone-frontend:16.0.0' },
 });
 

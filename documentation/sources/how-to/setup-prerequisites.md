@@ -250,7 +250,7 @@ kubectl config view --minify | grep namespace:
 ### Public Registries
 
 No configuration needed for public Plone images:
-- `plone/plone-backend:6.0.10`
+- `plone/plone-backend:6.1.3`
 - `plone/plone-frontend:16.0.0`
 
 ### Private Registries
@@ -287,7 +287,7 @@ Use the secret in your deployment:
 ```typescript
 new Plone(chart, 'my-plone', {
   imagePullSecrets: ['docker-hub', 'gcr-secret'],
-  backend: { image: 'private-registry.io/plone-backend:6.0.10' },
+  backend: { image: 'private-registry.io/plone-backend:6.1.3' },
 });
 ```
 

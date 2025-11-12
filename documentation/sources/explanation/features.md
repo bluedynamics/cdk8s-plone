@@ -157,7 +157,7 @@ backend: {
 ```typescript
 new Plone(chart, 'my-plone', {
   imagePullSecrets: ['docker-registry', 'gcr-registry'],
-  backend: { image: 'private-registry.io/plone-backend:6.0.10' },
+  backend: { image: 'private-registry.io/plone-backend:6.1.3' },
 })
 ```
 
@@ -181,7 +181,7 @@ import { Plone, PloneVariant } from '@bluedynamics/cdk8s-plone';
 
 new Plone(chart, 'my-plone', {
   variant: PloneVariant.VOLTO,
-  backend: { image: 'plone/plone-backend:6.0.10' },
+  backend: { image: 'plone/plone-backend:6.1.3' },
 });
 ```
 
@@ -203,7 +203,7 @@ from cdk8s_plone import Plone, PloneVariant
 
 Plone(chart, "my-plone",
     variant=PloneVariant.VOLTO,
-    backend={"image": "plone/plone-backend:6.0.10"}
+    backend={"image": "plone/plone-backend:6.1.3"}
 )
 ```
 
@@ -220,7 +220,7 @@ Plone(chart, "my-plone",
 ```typescript
 // TypeScript catches this error at compile time
 backend: {
-  image: 'plone/plone-backend:6.0.10',
+  image: 'plone/plone-backend:6.1.3',
   replicas: 'three',  // ❌ Type error: Expected number
 }
 ```
@@ -268,7 +268,7 @@ class ProductionPlone extends Construct {
 test('creates backend deployment', () => {
   const chart = Testing.chart();
   new Plone(chart, 'test-plone', {
-    backend: { image: 'plone/plone-backend:6.0.10' },
+    backend: { image: 'plone/plone-backend:6.1.3' },
   });
 
   const results = Testing.synth(chart);
