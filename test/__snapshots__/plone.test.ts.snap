@@ -564,3 +564,668 @@ exports[`defaults-with-pdps 1`] = `
   },
 ]
 `;
+
+exports[`with-backend-servicemonitor 1`] = `
+[
+  {
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/component": "backend",
+        "app.kubernetes.io/name": "plone-backend-deployment",
+      },
+      "name": "app-plone-backend-deployment-c85baacf",
+    },
+    "spec": {
+      "replicas": 2,
+      "selector": {
+        "matchLabels": {
+          "app": "app-plone-backend-c82290e6",
+        },
+      },
+      "template": {
+        "metadata": {
+          "labels": {
+            "app": "app-plone-backend-c82290e6",
+            "app.kubernetes.io/component": "backend",
+            "app.kubernetes.io/managed-by": "cdk8s-plone",
+            "app.kubernetes.io/name": "plone-backend",
+            "app.kubernetes.io/part-of": "plone",
+            "app.kubernetes.io/version": "undefined",
+          },
+        },
+        "spec": {
+          "containers": [
+            {
+              "env": [],
+              "envFrom": [],
+              "image": "plone/plone-backend:latest",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "backend-container",
+              "readinessProbe": {
+                "failureThreshold": 3,
+                "httpGet": {
+                  "path": "/",
+                  "port": 8080,
+                },
+                "initialDelaySeconds": 10,
+                "periodSeconds": 10,
+                "successThreshold": 1,
+                "timeoutSeconds": 15,
+              },
+              "resources": {
+                "limits": {
+                  "cpu": "500m",
+                  "memory": "512Mi",
+                },
+                "requests": {
+                  "cpu": "200m",
+                  "memory": "256Mi",
+                },
+              },
+            },
+          ],
+          "imagePullSecrets": [],
+        },
+      },
+    },
+  },
+  {
+    "apiVersion": "policy/v1",
+    "kind": "PodDisruptionBudget",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/managed-by": "cdk8s-plone",
+        "app.kubernetes.io/part-of": "plone",
+      },
+      "name": "app-plone-backend-pdb-c8f00fdc",
+    },
+    "spec": {
+      "minAvailable": 1,
+      "selector": {
+        "matchLabels": {
+          "app": "app-plone-backend-c82290e6",
+        },
+      },
+    },
+  },
+  {
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/component": "service",
+        "app.kubernetes.io/managed-by": "cdk8s-plone",
+        "app.kubernetes.io/name": "plone-backend-service",
+        "app.kubernetes.io/part-of": "plone",
+      },
+      "name": "app-plone-backend-service-c8efef4c",
+    },
+    "spec": {
+      "ports": [
+        {
+          "name": "backend-http",
+          "port": 8080,
+          "targetPort": 8080,
+        },
+      ],
+      "selector": {
+        "app": "app-plone-backend-c82290e6",
+      },
+    },
+  },
+  {
+    "apiVersion": "monitoring.coreos.com/v1",
+    "kind": "ServiceMonitor",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/component": "servicemonitor",
+        "app.kubernetes.io/name": "app-plone-backend-service-c8efef4c",
+      },
+      "name": "app-plone-backend-service-c8efef4c-monitor",
+    },
+    "spec": {
+      "endpoints": [
+        {
+          "interval": "30s",
+          "path": "/metrics",
+          "port": "backend-http",
+        },
+      ],
+      "selector": {
+        "matchLabels": {
+          "app.kubernetes.io/name": "plone-backend-service",
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`with-both-servicemonitors 1`] = `
+[
+  {
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/component": "backend",
+        "app.kubernetes.io/name": "plone-backend-deployment",
+      },
+      "name": "app-plone-backend-deployment-c85baacf",
+    },
+    "spec": {
+      "replicas": 2,
+      "selector": {
+        "matchLabels": {
+          "app": "app-plone-backend-c82290e6",
+        },
+      },
+      "template": {
+        "metadata": {
+          "labels": {
+            "app": "app-plone-backend-c82290e6",
+            "app.kubernetes.io/component": "backend",
+            "app.kubernetes.io/managed-by": "cdk8s-plone",
+            "app.kubernetes.io/name": "plone-backend",
+            "app.kubernetes.io/part-of": "plone",
+            "app.kubernetes.io/version": "undefined",
+          },
+        },
+        "spec": {
+          "containers": [
+            {
+              "env": [],
+              "envFrom": [],
+              "image": "plone/plone-backend:latest",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "backend-container",
+              "readinessProbe": {
+                "failureThreshold": 3,
+                "httpGet": {
+                  "path": "/",
+                  "port": 8080,
+                },
+                "initialDelaySeconds": 10,
+                "periodSeconds": 10,
+                "successThreshold": 1,
+                "timeoutSeconds": 15,
+              },
+              "resources": {
+                "limits": {
+                  "cpu": "500m",
+                  "memory": "512Mi",
+                },
+                "requests": {
+                  "cpu": "200m",
+                  "memory": "256Mi",
+                },
+              },
+            },
+          ],
+          "imagePullSecrets": [],
+        },
+      },
+    },
+  },
+  {
+    "apiVersion": "policy/v1",
+    "kind": "PodDisruptionBudget",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/managed-by": "cdk8s-plone",
+        "app.kubernetes.io/part-of": "plone",
+      },
+      "name": "app-plone-backend-pdb-c8f00fdc",
+    },
+    "spec": {
+      "minAvailable": 1,
+      "selector": {
+        "matchLabels": {
+          "app": "app-plone-backend-c82290e6",
+        },
+      },
+    },
+  },
+  {
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/component": "service",
+        "app.kubernetes.io/managed-by": "cdk8s-plone",
+        "app.kubernetes.io/name": "plone-backend-service",
+        "app.kubernetes.io/part-of": "plone",
+      },
+      "name": "app-plone-backend-service-c8efef4c",
+    },
+    "spec": {
+      "ports": [
+        {
+          "name": "backend-http",
+          "port": 8080,
+          "targetPort": 8080,
+        },
+      ],
+      "selector": {
+        "app": "app-plone-backend-c82290e6",
+      },
+    },
+  },
+  {
+    "apiVersion": "monitoring.coreos.com/v1",
+    "kind": "ServiceMonitor",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/component": "servicemonitor",
+        "app.kubernetes.io/name": "app-plone-backend-service-c8efef4c",
+      },
+      "name": "app-plone-backend-service-c8efef4c-monitor",
+    },
+    "spec": {
+      "endpoints": [
+        {
+          "interval": "30s",
+          "path": "/backend/metrics",
+          "port": "backend-http",
+        },
+      ],
+      "selector": {
+        "matchLabels": {
+          "app.kubernetes.io/name": "plone-backend-service",
+        },
+      },
+    },
+  },
+  {
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/component": "frontend",
+        "app.kubernetes.io/name": "plone-frontend-deployment",
+      },
+      "name": "app-plone-frontend-deployment-c872e367",
+    },
+    "spec": {
+      "replicas": 2,
+      "selector": {
+        "matchLabels": {
+          "app": "app-plone-frontend-c8d010d1",
+        },
+      },
+      "template": {
+        "metadata": {
+          "labels": {
+            "app": "app-plone-frontend-c8d010d1",
+            "app.kubernetes.io/component": "frontend",
+            "app.kubernetes.io/managed-by": "cdk8s-plone",
+            "app.kubernetes.io/name": "plone-frontend",
+            "app.kubernetes.io/part-of": "plone",
+            "app.kubernetes.io/version": "undefined",
+          },
+        },
+        "spec": {
+          "containers": [
+            {
+              "env": [
+                {
+                  "name": "RAZZLE_INTERNAL_API_PATH",
+                  "value": "http://app-plone-backend-service-c8efef4c:8080/Plone",
+                },
+              ],
+              "envFrom": [],
+              "image": "plone/plone-frontend:latest",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "frontend-container",
+              "readinessProbe": {
+                "failureThreshold": 3,
+                "httpGet": {
+                  "path": "/",
+                  "port": 3000,
+                },
+                "initialDelaySeconds": 10,
+                "periodSeconds": 10,
+                "successThreshold": 1,
+                "timeoutSeconds": 15,
+              },
+              "resources": {
+                "limits": {
+                  "cpu": "500m",
+                  "memory": "1Gi",
+                },
+                "requests": {
+                  "cpu": "200m",
+                  "memory": "256Mi",
+                },
+              },
+            },
+          ],
+          "imagePullSecrets": [],
+        },
+      },
+    },
+  },
+  {
+    "apiVersion": "policy/v1",
+    "kind": "PodDisruptionBudget",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/managed-by": "cdk8s-plone",
+        "app.kubernetes.io/part-of": "plone",
+      },
+      "name": "app-plone-frontend-pdb-c82dd14e",
+    },
+    "spec": {
+      "minAvailable": 1,
+      "selector": {
+        "matchLabels": {
+          "app": "app-plone-frontend-c8d010d1",
+        },
+      },
+    },
+  },
+  {
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/component": "service",
+        "app.kubernetes.io/managed-by": "cdk8s-plone",
+        "app.kubernetes.io/name": "plone-frontend-service",
+        "app.kubernetes.io/part-of": "plone",
+      },
+      "name": "app-plone-frontend-service-c8f392cd",
+    },
+    "spec": {
+      "ports": [
+        {
+          "name": "frontend-http",
+          "port": 3000,
+          "targetPort": 3000,
+        },
+      ],
+      "selector": {
+        "app": "app-plone-frontend-c8d010d1",
+      },
+    },
+  },
+  {
+    "apiVersion": "monitoring.coreos.com/v1",
+    "kind": "ServiceMonitor",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/component": "servicemonitor",
+        "app.kubernetes.io/name": "app-plone-frontend-service-c8f392cd",
+      },
+      "name": "app-plone-frontend-service-c8f392cd-monitor",
+    },
+    "spec": {
+      "endpoints": [
+        {
+          "interval": "30s",
+          "path": "/frontend/metrics",
+          "port": "frontend-http",
+        },
+      ],
+      "selector": {
+        "matchLabels": {
+          "app.kubernetes.io/name": "plone-frontend-service",
+        },
+      },
+    },
+  },
+]
+`;
+
+exports[`with-frontend-servicemonitor 1`] = `
+[
+  {
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/component": "backend",
+        "app.kubernetes.io/name": "plone-backend-deployment",
+      },
+      "name": "app-plone-backend-deployment-c85baacf",
+    },
+    "spec": {
+      "replicas": 2,
+      "selector": {
+        "matchLabels": {
+          "app": "app-plone-backend-c82290e6",
+        },
+      },
+      "template": {
+        "metadata": {
+          "labels": {
+            "app": "app-plone-backend-c82290e6",
+            "app.kubernetes.io/component": "backend",
+            "app.kubernetes.io/managed-by": "cdk8s-plone",
+            "app.kubernetes.io/name": "plone-backend",
+            "app.kubernetes.io/part-of": "plone",
+            "app.kubernetes.io/version": "undefined",
+          },
+        },
+        "spec": {
+          "containers": [
+            {
+              "env": [],
+              "envFrom": [],
+              "image": "plone/plone-backend:latest",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "backend-container",
+              "readinessProbe": {
+                "failureThreshold": 3,
+                "httpGet": {
+                  "path": "/",
+                  "port": 8080,
+                },
+                "initialDelaySeconds": 10,
+                "periodSeconds": 10,
+                "successThreshold": 1,
+                "timeoutSeconds": 15,
+              },
+              "resources": {
+                "limits": {
+                  "cpu": "500m",
+                  "memory": "512Mi",
+                },
+                "requests": {
+                  "cpu": "200m",
+                  "memory": "256Mi",
+                },
+              },
+            },
+          ],
+          "imagePullSecrets": [],
+        },
+      },
+    },
+  },
+  {
+    "apiVersion": "policy/v1",
+    "kind": "PodDisruptionBudget",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/managed-by": "cdk8s-plone",
+        "app.kubernetes.io/part-of": "plone",
+      },
+      "name": "app-plone-backend-pdb-c8f00fdc",
+    },
+    "spec": {
+      "minAvailable": 1,
+      "selector": {
+        "matchLabels": {
+          "app": "app-plone-backend-c82290e6",
+        },
+      },
+    },
+  },
+  {
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/component": "service",
+        "app.kubernetes.io/managed-by": "cdk8s-plone",
+        "app.kubernetes.io/name": "plone-backend-service",
+        "app.kubernetes.io/part-of": "plone",
+      },
+      "name": "app-plone-backend-service-c8efef4c",
+    },
+    "spec": {
+      "ports": [
+        {
+          "name": "backend-http",
+          "port": 8080,
+          "targetPort": 8080,
+        },
+      ],
+      "selector": {
+        "app": "app-plone-backend-c82290e6",
+      },
+    },
+  },
+  {
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/component": "frontend",
+        "app.kubernetes.io/name": "plone-frontend-deployment",
+      },
+      "name": "app-plone-frontend-deployment-c872e367",
+    },
+    "spec": {
+      "replicas": 2,
+      "selector": {
+        "matchLabels": {
+          "app": "app-plone-frontend-c8d010d1",
+        },
+      },
+      "template": {
+        "metadata": {
+          "labels": {
+            "app": "app-plone-frontend-c8d010d1",
+            "app.kubernetes.io/component": "frontend",
+            "app.kubernetes.io/managed-by": "cdk8s-plone",
+            "app.kubernetes.io/name": "plone-frontend",
+            "app.kubernetes.io/part-of": "plone",
+            "app.kubernetes.io/version": "undefined",
+          },
+        },
+        "spec": {
+          "containers": [
+            {
+              "env": [
+                {
+                  "name": "RAZZLE_INTERNAL_API_PATH",
+                  "value": "http://app-plone-backend-service-c8efef4c:8080/Plone",
+                },
+              ],
+              "envFrom": [],
+              "image": "plone/plone-frontend:latest",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "frontend-container",
+              "readinessProbe": {
+                "failureThreshold": 3,
+                "httpGet": {
+                  "path": "/",
+                  "port": 3000,
+                },
+                "initialDelaySeconds": 10,
+                "periodSeconds": 10,
+                "successThreshold": 1,
+                "timeoutSeconds": 15,
+              },
+              "resources": {
+                "limits": {
+                  "cpu": "500m",
+                  "memory": "1Gi",
+                },
+                "requests": {
+                  "cpu": "200m",
+                  "memory": "256Mi",
+                },
+              },
+            },
+          ],
+          "imagePullSecrets": [],
+        },
+      },
+    },
+  },
+  {
+    "apiVersion": "policy/v1",
+    "kind": "PodDisruptionBudget",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/managed-by": "cdk8s-plone",
+        "app.kubernetes.io/part-of": "plone",
+      },
+      "name": "app-plone-frontend-pdb-c82dd14e",
+    },
+    "spec": {
+      "minAvailable": 1,
+      "selector": {
+        "matchLabels": {
+          "app": "app-plone-frontend-c8d010d1",
+        },
+      },
+    },
+  },
+  {
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/component": "service",
+        "app.kubernetes.io/managed-by": "cdk8s-plone",
+        "app.kubernetes.io/name": "plone-frontend-service",
+        "app.kubernetes.io/part-of": "plone",
+      },
+      "name": "app-plone-frontend-service-c8f392cd",
+    },
+    "spec": {
+      "ports": [
+        {
+          "name": "frontend-http",
+          "port": 3000,
+          "targetPort": 3000,
+        },
+      ],
+      "selector": {
+        "app": "app-plone-frontend-c8d010d1",
+      },
+    },
+  },
+  {
+    "apiVersion": "monitoring.coreos.com/v1",
+    "kind": "ServiceMonitor",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/component": "servicemonitor",
+        "app.kubernetes.io/name": "app-plone-frontend-service-c8f392cd",
+      },
+      "name": "app-plone-frontend-service-c8f392cd-monitor",
+    },
+    "spec": {
+      "endpoints": [
+        {
+          "interval": "30s",
+          "path": "/api/metrics",
+          "targetPort": 9090,
+        },
+      ],
+      "selector": {
+        "matchLabels": {
+          "app.kubernetes.io/name": "plone-frontend-service",
+        },
+      },
+    },
+  },
+]
+`;

@@ -50,6 +50,11 @@ export class PloneService extends Construct {
    */
   public name: string;
 
+  /**
+   * The labels applied to this service.
+   */
+  public labels: { [name: string]: string };
+
   constructor(scope: Construct, id: string, options: PloneServiceOptions) {
     super(scope, id);
 
@@ -73,5 +78,6 @@ export class PloneService extends Construct {
     };
     const service = new k8s.KubeService(this, 'service', serviceOpts);
     this.name = service.name;
+    this.labels = service_labels;
   }
 }

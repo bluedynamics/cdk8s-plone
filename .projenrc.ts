@@ -26,6 +26,7 @@ const project = new cdk.JsiiProject({
     constructs, // this is ignored by projen
     kplus,
     'yaml@^2.8.1',
+    'cdk8s-cli',
   ],
   publishToPypi: {
     distName: 'cdk8s-plone',
@@ -52,6 +53,12 @@ if (!eslintJson) {
   throw new Error('.eslintrc.json not found');
 }
 eslintJson.patch(JsonPatch.add('/ignorePatterns/-', 'imports/'));
+
+// Add task to import Prometheus Operator ServiceMonitor CRD
+project.addTask('import:servicemonitor', {
+  description: 'Import Prometheus Operator ServiceMonitor CRD',
+  exec: 'cdk8s import https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml --language typescript --output src/imports/',
+});
 
 // // Fix upgrade workflow permissions for PR job
 // const upgradeMain = project.tryFindObjectFile('.github/workflows/upgrade-main.yml');
