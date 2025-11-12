@@ -81,6 +81,13 @@ export interface PloneHttpcacheOptions {
   readonly chartVersion?: string;
 
   /**
+   * Version of the kube-httpcache Container Image to use.
+   * If not specified, the latest version from the repository will be used.
+   * @default undefined (chartVersion = with each chart release there is an image release too )
+   */
+  readonly appVersion?: string;
+
+  /**
    * Number of Varnish pod replicas to run.
    * @default 2
    */
@@ -124,6 +131,7 @@ export class PloneHttpcache extends Construct {
     } else {
       varnishVcl = options.varnishVcl;
     }
+    const imageTag = options.appVersion ?? options.chartVersion;
     const httpcache = new Helm(this, 'httpcache', {
       // see https://github.com/mittwald/kube-httpcache/chart
       repo: 'https://helm.mittwald.de',
@@ -131,6 +139,7 @@ export class PloneHttpcache extends Construct {
       version: options.chartVersion,
       values: {
         replicaCount: options.replicas ?? 2,
+        ...(imageTag && { image: { tag: imageTag } }),
         cache: {
           // need to looks at the frontendWatch, do we need it?
           frontendWatch: false,

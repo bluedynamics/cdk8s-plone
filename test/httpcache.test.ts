@@ -40,3 +40,25 @@ test('with exporter disabled', () => {
   // THEN
   expect(Testing.synth(chart)).toMatchSnapshot();
 });
+
+test('with custom appVersion', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const plone = new Plone(chart, 'plone');
+
+  // WHEN
+  new PloneHttpcache(
+    chart,
+    'test',
+    {
+      plone: plone,
+      varnishVcl: 'test',
+      existingSecret: 'testsecret',
+      appVersion: 'v1.2.3',
+    },
+  );
+
+  // THEN
+  expect(Testing.synth(chart)).toMatchSnapshot();
+});

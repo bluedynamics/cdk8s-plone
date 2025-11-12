@@ -189,6 +189,7 @@ Configuration for backend or frontend:
 - `servicemonitor` - Enable Prometheus ServiceMonitor (default: false)
 - `exporterEnabled` - Enable Prometheus exporter sidecar (default: true)
 - `chartVersion` - kube-httpcache Helm chart version (default: latest)
+- `appVersion` - kube-httpcache container image version (default: chartVersion or chart default)
 
 
 ## Development
