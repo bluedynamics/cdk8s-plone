@@ -44,3 +44,59 @@ test('defaults-with-pdps', () => {
   // THEN
   expect(Testing.synth(chart)).toMatchSnapshot();
 });
+
+test('with-backend-servicemonitor', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'app');
+
+  // WHEN
+  new Plone(chart, 'plone', {
+    variant: PloneVariant.CLASSICUI,
+    backend: {
+      servicemonitor: true,
+    },
+  });
+
+  // THEN
+  expect(Testing.synth(chart)).toMatchSnapshot();
+});
+
+test('with-frontend-servicemonitor', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'app');
+
+  // WHEN
+  new Plone(chart, 'plone', {
+    frontend: {
+      servicemonitor: true,
+      metricsPath: '/api/metrics',
+      metricsPort: 9090,
+    },
+  });
+
+  // THEN
+  expect(Testing.synth(chart)).toMatchSnapshot();
+});
+
+test('with-both-servicemonitors', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'app');
+
+  // WHEN
+  new Plone(chart, 'plone', {
+    backend: {
+      servicemonitor: true,
+      metricsPath: '/backend/metrics',
+    },
+    frontend: {
+      servicemonitor: true,
+      metricsPath: '/frontend/metrics',
+    },
+  });
+
+  // THEN
+  expect(Testing.synth(chart)).toMatchSnapshot();
+});

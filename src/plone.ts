@@ -1,4 +1,4 @@
-import { Names } from 'cdk8s';
+import { ApiObject, Names } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-30';
 import { Construct } from 'constructs';
 import { PloneDeployment, PloneDeploymentOptions } from './deployment';
@@ -179,6 +179,28 @@ export interface PloneBaseOptions {
    * @default - no additional annotations
    */
   readonly serviceAnnotations?: { [name: string]: string };
+
+  /**
+   * Enable Prometheus ServiceMonitor for metrics collection.
+   * Requires Prometheus Operator to be installed in the cluster.
+   * When enabled, a ServiceMonitor resource will be created to scrape metrics.
+   * @default false
+   */
+  readonly servicemonitor?: boolean;
+
+  /**
+   * Port name or number to scrape metrics from.
+   * Only used when servicemonitor is enabled.
+   * @default - uses the main service port
+   */
+  readonly metricsPort?: string | number;
+
+  /**
+   * Path to scrape metrics from.
+   * Only used when servicemonitor is enabled.
+   * @default '/metrics'
+   */
+  readonly metricsPath?: string;
 }
 /**
  * Plone deployment variants.
@@ -370,6 +392,14 @@ export class Plone extends Construct {
     });
     this.backendServiceName = backendService.name;
 
+    // ServiceMonitor for backend
+    if (backend.servicemonitor) {
+      this.createServiceMonitor(backendService, 'backend', {
+        port: backend.metricsPort ?? 'backend-http',
+        path: backend.metricsPath ?? '/metrics',
+      });
+    }
+
     // ------------------------------------------------------------------------
     // Frontend
     if (this.variant == PloneVariant.VOLTO) {
@@ -453,6 +483,56 @@ export class Plone extends Construct {
         annotations: frontend.serviceAnnotations,
       });
       this.frontendServiceName = frontendService.name;
+
+      // ServiceMonitor for frontend
+      if (frontend.servicemonitor) {
+        this.createServiceMonitor(frontendService, 'frontend', {
+          port: frontend.metricsPort ?? 'frontend-http',
+          path: frontend.metricsPath ?? '/metrics',
+        });
+      }
     }
+  }
+
+  /**
+   * Creates a Prometheus ServiceMonitor resource for the given service.
+   * @param service The PloneService to monitor
+   * @param id Unique identifier for the ServiceMonitor
+   * @param config Configuration for the ServiceMonitor
+   */
+  private createServiceMonitor(
+    service: PloneService,
+    id: string,
+    config: { port: string | number; path: string },
+  ): void {
+    const portName = typeof config.port === 'string' ? config.port : undefined;
+    const portNumber = typeof config.port === 'number' ? config.port : undefined;
+
+    new ApiObject(this, `servicemonitor-${id}`, {
+      apiVersion: 'monitoring.coreos.com/v1',
+      kind: 'ServiceMonitor',
+      metadata: {
+        name: `${service.name}-monitor`,
+        labels: {
+          'app.kubernetes.io/name': service.name,
+          'app.kubernetes.io/component': 'servicemonitor',
+        },
+      },
+      spec: {
+        selector: {
+          matchLabels: {
+            'app.kubernetes.io/name': service.labels['app.kubernetes.io/name'],
+          },
+        },
+        endpoints: [
+          {
+            ...(portName && { port: portName }),
+            ...(portNumber && { targetPort: portNumber }),
+            path: config.path,
+            interval: '30s',
+          },
+        ],
+      },
+    });
   }
 }

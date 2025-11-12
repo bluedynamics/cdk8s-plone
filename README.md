@@ -75,8 +75,26 @@ kubectl apply -f dist/
 
 See the [cdk8s-plone-example](https://github.com/bluedynamics/cdk8s-plone-example) repository for complete working examples.
 
-## Requirements
+### Prometheus Metrics
 
+Enable Prometheus ServiceMonitor for metrics collection (requires Prometheus Operator):
+
+```typescript
+new Plone(chart, 'my-plone', {
+  backend: {
+    servicemonitor: true,
+    metricsPath: '/metrics',  // optional, defaults to '/metrics'
+  },
+  frontend: {
+    servicemonitor: true,
+    metricsPort: 9090,  // optional, defaults to service port
+  },
+});
+```
+
+**Note:** You must instrument your Plone backend/frontend to expose metrics at the configured endpoint. For Volto/Node.js frontends, consider using [prom-client](https://www.npmjs.com/package/prom-client) or [express-prometheus-middleware](https://www.npmjs.com/package/express-prometheus-middleware).
+
+## Requirements
 - **kubectl** - [Install kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
 - **Node.js 16+** (for TypeScript/JavaScript) - [Install Node.js](https://nodejs.org/)
 - **Python 3.8+** (for Python) - [Install Python](https://www.python.org/)
