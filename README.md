@@ -75,11 +75,18 @@ kubectl apply -f dist/
 
 Complete working examples are available in the [`examples/`](examples/) directory:
 
-- **[Production Volto](examples/production-volto/)** - Production-ready Plone 6 deployment with:
+- **[Production Volto](examples/production-volto/)** - Production-ready Plone 6 deployment with modern UI:
   - Volto frontend (React) + REST API backend
   - PostgreSQL with RelStorage (CloudNativePG or Bitnami)
   - Varnish HTTP caching with kube-httpcache
   - Ingress support (Traefik/Kong) with TLS
+
+- **[Classic UI](examples/classic-ui/)** - Traditional Plone deployment with server-side rendering:
+  - Classic UI (traditional Plone interface)
+  - PostgreSQL with RelStorage (CloudNativePG or Bitnami)
+  - Varnish HTTP caching with kube-httpcache
+  - Ingress support (Traefik/Kong) with TLS
+  - Simpler architecture (no separate frontend)
 
 ### Prometheus Metrics
 
