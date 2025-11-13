@@ -379,6 +379,8 @@ const ploneBaseOptions: PloneBaseOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.livenessSuccessThreshold">livenessSuccessThreshold</a></code> | <code>number</code> | Minimum consecutive successes for the liveness probe to be considered successful. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.livenessTimeoutSeconds">livenessTimeoutSeconds</a></code> | <code>number</code> | Number of seconds after which the liveness probe times out. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.maxUnavailable">maxUnavailable</a></code> | <code>string \| number</code> | Maximum number of pods that can be unavailable during updates. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.metricsPath">metricsPath</a></code> | <code>string</code> | Path to scrape metrics from. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.metricsPort">metricsPort</a></code> | <code>string \| number</code> | Port name or number to scrape metrics from. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.minAvailable">minAvailable</a></code> | <code>string \| number</code> | Minimum number of pods that must be available during updates. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.podAnnotations">podAnnotations</a></code> | <code>{[ key: string ]: string}</code> | Annotations to add to the Pod template metadata. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessEnabled">readinessEnabled</a></code> | <code>boolean</code> | Enable readiness probe for the container. |
@@ -391,6 +393,7 @@ const ploneBaseOptions: PloneBaseOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.requestCpu">requestCpu</a></code> | <code>string</code> | CPU request for the container. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.requestMemory">requestMemory</a></code> | <code>string</code> | Memory request for the container. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.serviceAnnotations">serviceAnnotations</a></code> | <code>{[ key: string ]: string}</code> | Annotations to add to the Service metadata. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.servicemonitor">servicemonitor</a></code> | <code>boolean</code> | Enable Prometheus ServiceMonitor for metrics collection. |
 
 ---
 
@@ -599,6 +602,36 @@ Used in PodDisruptionBudget if specified.
 
 ---
 
+##### `metricsPath`<sup>Optional</sup> <a name="metricsPath" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.metricsPath"></a>
+
+```typescript
+public readonly metricsPath: string;
+```
+
+- *Type:* string
+- *Default:* '/metrics'
+
+Path to scrape metrics from.
+
+Only used when servicemonitor is enabled.
+
+---
+
+##### `metricsPort`<sup>Optional</sup> <a name="metricsPort" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.metricsPort"></a>
+
+```typescript
+public readonly metricsPort: string | number;
+```
+
+- *Type:* string | number
+- *Default:* uses the main service port
+
+Port name or number to scrape metrics from.
+
+Only used when servicemonitor is enabled.
+
+---
+
 ##### `minAvailable`<sup>Optional</sup> <a name="minAvailable" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.minAvailable"></a>
 
 ```typescript
@@ -791,6 +824,22 @@ Common for external-dns, load balancers, service mesh, etc.
 { 'external-dns.alpha.kubernetes.io/hostname': 'plone.example.com' }
 ```
 
+
+##### `servicemonitor`<sup>Optional</sup> <a name="servicemonitor" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.servicemonitor"></a>
+
+```typescript
+public readonly servicemonitor: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Enable Prometheus ServiceMonitor for metrics collection.
+
+Requires Prometheus Operator to be installed in the cluster.
+When enabled, a ServiceMonitor resource will be created to scrape metrics.
+
+---
 
 ### PloneHttpcacheOptions <a name="PloneHttpcacheOptions" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions"></a>
 
