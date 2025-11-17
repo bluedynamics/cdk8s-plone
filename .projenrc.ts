@@ -74,6 +74,7 @@ const releaseWorkflow = project.tryFindObjectFile('.github/workflows/release.yml
 if (releaseWorkflow) {
   releaseWorkflow.addOverride('on.push.paths-ignore', [
     'documentation/**',
+    'examples/**',
     '*.md',
     '.github/workflows/documentation.yml',
   ]);
