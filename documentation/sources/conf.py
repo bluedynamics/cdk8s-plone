@@ -22,7 +22,21 @@ copyright = "2024-2025, Blue Dynamics Alliance"
 author = "Blue Dynamics Alliance Contributors"
 
 # The full version, including alpha/beta/rc tags
-release = "0.0.0"
+# Read version from git tags
+import subprocess
+
+try:
+    # Get the latest git tag
+    result = subprocess.run(
+        ["git", "describe", "--tags", "--abbrev=0"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    release = result.stdout.strip().lstrip("v")  # Remove 'v' prefix if present
+except (subprocess.CalledProcessError, FileNotFoundError):
+    # Fallback to 0.0.0 if git is not available or no tags exist
+    release = "0.0.0"
 
 
 # -- General configuration ---------------------------------------------------
