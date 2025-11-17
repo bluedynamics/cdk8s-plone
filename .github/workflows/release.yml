@@ -5,6 +5,10 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - documentation/**
+      - "*.md"
+      - .github/workflows/documentation.yml
   workflow_dispatch: {}
 concurrency:
   group: ${{ github.workflow }}
