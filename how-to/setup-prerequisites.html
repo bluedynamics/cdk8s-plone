@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Setup Prerequisites - cdk8s-plone 0.1.10 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Deploy Production Volto Example" href="deploy-production-volto.html" /><link rel="prev" title="How-To Guides" href="index.html" />
+      <link rel="canonical" href="https://bluedynamics.github.io/cdk8s-plone/how-to/setup-prerequisites.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=14737038" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/brand-theme.css?v=a3a78658" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom-icons.css?v=77ce15dc" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://bluedynamics.github.io/cdk8s-plone/how-to/setup-prerequisites.html"/>
+  <meta property="og:title" content="Setup Prerequisites"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="/">
+      <img class="light-logo" src="../_static/kup6s-icon-plone.svg" alt="cdk8s-plone" height="28" loading="lazy" />
+      <img class="dark-logo" src="../_static/kup6s-icon-plone.svg" alt="cdk8s-plone" height="28" loading="lazy" />
+      <strong>cdk8s-plone</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials"></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/01-quick-start.html">Quick Start</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">How-To Guides</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Setup Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy-production-volto.html">Deploy Production Volto Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy-classic-ui.html">Deploy Classic UI Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configuration-options.html">Configuration Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/api/index.html">API Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Explanation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/features.html">Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/architecture.html">Architecture Overview</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#required-tools">Required Tools</a><ul>
+<li><a class="reference internal" href="#kubectl">kubectl</a></li>
+<li><a class="reference internal" href="#node-js-for-typescript-javascript">Node.js (for TypeScript/JavaScript)</a></li>
+<li><a class="reference internal" href="#python-for-python-development">Python (for Python Development)</a></li>
+<li><a class="reference internal" href="#cdk8s-cli">CDK8S CLI</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#optional-tools">Optional Tools</a><ul>
+<li><a class="reference internal" href="#helm">Helm</a></li>
+<li><a class="reference internal" href="#k9s">k9s</a></li>
+<li><a class="reference internal" href="#kubectx-and-kubens">kubectx and kubens</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#kubernetes-cluster">Kubernetes Cluster</a><ul>
+<li><a class="reference internal" href="#local-development-clusters">Local Development Clusters</a></li>
+<li><a class="reference internal" href="#cloud-kubernetes-services">Cloud Kubernetes Services</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cluster-requirements">Cluster Requirements</a><ul>
+<li><a class="reference internal" href="#minimum-resources">Minimum Resources</a></li>
+<li><a class="reference internal" href="#required-kubernetes-features">Required Kubernetes Features</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#namespace-setup">Namespace Setup</a></li>
+<li><a class="reference internal" href="#image-registry-access">Image Registry Access</a><ul>
+<li><a class="reference internal" href="#public-registries">Public Registries</a></li>
+<li><a class="reference internal" href="#private-registries">Private Registries</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#verification-checklist">Verification Checklist</a></li>
+<li><a class="reference internal" href="#next-steps">Next Steps</a></li>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a><ul>
+<li><a class="reference internal" href="#kubectl-command-not-found">kubectl: command not found</a></li>
+<li><a class="reference internal" href="#cannot-connect-to-cluster">Cannot connect to cluster</a></li>
+<li><a class="reference internal" href="#no-storage-classes-available">No storage classes available</a></li>
+<li><a class="reference internal" href="#permission-denied-errors">Permission denied errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">cdk8s-plone</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">How-To Guides</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Setup Prerequisites</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue dark-code" role="main">
+          <section id="setup-prerequisites">
+<h1>Setup Prerequisites<a class="headerlink" href="#setup-prerequisites" title="Link to this heading">¶</a></h1>
+<p>Prepare your environment for deploying Plone with cdk8s-plone.</p>
+<section id="required-tools">
+<h2>Required Tools<a class="headerlink" href="#required-tools" title="Link to this heading">¶</a></h2>
+<section id="kubectl">
+<h3>kubectl<a class="headerlink" href="#kubectl" title="Link to this heading">¶</a></h3>
+<p>Command-line tool for deploying and managing Kubernetes resources.</p>
+<p><strong>Installation:</strong></p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://kubernetes.io/docs/tasks/tools/#kubectl">Install kubectl</a></p></li>
+</ul>
+<p><strong>Verify installation:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectl<span class="w"> </span>version<span class="w"> </span>--client
+</span></pre></div>
+</div>
+<p><strong>Configure cluster access:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Verify you can connect to your cluster</span>
+</span><span data-line="2">kubectl<span class="w"> </span>cluster-info
+</span><span data-line="3">kubectl<span class="w"> </span>get<span class="w"> </span>nodes
+</span></pre></div>
+</div>
+</section>
+<section id="node-js-for-typescript-javascript">
+<h3>Node.js (for TypeScript/JavaScript)<a class="headerlink" href="#node-js-for-typescript-javascript" title="Link to this heading">¶</a></h3>
+<p>Required for TypeScript/JavaScript development.</p>
+<p><strong>Minimum version:</strong> 16+
+<strong>Recommended:</strong> LTS version</p>
+<p><strong>Installation:</strong></p>
+<ul>
+<li><p><a class="reference external" href="https://nodejs.org/">Install Node.js</a></p></li>
+<li><p>Or use <a class="reference external" href="https://github.com/nvm-sh/nvm">nvm</a>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">nvm<span class="w"> </span>install<span class="w"> </span>--lts
+</span><span data-line="2">nvm<span class="w"> </span>use<span class="w"> </span>--lts
+</span></pre></div>
+</div>
+</li>
+</ul>
+<p><strong>Verify installation:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">node<span class="w"> </span>--version
+</span><span data-line="2">npm<span class="w"> </span>--version
+</span></pre></div>
+</div>
+</section>
+<section id="python-for-python-development">
+<h3>Python (for Python Development)<a class="headerlink" href="#python-for-python-development" title="Link to this heading">¶</a></h3>
+<p>Required for Python development.</p>
+<p><strong>Minimum version:</strong> Python 3.8+
+<strong>Recommended:</strong> Python 3.11+</p>
+<p><strong>Installation:</strong></p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.python.org/downloads/">Install Python</a></p></li>
+</ul>
+<p><strong>Verify installation:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">python<span class="w"> </span>--version
+</span><span data-line="2">pip<span class="w"> </span>--version
+</span></pre></div>
+</div>
+</section>
+<section id="cdk8s-cli">
+<h3>CDK8S CLI<a class="headerlink" href="#cdk8s-cli" title="Link to this heading">¶</a></h3>
+<p>The CDK8S command-line tool for project initialization and synthesis.</p>
+<p><strong>Installation:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>cdk8s-cli
+</span></pre></div>
+</div>
+<p><strong>Verify installation:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">cdk8s<span class="w"> </span>--version
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="optional-tools">
+<h2>Optional Tools<a class="headerlink" href="#optional-tools" title="Link to this heading">¶</a></h2>
+<section id="helm">
+<h3>Helm<a class="headerlink" href="#helm" title="Link to this heading">¶</a></h3>
+<p>Required only if you want to generate Helm charts instead of raw Kubernetes manifests.</p>
+<p><strong>Installation:</strong></p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://helm.sh/docs/intro/install/">Install Helm</a></p></li>
+</ul>
+<p><strong>Verify installation:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">helm<span class="w"> </span>version
+</span></pre></div>
+</div>
+</section>
+<section id="k9s">
+<h3>k9s<a class="headerlink" href="#k9s" title="Link to this heading">¶</a></h3>
+<p>Terminal-based UI for managing Kubernetes clusters (recommended for development).</p>
+<p><strong>Installation:</strong></p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://k9scli.io/topics/install/">Install k9s</a></p></li>
+</ul>
+<p><strong>Usage:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">k9s
+</span></pre></div>
+</div>
+</section>
+<section id="kubectx-and-kubens">
+<h3>kubectx and kubens<a class="headerlink" href="#kubectx-and-kubens" title="Link to this heading">¶</a></h3>
+<p>Tools for switching between Kubernetes contexts and namespaces.</p>
+<p><strong>Installation:</strong></p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/ahmetb/kubectx#installation">Install kubectx</a></p></li>
+</ul>
+<p><strong>Usage:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectx<span class="w">                  </span><span class="c1"># List contexts</span>
+</span><span data-line="2">kubectx<span class="w"> </span>my-cluster<span class="w">       </span><span class="c1"># Switch context</span>
+</span><span data-line="3">kubens<span class="w"> </span>my-namespace<span class="w">      </span><span class="c1"># Switch namespace</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="kubernetes-cluster">
+<h2>Kubernetes Cluster<a class="headerlink" href="#kubernetes-cluster" title="Link to this heading">¶</a></h2>
+<p>You need access to a Kubernetes cluster for deployment.</p>
+<section id="local-development-clusters">
+<h3>Local Development Clusters<a class="headerlink" href="#local-development-clusters" title="Link to this heading">¶</a></h3>
+<p><strong>Minikube</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Install</span>
+</span><span data-line="2"><span class="c1"># https://minikube.sigs.k8s.io/docs/start/</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># Start cluster</span>
+</span><span data-line="5">minikube<span class="w"> </span>start
+</span><span data-line="6">
+</span><span data-line="7"><span class="c1"># Verify</span>
+</span><span data-line="8">kubectl<span class="w"> </span>cluster-info
+</span></pre></div>
+</div>
+<p><strong>kind (Kubernetes in Docker)</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Install</span>
+</span><span data-line="2"><span class="c1"># https://kind.sigs.k8s.io/docs/user/quick-start/</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># Create cluster</span>
+</span><span data-line="5">kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--name<span class="w"> </span>plone-dev
+</span><span data-line="6">
+</span><span data-line="7"><span class="c1"># Verify</span>
+</span><span data-line="8">kubectl<span class="w"> </span>cluster-info
+</span></pre></div>
+</div>
+<p><strong>Docker Desktop</strong></p>
+<ul class="simple">
+<li><p>Enable Kubernetes in Docker Desktop settings</p></li>
+<li><p>Verify with <code class="docutils literal notranslate"><span class="pre">kubectl</span> <span class="pre">cluster-info</span></code></p></li>
+</ul>
+<p><strong>k3d (Lightweight Kubernetes)</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Install</span>
+</span><span data-line="2"><span class="c1"># https://k3d.io/</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># Create cluster</span>
+</span><span data-line="5">k3d<span class="w"> </span>cluster<span class="w"> </span>create<span class="w"> </span>plone-dev
+</span><span data-line="6">
+</span><span data-line="7"><span class="c1"># Verify</span>
+</span><span data-line="8">kubectl<span class="w"> </span>cluster-info
+</span></pre></div>
+</div>
+</section>
+<section id="cloud-kubernetes-services">
+<h3>Cloud Kubernetes Services<a class="headerlink" href="#cloud-kubernetes-services" title="Link to this heading">¶</a></h3>
+<p><strong>Google Kubernetes Engine (GKE)</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Create cluster</span>
+</span><span data-line="2">gcloud<span class="w"> </span>container<span class="w"> </span>clusters<span class="w"> </span>create<span class="w"> </span>plone-cluster<span class="w"> </span><span class="se">\</span>
+</span><span data-line="3"><span class="w">  </span>--num-nodes<span class="o">=</span><span class="m">3</span><span class="w"> </span><span class="se">\</span>
+</span><span data-line="4"><span class="w">  </span>--machine-type<span class="o">=</span>n1-standard-2
+</span><span data-line="5">
+</span><span data-line="6"><span class="c1"># Get credentials</span>
+</span><span data-line="7">gcloud<span class="w"> </span>container<span class="w"> </span>clusters<span class="w"> </span>get-credentials<span class="w"> </span>plone-cluster
+</span></pre></div>
+</div>
+<p><strong>Amazon EKS</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Create cluster using eksctl</span>
+</span><span data-line="2">eksctl<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span><span class="se">\</span>
+</span><span data-line="3"><span class="w">  </span>--name<span class="w"> </span>plone-cluster<span class="w"> </span><span class="se">\</span>
+</span><span data-line="4"><span class="w">  </span>--nodes<span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="se">\</span>
+</span><span data-line="5"><span class="w">  </span>--node-type<span class="w"> </span>t3.medium
+</span><span data-line="6">
+</span><span data-line="7"><span class="c1"># Verify</span>
+</span><span data-line="8">kubectl<span class="w"> </span>get<span class="w"> </span>nodes
+</span></pre></div>
+</div>
+<p><strong>Azure Kubernetes Service (AKS)</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Create cluster</span>
+</span><span data-line="2">az<span class="w"> </span>aks<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+</span><span data-line="3"><span class="w">  </span>--resource-group<span class="w"> </span>myResourceGroup<span class="w"> </span><span class="se">\</span>
+</span><span data-line="4"><span class="w">  </span>--name<span class="w"> </span>plone-cluster<span class="w"> </span><span class="se">\</span>
+</span><span data-line="5"><span class="w">  </span>--node-count<span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="se">\</span>
+</span><span data-line="6"><span class="w">  </span>--node-vm-size<span class="w"> </span>Standard_D2_v2
+</span><span data-line="7">
+</span><span data-line="8"><span class="c1"># Get credentials</span>
+</span><span data-line="9">az<span class="w"> </span>aks<span class="w"> </span>get-credentials<span class="w"> </span><span class="se">\</span>
+</span><span data-line="10"><span class="w">  </span>--resource-group<span class="w"> </span>myResourceGroup<span class="w"> </span><span class="se">\</span>
+</span><span data-line="11"><span class="w">  </span>--name<span class="w"> </span>plone-cluster
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="cluster-requirements">
+<h2>Cluster Requirements<a class="headerlink" href="#cluster-requirements" title="Link to this heading">¶</a></h2>
+<section id="minimum-resources">
+<h3>Minimum Resources<a class="headerlink" href="#minimum-resources" title="Link to this heading">¶</a></h3>
+<p><strong>For development/testing:</strong></p>
+<ul class="simple">
+<li><p><strong>Nodes:</strong> 1-2 nodes</p></li>
+<li><p><strong>CPU:</strong> 2+ cores per node</p></li>
+<li><p><strong>Memory:</strong> 4GB+ per node</p></li>
+<li><p><strong>Storage:</strong> 20GB+ per node</p></li>
+</ul>
+<p><strong>For production:</strong></p>
+<ul class="simple">
+<li><p><strong>Nodes:</strong> 3+ nodes (for high availability)</p></li>
+<li><p><strong>CPU:</strong> 4+ cores per node</p></li>
+<li><p><strong>Memory:</strong> 8GB+ per node</p></li>
+<li><p><strong>Storage:</strong> 50GB+ per node</p></li>
+</ul>
+</section>
+<section id="required-kubernetes-features">
+<h3>Required Kubernetes Features<a class="headerlink" href="#required-kubernetes-features" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Version:</strong> Kubernetes 1.20+</p></li>
+<li><p><strong>Networking:</strong> CNI plugin installed</p></li>
+<li><p><strong>Storage:</strong> StorageClass with dynamic provisioning</p></li>
+<li><p><strong>DNS:</strong> CoreDNS or equivalent</p></li>
+</ul>
+<p><strong>Verify storage classes:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectl<span class="w"> </span>get<span class="w"> </span>storageclasses
+</span></pre></div>
+</div>
+<p>If no storage class exists, you need to configure one for your cluster.</p>
+</section>
+</section>
+<section id="namespace-setup">
+<h2>Namespace Setup<a class="headerlink" href="#namespace-setup" title="Link to this heading">¶</a></h2>
+<p>Create a namespace for your Plone deployment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Create namespace</span>
+</span><span data-line="2">kubectl<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span>plone
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># Set as default (optional)</span>
+</span><span data-line="5">kubectl<span class="w"> </span>config<span class="w"> </span>set-context<span class="w"> </span>--current<span class="w"> </span>--namespace<span class="o">=</span>plone
+</span><span data-line="6">
+</span><span data-line="7"><span class="c1"># Verify</span>
+</span><span data-line="8">kubectl<span class="w"> </span>config<span class="w"> </span>view<span class="w"> </span>--minify<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>namespace:
+</span></pre></div>
+</div>
+</section>
+<section id="image-registry-access">
+<h2>Image Registry Access<a class="headerlink" href="#image-registry-access" title="Link to this heading">¶</a></h2>
+<section id="public-registries">
+<h3>Public Registries<a class="headerlink" href="#public-registries" title="Link to this heading">¶</a></h3>
+<p>No configuration needed for public Plone images:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">plone/plone-backend:6.1.3</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">plone/plone-frontend:16.0.0</span></code></p></li>
+</ul>
+</section>
+<section id="private-registries">
+<h3>Private Registries<a class="headerlink" href="#private-registries" title="Link to this heading">¶</a></h3>
+<p>Create a pull secret for private registries:</p>
+<p><strong>Docker Hub:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectl<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>docker-registry<span class="w"> </span>docker-hub<span class="w"> </span><span class="se">\</span>
+</span><span data-line="2"><span class="w">  </span>--docker-server<span class="o">=</span>docker.io<span class="w"> </span><span class="se">\</span>
+</span><span data-line="3"><span class="w">  </span>--docker-username<span class="o">=</span>YOUR_USERNAME<span class="w"> </span><span class="se">\</span>
+</span><span data-line="4"><span class="w">  </span>--docker-password<span class="o">=</span>YOUR_PASSWORD<span class="w"> </span><span class="se">\</span>
+</span><span data-line="5"><span class="w">  </span>--docker-email<span class="o">=</span>YOUR_EMAIL
+</span></pre></div>
+</div>
+<p><strong>Google Container Registry:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectl<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>docker-registry<span class="w"> </span>gcr-secret<span class="w"> </span><span class="se">\</span>
+</span><span data-line="2"><span class="w">  </span>--docker-server<span class="o">=</span>gcr.io<span class="w"> </span><span class="se">\</span>
+</span><span data-line="3"><span class="w">  </span>--docker-username<span class="o">=</span>_json_key<span class="w"> </span><span class="se">\</span>
+</span><span data-line="4"><span class="w">  </span>--docker-password<span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>cat<span class="w"> </span>keyfile.json<span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span data-line="5"><span class="w">  </span>--docker-email<span class="o">=</span>user@example.com
+</span></pre></div>
+</div>
+<p><strong>Azure Container Registry:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectl<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>docker-registry<span class="w"> </span>acr-secret<span class="w"> </span><span class="se">\</span>
+</span><span data-line="2"><span class="w">  </span>--docker-server<span class="o">=</span>myregistry.azurecr.io<span class="w"> </span><span class="se">\</span>
+</span><span data-line="3"><span class="w">  </span>--docker-username<span class="o">=</span>YOUR_USERNAME<span class="w"> </span><span class="se">\</span>
+</span><span data-line="4"><span class="w">  </span>--docker-password<span class="o">=</span>YOUR_PASSWORD
+</span></pre></div>
+</div>
+<p>Use the secret in your deployment:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="ow">new</span><span class="w"> </span><span class="nx">Plone</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;my-plone&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">imagePullSecrets</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;docker-hub&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;gcr-secret&#39;</span><span class="p">],</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;private-registry.io/plone-backend:6.1.3&#39;</span><span class="w"> </span><span class="p">},</span>
+</span><span data-line="4"><span class="p">});</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="verification-checklist">
+<h2>Verification Checklist<a class="headerlink" href="#verification-checklist" title="Link to this heading">¶</a></h2>
+<p>Before proceeding, verify:</p>
+<ul class="simple">
+<li><p>[ ] kubectl installed and configured</p></li>
+<li><p>[ ] Access to Kubernetes cluster verified</p></li>
+<li><p>[ ] Node.js or Python installed (depending on your language choice)</p></li>
+<li><p>[ ] CDK8S CLI installed</p></li>
+<li><p>[ ] Namespace created (optional but recommended)</p></li>
+<li><p>[ ] Storage class available in cluster</p></li>
+<li><p>[ ] Image pull secrets created (if using private registries)</p></li>
+</ul>
+<p><strong>Verify everything:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Check tools</span>
+</span><span data-line="2">kubectl<span class="w"> </span>version<span class="w"> </span>--client
+</span><span data-line="3">cdk8s<span class="w"> </span>--version
+</span><span data-line="4">node<span class="w"> </span>--version<span class="w">  </span><span class="c1"># or python --version</span>
+</span><span data-line="5">
+</span><span data-line="6"><span class="c1"># Check cluster access</span>
+</span><span data-line="7">kubectl<span class="w"> </span>cluster-info
+</span><span data-line="8">kubectl<span class="w"> </span>get<span class="w"> </span>nodes
+</span><span data-line="9">kubectl<span class="w"> </span>get<span class="w"> </span>storageclasses
+</span><span data-line="10">
+</span><span data-line="11"><span class="c1"># Check namespace</span>
+</span><span data-line="12">kubectl<span class="w"> </span>get<span class="w"> </span>namespace<span class="w"> </span>plone
+</span></pre></div>
+</div>
+</section>
+<section id="next-steps">
+<h2>Next Steps<a class="headerlink" href="#next-steps" title="Link to this heading">¶</a></h2>
+<p>Now that your environment is ready:</p>
+<ol class="arabic simple">
+<li><p><strong>Start the tutorial</strong>: Follow the <a class="reference internal" href="../tutorials/01-quick-start.html"><span class="std std-doc">Quick Start</span></a> guide</p></li>
+<li><p><strong>Explore examples</strong>: Check the <a class="reference external" href="https://github.com/bluedynamics/cdk8s-plone-example">example project</a></p></li>
+<li><p><strong>Read about variants</strong>: Learn about <a class="reference internal" href="../explanation/features.html#deployment-variants"><span class="std std-ref">Plone variants</span></a></p></li>
+</ol>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">¶</a></h2>
+<section id="kubectl-command-not-found">
+<h3>kubectl: command not found<a class="headerlink" href="#kubectl-command-not-found" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Ensure kubectl is in your PATH</p></li>
+<li><p>Reinstall following the <a class="reference external" href="https://kubernetes.io/docs/tasks/tools/#kubectl">official guide</a></p></li>
+</ul>
+</section>
+<section id="cannot-connect-to-cluster">
+<h3>Cannot connect to cluster<a class="headerlink" href="#cannot-connect-to-cluster" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Verify kubeconfig: <code class="docutils literal notranslate"><span class="pre">kubectl</span> <span class="pre">config</span> <span class="pre">view</span></code></p></li>
+<li><p>Check cluster status: <code class="docutils literal notranslate"><span class="pre">kubectl</span> <span class="pre">cluster-info</span></code></p></li>
+<li><p>Ensure VPN is connected (if required)</p></li>
+</ul>
+</section>
+<section id="no-storage-classes-available">
+<h3>No storage classes available<a class="headerlink" href="#no-storage-classes-available" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Check cluster documentation for storage setup</p></li>
+<li><p>For local clusters, storage is usually pre-configured</p></li>
+<li><p>For cloud providers, ensure CSI drivers are installed</p></li>
+</ul>
+</section>
+<section id="permission-denied-errors">
+<h3>Permission denied errors<a class="headerlink" href="#permission-denied-errors" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Verify RBAC permissions: <code class="docutils literal notranslate"><span class="pre">kubectl</span> <span class="pre">auth</span> <span class="pre">can-i</span> <span class="pre">create</span> <span class="pre">deployments</span></code></p></li>
+<li><p>Contact your cluster administrator for proper permissions</p></li>
+</ul>
+</section>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../tutorials/01-quick-start.html"><span class="std std-doc">Quick Start Tutorial</span></a> - Get started with deployment</p></li>
+<li><p><a class="reference internal" href="../explanation/architecture.html"><span class="std std-doc">Architecture Overview</span></a> - Understanding the system</p></li>
+<li><p><a class="reference internal" href="../reference/configuration-options.html"><span class="std std-doc">Configuration Options</span></a> - Complete configuration reference</p></li>
+</ul>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="index.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">How-To Guides</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="deploy-production-volto.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Deploy Production Volto Example</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024-2025, Blue Dynamics Alliance</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials"></div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=bafade30"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script src="../_static/shibuya.js?v=c1cf1a6b"></script>
+      <script src="../_static/logo-fix.js?v=7f36b008"></script></body>
+</html>

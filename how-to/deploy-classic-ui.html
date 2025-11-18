@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Deploy Classic UI Example - cdk8s-plone 0.1.10 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Reference" href="../reference/index.html" /><link rel="prev" title="Deploy Production Volto Example" href="deploy-production-volto.html" />
+      <link rel="canonical" href="https://bluedynamics.github.io/cdk8s-plone/how-to/deploy-classic-ui.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=14737038" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/brand-theme.css?v=a3a78658" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom-icons.css?v=77ce15dc" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://bluedynamics.github.io/cdk8s-plone/how-to/deploy-classic-ui.html"/>
+  <meta property="og:title" content="Deploy Classic UI Example"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="/">
+      <img class="light-logo" src="../_static/kup6s-icon-plone.svg" alt="cdk8s-plone" height="28" loading="lazy" />
+      <img class="dark-logo" src="../_static/kup6s-icon-plone.svg" alt="cdk8s-plone" height="28" loading="lazy" />
+      <strong>cdk8s-plone</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials"></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/01-quick-start.html">Quick Start</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">How-To Guides</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="setup-prerequisites.html">Setup Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy-production-volto.html">Deploy Production Volto Example</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Deploy Classic UI Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configuration-options.html">Configuration Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/api/index.html">API Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Explanation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/features.html">Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/architecture.html">Architecture Overview</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#what-you-ll-deploy">What You&#8217;ll Deploy</a></li>
+<li><a class="reference internal" href="#classic-ui-vs-volto">Classic UI vs Volto</a></li>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#step-1-get-the-example">Step 1: Get the Example</a></li>
+<li><a class="reference internal" href="#step-2-install-dependencies">Step 2: Install Dependencies</a></li>
+<li><a class="reference internal" href="#step-3-import-crds">Step 3: Import CRDs</a></li>
+<li><a class="reference internal" href="#step-4-configure-environment">Step 4: Configure Environment</a></li>
+<li><a class="reference internal" href="#step-5-generate-manifests">Step 5: Generate Manifests</a></li>
+<li><a class="reference internal" href="#step-6-review-manifests">Step 6: Review Manifests</a></li>
+<li><a class="reference internal" href="#step-7-deploy">Step 7: Deploy</a></li>
+<li><a class="reference internal" href="#step-8-monitor-deployment">Step 8: Monitor Deployment</a></li>
+<li><a class="reference internal" href="#step-9-verify-services">Step 9: Verify Services</a></li>
+<li><a class="reference internal" href="#step-10-check-ingress">Step 10: Check Ingress</a></li>
+<li><a class="reference internal" href="#step-11-access-your-site">Step 11: Access Your Site</a><ul>
+<li><a class="reference internal" href="#create-plone-site">Create Plone Site</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#key-differences-from-volto">Key Differences from Volto</a><ul>
+<li><a class="reference internal" href="#architecture">Architecture</a></li>
+<li><a class="reference internal" href="#ingress-routes">Ingress Routes</a></li>
+<li><a class="reference internal" href="#no-frontend-service">No Frontend Service</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a><ul>
+<li><a class="reference internal" href="#backend-not-starting">Backend Not Starting</a></li>
+<li><a class="reference internal" href="#classic-ui-interface-not-loading">Classic UI Interface Not Loading</a></li>
+<li><a class="reference internal" href="#add-on-compatibility">Add-on Compatibility</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#migrating-to-volto">Migrating to Volto</a></li>
+<li><a class="reference internal" href="#customization">Customization</a><ul>
+<li><a class="reference internal" href="#backend-configuration">Backend Configuration</a></li>
+<li><a class="reference internal" href="#varnish-caching">Varnish Caching</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#scaling">Scaling</a></li>
+<li><a class="reference internal" href="#performance">Performance</a></li>
+<li><a class="reference internal" href="#cleanup">Cleanup</a></li>
+<li><a class="reference internal" href="#next-steps">Next Steps</a></li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">cdk8s-plone</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">How-To Guides</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Deploy Classic UI Example</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue dark-code" role="main">
+          <section id="deploy-classic-ui-example">
+<h1>Deploy Classic UI Example<a class="headerlink" href="#deploy-classic-ui-example" title="Link to this heading">¶</a></h1>
+<p>This guide shows you how to deploy the Classic UI example to your Kubernetes cluster.</p>
+<section id="what-you-ll-deploy">
+<h2>What You’ll Deploy<a class="headerlink" href="#what-you-ll-deploy" title="Link to this heading">¶</a></h2>
+<p>The <a class="reference external" href="https://github.com/bluedynamics/cdk8s-plone/tree/main/examples/classic-ui">Classic UI example</a> provides traditional Plone with server-side rendering:</p>
+<ul class="simple">
+<li><p><strong>Plone 6.1 Classic UI</strong> (traditional interface, no separate frontend)</p></li>
+<li><p><strong>PostgreSQL</strong> with RelStorage (CloudNativePG or Bitnami)</p></li>
+<li><p><strong>Varnish HTTP caching</strong> with kube-httpcache</p></li>
+<li><p><strong>Ingress</strong> with TLS (Traefik or Kong)</p></li>
+<li><p><strong>Simpler architecture</strong> (single backend service)</p></li>
+</ul>
+</section>
+<section id="classic-ui-vs-volto">
+<h2>Classic UI vs Volto<a class="headerlink" href="#classic-ui-vs-volto" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Feature</p></th>
+<th class="head"><p>Classic UI</p></th>
+<th class="head"><p>Volto</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Architecture</strong></p></td>
+<td><p>Single backend</p></td>
+<td><p>Frontend + Backend</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Rendering</strong></p></td>
+<td><p>Server-side</p></td>
+<td><p>Client-side (React)</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Deployment</strong></p></td>
+<td><p>Simpler</p></td>
+<td><p>More complex</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Best for</strong></p></td>
+<td><p>Migrations, intranets</p></td>
+<td><p>Modern projects</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Choose Classic UI if you’re migrating from older Plone versions or need specific Classic UI add-ons. For new projects, consider <a class="reference internal" href="deploy-production-volto.html"><span class="std std-doc">Volto</span></a>.</p>
+</div>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">¶</a></h2>
+<p>Same as the <a class="reference internal" href="deploy-production-volto.html#prerequisites"><span class="std std-ref">Production Volto guide</span></a>, you need:</p>
+<ul class="simple">
+<li><p>Ingress controller (Traefik or Kong)</p></li>
+<li><p>cert-manager</p></li>
+<li><p>kube-httpcache operator</p></li>
+<li><p>PostgreSQL operator (CloudNativePG or Bitnami)</p></li>
+</ul>
+<p>See <a class="reference internal" href="setup-prerequisites.html"><span class="std std-doc">Setup Prerequisites</span></a> for detailed instructions.</p>
+</section>
+<section id="step-1-get-the-example">
+<h2>Step 1: Get the Example<a class="headerlink" href="#step-1-get-the-example" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">git<span class="w"> </span>clone<span class="w"> </span>https://github.com/bluedynamics/cdk8s-plone.git
+</span><span data-line="2"><span class="nb">cd</span><span class="w"> </span>cdk8s-plone/examples/classic-ui
+</span></pre></div>
+</div>
+</section>
+<section id="step-2-install-dependencies">
+<h2>Step 2: Install Dependencies<a class="headerlink" href="#step-2-install-dependencies" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">npm<span class="w"> </span>install
+</span></pre></div>
+</div>
+</section>
+<section id="step-3-import-crds">
+<h2>Step 3: Import CRDs<a class="headerlink" href="#step-3-import-crds" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">npm<span class="w"> </span>run<span class="w"> </span>import
+</span></pre></div>
+</div>
+</section>
+<section id="step-4-configure-environment">
+<h2>Step 4: Configure Environment<a class="headerlink" href="#step-4-configure-environment" title="Link to this heading">¶</a></h2>
+<p>Create <code class="docutils literal notranslate"><span class="pre">.env</span></code> from the example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">cp<span class="w"> </span>.env.example<span class="w"> </span>.env
+</span></pre></div>
+</div>
+<p>Edit <code class="docutils literal notranslate"><span class="pre">.env</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Your domains</span>
+</span><span data-line="2"><span class="nv">DOMAIN_CACHED</span><span class="o">=</span>plone.example.com
+</span><span data-line="3"><span class="nv">DOMAIN_UNCACHED</span><span class="o">=</span>plone-test.example.com
+</span><span data-line="4"><span class="nv">DOMAIN_MAINTENANCE</span><span class="o">=</span>plone-admin.example.com
+</span><span data-line="5">
+</span><span data-line="6"><span class="c1"># Your cert-manager ClusterIssuer</span>
+</span><span data-line="7"><span class="nv">CLUSTER_ISSUER</span><span class="o">=</span>letsencrypt-prod
+</span><span data-line="8">
+</span><span data-line="9"><span class="c1"># Optional: Custom backend image</span>
+</span><span data-line="10"><span class="c1">#PLONE_BACKEND_IMAGE=plone/plone-backend:6.1.3</span>
+</span><span data-line="11">
+</span><span data-line="12"><span class="c1"># Database: &#39;bitnami&#39; or &#39;cloudnativepg&#39;</span>
+</span><span data-line="13"><span class="nv">DATABASE</span><span class="o">=</span>cloudnativepg
+</span></pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Classic UI only needs one image (backend). There’s no frontend image configuration.</p>
+</div>
+</section>
+<section id="step-5-generate-manifests">
+<h2>Step 5: Generate Manifests<a class="headerlink" href="#step-5-generate-manifests" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">npm<span class="w"> </span>run<span class="w"> </span>synth
+</span></pre></div>
+</div>
+<p>Creates <code class="docutils literal notranslate"><span class="pre">dist/plone-classic.k8s.yaml</span></code> (~27 KB, smaller than Volto’s 32 KB).</p>
+</section>
+<section id="step-6-review-manifests">
+<h2>Step 6: Review Manifests<a class="headerlink" href="#step-6-review-manifests" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Count resources</span>
+</span><span data-line="2">grep<span class="w"> </span><span class="s2">&quot;^kind:&quot;</span><span class="w"> </span>dist/plone-classic.k8s.yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>sort<span class="w"> </span><span class="p">|</span><span class="w"> </span>uniq<span class="w"> </span>-c
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># Dry run</span>
+</span><span data-line="5">kubectl<span class="w"> </span>apply<span class="w"> </span>--dry-run<span class="o">=</span>client<span class="w"> </span>-f<span class="w"> </span>dist/plone-classic.k8s.yaml
+</span></pre></div>
+</div>
+</section>
+<section id="step-7-deploy">
+<h2>Step 7: Deploy<a class="headerlink" href="#step-7-deploy" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>dist/plone-classic.k8s.yaml
+</span></pre></div>
+</div>
+<p>Or to a specific namespace:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>dist/plone-classic.k8s.yaml<span class="w"> </span>-n<span class="w"> </span>plone
+</span></pre></div>
+</div>
+</section>
+<section id="step-8-monitor-deployment">
+<h2>Step 8: Monitor Deployment<a class="headerlink" href="#step-8-monitor-deployment" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Watch pods</span>
+</span><span data-line="2">kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-l<span class="w"> </span>app.kubernetes.io/part-of<span class="o">=</span>plone<span class="w"> </span>-w
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># Wait for ready</span>
+</span><span data-line="5">kubectl<span class="w"> </span><span class="nb">wait</span><span class="w"> </span>--for<span class="o">=</span><span class="nv">condition</span><span class="o">=</span>ready<span class="w"> </span>pod<span class="w"> </span><span class="se">\</span>
+</span><span data-line="6"><span class="w">  </span>-l<span class="w"> </span>app.kubernetes.io/part-of<span class="o">=</span>plone<span class="w"> </span><span class="se">\</span>
+</span><span data-line="7"><span class="w">  </span>--timeout<span class="o">=</span>300s
+</span></pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Classic UI deploys fewer pods than Volto (no frontend pods).</p>
+</div>
+</section>
+<section id="step-9-verify-services">
+<h2>Step 9: Verify Services<a class="headerlink" href="#step-9-verify-services" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectl<span class="w"> </span>get<span class="w"> </span>svc<span class="w"> </span>-l<span class="w"> </span>app.kubernetes.io/part-of<span class="o">=</span>plone
+</span></pre></div>
+</div>
+<p>You should see:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">plone-backend</span></code> (Classic UI service)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">plone-httpcache</span></code> (Varnish cache)</p></li>
+<li><p>Database service</p></li>
+</ul>
+</section>
+<section id="step-10-check-ingress">
+<h2>Step 10: Check Ingress<a class="headerlink" href="#step-10-check-ingress" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectl<span class="w"> </span>get<span class="w"> </span>ingress
+</span><span data-line="2">kubectl<span class="w"> </span>get<span class="w"> </span>certificate
+</span></pre></div>
+</div>
+</section>
+<section id="step-11-access-your-site">
+<h2>Step 11: Access Your Site<a class="headerlink" href="#step-11-access-your-site" title="Link to this heading">¶</a></h2>
+<p>Once DNS and TLS are ready:</p>
+<ul class="simple">
+<li><p><strong>Public (cached)</strong>: https://plone.example.com</p></li>
+<li><p><strong>Testing (uncached)</strong>: https://plone-test.example.com</p></li>
+<li><p><strong>Maintenance</strong>: https://plone-admin.example.com</p></li>
+</ul>
+<section id="create-plone-site">
+<h3>Create Plone Site<a class="headerlink" href="#create-plone-site" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p>Access maintenance domain: https://plone-admin.example.com</p></li>
+<li><p>Click “Create a new Plone site”</p></li>
+<li><p>Configure:</p>
+<ul class="simple">
+<li><p><strong>Site ID</strong>: <code class="docutils literal notranslate"><span class="pre">Plone</span></code></p></li>
+<li><p><strong>Title</strong>: Your site name</p></li>
+<li><p><strong>Language</strong>: Select language</p></li>
+<li><p><strong>Add-ons</strong>: Choose Classic UI add-ons</p></li>
+</ul>
+</li>
+<li><p>Click “Create Plone Site”</p></li>
+</ol>
+</section>
+</section>
+<section id="key-differences-from-volto">
+<h2>Key Differences from Volto<a class="headerlink" href="#key-differences-from-volto" title="Link to this heading">¶</a></h2>
+<section id="architecture">
+<h3>Architecture<a class="headerlink" href="#architecture" title="Link to this heading">¶</a></h3>
+<p>Classic UI routing is simpler - all traffic goes to the backend:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1">Traffic → Ingress → Varnish → Plone Backend (Classic UI)
+</span></pre></div>
+</div>
+<p>Compared to Volto:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1">Traffic → Ingress → {Varnish → Frontend, Backend}
+</span></pre></div>
+</div>
+</section>
+<section id="ingress-routes">
+<h3>Ingress Routes<a class="headerlink" href="#ingress-routes" title="Link to this heading">¶</a></h3>
+<p>Classic UI uses virtual host rewriting for direct backend access:</p>
+<ul class="simple">
+<li><p><strong>Cached</strong>: Routes through Varnish to backend</p></li>
+<li><p><strong>Uncached</strong>: Direct to backend with VirtualHostBase rewrite</p></li>
+<li><p><strong>Maintenance</strong>: Direct backend access with VirtualHostRoot</p></li>
+</ul>
+</section>
+<section id="no-frontend-service">
+<h3>No Frontend Service<a class="headerlink" href="#no-frontend-service" title="Link to this heading">¶</a></h3>
+<p>The manifest doesn’t include:</p>
+<ul class="simple">
+<li><p>Frontend deployment</p></li>
+<li><p>Frontend service</p></li>
+<li><p>Frontend-to-backend internal routing</p></li>
+</ul>
+<p>This makes the deployment ~15% smaller and simpler to manage.</p>
+</section>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">¶</a></h2>
+<section id="backend-not-starting">
+<h3>Backend Not Starting<a class="headerlink" href="#backend-not-starting" title="Link to this heading">¶</a></h3>
+<p>Check backend logs:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectl<span class="w"> </span>logs<span class="w"> </span>-l<span class="w"> </span>app.kubernetes.io/name<span class="o">=</span>plone-backend<span class="w"> </span>-f
+</span></pre></div>
+</div>
+<p>Common issues:</p>
+<ul class="simple">
+<li><p>Database connection failures</p></li>
+<li><p>Memory limits too low</p></li>
+<li><p>Image pull errors</p></li>
+</ul>
+</section>
+<section id="classic-ui-interface-not-loading">
+<h3>Classic UI Interface Not Loading<a class="headerlink" href="#classic-ui-interface-not-loading" title="Link to this heading">¶</a></h3>
+<ol class="arabic">
+<li><p>Check if backend pods are running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-l<span class="w"> </span>app.kubernetes.io/name<span class="o">=</span>plone-backend
+</span></pre></div>
+</div>
+</li>
+<li><p>Verify virtual host rewriting in ingress:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectl<span class="w"> </span>describe<span class="w"> </span>ingress
+</span></pre></div>
+</div>
+</li>
+<li><p>Check Varnish routing:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectl<span class="w"> </span>logs<span class="w"> </span>-l<span class="w"> </span>app.kubernetes.io/name<span class="o">=</span>plone-httpcache
+</span></pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="add-on-compatibility">
+<h3>Add-on Compatibility<a class="headerlink" href="#add-on-compatibility" title="Link to this heading">¶</a></h3>
+<p>Some add-ons are Volto-specific. For Classic UI:</p>
+<ul class="simple">
+<li><p>Use Classic UI themes (not Volto themes)</p></li>
+<li><p>Check add-on compatibility with Plone 6 Classic UI</p></li>
+<li><p>Avoid Volto-specific frontend add-ons</p></li>
+</ul>
+</section>
+</section>
+<section id="migrating-to-volto">
+<h2>Migrating to Volto<a class="headerlink" href="#migrating-to-volto" title="Link to this heading">¶</a></h2>
+<p>If you want to migrate from Classic UI to Volto later:</p>
+<ol class="arabic simple">
+<li><p>Keep your backend deployment (same configuration)</p></li>
+<li><p>Add Volto frontend from the <a class="reference internal" href="deploy-production-volto.html"><span class="std std-doc">Volto example</span></a></p></li>
+<li><p>Update ingress to route to frontend</p></li>
+<li><p>Both UIs can run simultaneously during migration</p></li>
+</ol>
+<p>See the <a class="reference internal" href="deploy-production-volto.html"><span class="std std-doc">Production Volto deployment guide</span></a> for details.</p>
+</section>
+<section id="customization">
+<h2>Customization<a class="headerlink" href="#customization" title="Link to this heading">¶</a></h2>
+<section id="backend-configuration">
+<h3>Backend Configuration<a class="headerlink" href="#backend-configuration" title="Link to this heading">¶</a></h3>
+<p>Edit <code class="docutils literal notranslate"><span class="pre">main.ts</span></code> to customize:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kd">const</span><span class="w"> </span><span class="nx">plone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Plone</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plone&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">variant</span><span class="o">:</span><span class="w"> </span><span class="kt">PloneVariant.CLASSICUI</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="4"><span class="w">    </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;plone/plone-backend:6.1.3&#39;</span><span class="p">,</span>
+</span><span data-line="5"><span class="w">    </span><span class="nx">replicas</span><span class="o">:</span><span class="w"> </span><span class="kt">2</span><span class="p">,</span>
+</span><span data-line="6"><span class="w">    </span><span class="nx">limitMemory</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;1Gi&#39;</span><span class="p">,</span>
+</span><span data-line="7"><span class="w">    </span><span class="nx">limitCpu</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;1000m&#39;</span><span class="p">,</span>
+</span><span data-line="8"><span class="w">    </span><span class="nx">environment</span><span class="o">:</span><span class="w"> </span><span class="kt">env</span><span class="p">,</span>
+</span><span data-line="9"><span class="w">  </span><span class="p">},</span>
+</span><span data-line="10"><span class="p">})</span>
+</span></pre></div>
+</div>
+</section>
+<section id="varnish-caching">
+<h3>Varnish Caching<a class="headerlink" href="#varnish-caching" title="Link to this heading">¶</a></h3>
+<p>Edit <code class="docutils literal notranslate"><span class="pre">config/varnish.tpl.vcl</span></code> for caching rules specific to Classic UI.</p>
+<p>Classic UI VCL is simpler than Volto’s - all traffic routes to one backend.</p>
+</section>
+</section>
+<section id="scaling">
+<h2>Scaling<a class="headerlink" href="#scaling" title="Link to this heading">¶</a></h2>
+<p>Scale backend replicas:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">replicas</span><span class="o">:</span><span class="w"> </span><span class="kt">3</span><span class="p">,</span><span class="w">  </span><span class="c1">// Increase for higher traffic</span>
+</span><span data-line="3"><span class="p">}</span>
+</span></pre></div>
+</div>
+<p>Then:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">npm<span class="w"> </span>run<span class="w"> </span>synth
+</span><span data-line="2">kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>dist/plone-classic.k8s.yaml
+</span></pre></div>
+</div>
+</section>
+<section id="performance">
+<h2>Performance<a class="headerlink" href="#performance" title="Link to this heading">¶</a></h2>
+<p>Classic UI performance characteristics:</p>
+<ul class="simple">
+<li><p><strong>Server-side rendering</strong> can be slower than Volto’s client-side</p></li>
+<li><p><strong>Varnish caching</strong> is critical for performance</p></li>
+<li><p><strong>Database</strong> is the main bottleneck (use CloudNativePG for HA)</p></li>
+<li><p><strong>Fewer HTTP requests</strong> than Volto (no separate frontend API calls)</p></li>
+</ul>
+</section>
+<section id="cleanup">
+<h2>Cleanup<a class="headerlink" href="#cleanup" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectl<span class="w"> </span>delete<span class="w"> </span>-f<span class="w"> </span>dist/plone-classic.k8s.yaml
+</span></pre></div>
+</div>
+</section>
+<section id="next-steps">
+<h2>Next Steps<a class="headerlink" href="#next-steps" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Add <a class="reference internal" href="../reference/configuration-options.html#monitoring"><span class="std std-ref">Prometheus monitoring</span></a></p></li>
+<li><p>Configure <a class="reference external" href="https://cloudnative-pg.io/documentation/">CloudNativePG backups</a></p></li>
+<li><p>Customize <a class="reference external" href="https://6.docs.plone.org/classic-ui/theming.html">Classic UI theme</a></p></li>
+<li><p>Set up <a class="reference external" href="https://6.docs.plone.org/install/upgrade-guide.html">content migration</a></p></li>
+</ul>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="deploy-production-volto.html"><span class="std std-doc">Deploy Production Volto</span></a> - For modern React UI</p></li>
+<li><p><a class="reference internal" href="setup-prerequisites.html"><span class="std std-doc">Setup Prerequisites</span></a> - Cluster requirements</p></li>
+<li><p><a class="reference internal" href="../reference/configuration-options.html"><span class="std std-doc">Configuration Options</span></a> - API reference</p></li>
+<li><p><a class="reference external" href="https://6.docs.plone.org/classic-ui/">Plone 6 Classic UI Documentation</a></p></li>
+</ul>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="deploy-production-volto.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Deploy Production Volto Example</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="../reference/index.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Reference</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024-2025, Blue Dynamics Alliance</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials"></div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=bafade30"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script src="../_static/shibuya.js?v=c1cf1a6b"></script>
+      <script src="../_static/logo-fix.js?v=7f36b008"></script></body>
+</html>

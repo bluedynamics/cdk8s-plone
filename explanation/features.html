@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Features - cdk8s-plone 0.1.10 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Architecture Overview" href="architecture.html" /><link rel="prev" title="Explanation" href="index.html" />
+      <link rel="canonical" href="https://bluedynamics.github.io/cdk8s-plone/explanation/features.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=14737038" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/brand-theme.css?v=a3a78658" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom-icons.css?v=77ce15dc" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://bluedynamics.github.io/cdk8s-plone/explanation/features.html"/>
+  <meta property="og:title" content="Features"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="/">
+      <img class="light-logo" src="../_static/kup6s-icon-plone.svg" alt="cdk8s-plone" height="28" loading="lazy" />
+      <img class="dark-logo" src="../_static/kup6s-icon-plone.svg" alt="cdk8s-plone" height="28" loading="lazy" />
+      <strong>cdk8s-plone</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials"></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/01-quick-start.html">Quick Start</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../how-to/index.html">How-To Guides</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/setup-prerequisites.html">Setup Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/deploy-production-volto.html">Deploy Production Volto Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/deploy-classic-ui.html">Deploy Classic UI Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configuration-options.html">Configuration Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/api/index.html">API Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Explanation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Architecture Overview</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#core-features">Core Features</a><ul>
+<li><a class="reference internal" href="#deployment-variants">Deployment Variants</a></li>
+<li><a class="reference internal" href="#high-availability">High Availability</a></li>
+<li><a class="reference internal" href="#http-caching-with-varnish">HTTP Caching with Varnish</a></li>
+<li><a class="reference internal" href="#resource-management">Resource Management</a></li>
+<li><a class="reference internal" href="#health-monitoring">Health Monitoring</a></li>
+<li><a class="reference internal" href="#environment-configuration">Environment Configuration</a></li>
+<li><a class="reference internal" href="#kubernetes-annotations">Kubernetes Annotations</a></li>
+<li><a class="reference internal" href="#private-registry-support">Private Registry Support</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#multi-language-support">Multi-Language Support</a><ul>
+<li><a class="reference internal" href="#typescript-javascript">TypeScript/JavaScript</a></li>
+<li><a class="reference internal" href="#python">Python</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#infrastructure-as-code-benefits">Infrastructure as Code Benefits</a><ul>
+<li><a class="reference internal" href="#type-safety">Type Safety</a></li>
+<li><a class="reference internal" href="#reusability">Reusability</a></li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
+<li><a class="reference internal" href="#programmatic-control">Programmatic Control</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#production-ready-features">Production-Ready Features</a><ul>
+<li><a class="reference internal" href="#manifest-generation">Manifest Generation</a></li>
+<li><a class="reference internal" href="#helm-chart-integration">Helm Chart Integration</a></li>
+<li><a class="reference internal" href="#monitoring-integration">Monitoring Integration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#upcoming-features">Upcoming Features</a></li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">cdk8s-plone</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">Explanation</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Features</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue dark-code" role="main">
+          <section id="features">
+<h1>Features<a class="headerlink" href="#features" title="Link to this heading">¶</a></h1>
+<p>Complete overview of cdk8s-plone features and capabilities.</p>
+<section id="core-features">
+<h2>Core Features<a class="headerlink" href="#core-features" title="Link to this heading">¶</a></h2>
+<section id="deployment-variants">
+<h3>Deployment Variants<a class="headerlink" href="#deployment-variants" title="Link to this heading">¶</a></h3>
+<p>cdk8s-plone supports two deployment modes to match your requirements:</p>
+<p><strong>Volto (Modern React Frontend)</strong></p>
+<ul class="simple">
+<li><p>Modern React-based user interface</p></li>
+<li><p>Headless CMS architecture</p></li>
+<li><p>Separate frontend and backend services</p></li>
+<li><p>Best for: New projects, modern UX requirements, API-first architectures</p></li>
+</ul>
+<p><strong>Classic UI (Traditional Plone)</strong></p>
+<ul class="simple">
+<li><p>Server-side rendered interface</p></li>
+<li><p>Integrated single-service deployment</p></li>
+<li><p>Traditional Plone experience</p></li>
+<li><p>Best for: Legacy migrations, existing add-ons, simpler deployments</p></li>
+</ul>
+<p>See <a class="reference internal" href="#plone-variants.md"><span class="xref myst">Plone Variants</span></a> for detailed comparison.</p>
+</section>
+<section id="high-availability">
+<h3>High Availability<a class="headerlink" href="#high-availability" title="Link to this heading">¶</a></h3>
+<p><strong>Configurable Replicas</strong></p>
+<ul class="simple">
+<li><p>Set any number of replicas for backend and frontend</p></li>
+<li><p>Default: 2 replicas per component</p></li>
+<li><p>Supports horizontal scaling for increased capacity</p></li>
+</ul>
+<p><strong>Pod Disruption Budgets</strong></p>
+<ul class="simple">
+<li><p>Ensures minimum availability during voluntary disruptions</p></li>
+<li><p>Prevents too many pods being unavailable simultaneously</p></li>
+<li><p>Configurable <code class="docutils literal notranslate"><span class="pre">minAvailable</span></code> or <code class="docutils literal notranslate"><span class="pre">maxUnavailable</span></code> thresholds</p></li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">replicas</span><span class="o">:</span><span class="w"> </span><span class="kt">5</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">minAvailable</span><span class="o">:</span><span class="w"> </span><span class="kt">3</span><span class="p">,</span><span class="w">  </span><span class="c1">// Keep at least 3 pods running</span>
+</span><span data-line="4"><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+<section id="http-caching-with-varnish">
+<h3>HTTP Caching with Varnish<a class="headerlink" href="#http-caching-with-varnish" title="Link to this heading">¶</a></h3>
+<p><strong>kube-httpcache Integration</strong></p>
+<ul class="simple">
+<li><p>Production-grade Varnish deployment</p></li>
+<li><p>Cluster-wide cache invalidation</p></li>
+<li><p>Automatic invalidation on content changes</p></li>
+<li><p>HTTP/2 support</p></li>
+</ul>
+<p><strong>Benefits:</strong></p>
+<ul class="simple">
+<li><p>Dramatically reduced backend load</p></li>
+<li><p>Faster response times</p></li>
+<li><p>Better scalability</p></li>
+<li><p>Lower resource requirements</p></li>
+</ul>
+<p><strong>Monitoring:</strong></p>
+<ul class="simple">
+<li><p>Built-in Prometheus exporter</p></li>
+<li><p>Cache hit/miss metrics</p></li>
+<li><p>Performance monitoring</p></li>
+</ul>
+</section>
+<section id="resource-management">
+<h3>Resource Management<a class="headerlink" href="#resource-management" title="Link to this heading">¶</a></h3>
+<p><strong>Fine-Grained Control</strong></p>
+<ul class="simple">
+<li><p>CPU requests and limits</p></li>
+<li><p>Memory requests and limits</p></li>
+<li><p>Per-component configuration</p></li>
+<li><p>Kubernetes-native resource management</p></li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">requestCpu</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;500m&#39;</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">limitCpu</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;2&#39;</span><span class="p">,</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">requestMemory</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;512Mi&#39;</span><span class="p">,</span>
+</span><span data-line="5"><span class="w">  </span><span class="nx">limitMemory</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;2Gi&#39;</span><span class="p">,</span>
+</span><span data-line="6"><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+<section id="health-monitoring">
+<h3>Health Monitoring<a class="headerlink" href="#health-monitoring" title="Link to this heading">¶</a></h3>
+<p><strong>Readiness Probes</strong></p>
+<ul class="simple">
+<li><p>Ensures pods are ready before receiving traffic</p></li>
+<li><p>Configurable delays and thresholds</p></li>
+<li><p>Enabled by default for backend</p></li>
+<li><p>Prevents downtime during startup</p></li>
+</ul>
+<p><strong>Liveness Probes</strong></p>
+<ul class="simple">
+<li><p>Automatic restart of unhealthy pods</p></li>
+<li><p>Configurable for backend and frontend</p></li>
+<li><p>Recommended for frontend to detect SSR hangs</p></li>
+<li><p>Prevents stuck processes</p></li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="nx">frontend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">livenessEnabled</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">livenessInitialDelaySeconds</span><span class="o">:</span><span class="w"> </span><span class="kt">30</span><span class="p">,</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">livenessFailureThreshold</span><span class="o">:</span><span class="w"> </span><span class="kt">3</span><span class="p">,</span>
+</span><span data-line="5"><span class="w">  </span><span class="nx">readinessEnabled</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+</span><span data-line="6"><span class="w">  </span><span class="nx">readinessInitialDelaySeconds</span><span class="o">:</span><span class="w"> </span><span class="kt">10</span><span class="p">,</span>
+</span><span data-line="7"><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+<section id="environment-configuration">
+<h3>Environment Configuration<a class="headerlink" href="#environment-configuration" title="Link to this heading">¶</a></h3>
+<p><strong>Flexible Environment Variables</strong></p>
+<ul class="simple">
+<li><p>Use cdk8s-plus-30 Env API</p></li>
+<li><p>Support for values, ConfigMaps, and Secrets</p></li>
+<li><p>Per-component environment configuration</p></li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Env</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;cdk8s-plus-30&#39;</span><span class="p">;</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">environment</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="5"><span class="w">    </span><span class="nx">variables</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="6"><span class="w">      </span><span class="nx">SITE</span><span class="o">:</span><span class="w"> </span><span class="kt">Env.value</span><span class="p">(</span><span class="s1">&#39;MySite&#39;</span><span class="p">),</span>
+</span><span data-line="7"><span class="w">      </span><span class="nx">DB_USER</span><span class="o">:</span><span class="w"> </span><span class="kt">Env.fromSecret</span><span class="p">(</span><span class="s1">&#39;db-credentials&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;username&#39;</span><span class="p">),</span>
+</span><span data-line="8"><span class="w">      </span><span class="nx">CORS_ALLOW</span><span class="o">:</span><span class="w"> </span><span class="kt">Env.fromConfigMap</span><span class="p">(</span><span class="s1">&#39;app-config&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;cors-origins&#39;</span><span class="p">),</span>
+</span><span data-line="9"><span class="w">    </span><span class="p">},</span>
+</span><span data-line="10"><span class="w">  </span><span class="p">},</span>
+</span><span data-line="11"><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+<section id="kubernetes-annotations">
+<h3>Kubernetes Annotations<a class="headerlink" href="#kubernetes-annotations" title="Link to this heading">¶</a></h3>
+<p><strong>Three Levels of Annotations</strong></p>
+<ul class="simple">
+<li><p><strong>Deployment annotations</strong>: Metadata for the deployment resource</p></li>
+<li><p><strong>Pod annotations</strong>: Applied to pod templates (Prometheus, service mesh)</p></li>
+<li><p><strong>Service annotations</strong>: Applied to services (external-dns, load balancers)</p></li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">podAnnotations</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="3"><span class="w">    </span><span class="s1">&#39;prometheus.io/scrape&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;true&#39;</span><span class="p">,</span>
+</span><span data-line="4"><span class="w">    </span><span class="s1">&#39;prometheus.io/port&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;8080&#39;</span><span class="p">,</span>
+</span><span data-line="5"><span class="w">  </span><span class="p">},</span>
+</span><span data-line="6"><span class="w">  </span><span class="nx">serviceAnnotations</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="7"><span class="w">    </span><span class="s1">&#39;external-dns.alpha.kubernetes.io/hostname&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;backend.example.com&#39;</span><span class="p">,</span>
+</span><span data-line="8"><span class="w">  </span><span class="p">},</span>
+</span><span data-line="9"><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+<section id="private-registry-support">
+<h3>Private Registry Support<a class="headerlink" href="#private-registry-support" title="Link to this heading">¶</a></h3>
+<p><strong>Image Pull Secrets</strong></p>
+<ul class="simple">
+<li><p>Support for private container registries</p></li>
+<li><p>Multiple secrets supported</p></li>
+<li><p>Applied to all deployments</p></li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="ow">new</span><span class="w"> </span><span class="nx">Plone</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;my-plone&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">imagePullSecrets</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;docker-registry&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;gcr-registry&#39;</span><span class="p">],</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;private-registry.io/plone-backend:6.1.3&#39;</span><span class="w"> </span><span class="p">},</span>
+</span><span data-line="4"><span class="p">})</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="multi-language-support">
+<h2>Multi-Language Support<a class="headerlink" href="#multi-language-support" title="Link to this heading">¶</a></h2>
+<section id="typescript-javascript">
+<h3>TypeScript/JavaScript<a class="headerlink" href="#typescript-javascript" title="Link to this heading">¶</a></h3>
+<p><strong>Native CDK8S Experience</strong></p>
+<ul class="simple">
+<li><p>Full TypeScript type definitions</p></li>
+<li><p>IDE autocomplete and validation</p></li>
+<li><p>Familiar syntax for web developers</p></li>
+</ul>
+<p><strong>Installation:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">npm<span class="w"> </span>install<span class="w"> </span>@bluedynamics/cdk8s-plone
+</span></pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Plone</span><span class="p">,</span><span class="w"> </span><span class="nx">PloneVariant</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@bluedynamics/cdk8s-plone&#39;</span><span class="p">;</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="ow">new</span><span class="w"> </span><span class="nx">Plone</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;my-plone&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">variant</span><span class="o">:</span><span class="w"> </span><span class="kt">PloneVariant.VOLTO</span><span class="p">,</span>
+</span><span data-line="5"><span class="w">  </span><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;plone/plone-backend:6.1.3&#39;</span><span class="w"> </span><span class="p">},</span>
+</span><span data-line="6"><span class="p">});</span>
+</span></pre></div>
+</div>
+</section>
+<section id="python">
+<h3>Python<a class="headerlink" href="#python" title="Link to this heading">¶</a></h3>
+<p><strong>JSII-Generated Bindings</strong></p>
+<ul class="simple">
+<li><p>Pythonic API</p></li>
+<li><p>Type hints support</p></li>
+<li><p>Familiar syntax for Python developers</p></li>
+</ul>
+<p><strong>Installation:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">pip<span class="w"> </span>install<span class="w"> </span>cdk8s-plone
+</span></pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">cdk8s_plone</span><span class="w"> </span><span class="kn">import</span> <span class="n">Plone</span><span class="p">,</span> <span class="n">PloneVariant</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">Plone</span><span class="p">(</span><span class="n">chart</span><span class="p">,</span> <span class="s2">&quot;my-plone&quot;</span><span class="p">,</span>
+</span><span data-line="4">    <span class="n">variant</span><span class="o">=</span><span class="n">PloneVariant</span><span class="o">.</span><span class="n">VOLTO</span><span class="p">,</span>
+</span><span data-line="5">    <span class="n">backend</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;plone/plone-backend:6.1.3&quot;</span><span class="p">}</span>
+</span><span data-line="6"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="infrastructure-as-code-benefits">
+<h2>Infrastructure as Code Benefits<a class="headerlink" href="#infrastructure-as-code-benefits" title="Link to this heading">¶</a></h2>
+<section id="type-safety">
+<h3>Type Safety<a class="headerlink" href="#type-safety" title="Link to this heading">¶</a></h3>
+<p><strong>Compile-Time Validation</strong></p>
+<ul class="simple">
+<li><p>Catch configuration errors before deployment</p></li>
+<li><p>IDE validation and autocomplete</p></li>
+<li><p>Refactoring support</p></li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1">// TypeScript catches this error at compile time</span>
+</span><span data-line="2"><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;plone/plone-backend:6.1.3&#39;</span><span class="p">,</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">replicas</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;three&#39;</span><span class="p">,</span><span class="w">  </span><span class="c1">// ❌ Type error: Expected number</span>
+</span><span data-line="5"><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+<section id="reusability">
+<h3>Reusability<a class="headerlink" href="#reusability" title="Link to this heading">¶</a></h3>
+<p><strong>Construct Composition</strong></p>
+<ul class="simple">
+<li><p>Create custom constructs</p></li>
+<li><p>Encapsulate best practices</p></li>
+<li><p>Share across projects</p></li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kd">class</span><span class="w"> </span><span class="nx">ProductionPlone</span><span class="w"> </span><span class="k">extends</span><span class="w"> </span><span class="nx">Construct</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="kr">constructor</span><span class="p">(</span><span class="nx">scope</span><span class="o">:</span><span class="w"> </span><span class="kt">Construct</span><span class="p">,</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="3"><span class="w">    </span><span class="k">super</span><span class="p">(</span><span class="nx">scope</span><span class="p">,</span><span class="w"> </span><span class="nx">id</span><span class="p">);</span>
+</span><span data-line="4">
+</span><span data-line="5"><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">plone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Plone</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plone&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="6"><span class="w">      </span><span class="nx">variant</span><span class="o">:</span><span class="w"> </span><span class="kt">PloneVariant.VOLTO</span><span class="p">,</span>
+</span><span data-line="7"><span class="w">      </span><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="8"><span class="w">        </span><span class="nx">replicas</span><span class="o">:</span><span class="w"> </span><span class="kt">3</span><span class="p">,</span>
+</span><span data-line="9"><span class="w">        </span><span class="nx">minAvailable</span><span class="o">:</span><span class="w"> </span><span class="kt">2</span><span class="p">,</span>
+</span><span data-line="10"><span class="w">        </span><span class="nx">requestCpu</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;500m&#39;</span><span class="p">,</span>
+</span><span data-line="11"><span class="w">        </span><span class="nx">limitCpu</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;2&#39;</span><span class="p">,</span>
+</span><span data-line="12"><span class="w">      </span><span class="p">},</span>
+</span><span data-line="13"><span class="w">    </span><span class="p">});</span>
+</span><span data-line="14">
+</span><span data-line="15"><span class="w">    </span><span class="ow">new</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;cache&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="16"><span class="w">      </span><span class="nx">plone</span><span class="o">:</span><span class="w"> </span><span class="kt">plone</span><span class="p">,</span>
+</span><span data-line="17"><span class="w">      </span><span class="nx">replicas</span><span class="o">:</span><span class="w"> </span><span class="kt">2</span><span class="p">,</span>
+</span><span data-line="18"><span class="w">    </span><span class="p">});</span>
+</span><span data-line="19"><span class="w">  </span><span class="p">}</span>
+</span><span data-line="20"><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+<section id="testing">
+<h3>Testing<a class="headerlink" href="#testing" title="Link to this heading">¶</a></h3>
+<p><strong>Unit Testing</strong></p>
+<ul class="simple">
+<li><p>Test infrastructure definitions</p></li>
+<li><p>Validate resource creation</p></li>
+<li><p>Catch regressions early</p></li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="nx">test</span><span class="p">(</span><span class="s1">&#39;creates backend deployment&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">chart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Testing</span><span class="p">.</span><span class="nx">chart</span><span class="p">();</span>
+</span><span data-line="3"><span class="w">  </span><span class="ow">new</span><span class="w"> </span><span class="nx">Plone</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;test-plone&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="4"><span class="w">    </span><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;plone/plone-backend:6.1.3&#39;</span><span class="w"> </span><span class="p">},</span>
+</span><span data-line="5"><span class="w">  </span><span class="p">});</span>
+</span><span data-line="6">
+</span><span data-line="7"><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Testing</span><span class="p">.</span><span class="nx">synth</span><span class="p">(</span><span class="nx">chart</span><span class="p">);</span>
+</span><span data-line="8"><span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">results</span><span class="p">).</span><span class="nx">toMatchSnapshot</span><span class="p">();</span>
+</span><span data-line="9"><span class="p">});</span>
+</span></pre></div>
+</div>
+</section>
+<section id="programmatic-control">
+<h3>Programmatic Control<a class="headerlink" href="#programmatic-control" title="Link to this heading">¶</a></h3>
+<p><strong>Dynamic Configuration</strong></p>
+<ul class="simple">
+<li><p>Use loops and conditionals</p></li>
+<li><p>Environment-based configuration</p></li>
+<li><p>Dynamic resource generation</p></li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kd">const</span><span class="w"> </span><span class="nx">environments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;dev&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;staging&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;prod&#39;</span><span class="p">];</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="nx">environments</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">env</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="4"><span class="w">  </span><span class="ow">new</span><span class="w"> </span><span class="nx">Plone</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="sb">`plone-</span><span class="si">${</span><span class="nx">env</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="5"><span class="w">    </span><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="6"><span class="w">      </span><span class="nx">replicas</span><span class="o">:</span><span class="w"> </span><span class="kt">env</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">&#39;prod&#39;</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">5</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kt">2</span><span class="p">,</span>
+</span><span data-line="7"><span class="w">      </span><span class="nx">requestMemory</span><span class="o">:</span><span class="w"> </span><span class="kt">env</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">&#39;prod&#39;</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s1">&#39;1Gi&#39;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;512Mi&#39;</span><span class="p">,</span>
+</span><span data-line="8"><span class="w">    </span><span class="p">},</span>
+</span><span data-line="9"><span class="w">  </span><span class="p">});</span>
+</span><span data-line="10"><span class="p">});</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="production-ready-features">
+<h2>Production-Ready Features<a class="headerlink" href="#production-ready-features" title="Link to this heading">¶</a></h2>
+<section id="manifest-generation">
+<h3>Manifest Generation<a class="headerlink" href="#manifest-generation" title="Link to this heading">¶</a></h3>
+<p><strong>Standard Kubernetes YAML</strong></p>
+<ul class="simple">
+<li><p>Generates standard Kubernetes manifests</p></li>
+<li><p>No proprietary formats</p></li>
+<li><p>Apply with <code class="docutils literal notranslate"><span class="pre">kubectl</span> <span class="pre">apply</span> <span class="pre">-f</span></code></p></li>
+</ul>
+<p><strong>Output:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">cdk8s<span class="w"> </span>synth
+</span><span data-line="2"><span class="c1"># Creates dist/ directory with YAML files</span>
+</span><span data-line="3">kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>dist/
+</span></pre></div>
+</div>
+</section>
+<section id="helm-chart-integration">
+<h3>Helm Chart Integration<a class="headerlink" href="#helm-chart-integration" title="Link to this heading">¶</a></h3>
+<p><strong>PloneHttpcache Uses Helm</strong></p>
+<ul class="simple">
+<li><p>Leverages battle-tested kube-httpcache chart</p></li>
+<li><p>Automatic updates available</p></li>
+<li><p>Community-maintained</p></li>
+</ul>
+</section>
+<section id="monitoring-integration">
+<h3>Monitoring Integration<a class="headerlink" href="#monitoring-integration" title="Link to this heading">¶</a></h3>
+<p><strong>Prometheus Ready</strong></p>
+<ul class="simple">
+<li><p>ServiceMonitor support for Varnish</p></li>
+<li><p>Pod annotations for scraping</p></li>
+<li><p>Standard metrics endpoints</p></li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="ow">new</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;cache&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">plone</span><span class="o">:</span><span class="w"> </span><span class="kt">plone</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">servicemonitor</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span><span class="w">  </span><span class="c1">// Creates ServiceMonitor</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">exporterEnabled</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span><span class="w">  </span><span class="c1">// Enables Prometheus exporter sidecar</span>
+</span><span data-line="5"><span class="p">});</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="upcoming-features">
+<h2>Upcoming Features<a class="headerlink" href="#upcoming-features" title="Link to this heading">¶</a></h2>
+<p>Features planned for future releases:</p>
+<ul class="simple">
+<li><p><strong>Backup Integration</strong>: Automated backup configurations</p></li>
+<li><p><strong>Monitoring Dashboards</strong>: Pre-built Grafana dashboards</p></li>
+</ul>
+<p><strong>Note:</strong> Ingress and TLS management are intentionally out of scope - these should be handled by your cluster’s ingress controller and cert-manager. RelStorage with PostgreSQL is already supported through external database configuration (separation of concerns).</p>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="architecture.html"><span class="std std-doc">Architecture Overview</span></a> - System architecture and design</p></li>
+<li><p><a class="reference internal" href="../reference/configuration-options.html"><span class="std std-doc">Configuration Options</span></a> - Complete configuration reference</p></li>
+<li><p><a class="reference internal" href="../tutorials/01-quick-start.html"><span class="std std-doc">Quick Start</span></a> - Getting started tutorial</p></li>
+<li><p><a class="reference external" href="https://github.com/bluedynamics/cdk8s-plone-example">Example Project</a> - Complete working example</p></li>
+</ul>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="index.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Explanation</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="architecture.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Architecture Overview</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024-2025, Blue Dynamics Alliance</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials"></div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=bafade30"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script src="../_static/shibuya.js?v=c1cf1a6b"></script>
+      <script src="../_static/logo-fix.js?v=7f36b008"></script></body>
+</html>

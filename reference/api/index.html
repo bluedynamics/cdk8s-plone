@@ -1,0 +1,1725 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>API Reference - cdk8s-plone 0.1.10 documentation</title><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="Explanation" href="../../explanation/index.html" /><link rel="prev" title="Configuration Options" href="../configuration-options.html" />
+      <link rel="canonical" href="https://bluedynamics.github.io/cdk8s-plone/reference/api/" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../../_static/shibuya.css?v=14737038" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="../../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../../_static/brand-theme.css?v=a3a78658" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom-icons.css?v=77ce15dc" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://bluedynamics.github.io/cdk8s-plone/reference/api/"/>
+  <meta property="og:title" content="API Reference"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="/">
+      <img class="light-logo" src="../../_static/kup6s-icon-plone.svg" alt="cdk8s-plone" height="28" loading="lazy" />
+      <img class="dark-logo" src="../../_static/kup6s-icon-plone.svg" alt="cdk8s-plone" height="28" loading="lazy" />
+      <strong>cdk8s-plone</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials"></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/01-quick-start.html">Quick Start</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../how-to/index.html">How-To Guides</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../how-to/setup-prerequisites.html">Setup Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../how-to/deploy-production-volto.html">Deploy Production Volto Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../how-to/deploy-classic-ui.html">Deploy Classic UI Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../configuration-options.html">Configuration Options</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">API Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../explanation/index.html">Explanation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../explanation/features.html">Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../explanation/architecture.html">Architecture Overview</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#language-support">Language Support</a></li>
+<li><a class="reference internal" href="#constructs">Constructs <a name="Constructs" id="Constructs" /></a><ul>
+<li><a class="reference internal" href="#plone">Plone <a name="Plone" id="@bluedynamics/cdk8s-plone.Plone" /></a><ul>
+<li><a class="reference internal" href="#initializers">Initializers <a name="Initializers" id="@bluedynamics/cdk8s-plone.Plone.Initializer" /></a><ul>
+<li><a class="reference internal" href="#scoperequired"><code class="docutils literal notranslate"><span class="pre">scope</span></code><sup>Required</sup> <a name="scope" id="@bluedynamics/cdk8s-plone.Plone.Initializer.parameter.scope" /></a></li>
+<li><a class="reference internal" href="#idrequired"><code class="docutils literal notranslate"><span class="pre">id</span></code><sup>Required</sup> <a name="id" id="@bluedynamics/cdk8s-plone.Plone.Initializer.parameter.id" /></a></li>
+<li><a class="reference internal" href="#optionsoptional"><code class="docutils literal notranslate"><span class="pre">options</span></code><sup>Optional</sup> <a name="options" id="@bluedynamics/cdk8s-plone.Plone.Initializer.parameter.options" /></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#methods">Methods <a name="Methods" id="Methods" /></a><ul>
+<li><a class="reference internal" href="#tostring"><code class="docutils literal notranslate"><span class="pre">toString</span></code> <a name="toString" id="@bluedynamics/cdk8s-plone.Plone.toString" /></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#static-functions">Static Functions <a name="Static Functions" id="Static Functions" /></a><ul>
+<li><a class="reference internal" href="#isconstruct"><code class="docutils literal notranslate"><span class="pre">isConstruct</span></code> <a name="isConstruct" id="@bluedynamics/cdk8s-plone.Plone.isConstruct" /></a><ul>
+<li><a class="reference internal" href="#xrequired"><code class="docutils literal notranslate"><span class="pre">x</span></code><sup>Required</sup> <a name="x" id="@bluedynamics/cdk8s-plone.Plone.isConstruct.parameter.x" /></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#properties">Properties <a name="Properties" id="Properties" /></a><ul>
+<li><a class="reference internal" href="#noderequired"><code class="docutils literal notranslate"><span class="pre">node</span></code><sup>Required</sup> <a name="node" id="@bluedynamics/cdk8s-plone.Plone.property.node" /></a></li>
+<li><a class="reference internal" href="#backendservicenamerequired"><code class="docutils literal notranslate"><span class="pre">backendServiceName</span></code><sup>Required</sup> <a name="backendServiceName" id="@bluedynamics/cdk8s-plone.Plone.property.backendServiceName" /></a></li>
+<li><a class="reference internal" href="#siteidrequired"><code class="docutils literal notranslate"><span class="pre">siteId</span></code><sup>Required</sup> <a name="siteId" id="@bluedynamics/cdk8s-plone.Plone.property.siteId" /></a></li>
+<li><a class="reference internal" href="#variantrequired"><code class="docutils literal notranslate"><span class="pre">variant</span></code><sup>Required</sup> <a name="variant" id="@bluedynamics/cdk8s-plone.Plone.property.variant" /></a></li>
+<li><a class="reference internal" href="#frontendservicenameoptional"><code class="docutils literal notranslate"><span class="pre">frontendServiceName</span></code><sup>Optional</sup> <a name="frontendServiceName" id="@bluedynamics/cdk8s-plone.Plone.property.frontendServiceName" /></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#plonehttpcache">PloneHttpcache <a name="PloneHttpcache" id="@bluedynamics/cdk8s-plone.PloneHttpcache" /></a><ul>
+<li><a class="reference internal" href="#id1">Initializers <a name="Initializers" id="@bluedynamics/cdk8s-plone.PloneHttpcache.Initializer" /></a><ul>
+<li><a class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">scope</span></code><sup>Required</sup> <a name="scope" id="@bluedynamics/cdk8s-plone.PloneHttpcache.Initializer.parameter.scope" /></a></li>
+<li><a class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">id</span></code><sup>Required</sup> <a name="id" id="@bluedynamics/cdk8s-plone.PloneHttpcache.Initializer.parameter.id" /></a></li>
+<li><a class="reference internal" href="#optionsrequired"><code class="docutils literal notranslate"><span class="pre">options</span></code><sup>Required</sup> <a name="options" id="@bluedynamics/cdk8s-plone.PloneHttpcache.Initializer.parameter.options" /></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id4">Methods <a name="Methods" id="Methods" /></a><ul>
+<li><a class="reference internal" href="#id5"><code class="docutils literal notranslate"><span class="pre">toString</span></code> <a name="toString" id="@bluedynamics/cdk8s-plone.PloneHttpcache.toString" /></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id6">Static Functions <a name="Static Functions" id="Static Functions" /></a><ul>
+<li><a class="reference internal" href="#id7"><code class="docutils literal notranslate"><span class="pre">isConstruct</span></code> <a name="isConstruct" id="@bluedynamics/cdk8s-plone.PloneHttpcache.isConstruct" /></a><ul>
+<li><a class="reference internal" href="#id8"><code class="docutils literal notranslate"><span class="pre">x</span></code><sup>Required</sup> <a name="x" id="@bluedynamics/cdk8s-plone.PloneHttpcache.isConstruct.parameter.x" /></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id9">Properties <a name="Properties" id="Properties" /></a><ul>
+<li><a class="reference internal" href="#id10"><code class="docutils literal notranslate"><span class="pre">node</span></code><sup>Required</sup> <a name="node" id="@bluedynamics/cdk8s-plone.PloneHttpcache.property.node" /></a></li>
+<li><a class="reference internal" href="#httpcacheservicenamerequired"><code class="docutils literal notranslate"><span class="pre">httpcacheServiceName</span></code><sup>Required</sup> <a name="httpcacheServiceName" id="@bluedynamics/cdk8s-plone.PloneHttpcache.property.httpcacheServiceName" /></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#structs">Structs <a name="Structs" id="Structs" /></a><ul>
+<li><a class="reference internal" href="#plonebaseoptions">PloneBaseOptions <a name="PloneBaseOptions" id="@bluedynamics/cdk8s-plone.PloneBaseOptions" /></a><ul>
+<li><a class="reference internal" href="#initializer">Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.Initializer" /></a></li>
+<li><a class="reference internal" href="#id11">Properties <a name="Properties" id="Properties" /></a><ul>
+<li><a class="reference internal" href="#annotationsoptional"><code class="docutils literal notranslate"><span class="pre">annotations</span></code><sup>Optional</sup> <a name="annotations" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.annotations" /></a></li>
+<li><a class="reference internal" href="#environmentoptional"><code class="docutils literal notranslate"><span class="pre">environment</span></code><sup>Optional</sup> <a name="environment" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.environment" /></a></li>
+<li><a class="reference internal" href="#imageoptional"><code class="docutils literal notranslate"><span class="pre">image</span></code><sup>Optional</sup> <a name="image" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.image" /></a></li>
+<li><a class="reference internal" href="#imagepullpolicyoptional"><code class="docutils literal notranslate"><span class="pre">imagePullPolicy</span></code><sup>Optional</sup> <a name="imagePullPolicy" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.imagePullPolicy" /></a></li>
+<li><a class="reference internal" href="#limitcpuoptional"><code class="docutils literal notranslate"><span class="pre">limitCpu</span></code><sup>Optional</sup> <a name="limitCpu" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.limitCpu" /></a></li>
+<li><a class="reference internal" href="#limitmemoryoptional"><code class="docutils literal notranslate"><span class="pre">limitMemory</span></code><sup>Optional</sup> <a name="limitMemory" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.limitMemory" /></a></li>
+<li><a class="reference internal" href="#livenessenabledoptional"><code class="docutils literal notranslate"><span class="pre">livenessEnabled</span></code><sup>Optional</sup> <a name="livenessEnabled" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.livenessEnabled" /></a></li>
+<li><a class="reference internal" href="#livenessfailurethresholdoptional"><code class="docutils literal notranslate"><span class="pre">livenessFailureThreshold</span></code><sup>Optional</sup> <a name="livenessFailureThreshold" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.livenessFailureThreshold" /></a></li>
+<li><a class="reference internal" href="#livenessinitialdelaysecondsoptional"><code class="docutils literal notranslate"><span class="pre">livenessInitialDelaySeconds</span></code><sup>Optional</sup> <a name="livenessInitialDelaySeconds" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.livenessInitialDelaySeconds" /></a></li>
+<li><a class="reference internal" href="#livenessperiodsecondsoptional"><code class="docutils literal notranslate"><span class="pre">livenessPeriodSeconds</span></code><sup>Optional</sup> <a name="livenessPeriodSeconds" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.livenessPeriodSeconds" /></a></li>
+<li><a class="reference internal" href="#livenesssuccessthresholdoptional"><code class="docutils literal notranslate"><span class="pre">livenessSuccessThreshold</span></code><sup>Optional</sup> <a name="livenessSuccessThreshold" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.livenessSuccessThreshold" /></a></li>
+<li><a class="reference internal" href="#livenesstimeoutsecondsoptional"><code class="docutils literal notranslate"><span class="pre">livenessTimeoutSeconds</span></code><sup>Optional</sup> <a name="livenessTimeoutSeconds" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.livenessTimeoutSeconds" /></a></li>
+<li><a class="reference internal" href="#maxunavailableoptional"><code class="docutils literal notranslate"><span class="pre">maxUnavailable</span></code><sup>Optional</sup> <a name="maxUnavailable" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.maxUnavailable" /></a></li>
+<li><a class="reference internal" href="#metricspathoptional"><code class="docutils literal notranslate"><span class="pre">metricsPath</span></code><sup>Optional</sup> <a name="metricsPath" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.metricsPath" /></a></li>
+<li><a class="reference internal" href="#metricsportoptional"><code class="docutils literal notranslate"><span class="pre">metricsPort</span></code><sup>Optional</sup> <a name="metricsPort" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.metricsPort" /></a></li>
+<li><a class="reference internal" href="#minavailableoptional"><code class="docutils literal notranslate"><span class="pre">minAvailable</span></code><sup>Optional</sup> <a name="minAvailable" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.minAvailable" /></a></li>
+<li><a class="reference internal" href="#podannotationsoptional"><code class="docutils literal notranslate"><span class="pre">podAnnotations</span></code><sup>Optional</sup> <a name="podAnnotations" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.podAnnotations" /></a></li>
+<li><a class="reference internal" href="#readinessenabledoptional"><code class="docutils literal notranslate"><span class="pre">readinessEnabled</span></code><sup>Optional</sup> <a name="readinessEnabled" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessEnabled" /></a></li>
+<li><a class="reference internal" href="#readinessfailurethresholdoptional"><code class="docutils literal notranslate"><span class="pre">readinessFailureThreshold</span></code><sup>Optional</sup> <a name="readinessFailureThreshold" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessFailureThreshold" /></a></li>
+<li><a class="reference internal" href="#readinessinitialdelaysecondsoptional"><code class="docutils literal notranslate"><span class="pre">readinessInitialDelaySeconds</span></code><sup>Optional</sup> <a name="readinessInitialDelaySeconds" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessInitialDelaySeconds" /></a></li>
+<li><a class="reference internal" href="#readinessperiodsecondsoptional"><code class="docutils literal notranslate"><span class="pre">readinessPeriodSeconds</span></code><sup>Optional</sup> <a name="readinessPeriodSeconds" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessPeriodSeconds" /></a></li>
+<li><a class="reference internal" href="#readinesssuccessthresholdoptional"><code class="docutils literal notranslate"><span class="pre">readinessSuccessThreshold</span></code><sup>Optional</sup> <a name="readinessSuccessThreshold" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessSuccessThreshold" /></a></li>
+<li><a class="reference internal" href="#readinesstimeoutsecondsoptional"><code class="docutils literal notranslate"><span class="pre">readinessTimeoutSeconds</span></code><sup>Optional</sup> <a name="readinessTimeoutSeconds" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessTimeoutSeconds" /></a></li>
+<li><a class="reference internal" href="#replicasoptional"><code class="docutils literal notranslate"><span class="pre">replicas</span></code><sup>Optional</sup> <a name="replicas" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.replicas" /></a></li>
+<li><a class="reference internal" href="#requestcpuoptional"><code class="docutils literal notranslate"><span class="pre">requestCpu</span></code><sup>Optional</sup> <a name="requestCpu" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.requestCpu" /></a></li>
+<li><a class="reference internal" href="#requestmemoryoptional"><code class="docutils literal notranslate"><span class="pre">requestMemory</span></code><sup>Optional</sup> <a name="requestMemory" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.requestMemory" /></a></li>
+<li><a class="reference internal" href="#serviceannotationsoptional"><code class="docutils literal notranslate"><span class="pre">serviceAnnotations</span></code><sup>Optional</sup> <a name="serviceAnnotations" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.serviceAnnotations" /></a></li>
+<li><a class="reference internal" href="#servicemonitoroptional"><code class="docutils literal notranslate"><span class="pre">servicemonitor</span></code><sup>Optional</sup> <a name="servicemonitor" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.servicemonitor" /></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#plonehttpcacheoptions">PloneHttpcacheOptions <a name="PloneHttpcacheOptions" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions" /></a><ul>
+<li><a class="reference internal" href="#id12">Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.Initializer" /></a></li>
+<li><a class="reference internal" href="#id13">Properties <a name="Properties" id="Properties" /></a><ul>
+<li><a class="reference internal" href="#plonerequired"><code class="docutils literal notranslate"><span class="pre">plone</span></code><sup>Required</sup> <a name="plone" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.plone" /></a></li>
+<li><a class="reference internal" href="#appversionoptional"><code class="docutils literal notranslate"><span class="pre">appVersion</span></code><sup>Optional</sup> <a name="appVersion" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.appVersion" /></a></li>
+<li><a class="reference internal" href="#chartversionoptional"><code class="docutils literal notranslate"><span class="pre">chartVersion</span></code><sup>Optional</sup> <a name="chartVersion" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.chartVersion" /></a></li>
+<li><a class="reference internal" href="#existingsecretoptional"><code class="docutils literal notranslate"><span class="pre">existingSecret</span></code><sup>Optional</sup> <a name="existingSecret" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.existingSecret" /></a></li>
+<li><a class="reference internal" href="#exporterenabledoptional"><code class="docutils literal notranslate"><span class="pre">exporterEnabled</span></code><sup>Optional</sup> <a name="exporterEnabled" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.exporterEnabled" /></a></li>
+<li><a class="reference internal" href="#id14"><code class="docutils literal notranslate"><span class="pre">limitCpu</span></code><sup>Optional</sup> <a name="limitCpu" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.limitCpu" /></a></li>
+<li><a class="reference internal" href="#id15"><code class="docutils literal notranslate"><span class="pre">limitMemory</span></code><sup>Optional</sup> <a name="limitMemory" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.limitMemory" /></a></li>
+<li><a class="reference internal" href="#id16"><code class="docutils literal notranslate"><span class="pre">replicas</span></code><sup>Optional</sup> <a name="replicas" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.replicas" /></a></li>
+<li><a class="reference internal" href="#id17"><code class="docutils literal notranslate"><span class="pre">requestCpu</span></code><sup>Optional</sup> <a name="requestCpu" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.requestCpu" /></a></li>
+<li><a class="reference internal" href="#id18"><code class="docutils literal notranslate"><span class="pre">requestMemory</span></code><sup>Optional</sup> <a name="requestMemory" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.requestMemory" /></a></li>
+<li><a class="reference internal" href="#id19"><code class="docutils literal notranslate"><span class="pre">servicemonitor</span></code><sup>Optional</sup> <a name="servicemonitor" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.servicemonitor" /></a></li>
+<li><a class="reference internal" href="#varnishvcloptional"><code class="docutils literal notranslate"><span class="pre">varnishVcl</span></code><sup>Optional</sup> <a name="varnishVcl" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.varnishVcl" /></a></li>
+<li><a class="reference internal" href="#varnishvclfileoptional"><code class="docutils literal notranslate"><span class="pre">varnishVclFile</span></code><sup>Optional</sup> <a name="varnishVclFile" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.varnishVclFile" /></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ploneoptions">PloneOptions <a name="PloneOptions" id="@bluedynamics/cdk8s-plone.PloneOptions" /></a><ul>
+<li><a class="reference internal" href="#id20">Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.PloneOptions.Initializer" /></a></li>
+<li><a class="reference internal" href="#id21">Properties <a name="Properties" id="Properties" /></a><ul>
+<li><a class="reference internal" href="#backendoptional"><code class="docutils literal notranslate"><span class="pre">backend</span></code><sup>Optional</sup> <a name="backend" id="@bluedynamics/cdk8s-plone.PloneOptions.property.backend" /></a></li>
+<li><a class="reference internal" href="#frontendoptional"><code class="docutils literal notranslate"><span class="pre">frontend</span></code><sup>Optional</sup> <a name="frontend" id="@bluedynamics/cdk8s-plone.PloneOptions.property.frontend" /></a></li>
+<li><a class="reference internal" href="#imagepullsecretsoptional"><code class="docutils literal notranslate"><span class="pre">imagePullSecrets</span></code><sup>Optional</sup> <a name="imagePullSecrets" id="@bluedynamics/cdk8s-plone.PloneOptions.property.imagePullSecrets" /></a></li>
+<li><a class="reference internal" href="#siteidoptional"><code class="docutils literal notranslate"><span class="pre">siteId</span></code><sup>Optional</sup> <a name="siteId" id="@bluedynamics/cdk8s-plone.PloneOptions.property.siteId" /></a></li>
+<li><a class="reference internal" href="#variantoptional"><code class="docutils literal notranslate"><span class="pre">variant</span></code><sup>Optional</sup> <a name="variant" id="@bluedynamics/cdk8s-plone.PloneOptions.property.variant" /></a></li>
+<li><a class="reference internal" href="#versionoptional"><code class="docutils literal notranslate"><span class="pre">version</span></code><sup>Optional</sup> <a name="version" id="@bluedynamics/cdk8s-plone.PloneOptions.property.version" /></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#enums">Enums <a name="Enums" id="Enums" /></a><ul>
+<li><a class="reference internal" href="#plonevariant">PloneVariant <a name="PloneVariant" id="@bluedynamics/cdk8s-plone.PloneVariant" /></a><ul>
+<li><a class="reference internal" href="#members">Members <a name="Members" id="Members" /></a><ul>
+<li><a class="reference internal" href="#volto"><code class="docutils literal notranslate"><span class="pre">VOLTO</span></code> <a name="VOLTO" id="@bluedynamics/cdk8s-plone.PloneVariant.VOLTO" /></a></li>
+<li><a class="reference internal" href="#classicui"><code class="docutils literal notranslate"><span class="pre">CLASSICUI</span></code> <a name="CLASSICUI" id="@bluedynamics/cdk8s-plone.PloneVariant.CLASSICUI" /></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../../index.html"><span itemprop="name">cdk8s-plone</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">Reference</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">API Reference</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue dark-code" role="main">
+          <section id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">¶</a></h1>
+<p>Complete API reference for cdk8s-plone constructs, generated from TypeScript source code.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>The cdk8s-plone library provides the following main constructs:</p>
+<ul class="simple">
+<li><p><strong>Plone</strong>: Main construct for deploying Plone CMS with support for both Volto (React frontend) and Classic UI variants</p></li>
+<li><p><strong>PloneHttpcache</strong>: HTTP caching layer using Varnish for improved performance</p></li>
+</ul>
+</section>
+<section id="language-support">
+<h2>Language Support<a class="headerlink" href="#language-support" title="Link to this heading">¶</a></h2>
+<p>This API documentation shows TypeScript usage examples. The library is also available for Python via JSII transpilation:</p>
+<ul class="simple">
+<li><p><strong>TypeScript/JavaScript</strong>: <a class="reference external" href="https://www.npmjs.com/package/&#64;bluedynamics/cdk8s-plone"><code class="docutils literal notranslate"><span class="pre">&#64;bluedynamics/cdk8s-plone</span></code></a> on npm</p></li>
+<li><p><strong>Python</strong>: <a class="reference external" href="https://pypi.org/project/cdk8s-plone/"><code class="docutils literal notranslate"><span class="pre">cdk8s-plone</span></code></a> on PyPI</p></li>
+</ul>
+<p>For Python-specific usage, the API remains the same but follows Python naming conventions (snake_case instead of camelCase).</p>
+</section>
+<hr class="docutils" />
+<section id="constructs">
+<h2>Constructs <a name="Constructs" id="Constructs"></a><a class="headerlink" href="#constructs" title="Link to this heading">¶</a></h2>
+<section id="plone">
+<h3>Plone <a name="Plone" id="@bluedynamics/cdk8s-plone.Plone"></a><a class="headerlink" href="#plone" title="Link to this heading">¶</a></h3>
+<p>Plone construct for deploying Plone CMS to Kubernetes.</p>
+<p>This construct creates all necessary Kubernetes resources for running Plone:</p>
+<ul class="simple">
+<li><p>Deployment(s) for backend (and optionally frontend)</p></li>
+<li><p>Service(s) for network access</p></li>
+<li><p>Optional PodDisruptionBudget for high availability</p></li>
+</ul>
+<p>Supports two deployment variants:</p>
+<ul class="simple">
+<li><p>VOLTO: Modern React frontend with REST API backend (default)</p></li>
+<li><p>CLASSICUI: Traditional server-side rendered Plone</p></li>
+</ul>
+<p><em>Example</em></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="ow">new</span><span class="w"> </span><span class="nx">Plone</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;my-plone&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">variant</span><span class="o">:</span><span class="w"> </span><span class="kt">PloneVariant.VOLTO</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="4"><span class="w">    </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;plone/plone-backend:6.0.10&#39;</span><span class="p">,</span>
+</span><span data-line="5"><span class="w">    </span><span class="nx">replicas</span><span class="o">:</span><span class="w"> </span><span class="kt">3</span><span class="p">,</span>
+</span><span data-line="6"><span class="w">  </span><span class="p">},</span>
+</span><span data-line="7"><span class="w">  </span><span class="nx">frontend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="8"><span class="w">    </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;plone/plone-frontend:16.0.0&#39;</span><span class="p">,</span>
+</span><span data-line="9"><span class="w">  </span><span class="p">},</span>
+</span><span data-line="10"><span class="p">});</span>
+</span></pre></div>
+</div>
+<section id="initializers">
+<h4>Initializers <a name="Initializers" id="@bluedynamics/cdk8s-plone.Plone.Initializer"></a><a class="headerlink" href="#initializers" title="Link to this heading">¶</a></h4>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Plone</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@bluedynamics/cdk8s-plone&#39;</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="ow">new</span><span class="w"> </span><span class="nx">Plone</span><span class="p">(</span><span class="nx">scope</span><span class="o">:</span><span class="w"> </span><span class="kt">Construct</span><span class="p">,</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">options?</span><span class="o">:</span><span class="w"> </span><span class="kt">PloneOptions</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Name</strong></p></th>
+<th class="head"><p><strong>Type</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.Plone.Initializer.parameter.scope">scope</a></code></p></td>
+<td><p><code>constructs.Construct</code></p></td>
+<td><p><em>No description.</em></p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.Plone.Initializer.parameter.id">id</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p><em>No description.</em></p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.Plone.Initializer.parameter.options">options</a></code></p></td>
+<td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneOptions">PloneOptions</a></code></p></td>
+<td><p><em>No description.</em></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<section id="scoperequired">
+<h5><code class="docutils literal notranslate"><span class="pre">scope</span></code><sup>Required</sup> <a name="scope" id="@bluedynamics/cdk8s-plone.Plone.Initializer.parameter.scope"></a><a class="headerlink" href="#scoperequired" title="Link to this heading">¶</a></h5>
+<ul class="simple">
+<li><p><em>Type:</em> constructs.Construct</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="idrequired">
+<h5><code class="docutils literal notranslate"><span class="pre">id</span></code><sup>Required</sup> <a name="id" id="@bluedynamics/cdk8s-plone.Plone.Initializer.parameter.id"></a><a class="headerlink" href="#idrequired" title="Link to this heading">¶</a></h5>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="optionsoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">options</span></code><sup>Optional</sup> <a name="options" id="@bluedynamics/cdk8s-plone.Plone.Initializer.parameter.options"></a><a class="headerlink" href="#optionsoptional" title="Link to this heading">¶</a></h5>
+<ul class="simple">
+<li><p><em>Type:</em> <a href="#@bluedynamics/cdk8s-plone.PloneOptions">PloneOptions</a></p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="methods">
+<h4>Methods <a name="Methods" id="Methods"></a><a class="headerlink" href="#methods" title="Link to this heading">¶</a></h4>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Name</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.Plone.toString">toString</a></code></p></td>
+<td><p>Returns a string representation of this construct.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<section id="tostring">
+<h5><code class="docutils literal notranslate"><span class="pre">toString</span></code> <a name="toString" id="@bluedynamics/cdk8s-plone.Plone.toString"></a><a class="headerlink" href="#tostring" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="nx">toString</span><span class="p">()</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span>
+</span></pre></div>
+</div>
+<p>Returns a string representation of this construct.</p>
+</section>
+</section>
+<section id="static-functions">
+<h4>Static Functions <a name="Static Functions" id="Static Functions"></a><a class="headerlink" href="#static-functions" title="Link to this heading">¶</a></h4>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Name</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.Plone.isConstruct">isConstruct</a></code></p></td>
+<td><p>Checks if <code class="docutils literal notranslate"><span class="pre">x</span></code> is a construct.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<section id="isconstruct">
+<h5><code class="docutils literal notranslate"><span class="pre">isConstruct</span></code> <a name="isConstruct" id="@bluedynamics/cdk8s-plone.Plone.isConstruct"></a><a class="headerlink" href="#isconstruct" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Plone</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@bluedynamics/cdk8s-plone&#39;</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="nx">Plone</span><span class="p">.</span><span class="nx">isConstruct</span><span class="p">(</span><span class="nx">x</span><span class="o">:</span><span class="w"> </span><span class="kt">any</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Checks if <code class="docutils literal notranslate"><span class="pre">x</span></code> is a construct.</p>
+<p>Use this method instead of <code class="docutils literal notranslate"><span class="pre">instanceof</span></code> to properly detect <code class="docutils literal notranslate"><span class="pre">Construct</span></code>
+instances, even when the construct library is symlinked.</p>
+<p>Explanation: in JavaScript, multiple copies of the <code class="docutils literal notranslate"><span class="pre">constructs</span></code> library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class <code class="docutils literal notranslate"><span class="pre">Construct</span></code> in each copy of the <code class="docutils literal notranslate"><span class="pre">constructs</span></code> library
+is seen as a different class, and an instance of one class will not test as
+<code class="docutils literal notranslate"><span class="pre">instanceof</span></code> the other class. <code class="docutils literal notranslate"><span class="pre">npm</span> <span class="pre">install</span></code> will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the <code class="docutils literal notranslate"><span class="pre">constructs</span></code>
+library can be accidentally installed, and <code class="docutils literal notranslate"><span class="pre">instanceof</span></code> will behave
+unpredictably. It is safest to avoid using <code class="docutils literal notranslate"><span class="pre">instanceof</span></code>, and using
+this type-testing method instead.</p>
+<section id="xrequired">
+<h6><code class="docutils literal notranslate"><span class="pre">x</span></code><sup>Required</sup> <a name="x" id="@bluedynamics/cdk8s-plone.Plone.isConstruct.parameter.x"></a><a class="headerlink" href="#xrequired" title="Link to this heading">¶</a></h6>
+<ul class="simple">
+<li><p><em>Type:</em> any</p></li>
+</ul>
+<p>Any object.</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="properties">
+<h4>Properties <a name="Properties" id="Properties"></a><a class="headerlink" href="#properties" title="Link to this heading">¶</a></h4>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Name</strong></p></th>
+<th class="head"><p><strong>Type</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.Plone.property.node">node</a></code></p></td>
+<td><p><code>constructs.Node</code></p></td>
+<td><p>The tree node.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.Plone.property.backendServiceName">backendServiceName</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>Name of the backend Kubernetes service.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.Plone.property.siteId">siteId</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>The Plone site ID in ZODB.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.Plone.property.variant">variant</a></code></p></td>
+<td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneVariant">PloneVariant</a></code></p></td>
+<td><p>The deployment variant being used (VOLTO or CLASSICUI).</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.Plone.property.frontendServiceName">frontendServiceName</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>Name of the frontend Kubernetes service.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<section id="noderequired">
+<h5><code class="docutils literal notranslate"><span class="pre">node</span></code><sup>Required</sup> <a name="node" id="@bluedynamics/cdk8s-plone.Plone.property.node"></a><a class="headerlink" href="#noderequired" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">node</span><span class="o">:</span><span class="w"> </span><span class="kt">Node</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> constructs.Node</p></li>
+</ul>
+<p>The tree node.</p>
+</section>
+<hr class="docutils" />
+<section id="backendservicenamerequired">
+<h5><code class="docutils literal notranslate"><span class="pre">backendServiceName</span></code><sup>Required</sup> <a name="backendServiceName" id="@bluedynamics/cdk8s-plone.Plone.property.backendServiceName"></a><a class="headerlink" href="#backendservicenamerequired" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">backendServiceName</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+</ul>
+<p>Name of the backend Kubernetes service.</p>
+<p>Use this to reference the backend service from other constructs.</p>
+</section>
+<hr class="docutils" />
+<section id="siteidrequired">
+<h5><code class="docutils literal notranslate"><span class="pre">siteId</span></code><sup>Required</sup> <a name="siteId" id="@bluedynamics/cdk8s-plone.Plone.property.siteId"></a><a class="headerlink" href="#siteidrequired" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">siteId</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+</ul>
+<p>The Plone site ID in ZODB.</p>
+</section>
+<hr class="docutils" />
+<section id="variantrequired">
+<h5><code class="docutils literal notranslate"><span class="pre">variant</span></code><sup>Required</sup> <a name="variant" id="@bluedynamics/cdk8s-plone.Plone.property.variant"></a><a class="headerlink" href="#variantrequired" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">variant</span><span class="o">:</span><span class="w"> </span><span class="kt">PloneVariant</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> <a href="#@bluedynamics/cdk8s-plone.PloneVariant">PloneVariant</a></p></li>
+</ul>
+<p>The deployment variant being used (VOLTO or CLASSICUI).</p>
+</section>
+<hr class="docutils" />
+<section id="frontendservicenameoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">frontendServiceName</span></code><sup>Optional</sup> <a name="frontendServiceName" id="@bluedynamics/cdk8s-plone.Plone.property.frontendServiceName"></a><a class="headerlink" href="#frontendservicenameoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">frontendServiceName</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+</ul>
+<p>Name of the frontend Kubernetes service.</p>
+<p>Only set when variant is VOLTO, otherwise undefined.</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="plonehttpcache">
+<h3>PloneHttpcache <a name="PloneHttpcache" id="@bluedynamics/cdk8s-plone.PloneHttpcache"></a><a class="headerlink" href="#plonehttpcache" title="Link to this heading">¶</a></h3>
+<p>PloneHttpcache construct for deploying Varnish HTTP caching layer.</p>
+<p>Uses the mittwald/kube-httpcache Helm chart to deploy Varnish as a
+caching proxy in front of Plone backend and/or frontend services.</p>
+<p>The cache automatically connects to the Plone services and provides
+HTTP cache invalidation capabilities.</p>
+<p><em>Example</em></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kd">const</span><span class="w"> </span><span class="nx">plone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Plone</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plone&#39;</span><span class="p">);</span>
+</span><span data-line="2"><span class="kd">const</span><span class="w"> </span><span class="nx">cache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;cache&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">plone</span><span class="o">:</span><span class="w"> </span><span class="kt">plone</span><span class="p">,</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">existingSecret</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;varnish-secret&#39;</span><span class="p">,</span>
+</span><span data-line="5"><span class="p">});</span>
+</span></pre></div>
+</div>
+<section id="id1">
+<h4>Initializers <a name="Initializers" id="@bluedynamics/cdk8s-plone.PloneHttpcache.Initializer"></a><a class="headerlink" href="#id1" title="Link to this heading">¶</a></h4>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@bluedynamics/cdk8s-plone&#39;</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="ow">new</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="p">(</span><span class="nx">scope</span><span class="o">:</span><span class="w"> </span><span class="kt">Construct</span><span class="p">,</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="o">:</span><span class="w"> </span><span class="kt">PloneHttpcacheOptions</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Name</strong></p></th>
+<th class="head"><p><strong>Type</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcache.Initializer.parameter.scope">scope</a></code></p></td>
+<td><p><code>constructs.Construct</code></p></td>
+<td><p><em>No description.</em></p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcache.Initializer.parameter.id">id</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p><em>No description.</em></p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcache.Initializer.parameter.options">options</a></code></p></td>
+<td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions">PloneHttpcacheOptions</a></code></p></td>
+<td><p><em>No description.</em></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<section id="id2">
+<h5><code class="docutils literal notranslate"><span class="pre">scope</span></code><sup>Required</sup> <a name="scope" id="@bluedynamics/cdk8s-plone.PloneHttpcache.Initializer.parameter.scope"></a><a class="headerlink" href="#id2" title="Link to this heading">¶</a></h5>
+<ul class="simple">
+<li><p><em>Type:</em> constructs.Construct</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="id3">
+<h5><code class="docutils literal notranslate"><span class="pre">id</span></code><sup>Required</sup> <a name="id" id="@bluedynamics/cdk8s-plone.PloneHttpcache.Initializer.parameter.id"></a><a class="headerlink" href="#id3" title="Link to this heading">¶</a></h5>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="optionsrequired">
+<h5><code class="docutils literal notranslate"><span class="pre">options</span></code><sup>Required</sup> <a name="options" id="@bluedynamics/cdk8s-plone.PloneHttpcache.Initializer.parameter.options"></a><a class="headerlink" href="#optionsrequired" title="Link to this heading">¶</a></h5>
+<ul class="simple">
+<li><p><em>Type:</em> <a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions">PloneHttpcacheOptions</a></p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="id4">
+<h4>Methods <a name="Methods" id="Methods"></a><a class="headerlink" href="#id4" title="Link to this heading">¶</a></h4>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Name</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcache.toString">toString</a></code></p></td>
+<td><p>Returns a string representation of this construct.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<section id="id5">
+<h5><code class="docutils literal notranslate"><span class="pre">toString</span></code> <a name="toString" id="@bluedynamics/cdk8s-plone.PloneHttpcache.toString"></a><a class="headerlink" href="#id5" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="nx">toString</span><span class="p">()</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span>
+</span></pre></div>
+</div>
+<p>Returns a string representation of this construct.</p>
+</section>
+</section>
+<section id="id6">
+<h4>Static Functions <a name="Static Functions" id="Static Functions"></a><a class="headerlink" href="#id6" title="Link to this heading">¶</a></h4>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Name</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcache.isConstruct">isConstruct</a></code></p></td>
+<td><p>Checks if <code class="docutils literal notranslate"><span class="pre">x</span></code> is a construct.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<section id="id7">
+<h5><code class="docutils literal notranslate"><span class="pre">isConstruct</span></code> <a name="isConstruct" id="@bluedynamics/cdk8s-plone.PloneHttpcache.isConstruct"></a><a class="headerlink" href="#id7" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@bluedynamics/cdk8s-plone&#39;</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="nx">PloneHttpcache</span><span class="p">.</span><span class="nx">isConstruct</span><span class="p">(</span><span class="nx">x</span><span class="o">:</span><span class="w"> </span><span class="kt">any</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Checks if <code class="docutils literal notranslate"><span class="pre">x</span></code> is a construct.</p>
+<p>Use this method instead of <code class="docutils literal notranslate"><span class="pre">instanceof</span></code> to properly detect <code class="docutils literal notranslate"><span class="pre">Construct</span></code>
+instances, even when the construct library is symlinked.</p>
+<p>Explanation: in JavaScript, multiple copies of the <code class="docutils literal notranslate"><span class="pre">constructs</span></code> library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class <code class="docutils literal notranslate"><span class="pre">Construct</span></code> in each copy of the <code class="docutils literal notranslate"><span class="pre">constructs</span></code> library
+is seen as a different class, and an instance of one class will not test as
+<code class="docutils literal notranslate"><span class="pre">instanceof</span></code> the other class. <code class="docutils literal notranslate"><span class="pre">npm</span> <span class="pre">install</span></code> will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the <code class="docutils literal notranslate"><span class="pre">constructs</span></code>
+library can be accidentally installed, and <code class="docutils literal notranslate"><span class="pre">instanceof</span></code> will behave
+unpredictably. It is safest to avoid using <code class="docutils literal notranslate"><span class="pre">instanceof</span></code>, and using
+this type-testing method instead.</p>
+<section id="id8">
+<h6><code class="docutils literal notranslate"><span class="pre">x</span></code><sup>Required</sup> <a name="x" id="@bluedynamics/cdk8s-plone.PloneHttpcache.isConstruct.parameter.x"></a><a class="headerlink" href="#id8" title="Link to this heading">¶</a></h6>
+<ul class="simple">
+<li><p><em>Type:</em> any</p></li>
+</ul>
+<p>Any object.</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="id9">
+<h4>Properties <a name="Properties" id="Properties"></a><a class="headerlink" href="#id9" title="Link to this heading">¶</a></h4>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Name</strong></p></th>
+<th class="head"><p><strong>Type</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcache.property.node">node</a></code></p></td>
+<td><p><code>constructs.Node</code></p></td>
+<td><p>The tree node.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcache.property.httpcacheServiceName">httpcacheServiceName</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>Name of the Varnish service created by the Helm chart.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<section id="id10">
+<h5><code class="docutils literal notranslate"><span class="pre">node</span></code><sup>Required</sup> <a name="node" id="@bluedynamics/cdk8s-plone.PloneHttpcache.property.node"></a><a class="headerlink" href="#id10" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">node</span><span class="o">:</span><span class="w"> </span><span class="kt">Node</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> constructs.Node</p></li>
+</ul>
+<p>The tree node.</p>
+</section>
+<hr class="docutils" />
+<section id="httpcacheservicenamerequired">
+<h5><code class="docutils literal notranslate"><span class="pre">httpcacheServiceName</span></code><sup>Required</sup> <a name="httpcacheServiceName" id="@bluedynamics/cdk8s-plone.PloneHttpcache.property.httpcacheServiceName"></a><a class="headerlink" href="#httpcacheservicenamerequired" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">httpcacheServiceName</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+</ul>
+<p>Name of the Varnish service created by the Helm chart.</p>
+<p>Use this to reference the cache service from ingress or other constructs.</p>
+</section>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="structs">
+<h2>Structs <a name="Structs" id="Structs"></a><a class="headerlink" href="#structs" title="Link to this heading">¶</a></h2>
+<section id="plonebaseoptions">
+<h3>PloneBaseOptions <a name="PloneBaseOptions" id="@bluedynamics/cdk8s-plone.PloneBaseOptions"></a><a class="headerlink" href="#plonebaseoptions" title="Link to this heading">¶</a></h3>
+<p>Base options for Plone backend or frontend configuration.</p>
+<p>These options control container image, replica count, resource limits,
+environment variables, and health probes.</p>
+<section id="initializer">
+<h4>Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.Initializer"></a><a class="headerlink" href="#initializer" title="Link to this heading">¶</a></h4>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">PloneBaseOptions</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@bluedynamics/cdk8s-plone&#39;</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="kd">const</span><span class="w"> </span><span class="nx">ploneBaseOptions</span><span class="o">:</span><span class="w"> </span><span class="kt">PloneBaseOptions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+<section id="id11">
+<h4>Properties <a name="Properties" id="Properties"></a><a class="headerlink" href="#id11" title="Link to this heading">¶</a></h4>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Name</strong></p></th>
+<th class="head"><p><strong>Type</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.annotations">annotations</a></code></p></td>
+<td><p><code>{[ key: string ]: string}</code></p></td>
+<td><p>Annotations to add to the Deployment metadata.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.environment">environment</a></code></p></td>
+<td><p><code>cdk8s-plus-30.Env</code></p></td>
+<td><p>Environment variables to set in the container.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.image">image</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>Container image to use for the deployment.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.imagePullPolicy">imagePullPolicy</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>Image pull policy for the container.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.limitCpu">limitCpu</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>CPU limit for the container.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.limitMemory">limitMemory</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>Memory limit for the container.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.livenessEnabled">livenessEnabled</a></code></p></td>
+<td><p><code>boolean</code></p></td>
+<td><p>Enable liveness probe for the container.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.livenessFailureThreshold">livenessFailureThreshold</a></code></p></td>
+<td><p><code>number</code></p></td>
+<td><p>Minimum consecutive failures for the liveness probe to be considered failed.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.livenessInitialDelaySeconds">livenessInitialDelaySeconds</a></code></p></td>
+<td><p><code>number</code></p></td>
+<td><p>Number of seconds after container start before liveness probe is initiated.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.livenessPeriodSeconds">livenessPeriodSeconds</a></code></p></td>
+<td><p><code>number</code></p></td>
+<td><p>How often (in seconds) to perform the liveness probe.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.livenessSuccessThreshold">livenessSuccessThreshold</a></code></p></td>
+<td><p><code>number</code></p></td>
+<td><p>Minimum consecutive successes for the liveness probe to be considered successful.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.livenessTimeoutSeconds">livenessTimeoutSeconds</a></code></p></td>
+<td><p><code>number</code></p></td>
+<td><p>Number of seconds after which the liveness probe times out.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.maxUnavailable">maxUnavailable</a></code></p></td>
+<td><p><code>string | number</code></p></td>
+<td><p>Maximum number of pods that can be unavailable during updates.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.metricsPath">metricsPath</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>Path to scrape metrics from.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.metricsPort">metricsPort</a></code></p></td>
+<td><p><code>string | number</code></p></td>
+<td><p>Port name or number to scrape metrics from.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.minAvailable">minAvailable</a></code></p></td>
+<td><p><code>string | number</code></p></td>
+<td><p>Minimum number of pods that must be available during updates.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.podAnnotations">podAnnotations</a></code></p></td>
+<td><p><code>{[ key: string ]: string}</code></p></td>
+<td><p>Annotations to add to the Pod template metadata.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessEnabled">readinessEnabled</a></code></p></td>
+<td><p><code>boolean</code></p></td>
+<td><p>Enable readiness probe for the container.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessFailureThreshold">readinessFailureThreshold</a></code></p></td>
+<td><p><code>number</code></p></td>
+<td><p>Minimum consecutive failures for the readiness probe to be considered failed.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessInitialDelaySeconds">readinessInitialDelaySeconds</a></code></p></td>
+<td><p><code>number</code></p></td>
+<td><p>Number of seconds after container start before readiness probe is initiated.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessPeriodSeconds">readinessPeriodSeconds</a></code></p></td>
+<td><p><code>number</code></p></td>
+<td><p>How often (in seconds) to perform the readiness probe.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessSuccessThreshold">readinessSuccessThreshold</a></code></p></td>
+<td><p><code>number</code></p></td>
+<td><p>Minimum consecutive successes for the readiness probe to be considered successful.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessTimeoutSeconds">readinessTimeoutSeconds</a></code></p></td>
+<td><p><code>number</code></p></td>
+<td><p>Number of seconds after which the readiness probe times out.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.replicas">replicas</a></code></p></td>
+<td><p><code>number</code></p></td>
+<td><p>Number of pod replicas to run.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.requestCpu">requestCpu</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>CPU request for the container.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.requestMemory">requestMemory</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>Memory request for the container.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.serviceAnnotations">serviceAnnotations</a></code></p></td>
+<td><p><code>{[ key: string ]: string}</code></p></td>
+<td><p>Annotations to add to the Service metadata.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.servicemonitor">servicemonitor</a></code></p></td>
+<td><p><code>boolean</code></p></td>
+<td><p>Enable Prometheus ServiceMonitor for metrics collection.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<section id="annotationsoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">annotations</span></code><sup>Optional</sup> <a name="annotations" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.annotations"></a><a class="headerlink" href="#annotationsoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">annotations</span><span class="o">:</span><span class="w"> </span><span class="p">{[</span><span class="w"> </span><span class="nx">key</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">]</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">};</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> {[ key: string ]: string}</p></li>
+<li><p><em>Default:</em> no additional annotations</p></li>
+</ul>
+<p>Annotations to add to the Deployment metadata.</p>
+<hr class="docutils" />
+<p><em>Example</em></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="p">{</span><span class="w"> </span><span class="s1">&#39;deployment.kubernetes.io/revision&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;1&#39;</span><span class="w"> </span><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+<section id="environmentoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">environment</span></code><sup>Optional</sup> <a name="environment" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.environment"></a><a class="headerlink" href="#environmentoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">environment</span><span class="o">:</span><span class="w"> </span><span class="kt">Env</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> cdk8s-plus-30.Env</p></li>
+<li><p><em>Default:</em> undefined (no additional environment variables)</p></li>
+</ul>
+<p>Environment variables to set in the container.</p>
+<p>Use cdk8s-plus-30 Env class to define variables and sources.</p>
+</section>
+<hr class="docutils" />
+<section id="imageoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">image</span></code><sup>Optional</sup> <a name="image" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.image"></a><a class="headerlink" href="#imageoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+<li><p><em>Default:</em> ‘plone/plone-backend:latest’ for backend, ‘plone/plone-frontend:latest’ for frontend</p></li>
+</ul>
+<p>Container image to use for the deployment.</p>
+<hr class="docutils" />
+<p><em>Example</em></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="s1">&#39;plone/plone-backend:6.0.10&#39;</span><span class="w"> </span><span class="nx">or</span><span class="w"> </span><span class="s1">&#39;plone/plone-frontend:16.0.0&#39;</span>
+</span></pre></div>
+</div>
+</section>
+<section id="imagepullpolicyoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">imagePullPolicy</span></code><sup>Optional</sup> <a name="imagePullPolicy" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.imagePullPolicy"></a><a class="headerlink" href="#imagepullpolicyoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">imagePullPolicy</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+<li><p><em>Default:</em> ‘IfNotPresent’</p></li>
+</ul>
+<p>Image pull policy for the container.</p>
+</section>
+<hr class="docutils" />
+<section id="limitcpuoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">limitCpu</span></code><sup>Optional</sup> <a name="limitCpu" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.limitCpu"></a><a class="headerlink" href="#limitcpuoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">limitCpu</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+<li><p><em>Default:</em> ‘500m’ for both backend and frontend</p></li>
+</ul>
+<p>CPU limit for the container.</p>
+<hr class="docutils" />
+<p><em>Example</em></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="s1">&#39;500m&#39;</span><span class="w"> </span><span class="nx">or</span><span class="w"> </span><span class="s1">&#39;1&#39;</span><span class="w"> </span><span class="nx">or</span><span class="w"> </span><span class="s1">&#39;2000m&#39;</span>
+</span></pre></div>
+</div>
+</section>
+<section id="limitmemoryoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">limitMemory</span></code><sup>Optional</sup> <a name="limitMemory" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.limitMemory"></a><a class="headerlink" href="#limitmemoryoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">limitMemory</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+<li><p><em>Default:</em> ‘512Mi’ for backend, ‘1Gi’ for frontend</p></li>
+</ul>
+<p>Memory limit for the container.</p>
+<hr class="docutils" />
+<p><em>Example</em></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="s1">&#39;512Mi&#39;</span><span class="w"> </span><span class="nx">or</span><span class="w"> </span><span class="s1">&#39;1Gi&#39;</span>
+</span></pre></div>
+</div>
+</section>
+<section id="livenessenabledoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">livenessEnabled</span></code><sup>Optional</sup> <a name="livenessEnabled" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.livenessEnabled"></a><a class="headerlink" href="#livenessenabledoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">livenessEnabled</span><span class="o">:</span><span class="w"> </span><span class="kt">boolean</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> boolean</p></li>
+<li><p><em>Default:</em> false</p></li>
+</ul>
+<p>Enable liveness probe for the container.</p>
+<p>Liveness probes determine when to restart a container.
+Recommended: true for frontend, false for backend (Zope has its own recovery).</p>
+</section>
+<hr class="docutils" />
+<section id="livenessfailurethresholdoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">livenessFailureThreshold</span></code><sup>Optional</sup> <a name="livenessFailureThreshold" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.livenessFailureThreshold"></a><a class="headerlink" href="#livenessfailurethresholdoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">livenessFailureThreshold</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> number</p></li>
+<li><p><em>Default:</em> 3</p></li>
+</ul>
+<p>Minimum consecutive failures for the liveness probe to be considered failed.</p>
+</section>
+<hr class="docutils" />
+<section id="livenessinitialdelaysecondsoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">livenessInitialDelaySeconds</span></code><sup>Optional</sup> <a name="livenessInitialDelaySeconds" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.livenessInitialDelaySeconds"></a><a class="headerlink" href="#livenessinitialdelaysecondsoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">livenessInitialDelaySeconds</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> number</p></li>
+<li><p><em>Default:</em> 30</p></li>
+</ul>
+<p>Number of seconds after container start before liveness probe is initiated.</p>
+</section>
+<hr class="docutils" />
+<section id="livenessperiodsecondsoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">livenessPeriodSeconds</span></code><sup>Optional</sup> <a name="livenessPeriodSeconds" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.livenessPeriodSeconds"></a><a class="headerlink" href="#livenessperiodsecondsoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">livenessPeriodSeconds</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> number</p></li>
+<li><p><em>Default:</em> 10</p></li>
+</ul>
+<p>How often (in seconds) to perform the liveness probe.</p>
+</section>
+<hr class="docutils" />
+<section id="livenesssuccessthresholdoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">livenessSuccessThreshold</span></code><sup>Optional</sup> <a name="livenessSuccessThreshold" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.livenessSuccessThreshold"></a><a class="headerlink" href="#livenesssuccessthresholdoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">livenessSuccessThreshold</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> number</p></li>
+<li><p><em>Default:</em> 1</p></li>
+</ul>
+<p>Minimum consecutive successes for the liveness probe to be considered successful.</p>
+</section>
+<hr class="docutils" />
+<section id="livenesstimeoutsecondsoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">livenessTimeoutSeconds</span></code><sup>Optional</sup> <a name="livenessTimeoutSeconds" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.livenessTimeoutSeconds"></a><a class="headerlink" href="#livenesstimeoutsecondsoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">livenessTimeoutSeconds</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> number</p></li>
+<li><p><em>Default:</em> 5</p></li>
+</ul>
+<p>Number of seconds after which the liveness probe times out.</p>
+</section>
+<hr class="docutils" />
+<section id="maxunavailableoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">maxUnavailable</span></code><sup>Optional</sup> <a name="maxUnavailable" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.maxUnavailable"></a><a class="headerlink" href="#maxunavailableoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">maxUnavailable</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string | number</p></li>
+<li><p><em>Default:</em> undefined (not set)</p></li>
+</ul>
+<p>Maximum number of pods that can be unavailable during updates.</p>
+<p>Can be an absolute number (e.g., 1) or a percentage (e.g., ‘50%’).
+Used in PodDisruptionBudget if specified.</p>
+</section>
+<hr class="docutils" />
+<section id="metricspathoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">metricsPath</span></code><sup>Optional</sup> <a name="metricsPath" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.metricsPath"></a><a class="headerlink" href="#metricspathoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">metricsPath</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+<li><p><em>Default:</em> ‘/metrics’</p></li>
+</ul>
+<p>Path to scrape metrics from.</p>
+<p>Only used when servicemonitor is enabled.</p>
+</section>
+<hr class="docutils" />
+<section id="metricsportoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">metricsPort</span></code><sup>Optional</sup> <a name="metricsPort" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.metricsPort"></a><a class="headerlink" href="#metricsportoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">metricsPort</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string | number</p></li>
+<li><p><em>Default:</em> uses the main service port</p></li>
+</ul>
+<p>Port name or number to scrape metrics from.</p>
+<p>Only used when servicemonitor is enabled.</p>
+</section>
+<hr class="docutils" />
+<section id="minavailableoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">minAvailable</span></code><sup>Optional</sup> <a name="minAvailable" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.minAvailable"></a><a class="headerlink" href="#minavailableoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">minAvailable</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string | number</p></li>
+<li><p><em>Default:</em> undefined (not set)</p></li>
+</ul>
+<p>Minimum number of pods that must be available during updates.</p>
+<p>Can be an absolute number (e.g., 1) or a percentage (e.g., ‘50%’).
+Used in PodDisruptionBudget if specified.</p>
+</section>
+<hr class="docutils" />
+<section id="podannotationsoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">podAnnotations</span></code><sup>Optional</sup> <a name="podAnnotations" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.podAnnotations"></a><a class="headerlink" href="#podannotationsoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">podAnnotations</span><span class="o">:</span><span class="w"> </span><span class="p">{[</span><span class="w"> </span><span class="nx">key</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">]</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">};</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> {[ key: string ]: string}</p></li>
+<li><p><em>Default:</em> no additional annotations</p></li>
+</ul>
+<p>Annotations to add to the Pod template metadata.</p>
+<p>Common for Prometheus, Istio, backup policies, etc.</p>
+<hr class="docutils" />
+<p><em>Example</em></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="p">{</span><span class="w"> </span><span class="s1">&#39;prometheus.io/scrape&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;true&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;prometheus.io/port&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;8080&#39;</span><span class="w"> </span><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+<section id="readinessenabledoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">readinessEnabled</span></code><sup>Optional</sup> <a name="readinessEnabled" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessEnabled"></a><a class="headerlink" href="#readinessenabledoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">readinessEnabled</span><span class="o">:</span><span class="w"> </span><span class="kt">boolean</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> boolean</p></li>
+<li><p><em>Default:</em> true</p></li>
+</ul>
+<p>Enable readiness probe for the container.</p>
+<p>Readiness probes determine when a container is ready to accept traffic.</p>
+</section>
+<hr class="docutils" />
+<section id="readinessfailurethresholdoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">readinessFailureThreshold</span></code><sup>Optional</sup> <a name="readinessFailureThreshold" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessFailureThreshold"></a><a class="headerlink" href="#readinessfailurethresholdoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">readinessFailureThreshold</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> number</p></li>
+<li><p><em>Default:</em> 3</p></li>
+</ul>
+<p>Minimum consecutive failures for the readiness probe to be considered failed.</p>
+</section>
+<hr class="docutils" />
+<section id="readinessinitialdelaysecondsoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">readinessInitialDelaySeconds</span></code><sup>Optional</sup> <a name="readinessInitialDelaySeconds" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessInitialDelaySeconds"></a><a class="headerlink" href="#readinessinitialdelaysecondsoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">readinessInitialDelaySeconds</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> number</p></li>
+<li><p><em>Default:</em> 10</p></li>
+</ul>
+<p>Number of seconds after container start before readiness probe is initiated.</p>
+</section>
+<hr class="docutils" />
+<section id="readinessperiodsecondsoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">readinessPeriodSeconds</span></code><sup>Optional</sup> <a name="readinessPeriodSeconds" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessPeriodSeconds"></a><a class="headerlink" href="#readinessperiodsecondsoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">readinessPeriodSeconds</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> number</p></li>
+<li><p><em>Default:</em> 10</p></li>
+</ul>
+<p>How often (in seconds) to perform the readiness probe.</p>
+</section>
+<hr class="docutils" />
+<section id="readinesssuccessthresholdoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">readinessSuccessThreshold</span></code><sup>Optional</sup> <a name="readinessSuccessThreshold" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessSuccessThreshold"></a><a class="headerlink" href="#readinesssuccessthresholdoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">readinessSuccessThreshold</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> number</p></li>
+<li><p><em>Default:</em> 1</p></li>
+</ul>
+<p>Minimum consecutive successes for the readiness probe to be considered successful.</p>
+</section>
+<hr class="docutils" />
+<section id="readinesstimeoutsecondsoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">readinessTimeoutSeconds</span></code><sup>Optional</sup> <a name="readinessTimeoutSeconds" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessTimeoutSeconds"></a><a class="headerlink" href="#readinesstimeoutsecondsoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">readinessTimeoutSeconds</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> number</p></li>
+<li><p><em>Default:</em> 15</p></li>
+</ul>
+<p>Number of seconds after which the readiness probe times out.</p>
+</section>
+<hr class="docutils" />
+<section id="replicasoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">replicas</span></code><sup>Optional</sup> <a name="replicas" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.replicas"></a><a class="headerlink" href="#replicasoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">replicas</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> number</p></li>
+<li><p><em>Default:</em> 2</p></li>
+</ul>
+<p>Number of pod replicas to run.</p>
+</section>
+<hr class="docutils" />
+<section id="requestcpuoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">requestCpu</span></code><sup>Optional</sup> <a name="requestCpu" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.requestCpu"></a><a class="headerlink" href="#requestcpuoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">requestCpu</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+<li><p><em>Default:</em> ‘200m’</p></li>
+</ul>
+<p>CPU request for the container.</p>
+<hr class="docutils" />
+<p><em>Example</em></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="s1">&#39;200m&#39;</span><span class="w"> </span><span class="nx">or</span><span class="w"> </span><span class="s1">&#39;0.5&#39;</span>
+</span></pre></div>
+</div>
+</section>
+<section id="requestmemoryoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">requestMemory</span></code><sup>Optional</sup> <a name="requestMemory" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.requestMemory"></a><a class="headerlink" href="#requestmemoryoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">requestMemory</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+<li><p><em>Default:</em> ‘256Mi’</p></li>
+</ul>
+<p>Memory request for the container.</p>
+<hr class="docutils" />
+<p><em>Example</em></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="s1">&#39;256Mi&#39;</span><span class="w"> </span><span class="nx">or</span><span class="w"> </span><span class="s1">&#39;512Mi&#39;</span>
+</span></pre></div>
+</div>
+</section>
+<section id="serviceannotationsoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">serviceAnnotations</span></code><sup>Optional</sup> <a name="serviceAnnotations" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.serviceAnnotations"></a><a class="headerlink" href="#serviceannotationsoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">serviceAnnotations</span><span class="o">:</span><span class="w"> </span><span class="p">{[</span><span class="w"> </span><span class="nx">key</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">]</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">};</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> {[ key: string ]: string}</p></li>
+<li><p><em>Default:</em> no additional annotations</p></li>
+</ul>
+<p>Annotations to add to the Service metadata.</p>
+<p>Common for external-dns, load balancers, service mesh, etc.</p>
+<hr class="docutils" />
+<p><em>Example</em></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="p">{</span><span class="w"> </span><span class="s1">&#39;external-dns.alpha.kubernetes.io/hostname&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;plone.example.com&#39;</span><span class="w"> </span><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+<section id="servicemonitoroptional">
+<h5><code class="docutils literal notranslate"><span class="pre">servicemonitor</span></code><sup>Optional</sup> <a name="servicemonitor" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.servicemonitor"></a><a class="headerlink" href="#servicemonitoroptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">servicemonitor</span><span class="o">:</span><span class="w"> </span><span class="kt">boolean</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> boolean</p></li>
+<li><p><em>Default:</em> false</p></li>
+</ul>
+<p>Enable Prometheus ServiceMonitor for metrics collection.</p>
+<p>Requires Prometheus Operator to be installed in the cluster.
+When enabled, a ServiceMonitor resource will be created to scrape metrics.</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="plonehttpcacheoptions">
+<h3>PloneHttpcacheOptions <a name="PloneHttpcacheOptions" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions"></a><a class="headerlink" href="#plonehttpcacheoptions" title="Link to this heading">¶</a></h3>
+<p>Configuration options for PloneHttpcache (Varnish caching layer).</p>
+<section id="id12">
+<h4>Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.Initializer"></a><a class="headerlink" href="#id12" title="Link to this heading">¶</a></h4>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">PloneHttpcacheOptions</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@bluedynamics/cdk8s-plone&#39;</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="kd">const</span><span class="w"> </span><span class="nx">ploneHttpcacheOptions</span><span class="o">:</span><span class="w"> </span><span class="kt">PloneHttpcacheOptions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+<section id="id13">
+<h4>Properties <a name="Properties" id="Properties"></a><a class="headerlink" href="#id13" title="Link to this heading">¶</a></h4>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Name</strong></p></th>
+<th class="head"><p><strong>Type</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.plone">plone</a></code></p></td>
+<td><p><code><a href="#@bluedynamics/cdk8s-plone.Plone">Plone</a></code></p></td>
+<td><p>The Plone construct to attach the HTTP cache to.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.appVersion">appVersion</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>Version of the kube-httpcache Container Image to use.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.chartVersion">chartVersion</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>Version of the kube-httpcache Helm chart to use.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.existingSecret">existingSecret</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>Name of an existing Kubernetes secret containing Varnish admin credentials.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.exporterEnabled">exporterEnabled</a></code></p></td>
+<td><p><code>boolean</code></p></td>
+<td><p>Enable the Prometheus exporter for Varnish metrics.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.limitCpu">limitCpu</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>CPU limit for Varnish pods.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.limitMemory">limitMemory</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>Memory limit for Varnish pods.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.replicas">replicas</a></code></p></td>
+<td><p><code>number</code></p></td>
+<td><p>Number of Varnish pod replicas to run.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.requestCpu">requestCpu</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>CPU request for Varnish pods.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.requestMemory">requestMemory</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>Memory request for Varnish pods.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.servicemonitor">servicemonitor</a></code></p></td>
+<td><p><code>boolean</code></p></td>
+<td><p>Enable Prometheus ServiceMonitor for metrics collection.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.varnishVcl">varnishVcl</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>Varnish VCL configuration as a string.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.varnishVclFile">varnishVclFile</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>Path to a Varnish VCL configuration file.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<section id="plonerequired">
+<h5><code class="docutils literal notranslate"><span class="pre">plone</span></code><sup>Required</sup> <a name="plone" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.plone"></a><a class="headerlink" href="#plonerequired" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">plone</span><span class="o">:</span><span class="w"> </span><span class="kt">Plone</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> <a href="#@bluedynamics/cdk8s-plone.Plone">Plone</a></p></li>
+</ul>
+<p>The Plone construct to attach the HTTP cache to.</p>
+<p>The cache will automatically connect to the backend and frontend services.</p>
+</section>
+<hr class="docutils" />
+<section id="appversionoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">appVersion</span></code><sup>Optional</sup> <a name="appVersion" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.appVersion"></a><a class="headerlink" href="#appversionoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">appVersion</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+<li><p><em>Default:</em> undefined (chartVersion = with each chart release there is an image release too )</p></li>
+</ul>
+<p>Version of the kube-httpcache Container Image to use.</p>
+<p>If not specified, the latest version from the repository will be used.</p>
+</section>
+<hr class="docutils" />
+<section id="chartversionoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">chartVersion</span></code><sup>Optional</sup> <a name="chartVersion" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.chartVersion"></a><a class="headerlink" href="#chartversionoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">chartVersion</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+<li><p><em>Default:</em> undefined (latest)</p></li>
+</ul>
+<p>Version of the kube-httpcache Helm chart to use.</p>
+<p>If not specified, the latest version from the repository will be used.</p>
+</section>
+<hr class="docutils" />
+<section id="existingsecretoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">existingSecret</span></code><sup>Optional</sup> <a name="existingSecret" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.existingSecret"></a><a class="headerlink" href="#existingsecretoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">existingSecret</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+<li><p><em>Default:</em> undefined (no existing secret)</p></li>
+</ul>
+<p>Name of an existing Kubernetes secret containing Varnish admin credentials.</p>
+<p>The secret should be created separately in the same namespace.</p>
+</section>
+<hr class="docutils" />
+<section id="exporterenabledoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">exporterEnabled</span></code><sup>Optional</sup> <a name="exporterEnabled" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.exporterEnabled"></a><a class="headerlink" href="#exporterenabledoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">exporterEnabled</span><span class="o">:</span><span class="w"> </span><span class="kt">boolean</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> boolean</p></li>
+<li><p><em>Default:</em> true</p></li>
+</ul>
+<p>Enable the Prometheus exporter for Varnish metrics.</p>
+<p>When enabled, the exporter sidecar container will be deployed alongside Varnish.</p>
+</section>
+<hr class="docutils" />
+<section id="id14">
+<h5><code class="docutils literal notranslate"><span class="pre">limitCpu</span></code><sup>Optional</sup> <a name="limitCpu" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.limitCpu"></a><a class="headerlink" href="#id14" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">limitCpu</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+<li><p><em>Default:</em> ‘500m’</p></li>
+</ul>
+<p>CPU limit for Varnish pods.</p>
+</section>
+<hr class="docutils" />
+<section id="id15">
+<h5><code class="docutils literal notranslate"><span class="pre">limitMemory</span></code><sup>Optional</sup> <a name="limitMemory" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.limitMemory"></a><a class="headerlink" href="#id15" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">limitMemory</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+<li><p><em>Default:</em> ‘500Mi’</p></li>
+</ul>
+<p>Memory limit for Varnish pods.</p>
+</section>
+<hr class="docutils" />
+<section id="id16">
+<h5><code class="docutils literal notranslate"><span class="pre">replicas</span></code><sup>Optional</sup> <a name="replicas" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.replicas"></a><a class="headerlink" href="#id16" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">replicas</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> number</p></li>
+<li><p><em>Default:</em> 2</p></li>
+</ul>
+<p>Number of Varnish pod replicas to run.</p>
+</section>
+<hr class="docutils" />
+<section id="id17">
+<h5><code class="docutils literal notranslate"><span class="pre">requestCpu</span></code><sup>Optional</sup> <a name="requestCpu" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.requestCpu"></a><a class="headerlink" href="#id17" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">requestCpu</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+<li><p><em>Default:</em> ‘100m’</p></li>
+</ul>
+<p>CPU request for Varnish pods.</p>
+</section>
+<hr class="docutils" />
+<section id="id18">
+<h5><code class="docutils literal notranslate"><span class="pre">requestMemory</span></code><sup>Optional</sup> <a name="requestMemory" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.requestMemory"></a><a class="headerlink" href="#id18" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">requestMemory</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+<li><p><em>Default:</em> ‘100Mi’</p></li>
+</ul>
+<p>Memory request for Varnish pods.</p>
+</section>
+<hr class="docutils" />
+<section id="id19">
+<h5><code class="docutils literal notranslate"><span class="pre">servicemonitor</span></code><sup>Optional</sup> <a name="servicemonitor" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.servicemonitor"></a><a class="headerlink" href="#id19" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">servicemonitor</span><span class="o">:</span><span class="w"> </span><span class="kt">boolean</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> boolean</p></li>
+<li><p><em>Default:</em> false</p></li>
+</ul>
+<p>Enable Prometheus ServiceMonitor for metrics collection.</p>
+<p>Requires Prometheus Operator to be installed in the cluster.</p>
+</section>
+<hr class="docutils" />
+<section id="varnishvcloptional">
+<h5><code class="docutils literal notranslate"><span class="pre">varnishVcl</span></code><sup>Optional</sup> <a name="varnishVcl" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.varnishVcl"></a><a class="headerlink" href="#varnishvcloptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">varnishVcl</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+<li><p><em>Default:</em> loaded from varnishVclFile or default config file</p></li>
+</ul>
+<p>Varnish VCL configuration as a string.</p>
+<p>If provided, this takes precedence over varnishVclFile.</p>
+</section>
+<hr class="docutils" />
+<section id="varnishvclfileoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">varnishVclFile</span></code><sup>Optional</sup> <a name="varnishVclFile" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.varnishVclFile"></a><a class="headerlink" href="#varnishvclfileoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">varnishVclFile</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+<li><p><em>Default:</em> uses default config/varnish.tpl.vcl</p></li>
+</ul>
+<p>Path to a Varnish VCL configuration file.</p>
+<p>If not provided, uses the default VCL file included in the library.</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ploneoptions">
+<h3>PloneOptions <a name="PloneOptions" id="@bluedynamics/cdk8s-plone.PloneOptions"></a><a class="headerlink" href="#ploneoptions" title="Link to this heading">¶</a></h3>
+<p>Main configuration options for Plone deployment.</p>
+<section id="id20">
+<h4>Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.PloneOptions.Initializer"></a><a class="headerlink" href="#id20" title="Link to this heading">¶</a></h4>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">PloneOptions</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@bluedynamics/cdk8s-plone&#39;</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="kd">const</span><span class="w"> </span><span class="nx">ploneOptions</span><span class="o">:</span><span class="w"> </span><span class="kt">PloneOptions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+<section id="id21">
+<h4>Properties <a name="Properties" id="Properties"></a><a class="headerlink" href="#id21" title="Link to this heading">¶</a></h4>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Name</strong></p></th>
+<th class="head"><p><strong>Type</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneOptions.property.backend">backend</a></code></p></td>
+<td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions">PloneBaseOptions</a></code></p></td>
+<td><p>Backend (Plone API) configuration.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneOptions.property.frontend">frontend</a></code></p></td>
+<td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions">PloneBaseOptions</a></code></p></td>
+<td><p>Frontend (Volto) configuration.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneOptions.property.imagePullSecrets">imagePullSecrets</a></code></p></td>
+<td><p><code>string[]</code></p></td>
+<td><p>Names of Kubernetes secrets to use for pulling private container images.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneOptions.property.siteId">siteId</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>Plone site ID in the ZODB.</p></td>
+</tr>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneOptions.property.variant">variant</a></code></p></td>
+<td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneVariant">PloneVariant</a></code></p></td>
+<td><p>Plone deployment variant to use.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneOptions.property.version">version</a></code></p></td>
+<td><p><code>string</code></p></td>
+<td><p>Version string for labeling the deployment.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<section id="backendoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">backend</span></code><sup>Optional</sup> <a name="backend" id="@bluedynamics/cdk8s-plone.PloneOptions.property.backend"></a><a class="headerlink" href="#backendoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="kt">PloneBaseOptions</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> <a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions">PloneBaseOptions</a></p></li>
+<li><p><em>Default:</em> {} (uses default values from PloneBaseOptions)</p></li>
+</ul>
+<p>Backend (Plone API) configuration.</p>
+</section>
+<hr class="docutils" />
+<section id="frontendoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">frontend</span></code><sup>Optional</sup> <a name="frontend" id="@bluedynamics/cdk8s-plone.PloneOptions.property.frontend"></a><a class="headerlink" href="#frontendoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">frontend</span><span class="o">:</span><span class="w"> </span><span class="kt">PloneBaseOptions</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> <a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions">PloneBaseOptions</a></p></li>
+<li><p><em>Default:</em> {} (uses default values from PloneBaseOptions)</p></li>
+</ul>
+<p>Frontend (Volto) configuration.</p>
+<p>Only used when variant is PloneVariant.VOLTO.</p>
+</section>
+<hr class="docutils" />
+<section id="imagepullsecretsoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">imagePullSecrets</span></code><sup>Optional</sup> <a name="imagePullSecrets" id="@bluedynamics/cdk8s-plone.PloneOptions.property.imagePullSecrets"></a><a class="headerlink" href="#imagepullsecretsoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">imagePullSecrets</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">[];</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string[]</p></li>
+<li><p><em>Default:</em> [] (no image pull secrets)</p></li>
+</ul>
+<p>Names of Kubernetes secrets to use for pulling private container images.</p>
+<p>These secrets must exist in the same namespace as the deployment.</p>
+<hr class="docutils" />
+<p><em>Example</em></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="p">[</span><span class="s1">&#39;my-registry-secret&#39;</span><span class="p">]</span>
+</span></pre></div>
+</div>
+</section>
+<section id="siteidoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">siteId</span></code><sup>Optional</sup> <a name="siteId" id="@bluedynamics/cdk8s-plone.PloneOptions.property.siteId"></a><a class="headerlink" href="#siteidoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">siteId</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+<li><p><em>Default:</em> ‘Plone’</p></li>
+</ul>
+<p>Plone site ID in the ZODB.</p>
+<p>This is used to construct the internal API path for Volto frontend.</p>
+</section>
+<hr class="docutils" />
+<section id="variantoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">variant</span></code><sup>Optional</sup> <a name="variant" id="@bluedynamics/cdk8s-plone.PloneOptions.property.variant"></a><a class="headerlink" href="#variantoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">variant</span><span class="o">:</span><span class="w"> </span><span class="kt">PloneVariant</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> <a href="#@bluedynamics/cdk8s-plone.PloneVariant">PloneVariant</a></p></li>
+<li><p><em>Default:</em> PloneVariant.VOLTO</p></li>
+</ul>
+<p>Plone deployment variant to use.</p>
+</section>
+<hr class="docutils" />
+<section id="versionoptional">
+<h5><code class="docutils literal notranslate"><span class="pre">version</span></code><sup>Optional</sup> <a name="version" id="@bluedynamics/cdk8s-plone.PloneOptions.property.version"></a><a class="headerlink" href="#versionoptional" title="Link to this heading">¶</a></h5>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">public</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="nx">version</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p><em>Type:</em> string</p></li>
+<li><p><em>Default:</em> ‘undefined’</p></li>
+</ul>
+<p>Version string for labeling the deployment.</p>
+<p>This is used in Kubernetes labels and doesn’t affect the actual image versions.</p>
+</section>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="enums">
+<h2>Enums <a name="Enums" id="Enums"></a><a class="headerlink" href="#enums" title="Link to this heading">¶</a></h2>
+<section id="plonevariant">
+<h3>PloneVariant <a name="PloneVariant" id="@bluedynamics/cdk8s-plone.PloneVariant"></a><a class="headerlink" href="#plonevariant" title="Link to this heading">¶</a></h3>
+<p>Plone deployment variants.</p>
+<section id="members">
+<h4>Members <a name="Members" id="Members"></a><a class="headerlink" href="#members" title="Link to this heading">¶</a></h4>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Name</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneVariant.VOLTO">VOLTO</a></code></p></td>
+<td><p>Volto variant: ReactJS frontend (Volto) with REST API backend.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code><a href="#@bluedynamics/cdk8s-plone.PloneVariant.CLASSICUI">CLASSICUI</a></code></p></td>
+<td><p>Classic UI variant: Traditional Plone with server-side rendering.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<section id="volto">
+<h5><code class="docutils literal notranslate"><span class="pre">VOLTO</span></code> <a name="VOLTO" id="@bluedynamics/cdk8s-plone.PloneVariant.VOLTO"></a><a class="headerlink" href="#volto" title="Link to this heading">¶</a></h5>
+<p>Volto variant: ReactJS frontend (Volto) with REST API backend.</p>
+<p>Deploys both frontend and backend services.</p>
+</section>
+<hr class="docutils" />
+<section id="classicui">
+<h5><code class="docutils literal notranslate"><span class="pre">CLASSICUI</span></code> <a name="CLASSICUI" id="@bluedynamics/cdk8s-plone.PloneVariant.CLASSICUI"></a><a class="headerlink" href="#classicui" title="Link to this heading">¶</a></h5>
+<p>Classic UI variant: Traditional Plone with server-side rendering.</p>
+<p>Deploys only the backend service.</p>
+<hr class="docutils" />
+<p><em>This API reference is automatically generated from the TypeScript source code. For the latest version, run <code class="docutils literal notranslate"><span class="pre">npx</span> <span class="pre">projen</span> <span class="pre">docgen</span></code> in the project root.</em></p>
+</section>
+</section>
+</section>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="../configuration-options.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Configuration Options</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="../../explanation/index.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Explanation</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024-2025, Blue Dynamics Alliance</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials"></div>
+    </div>
+  </div>
+</footer>
+      <script src="../../_static/documentation_options.js?v=bafade30"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+      <script src="../../_static/shibuya.js?v=c1cf1a6b"></script>
+      <script src="../../_static/logo-fix.js?v=7f36b008"></script></body>
+</html>

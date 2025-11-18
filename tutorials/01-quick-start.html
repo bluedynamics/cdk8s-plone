@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Quick Start - cdk8s-plone 0.1.10 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="How-To Guides" href="../how-to/index.html" /><link rel="prev" title="Tutorials" href="index.html" />
+      <link rel="canonical" href="https://bluedynamics.github.io/cdk8s-plone/tutorials/01-quick-start.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=14737038" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/brand-theme.css?v=a3a78658" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom-icons.css?v=77ce15dc" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://bluedynamics.github.io/cdk8s-plone/tutorials/01-quick-start.html"/>
+  <meta property="og:title" content="Quick Start"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="/">
+      <img class="light-logo" src="../_static/kup6s-icon-plone.svg" alt="cdk8s-plone" height="28" loading="lazy" />
+      <img class="dark-logo" src="../_static/kup6s-icon-plone.svg" alt="cdk8s-plone" height="28" loading="lazy" />
+      <strong>cdk8s-plone</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials"></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Quick Start</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../how-to/index.html">How-To Guides</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/setup-prerequisites.html">Setup Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/deploy-production-volto.html">Deploy Production Volto Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/deploy-classic-ui.html">Deploy Classic UI Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configuration-options.html">Configuration Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/api/index.html">API Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Explanation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/features.html">Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/architecture.html">Architecture Overview</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#step-1-create-a-cdk8s-project">Step 1: Create a CDK8S Project</a></li>
+<li><a class="reference internal" href="#step-2-install-cdk8s-plone">Step 2: Install cdk8s-plone</a></li>
+<li><a class="reference internal" href="#step-3-create-a-basic-plone-deployment">Step 3: Create a Basic Plone Deployment</a></li>
+<li><a class="reference internal" href="#step-4-generate-kubernetes-manifests">Step 4: Generate Kubernetes Manifests</a></li>
+<li><a class="reference internal" href="#step-5-deploy-to-kubernetes">Step 5: Deploy to Kubernetes</a></li>
+<li><a class="reference internal" href="#step-6-access-your-plone-site">Step 6: Access Your Plone Site</a></li>
+<li><a class="reference internal" href="#adding-http-caching-optional">Adding HTTP Caching (Optional)</a></li>
+<li><a class="reference internal" href="#next-steps">Next Steps</a></li>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">cdk8s-plone</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">Tutorials</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Quick Start</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue dark-code" role="main">
+          <section id="quick-start">
+<h1>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h1>
+<p>This tutorial will guide you through deploying your first Plone instance using cdk8s-plone.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">¶</a></h2>
+<p>Before you start, ensure you have:</p>
+<ul class="simple">
+<li><p><strong>Node.js 16+</strong> and npm installed</p></li>
+<li><p><strong>kubectl</strong> configured to access your Kubernetes cluster</p></li>
+<li><p>Basic familiarity with Kubernetes and TypeScript</p></li>
+<li><p>A Kubernetes cluster (local or remote)</p></li>
+</ul>
+<p>For detailed prerequisites, see <a class="reference internal" href="../how-to/setup-prerequisites.html"><span class="std std-doc">Setup Prerequisites</span></a>.</p>
+</section>
+<section id="step-1-create-a-cdk8s-project">
+<h2>Step 1: Create a CDK8S Project<a class="headerlink" href="#step-1-create-a-cdk8s-project" title="Link to this heading">¶</a></h2>
+<p>Create a new CDK8S TypeScript project:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Create project directory</span>
+</span><span data-line="2">mkdir<span class="w"> </span>my-plone-deployment
+</span><span data-line="3"><span class="nb">cd</span><span class="w"> </span>my-plone-deployment
+</span><span data-line="4">
+</span><span data-line="5"><span class="c1"># Initialize CDK8S project</span>
+</span><span data-line="6">cdk8s<span class="w"> </span>init<span class="w"> </span>typescript-app
+</span></pre></div>
+</div>
+<p>This creates a basic CDK8S project structure.</p>
+</section>
+<section id="step-2-install-cdk8s-plone">
+<h2>Step 2: Install cdk8s-plone<a class="headerlink" href="#step-2-install-cdk8s-plone" title="Link to this heading">¶</a></h2>
+<p>Install the cdk8s-plone library:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">npm<span class="w"> </span>install<span class="w"> </span>@bluedynamics/cdk8s-plone
+</span></pre></div>
+</div>
+<p>The library is also available for Python via PyPI:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">pip<span class="w"> </span>install<span class="w"> </span>cdk8s-plone
+</span></pre></div>
+</div>
+</section>
+<section id="step-3-create-a-basic-plone-deployment">
+<h2>Step 3: Create a Basic Plone Deployment<a class="headerlink" href="#step-3-create-a-basic-plone-deployment" title="Link to this heading">¶</a></h2>
+<p>Edit <code class="docutils literal notranslate"><span class="pre">main.ts</span></code> with the following code:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">App</span><span class="p">,</span><span class="w"> </span><span class="nx">Chart</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;cdk8s&#39;</span><span class="p">;</span>
+</span><span data-line="2"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Plone</span><span class="p">,</span><span class="w"> </span><span class="nx">PloneVariant</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@bluedynamics/cdk8s-plone&#39;</span><span class="p">;</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="kd">const</span><span class="w"> </span><span class="nx">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">App</span><span class="p">();</span>
+</span><span data-line="5"><span class="kd">const</span><span class="w"> </span><span class="nx">chart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Chart</span><span class="p">(</span><span class="nx">app</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;PloneDeployment&#39;</span><span class="p">);</span>
+</span><span data-line="6">
+</span><span data-line="7"><span class="ow">new</span><span class="w"> </span><span class="nx">Plone</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;my-plone&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="8"><span class="w">  </span><span class="nx">variant</span><span class="o">:</span><span class="w"> </span><span class="kt">PloneVariant.VOLTO</span><span class="p">,</span>
+</span><span data-line="9"><span class="w">  </span><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="10"><span class="w">    </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;plone/plone-backend:6.1.3&#39;</span><span class="p">,</span>
+</span><span data-line="11"><span class="w">    </span><span class="nx">replicas</span><span class="o">:</span><span class="w"> </span><span class="kt">3</span><span class="p">,</span>
+</span><span data-line="12"><span class="w">  </span><span class="p">},</span>
+</span><span data-line="13"><span class="w">  </span><span class="nx">frontend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="14"><span class="w">    </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;plone/plone-frontend:16.0.0&#39;</span><span class="p">,</span>
+</span><span data-line="15"><span class="w">    </span><span class="nx">replicas</span><span class="o">:</span><span class="w"> </span><span class="kt">2</span><span class="p">,</span>
+</span><span data-line="16"><span class="w">  </span><span class="p">},</span>
+</span><span data-line="17"><span class="p">});</span>
+</span><span data-line="18">
+</span><span data-line="19"><span class="nx">app</span><span class="p">.</span><span class="nx">synth</span><span class="p">();</span>
+</span></pre></div>
+</div>
+<p>This creates:</p>
+<ul class="simple">
+<li><p>A Plone backend with 3 replicas</p></li>
+<li><p>A Volto frontend with 2 replicas</p></li>
+<li><p>All necessary Kubernetes services and deployments</p></li>
+</ul>
+</section>
+<section id="step-4-generate-kubernetes-manifests">
+<h2>Step 4: Generate Kubernetes Manifests<a class="headerlink" href="#step-4-generate-kubernetes-manifests" title="Link to this heading">¶</a></h2>
+<p>Generate the Kubernetes manifests:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">cdk8s<span class="w"> </span>synth
+</span></pre></div>
+</div>
+<p>This creates YAML files in the <code class="docutils literal notranslate"><span class="pre">dist/</span></code> directory containing all Kubernetes resources.</p>
+</section>
+<section id="step-5-deploy-to-kubernetes">
+<h2>Step 5: Deploy to Kubernetes<a class="headerlink" href="#step-5-deploy-to-kubernetes" title="Link to this heading">¶</a></h2>
+<p>Apply the generated manifests to your cluster:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>dist/
+</span></pre></div>
+</div>
+<p>Check the deployment status:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectl<span class="w"> </span>get<span class="w"> </span>pods
+</span><span data-line="2">kubectl<span class="w"> </span>get<span class="w"> </span>services
+</span></pre></div>
+</div>
+</section>
+<section id="step-6-access-your-plone-site">
+<h2>Step 6: Access Your Plone Site<a class="headerlink" href="#step-6-access-your-plone-site" title="Link to this heading">¶</a></h2>
+<p>Once all pods are running, access your Plone site:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Port-forward to the frontend service</span>
+</span><span data-line="2">kubectl<span class="w"> </span>port-forward<span class="w"> </span>service/my-plone-frontend<span class="w"> </span><span class="m">3000</span>:3000
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># Open in browser</span>
+</span><span data-line="5">open<span class="w"> </span>http://localhost:3000
+</span></pre></div>
+</div>
+</section>
+<section id="adding-http-caching-optional">
+<h2>Adding HTTP Caching (Optional)<a class="headerlink" href="#adding-http-caching-optional" title="Link to this heading">¶</a></h2>
+<p>For production deployments, add Varnish HTTP caching:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@bluedynamics/cdk8s-plone&#39;</span><span class="p">;</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="kd">const</span><span class="w"> </span><span class="nx">plone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Plone</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;my-plone&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">variant</span><span class="o">:</span><span class="w"> </span><span class="kt">PloneVariant.VOLTO</span><span class="p">,</span>
+</span><span data-line="5"><span class="w">  </span><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;plone/plone-backend:6.1.3&#39;</span><span class="w"> </span><span class="p">},</span>
+</span><span data-line="6"><span class="w">  </span><span class="nx">frontend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;plone/plone-frontend:16.0.0&#39;</span><span class="w"> </span><span class="p">},</span>
+</span><span data-line="7"><span class="p">});</span>
+</span><span data-line="8">
+</span><span data-line="9"><span class="ow">new</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;cache&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="10"><span class="w">  </span><span class="nx">plone</span><span class="o">:</span><span class="w"> </span><span class="kt">plone</span><span class="p">,</span>
+</span><span data-line="11"><span class="w">  </span><span class="nx">existingSecret</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;varnish-secret&#39;</span><span class="p">,</span>
+</span><span data-line="12"><span class="w">  </span><span class="nx">replicas</span><span class="o">:</span><span class="w"> </span><span class="kt">2</span><span class="p">,</span>
+</span><span data-line="13"><span class="p">});</span>
+</span></pre></div>
+</div>
+<p>This adds a Varnish caching layer with cluster-wide cache invalidation using <a class="reference external" href="https://github.com/mittwald/kube-httpcache">kube-httpcache</a>.</p>
+</section>
+<section id="next-steps">
+<h2>Next Steps<a class="headerlink" href="#next-steps" title="Link to this heading">¶</a></h2>
+<p>Now that you have a basic Plone deployment:</p>
+<ul class="simple">
+<li><p><strong>Configure resources</strong>: See <a class="reference internal" href="#../how-to/scale-resources.md"><span class="xref myst">Scale Resources</span></a> to adjust CPU and memory</p></li>
+<li><p><strong>Add monitoring</strong>: Configure <a class="reference internal" href="#../how-to/configure-monitoring.md"><span class="xref myst">Prometheus metrics</span></a></p></li>
+<li><p><strong>Explore variants</strong>: Learn about <a class="reference internal" href="#../explanation/plone-variants.md"><span class="xref myst">Classic UI vs Volto</span></a></p></li>
+</ul>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">¶</a></h2>
+<p><strong>Pods not starting?</strong></p>
+<ul class="simple">
+<li><p>Check pod logs: <code class="docutils literal notranslate"><span class="pre">kubectl</span> <span class="pre">logs</span> <span class="pre">&lt;pod-name&gt;</span></code></p></li>
+<li><p>Verify images are accessible: <code class="docutils literal notranslate"><span class="pre">kubectl</span> <span class="pre">describe</span> <span class="pre">pod</span> <span class="pre">&lt;pod-name&gt;</span></code></p></li>
+</ul>
+<p><strong>Can’t access the site?</strong></p>
+<ul class="simple">
+<li><p>Ensure port-forward is running</p></li>
+<li><p>Check service endpoints: <code class="docutils literal notranslate"><span class="pre">kubectl</span> <span class="pre">get</span> <span class="pre">endpoints</span></code></p></li>
+</ul>
+<p>For more help, see the <a class="reference internal" href="#../how-to/troubleshooting.md"><span class="xref myst">Troubleshooting guide</span></a>.</p>
+<hr class="docutils" />
+<p><strong>Complete example</strong>: See the <a class="reference external" href="https://github.com/bluedynamics/cdk8s-plone-example">cdk8s-plone-example</a> repository for a full working example.</p>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="index.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Tutorials</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="../how-to/index.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">How-To Guides</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024-2025, Blue Dynamics Alliance</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials"></div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=bafade30"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script src="../_static/shibuya.js?v=c1cf1a6b"></script>
+      <script src="../_static/logo-fix.js?v=7f36b008"></script></body>
+</html>

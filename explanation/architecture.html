@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Architecture Overview - cdk8s-plone 0.1.10 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="prev" title="Features" href="features.html" />
+      <link rel="canonical" href="https://bluedynamics.github.io/cdk8s-plone/explanation/architecture.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=14737038" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="stylesheet" type="text/css" href="../_static/brand-theme.css?v=a3a78658" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom-icons.css?v=77ce15dc" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://bluedynamics.github.io/cdk8s-plone/explanation/architecture.html"/>
+  <meta property="og:title" content="Architecture Overview"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="/">
+      <img class="light-logo" src="../_static/kup6s-icon-plone.svg" alt="cdk8s-plone" height="28" loading="lazy" />
+      <img class="dark-logo" src="../_static/kup6s-icon-plone.svg" alt="cdk8s-plone" height="28" loading="lazy" />
+      <strong>cdk8s-plone</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials"></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/01-quick-start.html">Quick Start</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../how-to/index.html">How-To Guides</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/setup-prerequisites.html">Setup Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/deploy-production-volto.html">Deploy Production Volto Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/deploy-classic-ui.html">Deploy Classic UI Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configuration-options.html">Configuration Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/api/index.html">API Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Explanation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Architecture Overview</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#key-features">Key Features</a><ul>
+<li><a class="reference internal" href="#deployment-variants">Deployment Variants</a></li>
+<li><a class="reference internal" href="#high-availability">High Availability</a></li>
+<li><a class="reference internal" href="#http-caching-layer">HTTP Caching Layer</a></li>
+<li><a class="reference internal" href="#multi-language-support">Multi-Language Support</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#architecture-diagram">Architecture Diagram</a></li>
+<li><a class="reference internal" href="#component-responsibilities">Component Responsibilities</a><ul>
+<li><a class="reference internal" href="#backend">Backend</a></li>
+<li><a class="reference internal" href="#frontend-volto">Frontend (Volto)</a></li>
+<li><a class="reference internal" href="#http-cache-varnish">HTTP Cache (Varnish)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#kubernetes-resources-created">Kubernetes Resources Created</a></li>
+<li><a class="reference internal" href="#design-decisions">Design Decisions</a><ul>
+<li><a class="reference internal" href="#cdk8s-constructs">CDK8S Constructs</a></li>
+<li><a class="reference internal" href="#separate-frontend-backend">Separate Frontend/Backend</a></li>
+<li><a class="reference internal" href="#optional-varnish-layer">Optional Varnish Layer</a></li>
+<li><a class="reference internal" href="#health-probes">Health Probes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#production-considerations">Production Considerations</a><ul>
+<li><a class="reference internal" href="#resource-planning">Resource Planning</a></li>
+<li><a class="reference internal" href="#id1">High Availability</a></li>
+<li><a class="reference internal" href="#monitoring">Monitoring</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">cdk8s-plone</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">Explanation</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Architecture Overview</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue dark-code" role="main">
+          <section id="architecture-overview">
+<h1>Architecture Overview<a class="headerlink" href="#architecture-overview" title="Link to this heading">¶</a></h1>
+<p>Understanding the architecture and design of cdk8s-plone deployments.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>cdk8s-plone provides CDK8S constructs for deploying Plone CMS on Kubernetes. The library handles all Kubernetes resources needed for a production-grade Plone deployment.</p>
+</section>
+<section id="key-features">
+<h2>Key Features<a class="headerlink" href="#key-features" title="Link to this heading">¶</a></h2>
+<section id="deployment-variants">
+<h3>Deployment Variants<a class="headerlink" href="#deployment-variants" title="Link to this heading">¶</a></h3>
+<p>cdk8s-plone supports two deployment variants:</p>
+<p><strong>Volto (Modern)</strong></p>
+<ul class="simple">
+<li><p>React-based frontend (Volto)</p></li>
+<li><p>REST API backend (Plone)</p></li>
+<li><p>Separate services for frontend and backend</p></li>
+<li><p>Modern user experience</p></li>
+<li><p>Headless CMS architecture</p></li>
+</ul>
+<p><strong>Classic UI (Traditional)</strong></p>
+<ul class="simple">
+<li><p>Server-side rendered Plone</p></li>
+<li><p>Single integrated service</p></li>
+<li><p>Traditional Plone experience</p></li>
+<li><p>Simpler deployment model</p></li>
+</ul>
+</section>
+<section id="high-availability">
+<h3>High Availability<a class="headerlink" href="#high-availability" title="Link to this heading">¶</a></h3>
+<p><strong>Replica Management</strong></p>
+<ul class="simple">
+<li><p>Configurable number of replicas for backend and frontend</p></li>
+<li><p>Default: 2 replicas for each component</p></li>
+<li><p>Supports horizontal scaling</p></li>
+</ul>
+<p><strong>Pod Disruption Budgets</strong></p>
+<ul class="simple">
+<li><p>Ensures minimum availability during cluster operations</p></li>
+<li><p>Configurable <code class="docutils literal notranslate"><span class="pre">minAvailable</span></code> and <code class="docutils literal notranslate"><span class="pre">maxUnavailable</span></code> thresholds</p></li>
+<li><p>Protects against voluntary disruptions (node drains, updates)</p></li>
+</ul>
+<p><strong>Health Probes</strong></p>
+<ul class="simple">
+<li><p>Readiness probes: Traffic routing only to healthy pods</p></li>
+<li><p>Liveness probes: Automatic restart of unhealthy pods</p></li>
+<li><p>Configurable delays, timeouts, and thresholds</p></li>
+</ul>
+</section>
+<section id="http-caching-layer">
+<h3>HTTP Caching Layer<a class="headerlink" href="#http-caching-layer" title="Link to this heading">¶</a></h3>
+<p><strong>Varnish Integration</strong></p>
+<ul class="simple">
+<li><p>Uses <a class="reference external" href="https://github.com/mittwald/kube-httpcache">kube-httpcache</a> Helm chart</p></li>
+<li><p>Cluster-wide cache invalidation</p></li>
+<li><p>HTTP/2 support</p></li>
+<li><p>Configurable VCL</p></li>
+<li><p>Prometheus metrics export</p></li>
+</ul>
+<p><strong>Benefits</strong></p>
+<ul class="simple">
+<li><p>Reduced backend load</p></li>
+<li><p>Improved response times</p></li>
+<li><p>Better scalability</p></li>
+<li><p>Automatic cache invalidation on content changes</p></li>
+</ul>
+</section>
+<section id="multi-language-support">
+<h3>Multi-Language Support<a class="headerlink" href="#multi-language-support" title="Link to this heading">¶</a></h3>
+<p>The library is published in multiple languages:</p>
+<p><strong>TypeScript/JavaScript</strong></p>
+<ul class="simple">
+<li><p>Native CDK8S experience</p></li>
+<li><p>Full TypeScript types</p></li>
+<li><p>Published to npm: <code class="docutils literal notranslate"><span class="pre">&#64;bluedynamics/cdk8s-plone</span></code></p></li>
+</ul>
+<p><strong>Python</strong></p>
+<ul class="simple">
+<li><p>JSII-generated Python bindings</p></li>
+<li><p>Pythonic API</p></li>
+<li><p>Published to PyPI: <code class="docutils literal notranslate"><span class="pre">cdk8s-plone</span></code></p></li>
+</ul>
+</section>
+</section>
+<section id="architecture-diagram">
+<h2>Architecture Diagram<a class="headerlink" href="#architecture-diagram" title="Link to this heading">¶</a></h2>
+<pre  class="mermaid">
+        graph TB
+    subgraph &quot;External Access&quot;
+        Client[Client/Browser]
+        Ingress[Ingress Controller]
+    end
+
+    subgraph &quot;HTTP Cache Layer (Optional)&quot;
+        Varnish[Varnish Cache&lt;br/&gt;kube-httpcache]
+    end
+
+    subgraph &quot;Plone Frontend (Volto)&quot;
+        FrontendSvc[Frontend Service]
+        Frontend1[Frontend Pod 1]
+        Frontend2[Frontend Pod 2]
+    end
+
+    subgraph &quot;Plone Backend (API)&quot;
+        BackendSvc[Backend Service]
+        Backend1[Backend Pod 1]
+        Backend2[Backend Pod 2]
+        Backend3[Backend Pod 3]
+    end
+
+    subgraph &quot;Data Layer&quot;
+        DB[(External Database&lt;br/&gt;PostgreSQL/MySQL/Oracle&lt;br/&gt;with RelStorage)]
+    end
+
+    Client --&gt; Ingress
+    Ingress --&gt; Varnish
+    Varnish -.cache miss.-&gt; FrontendSvc
+    Varnish -.invalidation.-&gt; BackendSvc
+
+    FrontendSvc --&gt; Frontend1
+    FrontendSvc --&gt; Frontend2
+
+    Frontend1 --&gt; BackendSvc
+    Frontend2 --&gt; BackendSvc
+
+    BackendSvc --&gt; Backend1
+    BackendSvc --&gt; Backend2
+    BackendSvc --&gt; Backend3
+
+    Backend1 --&gt; DB
+    Backend2 --&gt; DB
+    Backend3 --&gt; DB
+    </pre></section>
+<section id="component-responsibilities">
+<h2>Component Responsibilities<a class="headerlink" href="#component-responsibilities" title="Link to this heading">¶</a></h2>
+<section id="backend">
+<h3>Backend<a class="headerlink" href="#backend" title="Link to this heading">¶</a></h3>
+<p><strong>Responsibilities:</strong></p>
+<ul class="simple">
+<li><p>Plone REST API</p></li>
+<li><p>Content management</p></li>
+<li><p>ZODB with RelStorage (external database)</p></li>
+<li><p>Search indexing</p></li>
+<li><p>Workflow engine</p></li>
+</ul>
+<p><strong>Resources:</strong></p>
+<ul class="simple">
+<li><p>CPU: Compute-intensive operations (catalog queries, indexing)</p></li>
+<li><p>Memory: ZODB cache, Python processes</p></li>
+<li><p>Storage: Delegated to external database (PostgreSQL/MySQL/Oracle)</p></li>
+</ul>
+<p><strong>Scaling:</strong></p>
+<ul class="simple">
+<li><p>Horizontal: Add replicas for read scalability with RelStorage</p></li>
+<li><p>Vertical: Increase resources for large catalogs</p></li>
+<li><p>External database handles storage and multi-writer scenarios</p></li>
+</ul>
+</section>
+<section id="frontend-volto">
+<h3>Frontend (Volto)<a class="headerlink" href="#frontend-volto" title="Link to this heading">¶</a></h3>
+<p><strong>Responsibilities:</strong></p>
+<ul class="simple">
+<li><p>React single-page application</p></li>
+<li><p>Server-side rendering (SSR)</p></li>
+<li><p>API client</p></li>
+<li><p>User interface</p></li>
+</ul>
+<p><strong>Resources:</strong></p>
+<ul class="simple">
+<li><p>CPU: SSR rendering, JavaScript execution</p></li>
+<li><p>Memory: Node.js processes, SSR caching</p></li>
+<li><p>Storage: Minimal (build artifacts only)</p></li>
+</ul>
+<p><strong>Scaling:</strong></p>
+<ul class="simple">
+<li><p>Horizontal: Add replicas for traffic handling</p></li>
+<li><p>Vertical: Increase resources for SSR performance</p></li>
+<li><p>No shared storage needed (stateless)</p></li>
+</ul>
+</section>
+<section id="http-cache-varnish">
+<h3>HTTP Cache (Varnish)<a class="headerlink" href="#http-cache-varnish" title="Link to this heading">¶</a></h3>
+<p><strong>Responsibilities:</strong></p>
+<ul class="simple">
+<li><p>HTTP caching</p></li>
+<li><p>Cache invalidation</p></li>
+<li><p>Request routing</p></li>
+<li><p>Load distribution</p></li>
+</ul>
+<p><strong>Resources:</strong></p>
+<ul class="simple">
+<li><p>CPU: Request processing, cache lookup</p></li>
+<li><p>Memory: Cache storage</p></li>
+<li><p>Storage: Not required (in-memory cache)</p></li>
+</ul>
+<p><strong>Scaling:</strong></p>
+<ul class="simple">
+<li><p>Horizontal: Add replicas for cache distribution</p></li>
+<li><p>Vertical: Increase memory for larger cache</p></li>
+</ul>
+</section>
+</section>
+<section id="kubernetes-resources-created">
+<h2>Kubernetes Resources Created<a class="headerlink" href="#kubernetes-resources-created" title="Link to this heading">¶</a></h2>
+<p>For a typical Volto deployment, cdk8s-plone creates:</p>
+<p><strong>Backend:</strong></p>
+<ul class="simple">
+<li><p>Deployment (backend pods)</p></li>
+<li><p>Service (internal)</p></li>
+<li><p>PodDisruptionBudget (optional)</p></li>
+<li><p>ConfigMap (optional, for configuration)</p></li>
+</ul>
+<p><strong>Frontend:</strong></p>
+<ul class="simple">
+<li><p>Deployment (frontend pods)</p></li>
+<li><p>Service (internal)</p></li>
+<li><p>PodDisruptionBudget (optional)</p></li>
+</ul>
+<p><strong>HTTP Cache (optional):</strong></p>
+<ul class="simple">
+<li><p>StatefulSet (Varnish pods)</p></li>
+<li><p>Service (entry point)</p></li>
+<li><p>ConfigMap (VCL configuration)</p></li>
+<li><p>Secret (admin credentials)</p></li>
+<li><p>ServiceMonitor (optional, for Prometheus)</p></li>
+</ul>
+</section>
+<section id="design-decisions">
+<h2>Design Decisions<a class="headerlink" href="#design-decisions" title="Link to this heading">¶</a></h2>
+<section id="cdk8s-constructs">
+<h3>CDK8S Constructs<a class="headerlink" href="#cdk8s-constructs" title="Link to this heading">¶</a></h3>
+<p><strong>Why CDK8S?</strong></p>
+<ul class="simple">
+<li><p>Type-safe infrastructure as code</p></li>
+<li><p>Reusable components</p></li>
+<li><p>Familiar programming languages</p></li>
+<li><p>No templating required</p></li>
+<li><p>IDE support and IntelliSense</p></li>
+</ul>
+<p><strong>Benefits:</strong></p>
+<ul class="simple">
+<li><p>Reduced boilerplate</p></li>
+<li><p>Better error detection</p></li>
+<li><p>Easier testing</p></li>
+<li><p>Composition over configuration</p></li>
+</ul>
+</section>
+<section id="separate-frontend-backend">
+<h3>Separate Frontend/Backend<a class="headerlink" href="#separate-frontend-backend" title="Link to this heading">¶</a></h3>
+<p><strong>Volto Architecture:</strong></p>
+<ul class="simple">
+<li><p>Independent scaling of frontend and backend</p></li>
+<li><p>Frontend can be restarted without affecting backend</p></li>
+<li><p>Better resource utilization</p></li>
+<li><p>Clear separation of concerns</p></li>
+</ul>
+<p><strong>When to use Classic UI:</strong></p>
+<ul class="simple">
+<li><p>Simpler deployment model</p></li>
+<li><p>Lower resource requirements</p></li>
+<li><p>Legacy integrations</p></li>
+<li><p>Specific add-on requirements</p></li>
+</ul>
+</section>
+<section id="optional-varnish-layer">
+<h3>Optional Varnish Layer<a class="headerlink" href="#optional-varnish-layer" title="Link to this heading">¶</a></h3>
+<p><strong>Design Choice:</strong></p>
+<ul class="simple">
+<li><p>Varnish is optional, not mandatory</p></li>
+<li><p>Uses established Helm chart (kube-httpcache)</p></li>
+<li><p>Cluster-wide cache invalidation</p></li>
+<li><p>Production-tested solution</p></li>
+</ul>
+<p><strong>Trade-offs:</strong></p>
+<ul class="simple">
+<li><p>Additional complexity</p></li>
+<li><p>More resources required</p></li>
+<li><p>Better performance at scale</p></li>
+<li><p>Reduced backend load</p></li>
+</ul>
+</section>
+<section id="health-probes">
+<h3>Health Probes<a class="headerlink" href="#health-probes" title="Link to this heading">¶</a></h3>
+<p><strong>Readiness Probe:</strong></p>
+<ul class="simple">
+<li><p>Enabled by default for backend</p></li>
+<li><p>Prevents traffic to unready pods</p></li>
+<li><p>Fast startup detection</p></li>
+</ul>
+<p><strong>Liveness Probe:</strong></p>
+<ul class="simple">
+<li><p>Disabled by default for backend (Plone is resilient)</p></li>
+<li><p>Recommended enabled for frontend (detect SSR hangs)</p></li>
+<li><p>Configurable thresholds</p></li>
+</ul>
+</section>
+</section>
+<section id="production-considerations">
+<h2>Production Considerations<a class="headerlink" href="#production-considerations" title="Link to this heading">¶</a></h2>
+<section id="resource-planning">
+<h3>Resource Planning<a class="headerlink" href="#resource-planning" title="Link to this heading">¶</a></h3>
+<p><strong>Backend:</strong></p>
+<ul class="simple">
+<li><p>Plan for catalog size and query complexity</p></li>
+<li><p>ZODB cache size affects memory needs</p></li>
+<li><p>Indexing operations are CPU-intensive</p></li>
+</ul>
+<p><strong>Frontend:</strong></p>
+<ul class="simple">
+<li><p>SSR requires CPU resources</p></li>
+<li><p>Memory for Node.js processes</p></li>
+<li><p>Scale based on traffic patterns</p></li>
+</ul>
+<p><strong>Cache:</strong></p>
+<ul class="simple">
+<li><p>Memory size determines cache capacity</p></li>
+<li><p>Monitor hit rates and adjust sizing</p></li>
+</ul>
+</section>
+<section id="id1">
+<h3>High Availability<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<p><strong>Recommendations:</strong></p>
+<ul class="simple">
+<li><p>Minimum 2 replicas per component</p></li>
+<li><p>Configure PodDisruptionBudgets</p></li>
+<li><p>Use node affinity for distribution</p></li>
+<li><p>Enable health probes</p></li>
+</ul>
+<p><strong>Database:</strong></p>
+<ul class="simple">
+<li><p>External database required (PostgreSQL, MySQL, or Oracle)</p></li>
+<li><p>Uses RelStorage for ZODB persistence</p></li>
+<li><p>Enables true multi-writer deployments</p></li>
+<li><p>Better backup and recovery options</p></li>
+<li><p>MySQL derivatives (MariaDB, Percona) and Oracle are supported but untested</p></li>
+</ul>
+</section>
+<section id="monitoring">
+<h3>Monitoring<a class="headerlink" href="#monitoring" title="Link to this heading">¶</a></h3>
+<p><strong>Metrics to Track:</strong></p>
+<ul class="simple">
+<li><p>Pod resource usage (CPU, memory)</p></li>
+<li><p>Request rates and latencies</p></li>
+<li><p>Cache hit rates</p></li>
+<li><p>Error rates</p></li>
+<li><p>Health probe failures</p></li>
+</ul>
+<p><strong>Tools:</strong></p>
+<ul class="simple">
+<li><p>Prometheus for metrics collection</p></li>
+<li><p>Grafana for visualization</p></li>
+<li><p>Kubernetes events monitoring</p></li>
+</ul>
+</section>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="#plone-variants.md"><span class="xref myst">Plone Variants</span></a> - Detailed comparison of Volto vs Classic UI</p></li>
+<li><p><a class="reference internal" href="#scaling-patterns.md"><span class="xref myst">Scaling Patterns</span></a> - Horizontal and vertical scaling strategies</p></li>
+<li><p><a class="reference internal" href="../reference/configuration-options.html"><span class="std std-doc">Configuration Options</span></a> - Complete configuration reference</p></li>
+<li><p><a class="reference internal" href="../tutorials/01-quick-start.html"><span class="std std-doc">Quick Start</span></a> - Getting started tutorial</p></li>
+</ul>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="features.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Features</div></div>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024-2025, Blue Dynamics Alliance</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials"></div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=bafade30"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script src="../_static/shibuya.js?v=c1cf1a6b"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+      <script src="../_static/logo-fix.js?v=7f36b008"></script></body>
+</html>
