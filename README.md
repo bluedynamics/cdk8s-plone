@@ -73,7 +73,20 @@ kubectl apply -f dist/
 
 ## Examples
 
-See the [cdk8s-plone-example](https://github.com/bluedynamics/cdk8s-plone-example) repository for complete working examples.
+Complete working examples are available in the [`examples/`](examples/) directory:
+
+- **[Production Volto](examples/production-volto/)** - Production-ready Plone 6 deployment with modern UI:
+  - Volto frontend (React) + REST API backend
+  - PostgreSQL with RelStorage (CloudNativePG or Bitnami)
+  - Varnish HTTP caching with kube-httpcache
+  - Ingress support (Traefik/Kong) with TLS
+
+- **[Classic UI](examples/classic-ui/)** - Traditional Plone deployment with server-side rendering:
+  - Classic UI (traditional Plone interface)
+  - PostgreSQL with RelStorage (CloudNativePG or Bitnami)
+  - Varnish HTTP caching with kube-httpcache
+  - Ingress support (Traefik/Kong) with TLS
+  - Simpler architecture (no separate frontend)
 
 ### Prometheus Metrics
 
@@ -128,7 +141,7 @@ For detailed development instructions, see [CONTRIBUTING.md](./CONTRIBUTING.md) 
 - [CDK8S Documentation](https://cdk8s.io/)
 - [Plone CMS](https://plone.org/)
 - [kube-httpcache](https://github.com/mittwald/kube-httpcache) (for HTTP caching)
-- [Example Project](https://github.com/bluedynamics/cdk8s-plone-example)
+- [CloudNativePG](https://cloudnative-pg.io/) (for PostgreSQL management)
 
 ## License
 
