@@ -21,6 +21,19 @@ titlesonly: true
 setup-prerequisites
 ```
 
+## Deployment
+
+**Deploy complete Plone examples to your Kubernetes cluster:**
+
+```{toctree}
+---
+maxdepth: 1
+titlesonly: true
+---
+deploy-production-volto
+deploy-classic-ui
+```
+
 ## Configuration
 
 ```{toctree}
