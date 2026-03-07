@@ -36,6 +36,7 @@ const project = new cdk.JsiiProject({
   //   moduleName: 'github.com/bluedynamics/cdk8s-plone-go',
   // },
   npmProvenance: true,
+  npmTrustedPublishing: true,
   npmAccess: NpmAccess.PUBLIC,
   depsUpgradeOptions: {
     workflowOptions: {
@@ -78,10 +79,9 @@ if (releaseWorkflow) {
     '*.md',
     '.github/workflows/documentation.yml',
   ]);
-  // Use OIDC trusted publishing for npm instead of NPM_TOKEN
+  // npm OIDC trusted publishing needs Node 24+ and the 'release' environment
   releaseWorkflow.patch(JsonPatch.add('/jobs/release_npm/environment', 'release'));
-  releaseWorkflow.patch(JsonPatch.remove('/jobs/release_npm/steps/9/env/NPM_TOKEN'));
-  releaseWorkflow.patch(JsonPatch.add('/jobs/release_npm/steps/9/env/NPM_TRUSTED_PUBLISHER', 'true'));
+  releaseWorkflow.patch(JsonPatch.replace('/jobs/release_npm/steps/0/with/node-version', '24.x'));
 }
 
 project.synth();
