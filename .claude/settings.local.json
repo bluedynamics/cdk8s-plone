@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(echo $?)",
+      "Bash(find:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(git add:*)",
+      "Bash(git checkout:*)",
+      "Bash(git cherry-pick:*)",
+      "Bash(git commit:*)",
+      "Bash(git log:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(git push)",
+      "Bash(git stash:*)",
+      "Bash(make docs:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run compile:*)",
+      "Bash(npm test:*)",
+      "Bash(npx projen:*)",
+      "Bash(nvm use:*)",
+      "Bash(source:*)",
+      "Bash(yarn install)",
+      "Bash(npm run test-update:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

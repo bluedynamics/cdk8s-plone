@@ -69,7 +69,7 @@ project.addTask('import:servicemonitor', {
 //   upgradeMain.addOverride('jobs.pr.steps.4.with.token', '${{ github.token }}');
 // }
 
-// Configure release workflow to skip documentation-only changes
+// Configure release workflow to skip documentation and examples changes
 const releaseWorkflow = project.tryFindObjectFile('.github/workflows/release.yml');
 if (releaseWorkflow) {
   releaseWorkflow.addOverride('on.push.paths-ignore', [
