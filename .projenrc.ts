@@ -79,9 +79,11 @@ if (releaseWorkflow) {
     '*.md',
     '.github/workflows/documentation.yml',
   ]);
-  // npm OIDC trusted publishing needs Node 24+ and the 'release' environment
+  // npm OIDC trusted publishing needs Node 24+, the 'release' environment,
+  // and registry-url so setup-node creates .npmrc for OIDC auth
   releaseWorkflow.patch(JsonPatch.add('/jobs/release_npm/environment', 'release'));
   releaseWorkflow.patch(JsonPatch.replace('/jobs/release_npm/steps/0/with/node-version', '24.x'));
+  releaseWorkflow.patch(JsonPatch.add('/jobs/release_npm/steps/0/with/registry-url', 'https://registry.npmjs.org'));
 }
 
 project.synth();
