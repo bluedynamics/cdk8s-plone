@@ -80,6 +80,8 @@ if (releaseWorkflow) {
   ]);
   // Use OIDC trusted publishing for npm instead of NPM_TOKEN
   releaseWorkflow.patch(JsonPatch.add('/jobs/release_npm/environment', 'release'));
+  releaseWorkflow.patch(JsonPatch.remove('/jobs/release_npm/steps/9/env/NPM_TOKEN'));
+  releaseWorkflow.patch(JsonPatch.add('/jobs/release_npm/steps/9/env/NPM_TRUSTED_PUBLISHER', 'true'));
 }
 
 project.synth();
