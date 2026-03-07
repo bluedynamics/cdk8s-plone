@@ -78,6 +78,8 @@ if (releaseWorkflow) {
     '*.md',
     '.github/workflows/documentation.yml',
   ]);
+  // Use OIDC trusted publishing for npm instead of NPM_TOKEN
+  releaseWorkflow.patch(JsonPatch.add('/jobs/release_npm/environment', 'release'));
 }
 
 project.synth();
