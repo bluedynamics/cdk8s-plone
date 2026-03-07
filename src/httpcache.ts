@@ -5,6 +5,21 @@ import { Construct } from 'constructs';
 import { Plone } from './plone';
 
 /**
+ * An environment variable to pass to the kube-httpcache container.
+ */
+export interface HttpcacheEnvVar {
+  /**
+   * The name of the environment variable.
+   */
+  readonly name: string;
+
+  /**
+   * The value of the environment variable.
+   */
+  readonly value: string;
+}
+
+/**
  * Configuration options for PloneHttpcache (Varnish caching layer).
  */
 export interface PloneHttpcacheOptions {
@@ -92,6 +107,14 @@ export interface PloneHttpcacheOptions {
    * @default 2
    */
   readonly replicas?: number;
+
+  /**
+   * Additional environment variables to pass to the kube-httpcache container.
+   * These are appended to the built-in env vars (BACKEND_SERVICE_NAME, etc.)
+   * and can be referenced in VCL templates using Go template syntax: {{ .Env.VAR_NAME }}
+   * @default - no additional env vars
+   */
+  readonly extraEnvVars?: HttpcacheEnvVar[];
 }
 
 /**
@@ -153,6 +176,7 @@ export class PloneHttpcache extends Construct {
           { name: 'BACKEND_SITE_ID', value: options.plone.siteId },
           { name: 'FRONTEND_SERVICE_NAME', value: options.plone.frontendServiceName },
           { name: 'FRONTEND_SERVICE_PORT', value: '3000' },
+          ...(options.extraEnvVars ?? []),
         ],
         // see https://github.com/mittwald/kube-httpcache/issues/253
         nodeSelector: {

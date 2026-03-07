@@ -62,3 +62,29 @@ test('with custom appVersion', () => {
   // THEN
   expect(Testing.synth(chart)).toMatchSnapshot();
 });
+
+test('with extra env vars', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const plone = new Plone(chart, 'plone');
+
+  // WHEN
+  new PloneHttpcache(
+    chart,
+    'test',
+    {
+      plone: plone,
+      varnishVcl: 'test-extra-env',
+      existingSecret: 'testsecret',
+      extraEnvVars: [
+        { name: 'THUMBOR_SERVICE_NAME', value: 'my-thumbor' },
+        { name: 'CUSTOM_VAR', value: 'custom-value' },
+      ],
+    },
+  );
+
+  // THEN
+  const manifest = Testing.synth(chart);
+  expect(manifest).toMatchSnapshot();
+});

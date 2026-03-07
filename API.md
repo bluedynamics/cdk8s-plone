@@ -391,6 +391,51 @@ Use this to reference the cache service from ingress or other constructs.
 
 ## Structs <a name="Structs" id="Structs"></a>
 
+### HttpcacheEnvVar <a name="HttpcacheEnvVar" id="@bluedynamics/cdk8s-plone.HttpcacheEnvVar"></a>
+
+An environment variable to pass to the kube-httpcache container.
+
+#### Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.HttpcacheEnvVar.Initializer"></a>
+
+```typescript
+import { HttpcacheEnvVar } from '@bluedynamics/cdk8s-plone'
+
+const httpcacheEnvVar: HttpcacheEnvVar = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#@bluedynamics/cdk8s-plone.HttpcacheEnvVar.property.name">name</a></code> | <code>string</code> | The name of the environment variable. |
+| <code><a href="#@bluedynamics/cdk8s-plone.HttpcacheEnvVar.property.value">value</a></code> | <code>string</code> | The value of the environment variable. |
+
+---
+
+##### `name`<sup>Required</sup> <a name="name" id="@bluedynamics/cdk8s-plone.HttpcacheEnvVar.property.name"></a>
+
+```typescript
+public readonly name: string;
+```
+
+- *Type:* string
+
+The name of the environment variable.
+
+---
+
+##### `value`<sup>Required</sup> <a name="value" id="@bluedynamics/cdk8s-plone.HttpcacheEnvVar.property.value"></a>
+
+```typescript
+public readonly value: string;
+```
+
+- *Type:* string
+
+The value of the environment variable.
+
+---
+
 ### PloneBaseOptions <a name="PloneBaseOptions" id="@bluedynamics/cdk8s-plone.PloneBaseOptions"></a>
 
 Base options for Plone backend or frontend configuration.
@@ -906,6 +951,7 @@ const ploneHttpcacheOptions: PloneHttpcacheOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.chartVersion">chartVersion</a></code> | <code>string</code> | Version of the kube-httpcache Helm chart to use. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.existingSecret">existingSecret</a></code> | <code>string</code> | Name of an existing Kubernetes secret containing Varnish admin credentials. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.exporterEnabled">exporterEnabled</a></code> | <code>boolean</code> | Enable the Prometheus exporter for Varnish metrics. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.extraEnvVars">extraEnvVars</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.HttpcacheEnvVar">HttpcacheEnvVar</a>[]</code> | Additional environment variables to pass to the kube-httpcache container. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.limitCpu">limitCpu</a></code> | <code>string</code> | CPU limit for Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.limitMemory">limitMemory</a></code> | <code>string</code> | Memory limit for Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.replicas">replicas</a></code> | <code>number</code> | Number of Varnish pod replicas to run. |
@@ -988,6 +1034,22 @@ public readonly exporterEnabled: boolean;
 Enable the Prometheus exporter for Varnish metrics.
 
 When enabled, the exporter sidecar container will be deployed alongside Varnish.
+
+---
+
+##### `extraEnvVars`<sup>Optional</sup> <a name="extraEnvVars" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.extraEnvVars"></a>
+
+```typescript
+public readonly extraEnvVars: HttpcacheEnvVar[];
+```
+
+- *Type:* <a href="#@bluedynamics/cdk8s-plone.HttpcacheEnvVar">HttpcacheEnvVar</a>[]
+- *Default:* no additional env vars
+
+Additional environment variables to pass to the kube-httpcache container.
+
+These are appended to the built-in env vars (BACKEND_SERVICE_NAME, etc.)
+and can be referenced in VCL templates using Go template syntax: {{ .Env.VAR_NAME }}
 
 ---
 

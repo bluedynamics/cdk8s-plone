@@ -239,6 +239,7 @@ Configuration for the Varnish HTTP cache layer.
 | `servicemonitor` | `boolean` | No | `false` | Enable Prometheus ServiceMonitor |
 | `exporterEnabled` | `boolean` | No | `true` | Enable Prometheus exporter sidecar |
 | `chartVersion` | `string` | No | latest | kube-httpcache Helm chart version |
+| `extraEnvVars` | `HttpcacheEnvVar[]` | No | - | Additional env vars for kube-httpcache container |
 
 **Example:**
 ```typescript
@@ -273,6 +274,21 @@ new PloneHttpcache(chart, 'cache', {
 new PloneHttpcache(chart, 'cache', {
   plone: ploneInstance,
   varnishVclFile: './varnish/default.vcl',
+});
+```
+
+**Extra Environment Variables:**
+
+Pass additional environment variables to the kube-httpcache container.
+These are appended to the built-in env vars (`BACKEND_SERVICE_NAME`, `BACKEND_SERVICE_PORT`, `BACKEND_SITE_ID`, `FRONTEND_SERVICE_NAME`, `FRONTEND_SERVICE_PORT`) and can be referenced in VCL templates using Go template syntax `{{ .Env.VAR_NAME }}`.
+
+```typescript
+new PloneHttpcache(chart, 'cache', {
+  plone: ploneInstance,
+  varnishVclFile: './config/custom-varnish.tpl.vcl',
+  extraEnvVars: [
+    { name: 'THUMBOR_SERVICE_NAME', value: 'my-thumbor-service' },
+  ],
 });
 ```
 

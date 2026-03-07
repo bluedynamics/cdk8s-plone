@@ -1,2 +1,2 @@
 export { Plone, PloneOptions, PloneBaseOptions, PloneVariant } from './plone';
-export { PloneHttpcache, PloneHttpcacheOptions } from './httpcache';
+export { PloneHttpcache, PloneHttpcacheOptions, HttpcacheEnvVar } from './httpcache';
