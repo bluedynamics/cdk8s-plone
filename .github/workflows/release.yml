@@ -127,6 +127,7 @@ jobs:
           NPM_CONFIG_PROVENANCE: "true"
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx -p publib@latest publib-npm
+    environment: release
   release_pypi:
     name: Publish to PyPI
     needs: release
