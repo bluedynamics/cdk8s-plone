@@ -20,6 +20,34 @@ export interface HttpcacheEnvVar {
 }
 
 /**
+ * A Kubernetes toleration for the Varnish pods.
+ */
+export interface HttpcacheToleration {
+  /**
+   * The taint key to tolerate.
+   */
+  readonly key: string;
+
+  /**
+   * The operator (Equal or Exists).
+   * @default 'Equal'
+   */
+  readonly operator?: string;
+
+  /**
+   * The taint value to match (when operator is Equal).
+   * @default - no value
+   */
+  readonly value?: string;
+
+  /**
+   * The taint effect to tolerate (NoSchedule, PreferNoSchedule, NoExecute).
+   * @default - tolerate all effects
+   */
+  readonly effect?: string;
+}
+
+/**
  * Configuration options for PloneHttpcache (Varnish caching layer).
  */
 export interface PloneHttpcacheOptions {
@@ -115,6 +143,14 @@ export interface PloneHttpcacheOptions {
    * @default - no additional env vars
    */
   readonly extraEnvVars?: HttpcacheEnvVar[];
+
+  /**
+   * Tolerations for the Varnish pods.
+   * Use this to allow scheduling on nodes with specific taints,
+   * e.g. nodes tainted with kubernetes.io/arch=amd64:NoSchedule.
+   * @default - no tolerations
+   */
+  readonly tolerations?: HttpcacheToleration[];
 }
 
 /**
@@ -182,6 +218,7 @@ export class PloneHttpcache extends Construct {
         nodeSelector: {
           'kubernetes.io/arch': 'amd64',
         },
+        ...(options.tolerations && { tolerations: options.tolerations }),
         resources: {
           limits: {
             cpu: options.limitCpu || '500m',

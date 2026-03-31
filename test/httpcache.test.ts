@@ -88,3 +88,33 @@ test('with extra env vars', () => {
   const manifest = Testing.synth(chart);
   expect(manifest).toMatchSnapshot();
 });
+
+test('with tolerations', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const plone = new Plone(chart, 'plone');
+
+  // WHEN
+  new PloneHttpcache(
+    chart,
+    'test',
+    {
+      plone: plone,
+      varnishVcl: 'test',
+      existingSecret: 'testsecret',
+      tolerations: [
+        {
+          key: 'kubernetes.io/arch',
+          operator: 'Equal',
+          value: 'amd64',
+          effect: 'NoSchedule',
+        },
+      ],
+    },
+  );
+
+  // THEN
+  const manifest = Testing.synth(chart);
+  expect(manifest).toMatchSnapshot();
+});
