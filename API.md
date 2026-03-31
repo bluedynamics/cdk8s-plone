@@ -436,6 +436,80 @@ The value of the environment variable.
 
 ---
 
+### HttpcacheToleration <a name="HttpcacheToleration" id="@bluedynamics/cdk8s-plone.HttpcacheToleration"></a>
+
+A Kubernetes toleration for the Varnish pods.
+
+#### Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.HttpcacheToleration.Initializer"></a>
+
+```typescript
+import { HttpcacheToleration } from '@bluedynamics/cdk8s-plone'
+
+const httpcacheToleration: HttpcacheToleration = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#@bluedynamics/cdk8s-plone.HttpcacheToleration.property.key">key</a></code> | <code>string</code> | The taint key to tolerate. |
+| <code><a href="#@bluedynamics/cdk8s-plone.HttpcacheToleration.property.effect">effect</a></code> | <code>string</code> | The taint effect to tolerate (NoSchedule, PreferNoSchedule, NoExecute). |
+| <code><a href="#@bluedynamics/cdk8s-plone.HttpcacheToleration.property.operator">operator</a></code> | <code>string</code> | The operator (Equal or Exists). |
+| <code><a href="#@bluedynamics/cdk8s-plone.HttpcacheToleration.property.value">value</a></code> | <code>string</code> | The taint value to match (when operator is Equal). |
+
+---
+
+##### `key`<sup>Required</sup> <a name="key" id="@bluedynamics/cdk8s-plone.HttpcacheToleration.property.key"></a>
+
+```typescript
+public readonly key: string;
+```
+
+- *Type:* string
+
+The taint key to tolerate.
+
+---
+
+##### `effect`<sup>Optional</sup> <a name="effect" id="@bluedynamics/cdk8s-plone.HttpcacheToleration.property.effect"></a>
+
+```typescript
+public readonly effect: string;
+```
+
+- *Type:* string
+- *Default:* tolerate all effects
+
+The taint effect to tolerate (NoSchedule, PreferNoSchedule, NoExecute).
+
+---
+
+##### `operator`<sup>Optional</sup> <a name="operator" id="@bluedynamics/cdk8s-plone.HttpcacheToleration.property.operator"></a>
+
+```typescript
+public readonly operator: string;
+```
+
+- *Type:* string
+- *Default:* 'Equal'
+
+The operator (Equal or Exists).
+
+---
+
+##### `value`<sup>Optional</sup> <a name="value" id="@bluedynamics/cdk8s-plone.HttpcacheToleration.property.value"></a>
+
+```typescript
+public readonly value: string;
+```
+
+- *Type:* string
+- *Default:* no value
+
+The taint value to match (when operator is Equal).
+
+---
+
 ### PloneBaseOptions <a name="PloneBaseOptions" id="@bluedynamics/cdk8s-plone.PloneBaseOptions"></a>
 
 Base options for Plone backend or frontend configuration.
@@ -958,6 +1032,7 @@ const ploneHttpcacheOptions: PloneHttpcacheOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.requestCpu">requestCpu</a></code> | <code>string</code> | CPU request for Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.requestMemory">requestMemory</a></code> | <code>string</code> | Memory request for Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.servicemonitor">servicemonitor</a></code> | <code>boolean</code> | Enable Prometheus ServiceMonitor for metrics collection. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.tolerations">tolerations</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.HttpcacheToleration">HttpcacheToleration</a>[]</code> | Tolerations for the Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.varnishVcl">varnishVcl</a></code> | <code>string</code> | Varnish VCL configuration as a string. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.varnishVclFile">varnishVclFile</a></code> | <code>string</code> | Path to a Varnish VCL configuration file. |
 
@@ -1130,6 +1205,22 @@ public readonly servicemonitor: boolean;
 Enable Prometheus ServiceMonitor for metrics collection.
 
 Requires Prometheus Operator to be installed in the cluster.
+
+---
+
+##### `tolerations`<sup>Optional</sup> <a name="tolerations" id="@bluedynamics/cdk8s-plone.PloneHttpcacheOptions.property.tolerations"></a>
+
+```typescript
+public readonly tolerations: HttpcacheToleration[];
+```
+
+- *Type:* <a href="#@bluedynamics/cdk8s-plone.HttpcacheToleration">HttpcacheToleration</a>[]
+- *Default:* no tolerations
+
+Tolerations for the Varnish pods.
+
+Use this to allow scheduling on nodes with specific taints,
+e.g. nodes tainted with kubernetes.io/arch=amd64:NoSchedule.
 
 ---
 
