@@ -126,6 +126,12 @@ export interface PloneDeploymentOptions {
   readonly pdb?: PlonePDBOptions;
 
   /**
+   * Node selector labels for pod scheduling.
+   * @default - no node selector
+   */
+  readonly nodeSelector?: { [key: string]: string };
+
+  /**
    * Liveness probe configuration for the container.
    * @default - undefined (no liveness probe)
    */
@@ -209,6 +215,7 @@ export class PloneDeployment extends Construct {
           },
           spec: {
             imagePullSecrets: (image.imagePullSecrets ?? []).map((name) => ({ name: name })),
+            nodeSelector: options.nodeSelector,
             containers: [
               ploneContainerSpec,
               ...options.sidecars ?? [],
