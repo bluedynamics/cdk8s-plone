@@ -100,3 +100,22 @@ test('with-both-servicemonitors', () => {
   // THEN
   expect(Testing.synth(chart)).toMatchSnapshot();
 });
+
+test('with nodeSelector for region affinity', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'app');
+
+  // WHEN
+  new Plone(chart, 'plone', {
+    backend: {
+      nodeSelector: { 'topology.kubernetes.io/region': 'fsn1' },
+    },
+    frontend: {
+      nodeSelector: { 'topology.kubernetes.io/region': 'fsn1' },
+    },
+  });
+
+  // THEN
+  expect(Testing.synth(chart)).toMatchSnapshot();
+});

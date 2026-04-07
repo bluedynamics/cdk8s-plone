@@ -202,6 +202,14 @@ export interface PloneBaseOptions {
    * @default '/metrics'
    */
   readonly metricsPath?: string;
+
+  /**
+   * Node selector labels for pod scheduling.
+   * Use to constrain pods to nodes with matching labels, e.g. for region affinity.
+   * @example { 'topology.kubernetes.io/region': 'fsn1' }
+   * @default - no node selector
+   */
+  readonly nodeSelector?: { [key: string]: string };
 }
 /**
  * Plone deployment variants.
@@ -350,6 +358,7 @@ export class Plone extends Construct {
       environment: backend.environment,
       annotations: backend.annotations,
       podAnnotations: backend.podAnnotations,
+      nodeSelector: backend.nodeSelector,
     };
 
     // Probing
@@ -441,6 +450,7 @@ export class Plone extends Construct {
         environment: frontendEnvironment,
         annotations: frontend.annotations,
         podAnnotations: frontend.podAnnotations,
+        nodeSelector: frontend.nodeSelector,
       };
 
       // Probing
