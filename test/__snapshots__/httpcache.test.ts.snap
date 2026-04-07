@@ -272,6 +272,53 @@ exports[`defaults 1`] = `
     },
   },
   {
+    "apiVersion": "rbac.authorization.k8s.io/v1",
+    "kind": "Role",
+    "metadata": {
+      "name": "plone-test-httpcache-c8667035-kube-httpcache",
+    },
+    "rules": [
+      {
+        "apiGroups": [
+          "",
+        ],
+        "resources": [
+          "endpoints",
+          "pods",
+        ],
+        "verbs": [
+          "watch",
+          "get",
+        ],
+      },
+    ],
+  },
+  {
+    "apiVersion": "rbac.authorization.k8s.io/v1",
+    "kind": "RoleBinding",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/instance": "plone-test-httpcache-c8667035",
+        "app.kubernetes.io/managed-by": "Helm",
+        "app.kubernetes.io/name": "kube-httpcache",
+        "app.kubernetes.io/version": "v0.9.1",
+        "helm.sh/chart": "kube-httpcache-0.9.1",
+      },
+      "name": "plone-test-httpcache-c8667035-kube-httpcache",
+    },
+    "roleRef": {
+      "apiGroup": "rbac.authorization.k8s.io",
+      "kind": "Role",
+      "name": "plone-test-httpcache-c8667035-kube-httpcache",
+    },
+    "subjects": [
+      {
+        "kind": "ServiceAccount",
+        "name": "plone-test-httpcache-c8667035-kube-httpcache",
+      },
+    ],
+  },
+  {
     "apiVersion": "v1",
     "kind": "Service",
     "metadata": {
@@ -351,7 +398,7 @@ exports[`defaults 1`] = `
                 "-frontend-watch=false",
                 "-frontend-namespace=$(NAMESPACE)",
                 "-frontend-service=plone-test-httpcache-c8667035-kube-httpcache",
-                "-backend-watch=false",
+                "-backend-watch",
                 "-backend-namespace=$(NAMESPACE)",
                 "-backend-service=plone-backend-service-c87548c4",
                 "-varnish-secret-file=/etc/varnish/k8s-secret/secret",
@@ -761,6 +808,53 @@ exports[`with custom appVersion 1`] = `
     },
   },
   {
+    "apiVersion": "rbac.authorization.k8s.io/v1",
+    "kind": "Role",
+    "metadata": {
+      "name": "plone-test-httpcache-c8667035-kube-httpcache",
+    },
+    "rules": [
+      {
+        "apiGroups": [
+          "",
+        ],
+        "resources": [
+          "endpoints",
+          "pods",
+        ],
+        "verbs": [
+          "watch",
+          "get",
+        ],
+      },
+    ],
+  },
+  {
+    "apiVersion": "rbac.authorization.k8s.io/v1",
+    "kind": "RoleBinding",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/instance": "plone-test-httpcache-c8667035",
+        "app.kubernetes.io/managed-by": "Helm",
+        "app.kubernetes.io/name": "kube-httpcache",
+        "app.kubernetes.io/version": "v0.9.1",
+        "helm.sh/chart": "kube-httpcache-0.9.1",
+      },
+      "name": "plone-test-httpcache-c8667035-kube-httpcache",
+    },
+    "roleRef": {
+      "apiGroup": "rbac.authorization.k8s.io",
+      "kind": "Role",
+      "name": "plone-test-httpcache-c8667035-kube-httpcache",
+    },
+    "subjects": [
+      {
+        "kind": "ServiceAccount",
+        "name": "plone-test-httpcache-c8667035-kube-httpcache",
+      },
+    ],
+  },
+  {
     "apiVersion": "v1",
     "kind": "Service",
     "metadata": {
@@ -840,7 +934,7 @@ exports[`with custom appVersion 1`] = `
                 "-frontend-watch=false",
                 "-frontend-namespace=$(NAMESPACE)",
                 "-frontend-service=plone-test-httpcache-c8667035-kube-httpcache",
-                "-backend-watch=false",
+                "-backend-watch",
                 "-backend-namespace=$(NAMESPACE)",
                 "-backend-service=plone-backend-service-c87548c4",
                 "-varnish-secret-file=/etc/varnish/k8s-secret/secret",
@@ -1250,6 +1344,53 @@ exports[`with exporter disabled 1`] = `
     },
   },
   {
+    "apiVersion": "rbac.authorization.k8s.io/v1",
+    "kind": "Role",
+    "metadata": {
+      "name": "plone-test-httpcache-c8667035-kube-httpcache",
+    },
+    "rules": [
+      {
+        "apiGroups": [
+          "",
+        ],
+        "resources": [
+          "endpoints",
+          "pods",
+        ],
+        "verbs": [
+          "watch",
+          "get",
+        ],
+      },
+    ],
+  },
+  {
+    "apiVersion": "rbac.authorization.k8s.io/v1",
+    "kind": "RoleBinding",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/instance": "plone-test-httpcache-c8667035",
+        "app.kubernetes.io/managed-by": "Helm",
+        "app.kubernetes.io/name": "kube-httpcache",
+        "app.kubernetes.io/version": "v0.9.1",
+        "helm.sh/chart": "kube-httpcache-0.9.1",
+      },
+      "name": "plone-test-httpcache-c8667035-kube-httpcache",
+    },
+    "roleRef": {
+      "apiGroup": "rbac.authorization.k8s.io",
+      "kind": "Role",
+      "name": "plone-test-httpcache-c8667035-kube-httpcache",
+    },
+    "subjects": [
+      {
+        "kind": "ServiceAccount",
+        "name": "plone-test-httpcache-c8667035-kube-httpcache",
+      },
+    ],
+  },
+  {
     "apiVersion": "v1",
     "kind": "Service",
     "metadata": {
@@ -1324,7 +1465,7 @@ exports[`with exporter disabled 1`] = `
                 "-frontend-watch=false",
                 "-frontend-namespace=$(NAMESPACE)",
                 "-frontend-service=plone-test-httpcache-c8667035-kube-httpcache",
-                "-backend-watch=false",
+                "-backend-watch",
                 "-backend-namespace=$(NAMESPACE)",
                 "-backend-service=plone-backend-service-c87548c4",
                 "-varnish-secret-file=/etc/varnish/k8s-secret/secret",
@@ -1694,6 +1835,53 @@ exports[`with extra env vars 1`] = `
     },
   },
   {
+    "apiVersion": "rbac.authorization.k8s.io/v1",
+    "kind": "Role",
+    "metadata": {
+      "name": "plone-test-httpcache-c8667035-kube-httpcache",
+    },
+    "rules": [
+      {
+        "apiGroups": [
+          "",
+        ],
+        "resources": [
+          "endpoints",
+          "pods",
+        ],
+        "verbs": [
+          "watch",
+          "get",
+        ],
+      },
+    ],
+  },
+  {
+    "apiVersion": "rbac.authorization.k8s.io/v1",
+    "kind": "RoleBinding",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/instance": "plone-test-httpcache-c8667035",
+        "app.kubernetes.io/managed-by": "Helm",
+        "app.kubernetes.io/name": "kube-httpcache",
+        "app.kubernetes.io/version": "v0.9.1",
+        "helm.sh/chart": "kube-httpcache-0.9.1",
+      },
+      "name": "plone-test-httpcache-c8667035-kube-httpcache",
+    },
+    "roleRef": {
+      "apiGroup": "rbac.authorization.k8s.io",
+      "kind": "Role",
+      "name": "plone-test-httpcache-c8667035-kube-httpcache",
+    },
+    "subjects": [
+      {
+        "kind": "ServiceAccount",
+        "name": "plone-test-httpcache-c8667035-kube-httpcache",
+      },
+    ],
+  },
+  {
     "apiVersion": "v1",
     "kind": "Service",
     "metadata": {
@@ -1773,7 +1961,7 @@ exports[`with extra env vars 1`] = `
                 "-frontend-watch=false",
                 "-frontend-namespace=$(NAMESPACE)",
                 "-frontend-service=plone-test-httpcache-c8667035-kube-httpcache",
-                "-backend-watch=false",
+                "-backend-watch",
                 "-backend-namespace=$(NAMESPACE)",
                 "-backend-service=plone-backend-service-c87548c4",
                 "-varnish-secret-file=/etc/varnish/k8s-secret/secret",
@@ -2191,6 +2379,53 @@ exports[`with tolerations 1`] = `
     },
   },
   {
+    "apiVersion": "rbac.authorization.k8s.io/v1",
+    "kind": "Role",
+    "metadata": {
+      "name": "plone-test-httpcache-c8667035-kube-httpcache",
+    },
+    "rules": [
+      {
+        "apiGroups": [
+          "",
+        ],
+        "resources": [
+          "endpoints",
+          "pods",
+        ],
+        "verbs": [
+          "watch",
+          "get",
+        ],
+      },
+    ],
+  },
+  {
+    "apiVersion": "rbac.authorization.k8s.io/v1",
+    "kind": "RoleBinding",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/instance": "plone-test-httpcache-c8667035",
+        "app.kubernetes.io/managed-by": "Helm",
+        "app.kubernetes.io/name": "kube-httpcache",
+        "app.kubernetes.io/version": "v0.9.1",
+        "helm.sh/chart": "kube-httpcache-0.9.1",
+      },
+      "name": "plone-test-httpcache-c8667035-kube-httpcache",
+    },
+    "roleRef": {
+      "apiGroup": "rbac.authorization.k8s.io",
+      "kind": "Role",
+      "name": "plone-test-httpcache-c8667035-kube-httpcache",
+    },
+    "subjects": [
+      {
+        "kind": "ServiceAccount",
+        "name": "plone-test-httpcache-c8667035-kube-httpcache",
+      },
+    ],
+  },
+  {
     "apiVersion": "v1",
     "kind": "Service",
     "metadata": {
@@ -2270,7 +2505,7 @@ exports[`with tolerations 1`] = `
                 "-frontend-watch=false",
                 "-frontend-namespace=$(NAMESPACE)",
                 "-frontend-service=plone-test-httpcache-c8667035-kube-httpcache",
-                "-backend-watch=false",
+                "-backend-watch",
                 "-backend-namespace=$(NAMESPACE)",
                 "-backend-service=plone-backend-service-c87548c4",
                 "-varnish-secret-file=/etc/varnish/k8s-secret/secret",
