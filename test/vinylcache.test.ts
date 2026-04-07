@@ -138,6 +138,80 @@ test('with shard director', () => {
   expect(Testing.synth(chart)).toMatchSnapshot();
 });
 
+test('with extraBackends', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const plone = new Plone(chart, 'plone');
+
+  // WHEN
+  new PloneVinylCache(chart, 'test', {
+    plone,
+    extraBackends: [
+      {
+        name: 'custom_api',
+        serviceName: 'custom-api-service',
+        port: 9090,
+        probe: {
+          url: '/healthz',
+          interval: '10s',
+          timeout: '3s',
+          window: 5,
+          threshold: 3,
+        },
+      },
+    ],
+  });
+
+  // THEN
+  expect(Testing.synth(chart)).toMatchSnapshot();
+});
+
+test('with nodeSelector', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const plone = new Plone(chart, 'plone');
+
+  // WHEN
+  new PloneVinylCache(chart, 'test', {
+    plone,
+    nodeSelector: {
+      'kubernetes.io/os': 'linux',
+      'node-type': 'cache',
+    },
+  });
+
+  // THEN
+  expect(Testing.synth(chart)).toMatchSnapshot();
+});
+
+test('with nodeSelector and tolerations', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const plone = new Plone(chart, 'plone');
+
+  // WHEN
+  new PloneVinylCache(chart, 'test', {
+    plone,
+    nodeSelector: {
+      'node-type': 'cache',
+    },
+    tolerations: [
+      {
+        key: 'dedicated',
+        operator: 'Equal',
+        value: 'cache',
+        effect: 'NoSchedule',
+      },
+    ],
+  });
+
+  // THEN
+  expect(Testing.synth(chart)).toMatchSnapshot();
+});
+
 test('exposes vinylCacheServiceName', () => {
   // GIVEN
   const app = Testing.app();

@@ -11,6 +11,79 @@ import {
 import { Plone } from './plone';
 
 /**
+ * Health probe configuration for a VinylCache backend.
+ */
+export interface VinylCacheBackendProbe {
+  /**
+   * URL to probe.
+   * @default '/'
+   */
+  readonly url?: string;
+
+  /**
+   * How often to probe the backend.
+   * @default '5s'
+   */
+  readonly interval?: string;
+
+  /**
+   * Maximum time to wait for a probe response.
+   * @default '2s'
+   */
+  readonly timeout?: string;
+
+  /**
+   * Number of most recent probes to consider.
+   * @default 10
+   */
+  readonly window?: number;
+
+  /**
+   * Minimum successful probes within window for healthy status.
+   * @default 8
+   */
+  readonly threshold?: number;
+
+  /**
+   * Expected HTTP response status code.
+   * @default 200
+   */
+  readonly expectedResponse?: number;
+}
+
+/**
+ * An additional backend for the VinylCache.
+ */
+export interface VinylCacheBackend {
+  /**
+   * VCL identifier for this backend. Must match ^[a-zA-Z][a-zA-Z0-9_]*$.
+   */
+  readonly name: string;
+
+  /**
+   * Kubernetes Service name to use as backend.
+   */
+  readonly serviceName: string;
+
+  /**
+   * Port to use for this backend.
+   */
+  readonly port: number;
+
+  /**
+   * Health probe configuration.
+   * @default - no probe
+   */
+  readonly probe?: VinylCacheBackendProbe;
+
+  /**
+   * Relative weight for the director. 0 means standby.
+   * @default - operator default
+   */
+  readonly weight?: number;
+}
+
+/**
  * A Kubernetes toleration for the Varnish pods.
  */
 export interface VinylCacheToleration {
@@ -52,6 +125,13 @@ export interface PloneVinylCacheOptions {
    * Backends are auto-configured from the Plone services.
    */
   readonly plone: Plone;
+
+  /**
+   * Additional backends to add after the auto-generated Plone backends.
+   * Uses the same backend type structure as the VinylCache CRD.
+   * @default - no extra backends
+   */
+  readonly extraBackends?: VinylCacheBackend[];
 
   /**
    * Number of Varnish pod replicas.
@@ -126,6 +206,85 @@ export interface PloneVinylCacheOptions {
    * @default - no tolerations
    */
   readonly tolerations?: VinylCacheToleration[];
+
+  /**
+   * Node selector labels for the Varnish pods.
+   * Constrains pods to nodes matching all specified labels.
+   * @default - no node selector
+   */
+  readonly nodeSelector?: { [key: string]: string };
+
+  /**
+   * Custom VCL snippet for vcl_deliver subroutine.
+   * @default - no snippet
+   */
+  readonly vclDeliverSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_hit subroutine.
+   * @default - no snippet
+   */
+  readonly vclHitSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_miss subroutine.
+   * @default - no snippet
+   */
+  readonly vclMissSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_pass subroutine.
+   * @default - no snippet
+   */
+  readonly vclPassSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_pipe subroutine.
+   * @default - no snippet
+   */
+  readonly vclPipeSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_synth subroutine.
+   * @default - no snippet
+   */
+  readonly vclSynthSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_purge subroutine.
+   * @default - no snippet
+   */
+  readonly vclPurgeSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_hash subroutine.
+   * @default - no snippet
+   */
+  readonly vclHashSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_init subroutine.
+   * @default - no snippet
+   */
+  readonly vclInitSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_fini subroutine.
+   * @default - no snippet
+   */
+  readonly vclFiniSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_backend_fetch subroutine.
+   * @default - no snippet
+   */
+  readonly vclBackendFetchSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_backend_error subroutine.
+   * @default - no snippet
+   */
+  readonly vclBackendErrorSnippet?: string;
 }
 
 /**
@@ -183,7 +342,19 @@ export class PloneVinylCache extends Construct {
       fs.readFileSync(path.join(__dirname, 'config', 'plone-vinyl-backend-response.vcl'), 'utf8');
 
     // Build backends from Plone services
-    const backends = [
+    const backends: Array<{
+      name: string;
+      serviceRef: { name: string };
+      port: number;
+      probe?: {
+        url: string;
+        interval: string;
+        timeout: string;
+        window: number;
+        threshold: number;
+      };
+      weight?: number;
+    }> = [
       {
         name: 'plone_backend',
         serviceRef: { name: options.plone.backendServiceName },
@@ -213,6 +384,23 @@ export class PloneVinylCache extends Construct {
       });
     }
 
+    if (options.extraBackends) {
+      for (const eb of options.extraBackends) {
+        backends.push({
+          name: eb.name,
+          serviceRef: { name: eb.serviceName },
+          port: eb.port,
+          probe: eb.probe ? {
+            url: eb.probe.url ?? '/',
+            interval: eb.probe.interval ?? '5s',
+            timeout: eb.probe.timeout ?? '2s',
+            window: eb.probe.window ?? 10,
+            threshold: eb.probe.threshold ?? 8,
+          } : undefined,
+        });
+      }
+    }
+
     const vinylCache = new VinylCache(this, 'vinylcache', {
       spec: {
         replicas,
@@ -223,6 +411,18 @@ export class PloneVinylCache extends Construct {
           snippets: {
             vclRecv: vclRecv,
             vclBackendResponse: vclBackendResponse,
+            vclDeliver: options.vclDeliverSnippet,
+            vclHit: options.vclHitSnippet,
+            vclMiss: options.vclMissSnippet,
+            vclPass: options.vclPassSnippet,
+            vclPipe: options.vclPipeSnippet,
+            vclSynth: options.vclSynthSnippet,
+            vclPurge: options.vclPurgeSnippet,
+            vclHash: options.vclHashSnippet,
+            vclInit: options.vclInitSnippet,
+            vclFini: options.vclFiniSnippet,
+            vclBackendFetch: options.vclBackendFetchSnippet,
+            vclBackendError: options.vclBackendErrorSnippet,
           },
         },
         resources: {
@@ -244,13 +444,14 @@ export class PloneVinylCache extends Construct {
           enabled: true,
           serviceMonitor: { enabled: true },
         } : undefined,
-        pod: (options.tolerations && options.tolerations.length > 0) ? {
-          tolerations: options.tolerations.map(t => ({
+        pod: (options.tolerations?.length || options.nodeSelector) ? {
+          tolerations: options.tolerations?.map(t => ({
             key: t.key,
             operator: t.operator,
             value: t.value,
             effect: t.effect,
           })),
+          nodeSelector: options.nodeSelector,
         } : undefined,
       },
     });
