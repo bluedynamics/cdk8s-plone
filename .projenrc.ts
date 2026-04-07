@@ -61,6 +61,11 @@ project.addTask('import:servicemonitor', {
   exec: 'cdk8s import https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml --language typescript --output src/imports/',
 });
 
+project.addTask('import:vinylcache', {
+  description: 'Import cloud-vinyl VinylCache CRD',
+  exec: 'cdk8s import https://raw.githubusercontent.com/bluedynamics/cloud-vinyl/main/config/crd/bases/vinyl.bluedynamics.eu_vinylcaches.yaml --language typescript --output src/imports/',
+});
+
 // // Fix upgrade workflow permissions for PR job
 // const upgradeMain = project.tryFindObjectFile('.github/workflows/upgrade-main.yml');
 // if (upgradeMain) {
