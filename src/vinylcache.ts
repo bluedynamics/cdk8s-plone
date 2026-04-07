@@ -2,13 +2,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Names } from 'cdk8s';
 import { Construct } from 'constructs';
-import { Plone } from './plone';
 import {
   VinylCache,
   VinylCacheSpecDirectorType,
   VinylCacheSpecResourcesLimits,
   VinylCacheSpecResourcesRequests,
 } from './imports/vinyl.bluedynamics.eu';
+import { Plone } from './plone';
 
 /**
  * A Kubernetes toleration for the Varnish pods.

@@ -1,6 +1,6 @@
 import { Chart, Testing } from 'cdk8s';
-import { PloneVinylCache } from '../src/vinylcache';
 import { Plone } from '../src/plone';
+import { PloneVinylCache } from '../src/vinylcache';
 
 test('defaults', () => {
   // GIVEN
