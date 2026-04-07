@@ -32,6 +32,7 @@ titlesonly: true
 ---
 deploy-production-volto
 deploy-classic-ui
+deploy-with-vinyl-cache
 ```
 
 ## Configuration
