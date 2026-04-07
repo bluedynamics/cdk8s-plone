@@ -294,6 +294,62 @@ new PloneHttpcache(chart, 'cache', {
 
 ---
 
+### `PloneVinylCacheOptions`
+
+Configuration for the Varnish HTTP cache layer via the cloud-vinyl operator.
+Requires the [cloud-vinyl operator](https://github.com/bluedynamics/cloud-vinyl) to be installed in the cluster.
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `plone` | `Plone` | Yes | - | Plone construct to attach cache to |
+| `replicas` | `number` | No | `2` | Number of Varnish replicas |
+| `requestCpu` | `string` | No | `100m` | CPU request |
+| `limitCpu` | `string` | No | `500m` | CPU limit |
+| `requestMemory` | `string` | No | `256Mi` | Memory request |
+| `limitMemory` | `string` | No | `512Mi` | Memory limit |
+| `director` | `string` | No | `shard` | Director type: shard, round_robin, random, hash |
+| `vclRecvSnippet` | `string` | No | built-in | Custom VCL snippet for vcl_recv |
+| `vclBackendResponseSnippet` | `string` | No | built-in | Custom VCL snippet for vcl_backend_response |
+| `invalidation` | `boolean` | No | `true` | Enable PURGE/BAN/xkey cache invalidation |
+| `monitoring` | `boolean` | No | `false` | Enable Prometheus metrics and ServiceMonitor |
+| `tolerations` | `VinylCacheToleration[]` | No | - | Node tolerations for Varnish pods |
+
+**Example:**
+```typescript
+const cache = new PloneVinylCache(chart, 'cache', {
+  plone: ploneInstance,
+  replicas: 2,
+  requestCpu: '200m',
+  limitCpu: '1',
+  requestMemory: '256Mi',
+  limitMemory: '1Gi',
+  monitoring: true,
+});
+
+// Use the service name for IngressRoute
+console.log(cache.vinylCacheServiceName);
+```
+
+**Custom VCL Snippets:**
+```typescript
+new PloneVinylCache(chart, 'cache', {
+  plone: ploneInstance,
+  vclRecvSnippet: `
+    // Custom routing logic
+    if (req.url ~ "^/api/") {
+      set req.backend_hint = plone_backend.backend();
+    }
+  `,
+});
+```
+
+**vs PloneHttpcache:**
+- `PloneHttpcache` deploys Varnish via mittwald Helm chart (self-contained, no operator needed)
+- `PloneVinylCache` creates a VinylCache CR managed by the cloud-vinyl operator (requires operator in cluster)
+- VinylCache provides structured VCL generation, agent-based config delivery, and built-in invalidation proxy
+
+---
+
 ## PloneVariant Enum
 
 Defines the deployment variant:

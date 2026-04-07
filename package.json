@@ -16,6 +16,7 @@
     "eject": "npx projen eject",
     "eslint": "npx projen eslint",
     "import:servicemonitor": "npx projen import:servicemonitor",
+    "import:vinylcache": "npx projen import:vinylcache",
     "package": "npx projen package",
     "package-all": "npx projen package-all",
     "package:js": "npx projen package:js",
@@ -42,7 +43,7 @@
     "@types/node": "^18",
     "@typescript-eslint/eslint-plugin": "^8",
     "@typescript-eslint/parser": "^8",
-    "cdk8s-cli": "^2.205.1",
+    "cdk8s-cli": "^2.206.0",
     "cdk8s-plus-30": "^2.4.10",
     "commit-and-tag-version": "^12",
     "constructs": "10.4.2",
@@ -56,8 +57,8 @@
     "jsii-docgen": "^10.5.0",
     "jsii-pacmak": "^1.127.0",
     "jsii-rosetta": "~5.9.11",
-    "projen": "^0.99.21",
-    "ts-jest": "^29.4.6",
+    "projen": "^0.99.35",
+    "ts-jest": "^29.4.9",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "yaml": "^2.8.1"
@@ -67,7 +68,7 @@
     "constructs": "^10.4.2"
   },
   "dependencies": {
-    "cdk8s": "^2.70.52",
+    "cdk8s": "^2.70.54",
     "cdk8s-plus-30": "^2.4.10",
     "constructs": "^10.4.2"
   },

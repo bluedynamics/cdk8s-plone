@@ -145,6 +145,15 @@
         }
       ]
     },
+    "import:vinylcache": {
+      "name": "import:vinylcache",
+      "description": "Import cloud-vinyl VinylCache CRD",
+      "steps": [
+        {
+          "exec": "cdk8s import https://raw.githubusercontent.com/bluedynamics/cloud-vinyl/main/config/crd/bases/vinyl.bluedynamics.eu_vinylcaches.yaml --language typescript --output src/imports/"
+        }
+      ]
+    },
     "install": {
       "name": "install",
       "description": "Install project dependencies and update lockfile (non-frozen)",
