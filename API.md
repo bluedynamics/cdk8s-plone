@@ -545,6 +545,7 @@ const ploneBaseOptions: PloneBaseOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.metricsPath">metricsPath</a></code> | <code>string</code> | Path to scrape metrics from. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.metricsPort">metricsPort</a></code> | <code>string \| number</code> | Port name or number to scrape metrics from. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.minAvailable">minAvailable</a></code> | <code>string \| number</code> | Minimum number of pods that must be available during updates. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.nodeSelector">nodeSelector</a></code> | <code>{[ key: string ]: string}</code> | Node selector labels for pod scheduling. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.podAnnotations">podAnnotations</a></code> | <code>{[ key: string ]: string}</code> | Annotations to add to the Pod template metadata. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessEnabled">readinessEnabled</a></code> | <code>boolean</code> | Enable readiness probe for the container. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessFailureThreshold">readinessFailureThreshold</a></code> | <code>number</code> | Minimum consecutive failures for the readiness probe to be considered failed. |
@@ -810,6 +811,28 @@ Can be an absolute number (e.g., 1) or a percentage (e.g., '50%').
 Used in PodDisruptionBudget if specified.
 
 ---
+
+##### `nodeSelector`<sup>Optional</sup> <a name="nodeSelector" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.nodeSelector"></a>
+
+```typescript
+public readonly nodeSelector: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* no node selector
+
+Node selector labels for pod scheduling.
+
+Use to constrain pods to nodes with matching labels, e.g. for region affinity.
+
+---
+
+*Example*
+
+```typescript
+{ 'topology.kubernetes.io/region': 'fsn1' }
+```
+
 
 ##### `podAnnotations`<sup>Optional</sup> <a name="podAnnotations" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.podAnnotations"></a>
 
