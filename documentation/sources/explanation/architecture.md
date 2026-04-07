@@ -57,6 +57,24 @@ cdk8s-plone supports two deployment variants:
 - Better scalability
 - Automatic cache invalidation on content changes
 
+### Caching Options
+
+cdk8s-plone supports two HTTP caching approaches:
+
+**PloneHttpcache (mittwald/kube-httpcache)**
+- Self-contained: deploys Varnish via Helm chart, no operator needed
+- Full VCL template with Go template variable injection
+- Prometheus exporter sidecar for metrics
+
+**PloneVinylCache (cloud-vinyl operator)**
+- Operator-managed: creates a VinylCache custom resource
+- Structured VCL generation with snippet injection hooks
+- Built-in cache invalidation proxy (PURGE, BAN, xkey)
+- Agent-based VCL delivery and Prometheus metrics
+- Requires the [cloud-vinyl operator](https://github.com/bluedynamics/cloud-vinyl) in the cluster
+
+Choose PloneHttpcache for standalone deployments without cloud-vinyl. Choose PloneVinylCache when the operator is available for centralized cache management.
+
 ### Multi-Language Support
 
 The library is published in multiple languages:
