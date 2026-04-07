@@ -13,7 +13,7 @@ cdk8s-plone provides CDK8S constructs for deploying [Plone CMS](https://plone.or
 **Key Features:**
 - 🚀 Supports Volto (modern React frontend) and Classic UI
 - 📦 High availability with configurable replicas
-- ⚡ Optional Varnish HTTP caching layer
+- ⚡ Optional Varnish HTTP caching via kube-httpcache (`PloneHttpcache`) or cloud-vinyl VinylCache operator (`PloneVinylCache`)
 - 🔧 Fine-grained resource and probe configuration
 - 🌍 Multi-language support (TypeScript/JavaScript and Python)
 - ✅ Type-safe infrastructure as code

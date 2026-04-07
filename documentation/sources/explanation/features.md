@@ -44,11 +44,19 @@ backend: {
 
 ### HTTP Caching with Varnish
 
-**kube-httpcache Integration**
-- Production-grade Varnish deployment
+cdk8s-plone supports two caching backends: the self-contained mittwald kube-httpcache Helm chart (`PloneHttpcache`) and the operator-managed cloud-vinyl VinylCache (`PloneVinylCache`).
+
+**kube-httpcache Integration (PloneHttpcache)**
+- Production-grade Varnish deployment, no operator required
 - Cluster-wide cache invalidation
 - Automatic invalidation on content changes
 - HTTP/2 support
+
+**cloud-vinyl VinylCache Integration (PloneVinylCache)**
+- Operator-managed Varnish via VinylCache custom resource
+- Structured VCL generation with snippet injection hooks
+- Built-in cache invalidation proxy (PURGE, BAN, xkey)
+- Requires the cloud-vinyl operator in the cluster
 
 **Benefits:**
 - Dramatically reduced backend load

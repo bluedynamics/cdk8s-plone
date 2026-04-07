@@ -16,6 +16,7 @@
     "eject": "npx projen eject",
     "eslint": "npx projen eslint",
     "import:servicemonitor": "npx projen import:servicemonitor",
+    "import:vinylcache": "npx projen import:vinylcache",
     "package": "npx projen package",
     "package-all": "npx projen package-all",
     "package:js": "npx projen package:js",
