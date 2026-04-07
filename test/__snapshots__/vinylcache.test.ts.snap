@@ -263,7 +263,7 @@ exports[`defaults 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "ghcr.io/bluedynamics/cloud-vinyl-varnish:7.6",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -493,7 +493,7 @@ exports[`with classic-ui variant (no frontend) 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "ghcr.io/bluedynamics/cloud-vinyl-varnish:7.6",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -850,7 +850,7 @@ exports[`with custom VCL snippets 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "ghcr.io/bluedynamics/cloud-vinyl-varnish:7.6",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -1147,7 +1147,7 @@ exports[`with custom replicas and resources 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "ghcr.io/bluedynamics/cloud-vinyl-varnish:7.6",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -1518,7 +1518,7 @@ exports[`with extraBackends 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "ghcr.io/bluedynamics/cloud-vinyl-varnish:7.6",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -1875,7 +1875,7 @@ exports[`with invalidation disabled 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "ghcr.io/bluedynamics/cloud-vinyl-varnish:7.6",
       "replicas": 2,
       "resources": {
         "limits": {
@@ -2221,7 +2221,7 @@ exports[`with monitoring enabled 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "ghcr.io/bluedynamics/cloud-vinyl-varnish:7.6",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -2584,7 +2584,7 @@ exports[`with nodeSelector 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "ghcr.io/bluedynamics/cloud-vinyl-varnish:7.6",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -2947,7 +2947,7 @@ exports[`with nodeSelector and tolerations 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "ghcr.io/bluedynamics/cloud-vinyl-varnish:7.6",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -3317,7 +3317,7 @@ exports[`with shard director 1`] = `
       "director": {
         "type": "round_robin",
       },
-      "image": "varnish:7.6",
+      "image": "ghcr.io/bluedynamics/cloud-vinyl-varnish:7.6",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -3674,7 +3674,7 @@ exports[`with tolerations 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "ghcr.io/bluedynamics/cloud-vinyl-varnish:7.6",
       "invalidation": {
         "ban": {
           "enabled": true,

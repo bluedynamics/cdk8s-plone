@@ -197,7 +197,7 @@ export interface PloneVinylCacheOptions {
 
   /**
    * Container image for the Varnish pods.
-   * @default 'varnish:7.6'
+   * @default 'ghcr.io/bluedynamics/cloud-vinyl-varnish:7.6'
    */
   readonly image?: string;
 
@@ -404,7 +404,7 @@ export class PloneVinylCache extends Construct {
     const vinylCache = new VinylCache(this, 'vinylcache', {
       spec: {
         replicas,
-        image: options.image ?? 'varnish:7.6',
+        image: options.image ?? 'ghcr.io/bluedynamics/cloud-vinyl-varnish:7.6',
         backends,
         director: { type: directorType },
         vcl: {
