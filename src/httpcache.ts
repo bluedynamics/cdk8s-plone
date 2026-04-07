@@ -200,6 +200,7 @@ export class PloneHttpcache extends Construct {
         replicaCount: options.replicas ?? 2,
         ...(imageTag && { image: { tag: imageTag } }),
         cache: {
+          backendService: options.plone.backendServiceName,
           // need to looks at the frontendWatch, do we need it?
           frontendWatch: false,
           backendWatch: false,
