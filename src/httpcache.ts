@@ -201,11 +201,13 @@ export class PloneHttpcache extends Construct {
         ...(imageTag && { image: { tag: imageTag } }),
         cache: {
           backendService: options.plone.backendServiceName,
-          backendPortName: 'backend-http',
           frontendWatch: false,
           backendWatch: true,
           existingSecret: options.existingSecret ?? undefined,
         },
+        // Workaround: upstream chart accepts backendPortName but never
+        // renders it as CLI arg. Pass via cacheExtraArgs instead.
+        cacheExtraArgs: '- -backend-portname=backend-http',
         vclTemplate: varnishVcl,
         extraEnvVars: [
           { name: 'BACKEND_SERVICE_NAME', value: options.plone.backendServiceName },
