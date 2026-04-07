@@ -1665,7 +1665,7 @@ public readonly image: string;
 ```
 
 - *Type:* string
-- *Default:* 'varnish:7.6'
+- *Default:* 'ghcr.io/bluedynamics/cloud-vinyl-varnish:7.6'
 
 Container image for the Varnish pods.
 
