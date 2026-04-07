@@ -405,6 +405,7 @@ exports[`defaults 1`] = `
                 "-varnish-vcl-template=/etc/varnish/tmpl/default.vcl.tmpl",
                 "-varnish-storage=malloc,128M",
                 "-varnish-vcl-template-poll",
+                "-backend-portname=backend-http",
               ],
               "env": [
                 {
@@ -941,6 +942,7 @@ exports[`with custom appVersion 1`] = `
                 "-varnish-vcl-template=/etc/varnish/tmpl/default.vcl.tmpl",
                 "-varnish-storage=malloc,128M",
                 "-varnish-vcl-template-poll",
+                "-backend-portname=backend-http",
               ],
               "env": [
                 {
@@ -1472,6 +1474,7 @@ exports[`with exporter disabled 1`] = `
                 "-varnish-vcl-template=/etc/varnish/tmpl/default.vcl.tmpl",
                 "-varnish-storage=malloc,128M",
                 "-varnish-vcl-template-poll",
+                "-backend-portname=backend-http",
               ],
               "env": [
                 {
@@ -1968,6 +1971,7 @@ exports[`with extra env vars 1`] = `
                 "-varnish-vcl-template=/etc/varnish/tmpl/default.vcl.tmpl",
                 "-varnish-storage=malloc,128M",
                 "-varnish-vcl-template-poll",
+                "-backend-portname=backend-http",
               ],
               "env": [
                 {
@@ -2512,6 +2516,7 @@ exports[`with tolerations 1`] = `
                 "-varnish-vcl-template=/etc/varnish/tmpl/default.vcl.tmpl",
                 "-varnish-storage=malloc,128M",
                 "-varnish-vcl-template-poll",
+                "-backend-portname=backend-http",
               ],
               "env": [
                 {
