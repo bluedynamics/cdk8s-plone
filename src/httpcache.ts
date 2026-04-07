@@ -201,9 +201,9 @@ export class PloneHttpcache extends Construct {
         ...(imageTag && { image: { tag: imageTag } }),
         cache: {
           backendService: options.plone.backendServiceName,
-          // need to looks at the frontendWatch, do we need it?
+          backendPortName: 'backend-http',
           frontendWatch: false,
-          backendWatch: false,
+          backendWatch: true,
           existingSecret: options.existingSecret ?? undefined,
         },
         vclTemplate: varnishVcl,
@@ -231,7 +231,7 @@ export class PloneHttpcache extends Construct {
           },
         },
         rbac: {
-          enabled: false,
+          enabled: true,
         },
         exporter: {
           enabled: options.exporterEnabled ?? true,
