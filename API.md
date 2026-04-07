@@ -389,6 +389,176 @@ Use this to reference the cache service from ingress or other constructs.
 ---
 
 
+### PloneVinylCache <a name="PloneVinylCache" id="@bluedynamics/cdk8s-plone.PloneVinylCache"></a>
+
+PloneVinylCache construct for deploying Varnish Cache via cloud-vinyl operator.
+
+Creates a VinylCache custom resource with Plone backend/frontend services
+auto-configured as backends. The cloud-vinyl operator manages the full
+Varnish lifecycle including VCL generation, agent delivery, and monitoring.
+
+Requires the cloud-vinyl operator to be installed in the cluster.
+
+*Example*
+
+```typescript
+const plone = new Plone(chart, 'plone');
+const cache = new PloneVinylCache(chart, 'cache', {
+  plone: plone,
+  replicas: 2,
+});
+// Use cache.vinylCacheServiceName for IngressRoute
+```
+
+
+#### Initializers <a name="Initializers" id="@bluedynamics/cdk8s-plone.PloneVinylCache.Initializer"></a>
+
+```typescript
+import { PloneVinylCache } from '@bluedynamics/cdk8s-plone'
+
+new PloneVinylCache(scope: Construct, id: string, options: PloneVinylCacheOptions)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCache.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCache.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCache.Initializer.parameter.options">options</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions">PloneVinylCacheOptions</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="@bluedynamics/cdk8s-plone.PloneVinylCache.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="@bluedynamics/cdk8s-plone.PloneVinylCache.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `options`<sup>Required</sup> <a name="options" id="@bluedynamics/cdk8s-plone.PloneVinylCache.Initializer.parameter.options"></a>
+
+- *Type:* <a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions">PloneVinylCacheOptions</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCache.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCache.with">with</a></code> | Applies one or more mixins to this construct. |
+
+---
+
+##### `toString` <a name="toString" id="@bluedynamics/cdk8s-plone.PloneVinylCache.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+##### `with` <a name="with" id="@bluedynamics/cdk8s-plone.PloneVinylCache.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="@bluedynamics/cdk8s-plone.PloneVinylCache.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+The mixins to apply.
+
+---
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCache.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+
+---
+
+##### `isConstruct` <a name="isConstruct" id="@bluedynamics/cdk8s-plone.PloneVinylCache.isConstruct"></a>
+
+```typescript
+import { PloneVinylCache } from '@bluedynamics/cdk8s-plone'
+
+PloneVinylCache.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
+
+###### `x`<sup>Required</sup> <a name="x" id="@bluedynamics/cdk8s-plone.PloneVinylCache.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCache.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCache.property.vinylCacheServiceName">vinylCacheServiceName</a></code> | <code>string</code> | Name of the VinylCache service created by the operator. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="@bluedynamics/cdk8s-plone.PloneVinylCache.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+##### `vinylCacheServiceName`<sup>Required</sup> <a name="vinylCacheServiceName" id="@bluedynamics/cdk8s-plone.PloneVinylCache.property.vinylCacheServiceName"></a>
+
+```typescript
+public readonly vinylCacheServiceName: string;
+```
+
+- *Type:* string
+
+Name of the VinylCache service created by the operator.
+
+Use this to reference the cache service from ingress or other constructs.
+
+---
+
+
 ## Structs <a name="Structs" id="Structs"></a>
 
 ### HttpcacheEnvVar <a name="HttpcacheEnvVar" id="@bluedynamics/cdk8s-plone.HttpcacheEnvVar"></a>
@@ -1369,6 +1539,291 @@ public readonly version: string;
 Version string for labeling the deployment.
 
 This is used in Kubernetes labels and doesn't affect the actual image versions.
+
+---
+
+### PloneVinylCacheOptions <a name="PloneVinylCacheOptions" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions"></a>
+
+Configuration options for PloneVinylCache (cloud-vinyl operator).
+
+Creates a VinylCache custom resource that the cloud-vinyl operator
+reconciles into a Varnish Cache cluster with agent-based VCL delivery.
+
+Requires the cloud-vinyl operator to be installed in the cluster.
+
+#### Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.Initializer"></a>
+
+```typescript
+import { PloneVinylCacheOptions } from '@bluedynamics/cdk8s-plone'
+
+const ploneVinylCacheOptions: PloneVinylCacheOptions = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.plone">plone</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.Plone">Plone</a></code> | The Plone construct to attach the cache to. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.director">director</a></code> | <code>string</code> | Director type for load distribution. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.image">image</a></code> | <code>string</code> | Container image for the Varnish pods. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.invalidation">invalidation</a></code> | <code>boolean</code> | Enable cache invalidation (PURGE, BAN, xkey). |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.limitCpu">limitCpu</a></code> | <code>string</code> | CPU limit for Varnish pods. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.limitMemory">limitMemory</a></code> | <code>string</code> | Memory limit for Varnish pods. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.monitoring">monitoring</a></code> | <code>boolean</code> | Enable Prometheus monitoring (metrics + ServiceMonitor). |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.replicas">replicas</a></code> | <code>number</code> | Number of Varnish pod replicas. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.requestCpu">requestCpu</a></code> | <code>string</code> | CPU request for Varnish pods. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.requestMemory">requestMemory</a></code> | <code>string</code> | Memory request for Varnish pods. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.tolerations">tolerations</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheToleration">VinylCacheToleration</a>[]</code> | Tolerations for the Varnish pods. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclBackendResponseSnippet">vclBackendResponseSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_backend_response subroutine. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclRecvSnippet">vclRecvSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_recv subroutine. |
+
+---
+
+##### `plone`<sup>Required</sup> <a name="plone" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.plone"></a>
+
+```typescript
+public readonly plone: Plone;
+```
+
+- *Type:* <a href="#@bluedynamics/cdk8s-plone.Plone">Plone</a>
+
+The Plone construct to attach the cache to.
+
+Backends are auto-configured from the Plone services.
+
+---
+
+##### `director`<sup>Optional</sup> <a name="director" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.director"></a>
+
+```typescript
+public readonly director: string;
+```
+
+- *Type:* string
+- *Default:* 'shard'
+
+Director type for load distribution.
+
+---
+
+##### `image`<sup>Optional</sup> <a name="image" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.image"></a>
+
+```typescript
+public readonly image: string;
+```
+
+- *Type:* string
+- *Default:* 'varnish:7.6'
+
+Container image for the Varnish pods.
+
+---
+
+##### `invalidation`<sup>Optional</sup> <a name="invalidation" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.invalidation"></a>
+
+```typescript
+public readonly invalidation: boolean;
+```
+
+- *Type:* boolean
+- *Default:* true
+
+Enable cache invalidation (PURGE, BAN, xkey).
+
+---
+
+##### `limitCpu`<sup>Optional</sup> <a name="limitCpu" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.limitCpu"></a>
+
+```typescript
+public readonly limitCpu: string;
+```
+
+- *Type:* string
+- *Default:* '500m'
+
+CPU limit for Varnish pods.
+
+---
+
+##### `limitMemory`<sup>Optional</sup> <a name="limitMemory" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.limitMemory"></a>
+
+```typescript
+public readonly limitMemory: string;
+```
+
+- *Type:* string
+- *Default:* '512Mi'
+
+Memory limit for Varnish pods.
+
+---
+
+##### `monitoring`<sup>Optional</sup> <a name="monitoring" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.monitoring"></a>
+
+```typescript
+public readonly monitoring: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Enable Prometheus monitoring (metrics + ServiceMonitor).
+
+---
+
+##### `replicas`<sup>Optional</sup> <a name="replicas" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.replicas"></a>
+
+```typescript
+public readonly replicas: number;
+```
+
+- *Type:* number
+- *Default:* 2
+
+Number of Varnish pod replicas.
+
+---
+
+##### `requestCpu`<sup>Optional</sup> <a name="requestCpu" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.requestCpu"></a>
+
+```typescript
+public readonly requestCpu: string;
+```
+
+- *Type:* string
+- *Default:* '100m'
+
+CPU request for Varnish pods.
+
+---
+
+##### `requestMemory`<sup>Optional</sup> <a name="requestMemory" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.requestMemory"></a>
+
+```typescript
+public readonly requestMemory: string;
+```
+
+- *Type:* string
+- *Default:* '256Mi'
+
+Memory request for Varnish pods.
+
+---
+
+##### `tolerations`<sup>Optional</sup> <a name="tolerations" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.tolerations"></a>
+
+```typescript
+public readonly tolerations: VinylCacheToleration[];
+```
+
+- *Type:* <a href="#@bluedynamics/cdk8s-plone.VinylCacheToleration">VinylCacheToleration</a>[]
+- *Default:* no tolerations
+
+Tolerations for the Varnish pods.
+
+---
+
+##### `vclBackendResponseSnippet`<sup>Optional</sup> <a name="vclBackendResponseSnippet" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclBackendResponseSnippet"></a>
+
+```typescript
+public readonly vclBackendResponseSnippet: string;
+```
+
+- *Type:* string
+- *Default:* uses built-in plone-vinyl-backend-response.vcl
+
+Custom VCL snippet for vcl_backend_response subroutine.
+
+Replaces the default Plone backend_response snippet.
+
+---
+
+##### `vclRecvSnippet`<sup>Optional</sup> <a name="vclRecvSnippet" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclRecvSnippet"></a>
+
+```typescript
+public readonly vclRecvSnippet: string;
+```
+
+- *Type:* string
+- *Default:* uses built-in plone-vinyl-recv.vcl
+
+Custom VCL snippet for vcl_recv subroutine.
+
+Replaces the default Plone recv snippet.
+
+---
+
+### VinylCacheToleration <a name="VinylCacheToleration" id="@bluedynamics/cdk8s-plone.VinylCacheToleration"></a>
+
+A Kubernetes toleration for the Varnish pods.
+
+#### Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.VinylCacheToleration.Initializer"></a>
+
+```typescript
+import { VinylCacheToleration } from '@bluedynamics/cdk8s-plone'
+
+const vinylCacheToleration: VinylCacheToleration = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheToleration.property.key">key</a></code> | <code>string</code> | The taint key to tolerate. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheToleration.property.effect">effect</a></code> | <code>string</code> | The taint effect to tolerate (NoSchedule, PreferNoSchedule, NoExecute). |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheToleration.property.operator">operator</a></code> | <code>string</code> | The operator (Equal or Exists). |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheToleration.property.value">value</a></code> | <code>string</code> | The taint value to match (when operator is Equal). |
+
+---
+
+##### `key`<sup>Required</sup> <a name="key" id="@bluedynamics/cdk8s-plone.VinylCacheToleration.property.key"></a>
+
+```typescript
+public readonly key: string;
+```
+
+- *Type:* string
+
+The taint key to tolerate.
+
+---
+
+##### `effect`<sup>Optional</sup> <a name="effect" id="@bluedynamics/cdk8s-plone.VinylCacheToleration.property.effect"></a>
+
+```typescript
+public readonly effect: string;
+```
+
+- *Type:* string
+- *Default:* tolerate all effects
+
+The taint effect to tolerate (NoSchedule, PreferNoSchedule, NoExecute).
+
+---
+
+##### `operator`<sup>Optional</sup> <a name="operator" id="@bluedynamics/cdk8s-plone.VinylCacheToleration.property.operator"></a>
+
+```typescript
+public readonly operator: string;
+```
+
+- *Type:* string
+- *Default:* 'Equal'
+
+The operator (Equal or Exists).
+
+---
+
+##### `value`<sup>Optional</sup> <a name="value" id="@bluedynamics/cdk8s-plone.VinylCacheToleration.property.value"></a>
+
+```typescript
+public readonly value: string;
+```
+
+- *Type:* string
+- *Default:* no value
+
+The taint value to match (when operator is Equal).
 
 ---
 
