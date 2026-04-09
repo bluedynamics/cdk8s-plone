@@ -313,3 +313,63 @@ exports[`with-pdp 1`] = `
   },
 ]
 `;
+
+exports[`with-security-context 1`] = `
+[
+  {
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/component": "-deployment",
+        "app.kubernetes.io/name": "undefined-deployment",
+      },
+      "name": "plone-with_security_context-deployment-c88cad2d",
+    },
+    "spec": {
+      "replicas": 2,
+      "selector": {
+        "matchLabels": {
+          "app": "plone-with_security_context-c85ae4da",
+        },
+      },
+      "template": {
+        "metadata": {
+          "labels": {
+            "app": "plone-with_security_context-c85ae4da",
+            "app.kubernetes.io/managed-by": "cdk8s-plone",
+            "app.kubernetes.io/part-of": "plone",
+          },
+        },
+        "spec": {
+          "containers": [
+            {
+              "env": [],
+              "envFrom": [],
+              "name": "with_security_context-container",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "1Gi",
+                },
+                "requests": {
+                  "cpu": "200m",
+                  "memory": "300Mi",
+                },
+              },
+              "securityContext": {
+                "capabilities": {
+                  "add": [
+                    "SYS_PTRACE",
+                  ],
+                },
+              },
+            },
+          ],
+          "imagePullSecrets": [],
+        },
+      },
+    },
+  },
+]
+`;

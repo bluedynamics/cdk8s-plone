@@ -61,6 +61,23 @@ test('with-environment-valueFrom', () => {
   expect(Testing.synth(chart)).toMatchSnapshot();
 });
 
+test('with-security-context', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new PloneDeployment(chart, 'with_security_context', {
+    port: 8080,
+    securityContext: {
+      capabilities: { add: ['SYS_PTRACE'] },
+    },
+  });
+
+  // THEN
+  expect(Testing.synth(chart)).toMatchSnapshot();
+});
+
 test('with-environment-from-secret', () => {
   // GIVEN
   const app = Testing.app();
