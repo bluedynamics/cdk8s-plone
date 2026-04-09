@@ -101,6 +101,22 @@ test('with-both-servicemonitors', () => {
   expect(Testing.synth(chart)).toMatchSnapshot();
 });
 
+test('with securityContext for capabilities', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'app');
+
+  // WHEN
+  new Plone(chart, 'plone', {
+    backend: {
+      securityContext: { capabilities: { add: ['SYS_PTRACE'] } },
+    },
+  });
+
+  // THEN
+  expect(Testing.synth(chart)).toMatchSnapshot();
+});
+
 test('with nodeSelector for region affinity', () => {
   // GIVEN
   const app = Testing.app();

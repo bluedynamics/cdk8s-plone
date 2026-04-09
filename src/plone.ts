@@ -8,6 +8,72 @@ import { ServiceMonitor, ServiceMonitorSpecEndpointsTargetPort } from './imports
 import { PloneService } from './service';
 
 /**
+ * Linux capabilities to add or drop on a container.
+ */
+export interface PloneCapabilities {
+  /**
+   * Capabilities to add (e.g. 'SYS_PTRACE', 'NET_ADMIN').
+   * @default - no capabilities added
+   */
+  readonly add?: string[];
+
+  /**
+   * Capabilities to drop (e.g. 'ALL', 'NET_RAW').
+   * @default - no capabilities dropped
+   */
+  readonly drop?: string[];
+}
+
+/**
+ * Security context for a Plone container.
+ * Controls privilege and access settings.
+ */
+export interface PloneSecurityContext {
+  /**
+   * Linux capabilities to add or drop.
+   * @example { add: ['SYS_PTRACE'] }
+   * @default - no capability changes
+   */
+  readonly capabilities?: PloneCapabilities;
+
+  /**
+   * Run the container as a specific user ID.
+   * @default - container default
+   */
+  readonly runAsUser?: number;
+
+  /**
+   * Run the container as a specific group ID.
+   * @default - container default
+   */
+  readonly runAsGroup?: number;
+
+  /**
+   * Require the container to run as non-root.
+   * @default - undefined
+   */
+  readonly runAsNonRoot?: boolean;
+
+  /**
+   * Mount the root filesystem as read-only.
+   * @default - undefined
+   */
+  readonly readOnlyRootFilesystem?: boolean;
+
+  /**
+   * Allow privilege escalation for the container process.
+   * @default - undefined
+   */
+  readonly allowPrivilegeEscalation?: boolean;
+
+  /**
+   * Run the container in privileged mode.
+   * @default - undefined
+   */
+  readonly privileged?: boolean;
+}
+
+/**
  * Base options for Plone backend or frontend configuration.
  * These options control container image, replica count, resource limits,
  * environment variables, and health probes.
@@ -210,6 +276,14 @@ export interface PloneBaseOptions {
    * @default - no node selector
    */
   readonly nodeSelector?: { [key: string]: string };
+
+  /**
+   * Security context for the container.
+   * Use to set capabilities, run as non-root, read-only filesystem, etc.
+   * @example { capabilities: { add: ['SYS_PTRACE'] } }
+   * @default - no security context
+   */
+  readonly securityContext?: PloneSecurityContext;
 }
 /**
  * Plone deployment variants.
@@ -359,6 +433,7 @@ export class Plone extends Construct {
       annotations: backend.annotations,
       podAnnotations: backend.podAnnotations,
       nodeSelector: backend.nodeSelector,
+      securityContext: backend.securityContext as k8s.SecurityContext,
     };
 
     // Probing
@@ -451,6 +526,7 @@ export class Plone extends Construct {
         annotations: frontend.annotations,
         podAnnotations: frontend.podAnnotations,
         nodeSelector: frontend.nodeSelector,
+        securityContext: frontend.securityContext as k8s.SecurityContext,
       };
 
       // Probing

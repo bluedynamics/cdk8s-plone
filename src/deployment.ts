@@ -132,6 +132,14 @@ export interface PloneDeploymentOptions {
   readonly nodeSelector?: { [key: string]: string };
 
   /**
+   * Security context for the container.
+   * Use to set capabilities, run as non-root, read-only filesystem, etc.
+   * @example { capabilities: { add: ['SYS_PTRACE'] } }
+   * @default - no security context
+   */
+  readonly securityContext?: k8s.SecurityContext;
+
+  /**
    * Liveness probe configuration for the container.
    * @default - undefined (no liveness probe)
    */
@@ -197,6 +205,7 @@ export class PloneDeployment extends Construct {
       },
       livenessProbe: options.livenessProbe ?? undefined,
       readinessProbe: options.readinessProbe ?? undefined,
+      securityContext: options.securityContext,
     };
     const deploymentOptions: k8s.KubeDeploymentProps = {
       metadata: {
