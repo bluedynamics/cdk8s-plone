@@ -726,6 +726,7 @@ const ploneBaseOptions: PloneBaseOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.replicas">replicas</a></code> | <code>number</code> | Number of pod replicas to run. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.requestCpu">requestCpu</a></code> | <code>string</code> | CPU request for the container. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.requestMemory">requestMemory</a></code> | <code>string</code> | Memory request for the container. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.securityContext">securityContext</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.PloneSecurityContext">PloneSecurityContext</a></code> | Security context for the container. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.serviceAnnotations">serviceAnnotations</a></code> | <code>{[ key: string ]: string}</code> | Annotations to add to the Service metadata. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.servicemonitor">servicemonitor</a></code> | <code>boolean</code> | Enable Prometheus ServiceMonitor for metrics collection. |
 
@@ -1159,6 +1160,28 @@ Memory request for the container.
 ```
 
 
+##### `securityContext`<sup>Optional</sup> <a name="securityContext" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.securityContext"></a>
+
+```typescript
+public readonly securityContext: PloneSecurityContext;
+```
+
+- *Type:* <a href="#@bluedynamics/cdk8s-plone.PloneSecurityContext">PloneSecurityContext</a>
+- *Default:* no security context
+
+Security context for the container.
+
+Use to set capabilities, run as non-root, read-only filesystem, etc.
+
+---
+
+*Example*
+
+```typescript
+{ capabilities: { add: ['SYS_PTRACE'] } }
+```
+
+
 ##### `serviceAnnotations`<sup>Optional</sup> <a name="serviceAnnotations" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.serviceAnnotations"></a>
 
 ```typescript
@@ -1194,6 +1217,53 @@ Enable Prometheus ServiceMonitor for metrics collection.
 
 Requires Prometheus Operator to be installed in the cluster.
 When enabled, a ServiceMonitor resource will be created to scrape metrics.
+
+---
+
+### PloneCapabilities <a name="PloneCapabilities" id="@bluedynamics/cdk8s-plone.PloneCapabilities"></a>
+
+Linux capabilities to add or drop on a container.
+
+#### Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.PloneCapabilities.Initializer"></a>
+
+```typescript
+import { PloneCapabilities } from '@bluedynamics/cdk8s-plone'
+
+const ploneCapabilities: PloneCapabilities = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneCapabilities.property.add">add</a></code> | <code>string[]</code> | Capabilities to add (e.g. 'SYS_PTRACE', 'NET_ADMIN'). |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneCapabilities.property.drop">drop</a></code> | <code>string[]</code> | Capabilities to drop (e.g. 'ALL', 'NET_RAW'). |
+
+---
+
+##### `add`<sup>Optional</sup> <a name="add" id="@bluedynamics/cdk8s-plone.PloneCapabilities.property.add"></a>
+
+```typescript
+public readonly add: string[];
+```
+
+- *Type:* string[]
+- *Default:* no capabilities added
+
+Capabilities to add (e.g. 'SYS_PTRACE', 'NET_ADMIN').
+
+---
+
+##### `drop`<sup>Optional</sup> <a name="drop" id="@bluedynamics/cdk8s-plone.PloneCapabilities.property.drop"></a>
+
+```typescript
+public readonly drop: string[];
+```
+
+- *Type:* string[]
+- *Default:* no capabilities dropped
+
+Capabilities to drop (e.g. 'ALL', 'NET_RAW').
 
 ---
 
@@ -1562,6 +1632,132 @@ public readonly version: string;
 Version string for labeling the deployment.
 
 This is used in Kubernetes labels and doesn't affect the actual image versions.
+
+---
+
+### PloneSecurityContext <a name="PloneSecurityContext" id="@bluedynamics/cdk8s-plone.PloneSecurityContext"></a>
+
+Security context for a Plone container.
+
+Controls privilege and access settings.
+
+#### Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.PloneSecurityContext.Initializer"></a>
+
+```typescript
+import { PloneSecurityContext } from '@bluedynamics/cdk8s-plone'
+
+const ploneSecurityContext: PloneSecurityContext = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneSecurityContext.property.allowPrivilegeEscalation">allowPrivilegeEscalation</a></code> | <code>boolean</code> | Allow privilege escalation for the container process. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneSecurityContext.property.capabilities">capabilities</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.PloneCapabilities">PloneCapabilities</a></code> | Linux capabilities to add or drop. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneSecurityContext.property.privileged">privileged</a></code> | <code>boolean</code> | Run the container in privileged mode. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneSecurityContext.property.readOnlyRootFilesystem">readOnlyRootFilesystem</a></code> | <code>boolean</code> | Mount the root filesystem as read-only. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneSecurityContext.property.runAsGroup">runAsGroup</a></code> | <code>number</code> | Run the container as a specific group ID. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneSecurityContext.property.runAsNonRoot">runAsNonRoot</a></code> | <code>boolean</code> | Require the container to run as non-root. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneSecurityContext.property.runAsUser">runAsUser</a></code> | <code>number</code> | Run the container as a specific user ID. |
+
+---
+
+##### `allowPrivilegeEscalation`<sup>Optional</sup> <a name="allowPrivilegeEscalation" id="@bluedynamics/cdk8s-plone.PloneSecurityContext.property.allowPrivilegeEscalation"></a>
+
+```typescript
+public readonly allowPrivilegeEscalation: boolean;
+```
+
+- *Type:* boolean
+- *Default:* undefined
+
+Allow privilege escalation for the container process.
+
+---
+
+##### `capabilities`<sup>Optional</sup> <a name="capabilities" id="@bluedynamics/cdk8s-plone.PloneSecurityContext.property.capabilities"></a>
+
+```typescript
+public readonly capabilities: PloneCapabilities;
+```
+
+- *Type:* <a href="#@bluedynamics/cdk8s-plone.PloneCapabilities">PloneCapabilities</a>
+- *Default:* no capability changes
+
+Linux capabilities to add or drop.
+
+---
+
+*Example*
+
+```typescript
+{ add: ['SYS_PTRACE'] }
+```
+
+
+##### `privileged`<sup>Optional</sup> <a name="privileged" id="@bluedynamics/cdk8s-plone.PloneSecurityContext.property.privileged"></a>
+
+```typescript
+public readonly privileged: boolean;
+```
+
+- *Type:* boolean
+- *Default:* undefined
+
+Run the container in privileged mode.
+
+---
+
+##### `readOnlyRootFilesystem`<sup>Optional</sup> <a name="readOnlyRootFilesystem" id="@bluedynamics/cdk8s-plone.PloneSecurityContext.property.readOnlyRootFilesystem"></a>
+
+```typescript
+public readonly readOnlyRootFilesystem: boolean;
+```
+
+- *Type:* boolean
+- *Default:* undefined
+
+Mount the root filesystem as read-only.
+
+---
+
+##### `runAsGroup`<sup>Optional</sup> <a name="runAsGroup" id="@bluedynamics/cdk8s-plone.PloneSecurityContext.property.runAsGroup"></a>
+
+```typescript
+public readonly runAsGroup: number;
+```
+
+- *Type:* number
+- *Default:* container default
+
+Run the container as a specific group ID.
+
+---
+
+##### `runAsNonRoot`<sup>Optional</sup> <a name="runAsNonRoot" id="@bluedynamics/cdk8s-plone.PloneSecurityContext.property.runAsNonRoot"></a>
+
+```typescript
+public readonly runAsNonRoot: boolean;
+```
+
+- *Type:* boolean
+- *Default:* undefined
+
+Require the container to run as non-root.
+
+---
+
+##### `runAsUser`<sup>Optional</sup> <a name="runAsUser" id="@bluedynamics/cdk8s-plone.PloneSecurityContext.property.runAsUser"></a>
+
+```typescript
+public readonly runAsUser: number;
+```
+
+- *Type:* number
+- *Default:* container default
+
+Run the container as a specific user ID.
 
 ---
 
