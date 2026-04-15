@@ -261,6 +261,16 @@ export interface VinylCacheSpecBackends {
   readonly connectionParameters?: VinylCacheSpecBackendsConnectionParameters;
 
   /**
+   * director overrides the cluster-wide director for this backend only.
+   * If nil, a shard director with defaults is generated, grouping all resolved
+   * per-pod backends for this serviceRef. Use "round_robin" or "random" if
+   * consistent hashing is undesirable (e.g. stateless backends).
+   *
+   * @schema VinylCacheSpecBackends#director
+   */
+  readonly director?: VinylCacheSpecBackendsDirector;
+
+  /**
    * name is the VCL identifier for this backend. Must match ^[a-zA-Z][a-zA-Z0-9_]*$.
    *
    * @schema VinylCacheSpecBackends#name
@@ -304,6 +314,7 @@ export function toJson_VinylCacheSpecBackends(obj: VinylCacheSpecBackends | unde
   if (obj === undefined) { return undefined; }
   const result = {
     'connectionParameters': toJson_VinylCacheSpecBackendsConnectionParameters(obj.connectionParameters),
+    'director': toJson_VinylCacheSpecBackendsDirector(obj.director),
     'name': obj.name,
     'port': obj.port,
     'probe': toJson_VinylCacheSpecBackendsProbe(obj.probe),
@@ -360,7 +371,7 @@ export function toJson_VinylCacheSpecCluster(obj: VinylCacheSpecCluster | undefi
 export interface VinylCacheSpecDebounce {
   /**
    * duration is the time to wait after the last endpoint change before pushing a VCL update.
-   * This prevents thundering-herd on rapid endpoint churn. Default: 5s.
+   * This prevents thundering-herd on rapid endpoint churn. Default: 1s.
    *
    * @schema VinylCacheSpecDebounce#duration
    */
@@ -908,6 +919,55 @@ export function toJson_VinylCacheSpecBackendsConnectionParameters(obj: VinylCach
 /* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
 
 /**
+ * director overrides the cluster-wide director for this backend only.
+ * If nil, a shard director with defaults is generated, grouping all resolved
+ * per-pod backends for this serviceRef. Use "round_robin" or "random" if
+ * consistent hashing is undesirable (e.g. stateless backends).
+ *
+ * @schema VinylCacheSpecBackendsDirector
+ */
+export interface VinylCacheSpecBackendsDirector {
+  /**
+   * hash configures the hash director. Only used when type is "hash".
+   *
+   * @schema VinylCacheSpecBackendsDirector#hash
+   */
+  readonly hash?: VinylCacheSpecBackendsDirectorHash;
+
+  /**
+   * shard configures the shard director (consistent-hash). Only used when type is "shard".
+   *
+   * @schema VinylCacheSpecBackendsDirector#shard
+   */
+  readonly shard?: VinylCacheSpecBackendsDirectorShard;
+
+  /**
+   * type selects the Varnish director algorithm.
+   * "shard" (default) provides consistent hashing; "round_robin", "random", and "hash"
+   * are also supported.
+   *
+   * @schema VinylCacheSpecBackendsDirector#type
+   */
+  readonly type?: VinylCacheSpecBackendsDirectorType;
+}
+
+/**
+ * Converts an object of type 'VinylCacheSpecBackendsDirector' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheSpecBackendsDirector(obj: VinylCacheSpecBackendsDirector | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'hash': toJson_VinylCacheSpecBackendsDirectorHash(obj.hash),
+    'shard': toJson_VinylCacheSpecBackendsDirectorShard(obj.shard),
+    'type': obj.type,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
  * probe configures the Varnish backend health probe.
  *
  * @schema VinylCacheSpecBackendsProbe
@@ -1142,6 +1202,8 @@ export enum VinylCacheSpecDirectorType {
   RANDOM = "random",
   /** hash */
   HASH = "hash",
+  /** fallback */
+  FALLBACK = "fallback",
 }
 
 /**
@@ -1713,6 +1775,119 @@ export function toJson_VinylCacheSpecVclSnippets(obj: VinylCacheSpecVclSnippets 
 /* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
 
 /**
+ * hash configures the hash director. Only used when type is "hash".
+ *
+ * @schema VinylCacheSpecBackendsDirectorHash
+ */
+export interface VinylCacheSpecBackendsDirectorHash {
+  /**
+   * header is the request header name used as the hash key.
+   *
+   * @schema VinylCacheSpecBackendsDirectorHash#header
+   */
+  readonly header?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheSpecBackendsDirectorHash' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheSpecBackendsDirectorHash(obj: VinylCacheSpecBackendsDirectorHash | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'header': obj.header,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * shard configures the shard director (consistent-hash). Only used when type is "shard".
+ *
+ * @schema VinylCacheSpecBackendsDirectorShard
+ */
+export interface VinylCacheSpecBackendsDirectorShard {
+  /**
+   * by determines what value is hashed for shard selection. "HASH" uses the Varnish
+   * hash (default); "URL" uses the request URL.
+   *
+   * @schema VinylCacheSpecBackendsDirectorShard#by
+   */
+  readonly by?: VinylCacheSpecBackendsDirectorShardBy;
+
+  /**
+   * healthy controls which backends the director considers when selecting a shard.
+   * "CHOSEN" (default) only considers the chosen backend healthy; "ALL" requires all
+   * backends to be healthy.
+   *
+   * @schema VinylCacheSpecBackendsDirectorShard#healthy
+   */
+  readonly healthy?: VinylCacheSpecBackendsDirectorShardHealthy;
+
+  /**
+   * rampup is the time after adding a backend before it receives its full share of traffic,
+   * preventing thundering-herd. Default: 30s.
+   *
+   * @schema VinylCacheSpecBackendsDirectorShard#rampup
+   */
+  readonly rampup?: string;
+
+  /**
+   * replicas is the number of Ketama replicas per backend in the hash ring. Default: 67.
+   *
+   * @schema VinylCacheSpecBackendsDirectorShard#replicas
+   */
+  readonly replicas?: number;
+
+  /**
+   * warmup is the proportion of requests (0.0–1.0) sent to the alternative backend
+   * to pre-populate its cache. Default: 0.1. Must be between 0.0 and 1.0.
+   *
+   * @schema VinylCacheSpecBackendsDirectorShard#warmup
+   */
+  readonly warmup?: number;
+}
+
+/**
+ * Converts an object of type 'VinylCacheSpecBackendsDirectorShard' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheSpecBackendsDirectorShard(obj: VinylCacheSpecBackendsDirectorShard | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'by': obj.by,
+    'healthy': obj.healthy,
+    'rampup': obj.rampup,
+    'replicas': obj.replicas,
+    'warmup': obj.warmup,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * type selects the Varnish director algorithm.
+ * "shard" (default) provides consistent hashing; "round_robin", "random", and "hash"
+ * are also supported.
+ *
+ * @schema VinylCacheSpecBackendsDirectorType
+ */
+export enum VinylCacheSpecBackendsDirectorType {
+  /** shard */
+  SHARD = "shard",
+  /** round_robin */
+  ROUND_UNDERSCORE_ROBIN = "round_robin",
+  /** random */
+  RANDOM = "random",
+  /** hash */
+  HASH = "hash",
+  /** fallback */
+  FALLBACK = "fallback",
+}
+
+/**
  * type is the routing strategy between Varnish pods. Only "shard" is supported.
  *
  * @schema VinylCacheSpecClusterPeerRoutingType
@@ -1896,6 +2071,33 @@ export function toJson_VinylCacheSpecPodAffinityPodAntiAffinity(obj: VinylCacheS
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
 }
 /* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * by determines what value is hashed for shard selection. "HASH" uses the Varnish
+ * hash (default); "URL" uses the request URL.
+ *
+ * @schema VinylCacheSpecBackendsDirectorShardBy
+ */
+export enum VinylCacheSpecBackendsDirectorShardBy {
+  /** HASH */
+  HASH = "HASH",
+  /** URL */
+  URL = "URL",
+}
+
+/**
+ * healthy controls which backends the director considers when selecting a shard.
+ * "CHOSEN" (default) only considers the chosen backend healthy; "ALL" requires all
+ * backends to be healthy.
+ *
+ * @schema VinylCacheSpecBackendsDirectorShardHealthy
+ */
+export enum VinylCacheSpecBackendsDirectorShardHealthy {
+  /** CHOSEN */
+  CHOSEN = "CHOSEN",
+  /** ALL */
+  ALL = "ALL",
+}
 
 /**
  * An empty preferred scheduling term matches all objects with implicit weight 0
