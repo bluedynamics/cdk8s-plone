@@ -1794,6 +1794,10 @@ const ploneVinylCacheOptions: PloneVinylCacheOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.replicas">replicas</a></code> | <code>number</code> | Number of Varnish pod replicas. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.requestCpu">requestCpu</a></code> | <code>string</code> | CPU request for Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.requestMemory">requestMemory</a></code> | <code>string</code> | Memory request for Varnish pods. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardBy">shardBy</a></code> | <code>string</code> | Shard director: what value is hashed for shard selection. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardHealthy">shardHealthy</a></code> | <code>string</code> | Shard director: which backends the director considers when selecting a shard. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardRampup">shardRampup</a></code> | <code>string</code> | Shard director: time after adding a backend before it receives its full share of traffic, preventing thundering-herd. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardReplicas">shardReplicas</a></code> | <code>number</code> | Shard director: number of Ketama replicas per backend in the hash ring. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.tolerations">tolerations</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheToleration">VinylCacheToleration</a>[]</code> | Tolerations for the Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclBackendErrorSnippet">vclBackendErrorSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_backend_error subroutine. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclBackendFetchSnippet">vclBackendFetchSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_backend_fetch subroutine. |
@@ -1970,6 +1974,71 @@ public readonly requestMemory: string;
 - *Default:* '256Mi'
 
 Memory request for Varnish pods.
+
+---
+
+##### `shardBy`<sup>Optional</sup> <a name="shardBy" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardBy"></a>
+
+```typescript
+public readonly shardBy: string;
+```
+
+- *Type:* string
+- *Default:* operator default ("HASH")
+
+Shard director: what value is hashed for shard selection.
+
+"HASH" uses the Varnish hash (default); "URL" uses the request URL.
+Only applied when director is "shard".
+Requires cloud-vinyl operator >= 0.4.2.
+
+---
+
+##### `shardHealthy`<sup>Optional</sup> <a name="shardHealthy" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardHealthy"></a>
+
+```typescript
+public readonly shardHealthy: string;
+```
+
+- *Type:* string
+- *Default:* operator default ("CHOSEN")
+
+Shard director: which backends the director considers when selecting a shard.
+
+"CHOSEN" (default) only considers the chosen backend healthy; "ALL" requires all
+backends to be healthy.
+Only applied when director is "shard".
+Requires cloud-vinyl operator >= 0.4.2.
+
+---
+
+##### `shardRampup`<sup>Optional</sup> <a name="shardRampup" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardRampup"></a>
+
+```typescript
+public readonly shardRampup: string;
+```
+
+- *Type:* string
+- *Default:* operator default ("30s")
+
+Shard director: time after adding a backend before it receives its full share of traffic, preventing thundering-herd.
+
+Only applied when director is "shard".
+
+---
+
+##### `shardReplicas`<sup>Optional</sup> <a name="shardReplicas" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardReplicas"></a>
+
+```typescript
+public readonly shardReplicas: number;
+```
+
+- *Type:* number
+- *Default:* operator default (67)
+
+Shard director: number of Ketama replicas per backend in the hash ring.
+
+Only applied when director is "shard".
 
 ---
 

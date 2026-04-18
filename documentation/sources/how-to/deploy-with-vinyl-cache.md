@@ -82,6 +82,11 @@ new PloneVinylCache(chart, 'cache', {
 
 Invalidation is enabled by default (PURGE, BAN, xkey). Configure `plone.cachepurging` to point to the VinylCache invalidation proxy endpoint.
 
+:::{note}
+BAN-based invalidation requires **cloud-vinyl operator ≥ 0.4.2**. Earlier versions accept the spec but do not emit the BAN ACL / handler.
+Starting with 0.4.2 the operator's own pod IP is automatically added to the PURGE ACL, so purges from the operator itself work without additional configuration.
+:::
+
 To disable invalidation:
 
 ```typescript
@@ -90,6 +95,23 @@ new PloneVinylCache(chart, 'cache', {
   invalidation: false,
 });
 ```
+
+### Shard Director Tuning
+
+For shard-based load distribution (the default), you can fine-tune the consistent-hash behavior. These options require **cloud-vinyl ≥ 0.4.2** to be honored by the generated VCL.
+
+```typescript
+new PloneVinylCache(chart, 'cache', {
+  plone: plone,
+  director: 'shard',
+  shardBy: 'URL',        // hash the request URL instead of Varnish's hash
+  shardHealthy: 'ALL',   // require all backends healthy (vs. only "CHOSEN")
+  shardRampup: '45s',    // warm-up window for newly added backends
+  shardReplicas: 128,    // Ketama replicas per backend
+});
+```
+
+Shard options are ignored for non-shard directors (`round_robin`, `random`, `hash`).
 
 ## Migrating from PloneHttpcache
 
