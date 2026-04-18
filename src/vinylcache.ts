@@ -9,6 +9,9 @@ import {
   VinylCacheSpecDirectorType,
   VinylCacheSpecResourcesLimits,
   VinylCacheSpecResourcesRequests,
+  VinylCacheSpecStorage,
+  VinylCacheSpecStorageSize,
+  VinylCacheSpecStorageType,
 } from './imports/vinyl.bluedynamics.eu';
 import { Plone } from './plone';
 
@@ -83,6 +86,42 @@ export interface VinylCacheBackend {
    * @default - operator default
    */
   readonly weight?: number;
+}
+
+/**
+ * A Varnish storage backend configuration.
+ *
+ * Maps to `spec.storage[]` on the VinylCache CRD. The operator emits one
+ * `-s <name>=<type>,<options>` argument per entry to varnishd.
+ *
+ * Without any storage entry the operator falls back to the varnishd default
+ * (~100 MB malloc), which is almost always too small for real workloads.
+ */
+export interface VinylCacheStorage {
+  /**
+   * Internal storage identifier used in the varnishd `-s` argument.
+   * Must be unique within the VinylCache and match `^[a-zA-Z][a-zA-Z0-9_]*$`.
+   */
+  readonly name: string;
+
+  /**
+   * Storage backend type. Only "malloc" and "file" are permitted by the
+   * admission webhook.
+   */
+  readonly type: 'malloc' | 'file';
+
+  /**
+   * Storage allocation as a Kubernetes resource quantity (e.g. "1Gi", "500M").
+   * Required for malloc; required for file.
+   * @default - required for both malloc and file
+   */
+  readonly size?: string;
+
+  /**
+   * Filesystem path for file-type storage. Ignored for malloc.
+   * @default - required for type "file"
+   */
+  readonly path?: string;
 }
 
 /**
@@ -164,6 +203,20 @@ export interface PloneVinylCacheOptions {
    * @default '512Mi'
    */
   readonly limitMemory?: string;
+
+  /**
+   * Varnish storage backends (`spec.storage`).
+   *
+   * Each entry becomes a `-s <name>=<type>,<options>` argument to varnishd.
+   * If omitted, the operator ships varnishd with its stock default (~100 MB
+   * malloc) — almost always too small. Set an explicit malloc size at least
+   * matching the pod's memory request to use the allocated memory for caching.
+   *
+   * @default - no storage configured; operator uses varnishd default (~100MB malloc)
+   * @example
+   * storage: [{ name: 's0', type: 'malloc', size: '1Gi' }]
+   */
+  readonly storage?: VinylCacheStorage[];
 
   /**
    * Director type for load distribution.
@@ -463,12 +516,20 @@ export class PloneVinylCache extends Construct {
       }
     }
 
+    const storage: VinylCacheSpecStorage[] | undefined = options.storage?.map(s => ({
+      name: s.name,
+      type: s.type === 'file' ? VinylCacheSpecStorageType.FILE : VinylCacheSpecStorageType.MALLOC,
+      size: s.size !== undefined ? VinylCacheSpecStorageSize.fromString(s.size) : undefined,
+      path: s.path,
+    }));
+
     const vinylCache = new VinylCache(this, 'vinylcache', {
       spec: {
         replicas,
         image: options.image ?? 'varnish:7.6',
         backends,
         director: { type: directorType, shard: shardSpec },
+        storage,
         vcl: {
           snippets: {
             vclRecv: vclRecv,

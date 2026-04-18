@@ -66,6 +66,33 @@ kubectl get pods -n <namespace> -l app.kubernetes.io/managed-by=cloud-vinyl
 
 ## Customization
 
+### Sizing the Cache Storage
+
+Without an explicit `storage` entry, the operator ships varnishd with its
+stock default (~100 MB malloc) — almost always too small. Set a malloc size
+below the pod's memory limit, leaving headroom for varnishd overhead:
+
+```typescript
+new PloneVinylCache(chart, 'cache', {
+  plone: plone,
+  requestMemory: '512Mi',
+  limitMemory: '2Gi',
+  storage: [
+    { name: 's0', type: 'malloc', size: '1500M' },
+  ],
+});
+```
+
+For larger working sets you can combine an in-memory tier with a file-backed
+tier (requires a writable volume mount at the given path):
+
+```typescript
+storage: [
+  { name: 'mem', type: 'malloc', size: '500M' },
+  { name: 'disk', type: 'file', path: '/var/lib/varnish/disk.bin', size: '10Gi' },
+]
+```
+
 ### Custom VCL
 
 Override the default Plone VCL snippets for custom caching logic:
