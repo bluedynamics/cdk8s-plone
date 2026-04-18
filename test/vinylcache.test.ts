@@ -212,6 +212,65 @@ test('with nodeSelector and tolerations', () => {
   expect(Testing.synth(chart)).toMatchSnapshot();
 });
 
+test('with shard director and shardBy URL', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const plone = new Plone(chart, 'plone');
+
+  // WHEN
+  new PloneVinylCache(chart, 'test', {
+    plone,
+    director: 'shard',
+    shardBy: 'URL',
+  });
+
+  // THEN
+  expect(Testing.synth(chart)).toMatchSnapshot();
+});
+
+test('with full shard tuning (healthy, rampup, replicas)', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const plone = new Plone(chart, 'plone');
+
+  // WHEN
+  new PloneVinylCache(chart, 'test', {
+    plone,
+    director: 'shard',
+    shardBy: 'HASH',
+    shardHealthy: 'ALL',
+    shardRampup: '45s',
+    shardReplicas: 128,
+  });
+
+  // THEN
+  expect(Testing.synth(chart)).toMatchSnapshot();
+});
+
+test('shard options ignored when director is non-shard', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const plone = new Plone(chart, 'plone');
+
+  // WHEN
+  new PloneVinylCache(chart, 'test', {
+    plone,
+    director: 'round_robin',
+    shardBy: 'URL',
+    shardHealthy: 'ALL',
+  });
+
+  // THEN - emitted manifest must not contain a shard block
+  const manifest = Testing.synth(chart);
+  const vc = manifest.find(r => r.kind === 'VinylCache');
+  expect(vc).toBeDefined();
+  expect(vc.spec.director.type).toBe('round_robin');
+  expect(vc.spec.director.shard).toBeUndefined();
+});
+
 test('exposes vinylCacheServiceName', () => {
   // GIVEN
   const app = Testing.app();

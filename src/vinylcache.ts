@@ -4,6 +4,8 @@ import { Names } from 'cdk8s';
 import { Construct } from 'constructs';
 import {
   VinylCache,
+  VinylCacheSpecDirectorShardBy,
+  VinylCacheSpecDirectorShardHealthy,
   VinylCacheSpecDirectorType,
   VinylCacheSpecResourcesLimits,
   VinylCacheSpecResourcesRequests,
@@ -168,6 +170,40 @@ export interface PloneVinylCacheOptions {
    * @default 'shard'
    */
   readonly director?: string;
+
+  /**
+   * Shard director: what value is hashed for shard selection.
+   * "HASH" uses the Varnish hash (default); "URL" uses the request URL.
+   * Only applied when director is "shard".
+   * Requires cloud-vinyl operator >= 0.4.2.
+   * @default - operator default ("HASH")
+   */
+  readonly shardBy?: string;
+
+  /**
+   * Shard director: which backends the director considers when selecting a shard.
+   * "CHOSEN" (default) only considers the chosen backend healthy; "ALL" requires all
+   * backends to be healthy.
+   * Only applied when director is "shard".
+   * Requires cloud-vinyl operator >= 0.4.2.
+   * @default - operator default ("CHOSEN")
+   */
+  readonly shardHealthy?: string;
+
+  /**
+   * Shard director: time after adding a backend before it receives its full share of
+   * traffic, preventing thundering-herd.
+   * Only applied when director is "shard".
+   * @default - operator default ("30s")
+   */
+  readonly shardRampup?: string;
+
+  /**
+   * Shard director: number of Ketama replicas per backend in the hash ring.
+   * Only applied when director is "shard".
+   * @default - operator default (67)
+   */
+  readonly shardReplicas?: number;
 
   /**
    * Custom VCL snippet for vcl_recv subroutine.
@@ -335,6 +371,32 @@ export class PloneVinylCache extends Construct {
         directorType = VinylCacheSpecDirectorType.SHARD;
     }
 
+    // Shard director tuning: only honored by the operator when director type is "shard".
+    // Emit the shard block only for shard directors so manifests stay minimal.
+    let shardSpec: {
+      by?: VinylCacheSpecDirectorShardBy;
+      healthy?: VinylCacheSpecDirectorShardHealthy;
+      rampup?: string;
+      replicas?: number;
+    } | undefined;
+    if (directorType === VinylCacheSpecDirectorType.SHARD &&
+        (options.shardBy || options.shardHealthy || options.shardRampup || options.shardReplicas !== undefined)) {
+      let shardBy: VinylCacheSpecDirectorShardBy | undefined;
+      if (options.shardBy === 'URL') shardBy = VinylCacheSpecDirectorShardBy.URL;
+      else if (options.shardBy === 'HASH') shardBy = VinylCacheSpecDirectorShardBy.HASH;
+
+      let shardHealthy: VinylCacheSpecDirectorShardHealthy | undefined;
+      if (options.shardHealthy === 'ALL') shardHealthy = VinylCacheSpecDirectorShardHealthy.ALL;
+      else if (options.shardHealthy === 'CHOSEN') shardHealthy = VinylCacheSpecDirectorShardHealthy.CHOSEN;
+
+      shardSpec = {
+        by: shardBy,
+        healthy: shardHealthy,
+        rampup: options.shardRampup,
+        replicas: options.shardReplicas,
+      };
+    }
+
     // Load default VCL snippets
     const vclRecv = options.vclRecvSnippet ??
       fs.readFileSync(path.join(__dirname, 'config', 'plone-vinyl-recv.vcl'), 'utf8');
@@ -406,7 +468,7 @@ export class PloneVinylCache extends Construct {
         replicas,
         image: options.image ?? 'varnish:7.6',
         backends,
-        director: { type: directorType },
+        director: { type: directorType, shard: shardSpec },
         vcl: {
           snippets: {
             vclRecv: vclRecv,
