@@ -1798,6 +1798,7 @@ const ploneVinylCacheOptions: PloneVinylCacheOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardHealthy">shardHealthy</a></code> | <code>string</code> | Shard director: which backends the director considers when selecting a shard. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardRampup">shardRampup</a></code> | <code>string</code> | Shard director: time after adding a backend before it receives its full share of traffic, preventing thundering-herd. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardReplicas">shardReplicas</a></code> | <code>number</code> | Shard director: number of Ketama replicas per backend in the hash ring. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.storage">storage</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheStorage">VinylCacheStorage</a>[]</code> | Varnish storage backends (`spec.storage`). |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.tolerations">tolerations</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheToleration">VinylCacheToleration</a>[]</code> | Tolerations for the Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclBackendErrorSnippet">vclBackendErrorSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_backend_error subroutine. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclBackendFetchSnippet">vclBackendFetchSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_backend_fetch subroutine. |
@@ -2041,6 +2042,31 @@ Shard director: number of Ketama replicas per backend in the hash ring.
 Only applied when director is "shard".
 
 ---
+
+##### `storage`<sup>Optional</sup> <a name="storage" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.storage"></a>
+
+```typescript
+public readonly storage: VinylCacheStorage[];
+```
+
+- *Type:* <a href="#@bluedynamics/cdk8s-plone.VinylCacheStorage">VinylCacheStorage</a>[]
+- *Default:* no storage configured; operator uses varnishd default (~100MB malloc)
+
+Varnish storage backends (`spec.storage`).
+
+Each entry becomes a `-s <name>=<type>,<options>` argument to varnishd.
+If omitted, the operator ships varnishd with its stock default (~100 MB
+malloc) — almost always too small. Set an explicit malloc size at least
+matching the pod's memory request to use the allocated memory for caching.
+
+---
+
+*Example*
+
+```typescript
+storage: [{ name: 's0', type: 'malloc', size: '1Gi' }]
+```
+
 
 ##### `tolerations`<sup>Optional</sup> <a name="tolerations" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.tolerations"></a>
 
@@ -2431,6 +2457,92 @@ public readonly window: number;
 - *Default:* 10
 
 Number of most recent probes to consider.
+
+---
+
+### VinylCacheStorage <a name="VinylCacheStorage" id="@bluedynamics/cdk8s-plone.VinylCacheStorage"></a>
+
+A Varnish storage backend configuration.
+
+Maps to `spec.storage[]` on the VinylCache CRD. The operator emits one
+`-s <name>=<type>,<options>` argument per entry to varnishd.
+
+Without any storage entry the operator falls back to the varnishd default
+(~100 MB malloc), which is almost always too small for real workloads.
+
+#### Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.VinylCacheStorage.Initializer"></a>
+
+```typescript
+import { VinylCacheStorage } from '@bluedynamics/cdk8s-plone'
+
+const vinylCacheStorage: VinylCacheStorage = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheStorage.property.name">name</a></code> | <code>string</code> | Internal storage identifier used in the varnishd `-s` argument. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheStorage.property.type">type</a></code> | <code>string</code> | Storage backend type. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheStorage.property.path">path</a></code> | <code>string</code> | Filesystem path for file-type storage. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheStorage.property.size">size</a></code> | <code>string</code> | Storage allocation as a Kubernetes resource quantity (e.g. "1Gi", "500M"). Required for malloc; required for file. |
+
+---
+
+##### `name`<sup>Required</sup> <a name="name" id="@bluedynamics/cdk8s-plone.VinylCacheStorage.property.name"></a>
+
+```typescript
+public readonly name: string;
+```
+
+- *Type:* string
+
+Internal storage identifier used in the varnishd `-s` argument.
+
+Must be unique within the VinylCache and match `^[a-zA-Z][a-zA-Z0-9_]*$`.
+
+---
+
+##### `type`<sup>Required</sup> <a name="type" id="@bluedynamics/cdk8s-plone.VinylCacheStorage.property.type"></a>
+
+```typescript
+public readonly type: string;
+```
+
+- *Type:* string
+
+Storage backend type.
+
+Only "malloc" and "file" are permitted by the
+admission webhook.
+
+---
+
+##### `path`<sup>Optional</sup> <a name="path" id="@bluedynamics/cdk8s-plone.VinylCacheStorage.property.path"></a>
+
+```typescript
+public readonly path: string;
+```
+
+- *Type:* string
+- *Default:* required for type "file"
+
+Filesystem path for file-type storage.
+
+Ignored for malloc.
+
+---
+
+##### `size`<sup>Optional</sup> <a name="size" id="@bluedynamics/cdk8s-plone.VinylCacheStorage.property.size"></a>
+
+```typescript
+public readonly size: string;
+```
+
+- *Type:* string
+- *Default:* required for both malloc and file
+
+Storage allocation as a Kubernetes resource quantity (e.g. "1Gi", "500M"). Required for malloc; required for file.
 
 ---
 

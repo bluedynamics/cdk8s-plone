@@ -307,12 +307,22 @@ Requires the [cloud-vinyl operator](https://github.com/bluedynamics/cloud-vinyl)
 | `limitCpu` | `string` | No | `500m` | CPU limit |
 | `requestMemory` | `string` | No | `256Mi` | Memory request |
 | `limitMemory` | `string` | No | `512Mi` | Memory limit |
+| `storage` | `VinylCacheStorage[]` | No | - | Varnish storage backends. If omitted, the operator falls back to the varnishd default (~100 MB malloc), which is almost always too small. |
 | `director` | `string` | No | `shard` | Director type: shard, round_robin, random, hash |
 | `vclRecvSnippet` | `string` | No | built-in | Custom VCL snippet for vcl_recv |
 | `vclBackendResponseSnippet` | `string` | No | built-in | Custom VCL snippet for vcl_backend_response |
 | `invalidation` | `boolean` | No | `true` | Enable PURGE/BAN/xkey cache invalidation |
 | `monitoring` | `boolean` | No | `false` | Enable Prometheus metrics and ServiceMonitor |
 | `tolerations` | `VinylCacheToleration[]` | No | - | Node tolerations for Varnish pods |
+
+**`VinylCacheStorage` fields:**
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `name` | `string` | Yes | Internal storage identifier (must match `^[a-zA-Z][a-zA-Z0-9_]*$`) |
+| `type` | `'malloc' \| 'file'` | Yes | Storage backend type |
+| `size` | `string` | Yes | Kubernetes resource quantity (e.g. `"1Gi"`, `"500M"`) |
+| `path` | `string` | for `file` | Filesystem path for file-type storage |
 
 **Example:**
 ```typescript
@@ -342,6 +352,19 @@ new PloneVinylCache(chart, 'cache', {
   `,
 });
 ```
+
+**Storage sizing:**
+```typescript
+new PloneVinylCache(chart, 'cache', {
+  plone: ploneInstance,
+  limitMemory: '2Gi',
+  storage: [
+    { name: 's0', type: 'malloc', size: '1500M' },
+  ],
+});
+```
+
+Without an explicit `storage` entry, varnishd runs with its stock default (~100 MB malloc) regardless of the container's memory limit. Size malloc storage below the pod's memory limit to leave headroom for varnishd overhead and transient allocations.
 
 **vs PloneHttpcache:**
 - `PloneHttpcache` deploys Varnish via mittwald Helm chart (self-contained, no operator needed)
