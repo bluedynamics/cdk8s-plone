@@ -1,4 +1,4 @@
-import { cdk, JsonPatch, github } from 'projen';
+import { cdk, JsonPatch, YamlFile, github } from 'projen';
 import { NpmAccess } from 'projen/lib/javascript';
 
 const kplus = 'cdk8s-plus-30';
@@ -75,12 +75,11 @@ project.addTask('import:vinylcache', {
 //   upgradeMain.addOverride('jobs.pr.steps.4.with.token', '${{ github.token }}');
 // }
 
-// Configure release workflow to skip documentation and examples changes
+// Configure release workflow to skip documentation changes
 const releaseWorkflow = project.tryFindObjectFile('.github/workflows/release.yml');
 if (releaseWorkflow) {
   releaseWorkflow.addOverride('on.push.paths-ignore', [
     'documentation/**',
-    'examples/**',
     '*.md',
     '.github/workflows/documentation.yml',
   ]);
@@ -90,5 +89,23 @@ if (releaseWorkflow) {
   releaseWorkflow.patch(JsonPatch.replace('/jobs/release_npm/steps/0/with/node-version', '24.x'));
   releaseWorkflow.patch(JsonPatch.add('/jobs/release_npm/steps/0/with/registry-url', 'https://registry.npmjs.org'));
 }
+
+// Dependabot config for GitHub Actions only.
+// npm dependencies are handled by projen's upgrade-main workflow; enabling the
+// npm ecosystem here would duplicate that work.
+new YamlFile(project, '.github/dependabot.yml', {
+  obj: {
+    version: 2,
+    updates: [
+      {
+        'package-ecosystem': 'github-actions',
+        'directory': '/',
+        'schedule': { interval: 'weekly' },
+        'labels': ['auto-approve', 'dependencies'],
+        'open-pull-requests-limit': 5,
+      },
+    ],
+  },
+});
 
 project.synth();

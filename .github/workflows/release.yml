@@ -7,7 +7,6 @@ on:
       - main
     paths-ignore:
       - documentation/**
-      - examples/**
       - "*.md"
       - .github/workflows/documentation.yml
   workflow_dispatch: {}

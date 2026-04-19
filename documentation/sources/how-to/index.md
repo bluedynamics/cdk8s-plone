@@ -25,13 +25,16 @@ setup-prerequisites
 
 **Deploy complete Plone examples to your Kubernetes cluster:**
 
+Complete working deployment examples live in a dedicated companion repository:
+[**bluedynamics/cdk8s-plone-example**](https://github.com/bluedynamics/cdk8s-plone-example).
+Clone that repo for ready-to-run projects covering Volto, Classic UI, PostgreSQL
+operators, caching and ingress setups.
+
 ```{toctree}
 ---
 maxdepth: 1
 titlesonly: true
 ---
-deploy-production-volto
-deploy-classic-ui
 deploy-with-vinyl-cache
 ```
 
