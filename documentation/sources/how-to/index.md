@@ -42,20 +42,19 @@ deploy-with-vinyl-cache
 maxdepth: 1
 titlesonly: true
 ---
+configure-security-context
+schedule-pods
 ```
 
-*Configuration guides will be added in future releases.*
-
-## Operations & Maintenance
+## Operations & maintenance
 
 ```{toctree}
 ---
 maxdepth: 1
 titlesonly: true
 ---
+enable-prometheus-monitoring
 ```
-
-*Operations guides will be added in future releases.*
 
 ## Troubleshooting
 
