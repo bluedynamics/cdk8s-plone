@@ -1,3 +1,12 @@
+---
+myst:
+  html_meta:
+    "description": "Understanding-oriented discussion of cdk8s-plone concepts, architecture, and design decisions."
+    "property=og:description": "Understanding-oriented discussion of cdk8s-plone concepts, architecture, and design decisions."
+    "property=og:title": "Explanation"
+    "keywords": "Plone, cdk8s, Kubernetes, architecture, design, concepts"
+---
+
 ```{image} ../_static/kup6s-icon-explanation.svg
 :align: center
 :class: section-icon-large
@@ -9,7 +18,7 @@
 
 Explanation guides clarify and illuminate particular topics. They broaden the understanding of cdk8s-plone and help you make informed decisions about how to use it.
 
-## Architecture & Concepts
+## Architecture and concepts
 
 ```{toctree}
 ---
@@ -20,7 +29,7 @@ features
 architecture
 ```
 
-## Key Topics
+## Key topics
 
 *This section will explain:*
 - Plone architecture and component relationships
@@ -34,7 +43,7 @@ architecture
 - Scaling and high availability considerations
 - Performance optimization
 
-## Design Decisions
+## Design decisions
 
 *This section will document:*
 - Why certain defaults were chosen

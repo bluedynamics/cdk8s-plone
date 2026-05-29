@@ -1,8 +1,17 @@
-# Deploy Classic UI Example
+---
+myst:
+  html_meta:
+    "description": "Deploy the Classic UI example: server-side rendered Plone with PostgreSQL, Varnish caching, and ingress with TLS."
+    "property=og:description": "Deploy the Classic UI example: server-side rendered Plone with PostgreSQL, Varnish caching, and ingress with TLS."
+    "property=og:title": "Deploy Classic UI example"
+    "keywords": "Plone, cdk8s, Kubernetes, Classic UI, PostgreSQL, Varnish, ingress"
+---
+
+# Deploy Classic UI example
 
 This guide shows you how to deploy the Classic UI example to your Kubernetes cluster.
 
-## What You'll Deploy
+## What you'll deploy
 
 The [Classic UI example](https://github.com/bluedynamics/cdk8s-plone/tree/main/examples/classic-ui) provides traditional Plone with server-side rendering:
 
@@ -27,7 +36,7 @@ Choose Classic UI if you're migrating from older Plone versions or need specific
 
 ## Prerequisites
 
-Same as the [Production Volto guide](deploy-production-volto.md#prerequisites), you need:
+Same as the {ref}`production-volto-prerequisites` in the Production Volto guide, you need:
 
 - Ingress controller (Traefik or Kong)
 - cert-manager
@@ -36,36 +45,36 @@ Same as the [Production Volto guide](deploy-production-volto.md#prerequisites), 
 
 See [Setup Prerequisites](setup-prerequisites.md) for detailed instructions.
 
-## Step 1: Get the Example
+## Step 1: Get the example
 
-```bash
+```shell
 git clone https://github.com/bluedynamics/cdk8s-plone.git
 cd cdk8s-plone/examples/classic-ui
 ```
 
-## Step 2: Install Dependencies
+## Step 2: Install dependencies
 
-```bash
+```shell
 npm install
 ```
 
 ## Step 3: Import CRDs
 
-```bash
+```shell
 npm run import
 ```
 
-## Step 4: Configure Environment
+## Step 4: Configure environment
 
 Create `.env` from the example:
 
-```bash
+```shell
 cp .env.example .env
 ```
 
 Edit `.env`:
 
-```bash
+```shell
 # Your domains
 DOMAIN_CACHED=plone.example.com
 DOMAIN_UNCACHED=plone-test.example.com
@@ -85,17 +94,17 @@ DATABASE=cloudnativepg
 Classic UI only needs one image (backend). There's no frontend image configuration.
 :::
 
-## Step 5: Generate Manifests
+## Step 5: Generate manifests
 
-```bash
+```shell
 npm run synth
 ```
 
 Creates `dist/plone-classic.k8s.yaml` (~27 KB, smaller than Volto's 32 KB).
 
-## Step 6: Review Manifests
+## Step 6: Review manifests
 
-```bash
+```shell
 # Count resources
 grep "^kind:" dist/plone-classic.k8s.yaml | sort | uniq -c
 
@@ -105,19 +114,19 @@ kubectl apply --dry-run=client -f dist/plone-classic.k8s.yaml
 
 ## Step 7: Deploy
 
-```bash
+```shell
 kubectl apply -f dist/plone-classic.k8s.yaml
 ```
 
 Or to a specific namespace:
 
-```bash
+```shell
 kubectl apply -f dist/plone-classic.k8s.yaml -n plone
 ```
 
-## Step 8: Monitor Deployment
+## Step 8: Monitor deployment
 
-```bash
+```shell
 # Watch pods
 kubectl get pods -l app.kubernetes.io/part-of=plone -w
 
@@ -131,9 +140,9 @@ kubectl wait --for=condition=ready pod \
 Classic UI deploys fewer pods than Volto (no frontend pods).
 :::
 
-## Step 9: Verify Services
+## Step 9: Verify services
 
-```bash
+```shell
 kubectl get svc -l app.kubernetes.io/part-of=plone
 ```
 
@@ -142,14 +151,14 @@ You should see:
 - `plone-httpcache` (Varnish cache)
 - Database service
 
-## Step 10: Check Ingress
+## Step 10: Check ingress
 
-```bash
+```shell
 kubectl get ingress
 kubectl get certificate
 ```
 
-## Step 11: Access Your Site
+## Step 11: Access your site
 
 Once DNS and TLS are ready:
 
@@ -157,7 +166,7 @@ Once DNS and TLS are ready:
 - **Testing (uncached)**: https://plone-test.example.com
 - **Maintenance**: https://plone-admin.example.com
 
-### Create Plone Site
+### Create Plone site
 
 1. Access maintenance domain: https://plone-admin.example.com
 2. Click "Create a new Plone site"
@@ -168,7 +177,7 @@ Once DNS and TLS are ready:
    - **Add-ons**: Choose Classic UI add-ons
 4. Click "Create Plone Site"
 
-## Key Differences from Volto
+## Key differences from Volto
 
 ### Architecture
 
@@ -184,7 +193,7 @@ Compared to Volto:
 Traffic → Ingress → {Varnish → Frontend, Backend}
 ```
 
-### Ingress Routes
+### Ingress routes
 
 Classic UI uses virtual host rewriting for direct backend access:
 
@@ -192,7 +201,7 @@ Classic UI uses virtual host rewriting for direct backend access:
 - **Uncached**: Direct to backend with VirtualHostBase rewrite
 - **Maintenance**: Direct backend access with VirtualHostRoot
 
-### No Frontend Service
+### No frontend service
 
 The manifest doesn't include:
 - Frontend deployment
@@ -203,11 +212,11 @@ This makes the deployment ~15% smaller and simpler to manage.
 
 ## Troubleshooting
 
-### Backend Not Starting
+### Backend not starting
 
 Check backend logs:
 
-```bash
+```shell
 kubectl logs -l app.kubernetes.io/name=plone-backend -f
 ```
 
@@ -216,24 +225,24 @@ Common issues:
 - Memory limits too low
 - Image pull errors
 
-### Classic UI Interface Not Loading
+### Classic UI interface not loading
 
 1. Check if backend pods are running:
-   ```bash
+   ```shell
    kubectl get pods -l app.kubernetes.io/name=plone-backend
    ```
 
 2. Verify virtual host rewriting in ingress:
-   ```bash
+   ```shell
    kubectl describe ingress
    ```
 
 3. Check Varnish routing:
-   ```bash
+   ```shell
    kubectl logs -l app.kubernetes.io/name=plone-httpcache
    ```
 
-### Add-on Compatibility
+### Add-on compatibility
 
 Some add-ons are Volto-specific. For Classic UI:
 - Use Classic UI themes (not Volto themes)
@@ -253,7 +262,7 @@ See the [Production Volto deployment guide](deploy-production-volto.md) for deta
 
 ## Customization
 
-### Backend Configuration
+### Backend configuration
 
 Edit `main.ts` to customize:
 
@@ -270,7 +279,7 @@ const plone = new Plone(this, 'plone', {
 })
 ```
 
-### Varnish Caching
+### Varnish caching
 
 Edit `config/varnish.tpl.vcl` for caching rules specific to Classic UI.
 
@@ -287,7 +296,7 @@ backend: {
 ```
 
 Then:
-```bash
+```shell
 npm run synth
 kubectl apply -f dist/plone-classic.k8s.yaml
 ```
@@ -303,20 +312,19 @@ Classic UI performance characteristics:
 
 ## Cleanup
 
-```bash
+```shell
 kubectl delete -f dist/plone-classic.k8s.yaml
 ```
 
-## Next Steps
+## Next steps
 
-- Add [Prometheus monitoring](../reference/configuration-options.md#monitoring)
-- Configure [CloudNativePG backups](https://cloudnative-pg.io/documentation/)
-- Customize [Classic UI theme](https://6.docs.plone.org/classic-ui/theming.html)
-- Set up [content migration](https://6.docs.plone.org/install/upgrade-guide.html)
+- Follow {doc}`enable-prometheus-monitoring` to add Prometheus monitoring.
+- Configure [CloudNativePG backups](https://cloudnative-pg.io/documentation/).
+- Customize the Classic UI theme through [Plone 6 Classic UI documentation](https://6.docs.plone.org/classic-ui/).
 
-## See Also
+## See also
 
-- [Deploy Production Volto](deploy-production-volto.md) - For modern React UI
-- [Setup Prerequisites](setup-prerequisites.md) - Cluster requirements
-- [Configuration Options](../reference/configuration-options.md) - API reference
-- [Plone 6 Classic UI Documentation](https://6.docs.plone.org/classic-ui/)
+- {doc}`deploy-production-volto` — For the modern React UI.
+- {doc}`setup-prerequisites` — Cluster requirements.
+- {doc}`/reference/configuration-options` — API reference.
+- [Plone 6 Classic UI documentation](https://6.docs.plone.org/classic-ui/)

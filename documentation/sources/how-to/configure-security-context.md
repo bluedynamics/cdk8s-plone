@@ -1,3 +1,12 @@
+---
+myst:
+  html_meta:
+    "description": "Harden Plone backend and frontend pods with a Kubernetes container security context: capabilities, UID/GID, read-only root, privilege escalation."
+    "property=og:description": "Harden Plone backend and frontend pods with a Kubernetes container security context: capabilities, UID/GID, read-only root, privilege escalation."
+    "property=og:title": "Configure security context"
+    "keywords": "Plone, cdk8s, Kubernetes, security context, Pod Security Standards, hardening"
+---
+
 ```{image} ../_static/kup6s-icon-howto.svg
 :align: center
 :class: section-icon-large
@@ -116,7 +125,7 @@ backend: {
 
 ## Verify the rollout
 
-```bash
+```shell
 # Generate manifests
 cdk8s synth
 
