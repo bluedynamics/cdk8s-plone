@@ -1,8 +1,17 @@
-# Configuration Options
+---
+myst:
+  html_meta:
+    "description": "Complete reference for cdk8s-plone constructs and configuration options: Plone, PloneHttpcache, PloneVinylCache."
+    "property=og:description": "Complete reference for cdk8s-plone constructs and configuration options: Plone, PloneHttpcache, PloneVinylCache."
+    "property=og:title": "Configuration options"
+    "keywords": "Plone, cdk8s, Kubernetes, configuration, reference, Volto, Varnish"
+---
+
+# Configuration options
 
 Complete reference for all configuration options in cdk8s-plone.
 
-## Key Constructs
+## Key constructs
 
 ### `Plone`
 
@@ -56,7 +65,7 @@ new PloneHttpcache(chart, 'cache', {
 
 ---
 
-## Configuration Interfaces
+## Configuration interfaces
 
 ### `PloneOptions`
 
@@ -89,14 +98,14 @@ const options: PloneOptions = {
 
 Configuration for backend or frontend components.
 
-#### Container Configuration
+#### Container configuration
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
-| `image` | `string` | Yes | - | Container image (e.g., 'plone/plone-backend:6.1.3') |
-| `imagePullPolicy` | `string` | No | `'IfNotPresent'` | Image pull policy |
+| `image` | `string` | No | `plone/plone-backend:latest` (backend) / `plone/plone-frontend:latest` (frontend) | Container image |
+| `imagePullPolicy` | `string` | No | `IfNotPresent` | Image pull policy |
 | `replicas` | `number` | No | `2` | Number of pod replicas |
-| `environment` | `Env` | No | - | Environment variables (cdk8s-plus-30.Env) |
+| `environment` | `Env` | No | - | Environment variables (cdk8s-plus-30 `Env`) |
 
 **Example:**
 ```typescript
@@ -115,14 +124,14 @@ backend: {
 }
 ```
 
-#### Resource Configuration
+#### Resource configuration
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `requestCpu` | `string` | CPU request (e.g., '500m', '1') |
-| `limitCpu` | `string` | CPU limit |
-| `requestMemory` | `string` | Memory request (e.g., '512Mi', '1Gi') |
-| `limitMemory` | `string` | Memory limit |
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `requestCpu` | `string` | `200m` | CPU request |
+| `limitCpu` | `string` | `500m` | CPU limit |
+| `requestMemory` | `string` | `256Mi` | Memory request |
+| `limitMemory` | `string` | `512Mi` (backend) / `1Gi` (frontend) | Memory limit |
 
 **Example:**
 ```typescript
@@ -135,12 +144,12 @@ backend: {
 }
 ```
 
-#### High Availability
+#### High availability
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `minAvailable` | `number` | Minimum pods available during updates (for PodDisruptionBudget) |
-| `maxUnavailable` | `number` | Maximum unavailable pods during updates |
+| `minAvailable` | `number \| string` | Minimum pods available during updates (for PodDisruptionBudget). Accepts an absolute number or a percentage string such as `"50%"`. |
+| `maxUnavailable` | `number \| string` | Maximum unavailable pods during updates. Accepts an absolute number or a percentage string such as `"50%"`. |
 
 **Example:**
 ```typescript
@@ -151,16 +160,16 @@ backend: {
 }
 ```
 
-#### Readiness Probe
+#### Readiness probe
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `readinessEnabled` | `boolean` | `true` | Enable readiness probe |
-| `readinessInitialDelaySeconds` | `number` | - | Seconds before first probe |
-| `readinessTimeoutSeconds` | `number` | - | Probe timeout |
-| `readinessPeriodSeconds` | `number` | - | Probe frequency |
-| `readinessSuccessThreshold` | `number` | - | Consecutive successes required |
-| `readinessFailureThreshold` | `number` | - | Consecutive failures before marking unready |
+| `readinessInitialDelaySeconds` | `number` | `10` | Seconds before first probe |
+| `readinessTimeoutSeconds` | `number` | `15` | Probe timeout |
+| `readinessPeriodSeconds` | `number` | `10` | Probe frequency |
+| `readinessSuccessThreshold` | `number` | `1` | Consecutive successes required |
+| `readinessFailureThreshold` | `number` | `3` | Consecutive failures before marking unready |
 
 **Example:**
 ```typescript
@@ -174,16 +183,16 @@ backend: {
 }
 ```
 
-#### Liveness Probe
+#### Liveness probe
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `livenessEnabled` | `boolean` | `false` | Enable liveness probe (recommended `true` for frontend) |
-| `livenessInitialDelaySeconds` | `number` | - | Seconds before first probe |
-| `livenessTimeoutSeconds` | `number` | - | Probe timeout |
-| `livenessPeriodSeconds` | `number` | - | Probe frequency |
-| `livenessSuccessThreshold` | `number` | - | Consecutive successes required |
-| `livenessFailureThreshold` | `number` | - | Consecutive failures before restart |
+| `livenessInitialDelaySeconds` | `number` | `30` | Seconds before first probe |
+| `livenessTimeoutSeconds` | `number` | `5` | Probe timeout |
+| `livenessPeriodSeconds` | `number` | `10` | Probe frequency |
+| `livenessSuccessThreshold` | `number` | `1` | Consecutive successes required |
+| `livenessFailureThreshold` | `number` | `3` | Consecutive failures before restart |
 
 **Example:**
 ```typescript
@@ -219,6 +228,94 @@ backend: {
 }
 ```
 
+(monitoring)=
+
+#### Prometheus monitoring
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `servicemonitor` | `boolean` | `false` | Create a Prometheus `ServiceMonitor` for this component. Requires the Prometheus Operator. |
+| `metricsPort` | `string \| number` | main service port | Service port name or number that exposes metrics. |
+| `metricsPath` | `string` | `/metrics` | HTTP path the Prometheus scraper requests. |
+
+You must instrument the backend or frontend container to expose metrics at the configured endpoint.
+For step-by-step setup, see {doc}`/how-to/enable-prometheus-monitoring`.
+
+**Example:**
+```typescript
+backend: {
+  image: 'plone/plone-backend:6.1.3',
+  servicemonitor: true,
+  metricsPath: '/metrics',
+},
+frontend: {
+  image: 'plone/plone-frontend:16.0.0',
+  servicemonitor: true,
+  metricsPort: 9090,
+}
+```
+
+#### Scheduling
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `nodeSelector` | `Record<string, string>` | - | Constrain pods to nodes whose labels match all entries. |
+
+For tainted nodes and taint-based scheduling, see {doc}`/how-to/schedule-pods`.
+
+**Example:**
+```typescript
+backend: {
+  image: 'plone/plone-backend:6.1.3',
+  nodeSelector: {
+    'topology.kubernetes.io/region': 'fsn1',
+  },
+}
+```
+
+#### Security context
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `securityContext` | `PloneSecurityContext` | - | Container security settings (capabilities, UID/GID, read-only root, privilege escalation). |
+
+**`PloneSecurityContext` fields:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `capabilities` | `PloneCapabilities` | Linux capabilities to add or drop. |
+| `runAsUser` | `number` | Run the container as this UID. |
+| `runAsGroup` | `number` | Run the container as this GID. |
+| `runAsNonRoot` | `boolean` | Require the container to run as non-root. |
+| `readOnlyRootFilesystem` | `boolean` | Mount the root filesystem read-only. |
+| `allowPrivilegeEscalation` | `boolean` | Allow the process to gain more privileges than its parent. |
+| `privileged` | `boolean` | Run the container in privileged mode. |
+
+**`PloneCapabilities` fields:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `add` | `string[]` | Capabilities to add (e.g., `'SYS_PTRACE'`). |
+| `drop` | `string[]` | Capabilities to drop (e.g., `'ALL'`). |
+
+For a hardening walk-through, see {doc}`/how-to/configure-security-context`.
+
+**Example:**
+```typescript
+backend: {
+  image: 'plone/plone-backend:6.1.3',
+  securityContext: {
+    runAsNonRoot: true,
+    runAsUser: 500,
+    readOnlyRootFilesystem: true,
+    allowPrivilegeEscalation: false,
+    capabilities: {
+      drop: ['ALL'],
+    },
+  },
+}
+```
+
 ---
 
 ### `PloneHttpcacheOptions`
@@ -228,18 +325,36 @@ Configuration for the Varnish HTTP cache layer.
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `plone` | `Plone` | Yes | - | Plone construct to attach cache to |
-| `varnishVcl` | `string` | No | - | VCL configuration as string |
-| `varnishVclFile` | `string` | No | - | Path to VCL configuration file |
+| `varnishVcl` | `string` | No | - | VCL configuration as string. Takes precedence over `varnishVclFile`. |
+| `varnishVclFile` | `string` | No | built-in `config/varnish.tpl.vcl` | Path to a VCL template file |
 | `existingSecret` | `string` | No | - | Kubernetes secret for Varnish admin credentials |
 | `replicas` | `number` | No | `2` | Number of Varnish replicas |
-| `requestCpu` | `string` | No | - | CPU request |
-| `limitCpu` | `string` | No | - | CPU limit |
-| `requestMemory` | `string` | No | - | Memory request |
-| `limitMemory` | `string` | No | - | Memory limit |
-| `servicemonitor` | `boolean` | No | `false` | Enable Prometheus ServiceMonitor |
+| `requestCpu` | `string` | No | `100m` | CPU request |
+| `limitCpu` | `string` | No | `500m` | CPU limit |
+| `requestMemory` | `string` | No | `100Mi` | Memory request |
+| `limitMemory` | `string` | No | `500Mi` | Memory limit |
+| `servicemonitor` | `boolean` | No | `false` | Enable Prometheus `ServiceMonitor` |
 | `exporterEnabled` | `boolean` | No | `true` | Enable Prometheus exporter sidecar |
-| `chartVersion` | `string` | No | latest | kube-httpcache Helm chart version |
-| `extraEnvVars` | `HttpcacheEnvVar[]` | No | - | Additional env vars for kube-httpcache container |
+| `chartVersion` | `string` | No | chart latest | kube-httpcache Helm chart version |
+| `appVersion` | `string` | No | matches `chartVersion` | kube-httpcache container image tag |
+| `extraEnvVars` | `HttpcacheEnvVar[]` | No | - | Additional env vars for the kube-httpcache container |
+| `tolerations` | `HttpcacheToleration[]` | No | - | Pod tolerations for tainted nodes |
+
+**`HttpcacheEnvVar` fields:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `name` | `string` | Environment variable name |
+| `value` | `string` | Environment variable value |
+
+**`HttpcacheToleration` fields:**
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `key` | `string` | - | Taint key to tolerate |
+| `operator` | `string` | `Equal` | `Equal` or `Exists` |
+| `value` | `string` | - | Taint value (required for `Equal`) |
+| `effect` | `string` | - | `NoSchedule`, `PreferNoSchedule`, or `NoExecute`. Omit to tolerate all effects. |
 
 **Example:**
 ```typescript
@@ -302,17 +417,76 @@ Requires the [cloud-vinyl operator](https://github.com/bluedynamics/cloud-vinyl)
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `plone` | `Plone` | Yes | - | Plone construct to attach cache to |
+| `image` | `string` | No | `varnish:7.6` | Container image for the Varnish pods |
 | `replicas` | `number` | No | `2` | Number of Varnish replicas |
 | `requestCpu` | `string` | No | `100m` | CPU request |
 | `limitCpu` | `string` | No | `500m` | CPU limit |
 | `requestMemory` | `string` | No | `256Mi` | Memory request |
 | `limitMemory` | `string` | No | `512Mi` | Memory limit |
-| `director` | `string` | No | `shard` | Director type: shard, round_robin, random, hash |
-| `vclRecvSnippet` | `string` | No | built-in | Custom VCL snippet for vcl_recv |
-| `vclBackendResponseSnippet` | `string` | No | built-in | Custom VCL snippet for vcl_backend_response |
+| `storage` | `VinylCacheStorage[]` | No | - | Varnish storage backends. If omitted, the operator falls back to the varnishd default (~100 MB malloc), which is almost always too small. |
+| `extraBackends` | `VinylCacheBackend[]` | No | - | Additional backends appended after the auto-generated Plone backends. |
+| `director` | `string` | No | `shard` | Director type: `shard`, `round_robin`, `random`, `hash` |
+| `shardBy` | `string` | No | operator default (`HASH`) | Shard director: value to hash (`HASH` or `URL`). Requires cloud-vinyl ≥ 0.4.2. |
+| `shardHealthy` | `string` | No | operator default (`CHOSEN`) | Shard director: backend health requirement (`CHOSEN` or `ALL`). Requires cloud-vinyl ≥ 0.4.2. |
+| `shardRampup` | `string` | No | operator default (`30s`) | Shard director: ramp-up window for newly added backends. |
+| `shardReplicas` | `number` | No | operator default (`67`) | Shard director: Ketama replicas per backend. |
+| `vclRecvSnippet` | `string` | No | built-in `plone-vinyl-recv.vcl` | Custom VCL snippet for `vcl_recv` |
+| `vclBackendResponseSnippet` | `string` | No | built-in `plone-vinyl-backend-response.vcl` | Custom VCL snippet for `vcl_backend_response` |
+| `vclDeliverSnippet` | `string` | No | - | Custom VCL snippet for `vcl_deliver` |
+| `vclHitSnippet` | `string` | No | - | Custom VCL snippet for `vcl_hit` |
+| `vclMissSnippet` | `string` | No | - | Custom VCL snippet for `vcl_miss` |
+| `vclPassSnippet` | `string` | No | - | Custom VCL snippet for `vcl_pass` |
+| `vclPipeSnippet` | `string` | No | - | Custom VCL snippet for `vcl_pipe` |
+| `vclSynthSnippet` | `string` | No | - | Custom VCL snippet for `vcl_synth` |
+| `vclPurgeSnippet` | `string` | No | - | Custom VCL snippet for `vcl_purge` |
+| `vclHashSnippet` | `string` | No | - | Custom VCL snippet for `vcl_hash` |
+| `vclInitSnippet` | `string` | No | - | Custom VCL snippet for `vcl_init` |
+| `vclFiniSnippet` | `string` | No | - | Custom VCL snippet for `vcl_fini` |
+| `vclBackendFetchSnippet` | `string` | No | - | Custom VCL snippet for `vcl_backend_fetch` |
+| `vclBackendErrorSnippet` | `string` | No | - | Custom VCL snippet for `vcl_backend_error` |
 | `invalidation` | `boolean` | No | `true` | Enable PURGE/BAN/xkey cache invalidation |
-| `monitoring` | `boolean` | No | `false` | Enable Prometheus metrics and ServiceMonitor |
-| `tolerations` | `VinylCacheToleration[]` | No | - | Node tolerations for Varnish pods |
+| `monitoring` | `boolean` | No | `false` | Enable Prometheus metrics and `ServiceMonitor` |
+| `tolerations` | `VinylCacheToleration[]` | No | - | Pod tolerations for tainted nodes |
+| `nodeSelector` | `Record<string, string>` | No | - | Constrain Varnish pods to nodes matching all labels. |
+
+**`VinylCacheStorage` fields:**
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `name` | `string` | Yes | Internal storage identifier (must match `^[a-zA-Z][a-zA-Z0-9_]*$`) |
+| `type` | `'malloc' \| 'file'` | Yes | Storage backend type |
+| `size` | `string` | Yes | Kubernetes resource quantity (e.g. `"1Gi"`, `"500M"`) |
+| `path` | `string` | for `file` | Filesystem path for file-type storage |
+
+**`VinylCacheBackend` fields:**
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `name` | `string` | Yes | - | VCL identifier (must match `^[a-zA-Z][a-zA-Z0-9_]*$`) |
+| `serviceName` | `string` | Yes | - | Kubernetes Service name to use as backend |
+| `port` | `number` | Yes | - | Service port |
+| `probe` | `VinylCacheBackendProbe` | No | - | Health probe configuration |
+| `weight` | `number` | No | operator default | Relative weight in the director. `0` marks the backend as standby. |
+
+**`VinylCacheBackendProbe` fields:**
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `url` | `string` | `/` | URL to probe |
+| `interval` | `string` | `5s` | Probe interval |
+| `timeout` | `string` | `2s` | Probe timeout |
+| `window` | `number` | `10` | Number of recent probes evaluated |
+| `threshold` | `number` | `8` | Healthy threshold within the window |
+| `expectedResponse` | `number` | `200` | Expected HTTP status code |
+
+**`VinylCacheToleration` fields:**
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `key` | `string` | - | Taint key to tolerate |
+| `operator` | `string` | `Equal` | `Equal` or `Exists` |
+| `value` | `string` | - | Taint value (required for `Equal`) |
+| `effect` | `string` | - | `NoSchedule`, `PreferNoSchedule`, or `NoExecute`. Omit to tolerate all effects. |
 
 **Example:**
 ```typescript
@@ -343,6 +517,19 @@ new PloneVinylCache(chart, 'cache', {
 });
 ```
 
+**Storage sizing:**
+```typescript
+new PloneVinylCache(chart, 'cache', {
+  plone: ploneInstance,
+  limitMemory: '2Gi',
+  storage: [
+    { name: 's0', type: 'malloc', size: '1500M' },
+  ],
+});
+```
+
+Without an explicit `storage` entry, varnishd runs with its stock default (~100 MB malloc) regardless of the container's memory limit. Size malloc storage below the pod's memory limit to leave headroom for varnishd overhead and transient allocations.
+
 **vs PloneHttpcache:**
 - `PloneHttpcache` deploys Varnish via mittwald Helm chart (self-contained, no operator needed)
 - `PloneVinylCache` creates a VinylCache CR managed by the cloud-vinyl operator (requires operator in cluster)
@@ -350,7 +537,7 @@ new PloneVinylCache(chart, 'cache', {
 
 ---
 
-## PloneVariant Enum
+## PloneVariant enum
 
 Defines the deployment variant:
 
@@ -372,7 +559,7 @@ variant: PloneVariant.CLASSICUI
 
 ---
 
-## Complete Example
+## Complete example
 
 ```typescript
 import { App, Chart } from 'cdk8s';
@@ -434,9 +621,12 @@ app.synth();
 
 ---
 
-## See Also
+## See also
 
-- [API Documentation](api/) - Complete API reference
-- [Quick Start Tutorial](../tutorials/01-quick-start.md) - Get started guide
-- [Scale Resources](../how-to/scale-resources.md) - How to adjust resources
-- [Configure Monitoring](../how-to/configure-monitoring.md) - Prometheus setup
+- {doc}`/tutorials/01-quick-start` — Get started guide
+- {doc}`/how-to/deploy-production-volto` — Production-ready Volto deployment
+- {doc}`/how-to/deploy-classic-ui` — Classic UI deployment
+- {doc}`/how-to/deploy-with-vinyl-cache` — `PloneVinylCache` walk-through
+- {doc}`/how-to/enable-prometheus-monitoring` — Wire up `ServiceMonitor`
+- {doc}`/how-to/configure-security-context` — Harden backend and frontend pods
+- {doc}`/how-to/schedule-pods` — `nodeSelector` and `tolerations`

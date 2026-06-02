@@ -1,9 +1,18 @@
+---
+myst:
+  html_meta:
+    "description": "Add the cloud-vinyl VinylCache operator to your Plone deployment for operator-managed Varnish caching."
+    "property=og:description": "Add the cloud-vinyl VinylCache operator to your Plone deployment for operator-managed Varnish caching."
+    "property=og:title": "Deploy with cloud-vinyl cache"
+    "keywords": "Plone, cdk8s, Kubernetes, Varnish, cloud-vinyl, VinylCache, operator, caching"
+---
+
 ```{image} ../_static/kup6s-icon-howto.svg
 :align: center
 :class: section-icon-large
 ```
 
-# Deploy with Cloud-Vinyl Cache
+# Deploy with cloud-vinyl cache
 
 <div class="page-metadata">
   <div class="metadata-content">
@@ -21,7 +30,7 @@
 
 ## Steps
 
-### 1. Add PloneVinylCache to Your Deployment
+### 1. Add PloneVinylCache to your deployment
 
 ```typescript
 import { Plone, PloneVinylCache } from '@bluedynamics/cdk8s-plone';
@@ -37,7 +46,7 @@ const cache = new PloneVinylCache(chart, 'cache', {
 });
 ```
 
-### 2. Use the Cache Service in Your IngressRoute
+### 2. Use the cache service in your IngressRoute
 
 The cache exposes a service that should be used as the upstream in your IngressRoute:
 
@@ -46,9 +55,9 @@ The cache exposes a service that should be used as the upstream in your IngressR
 // instead of plone.frontendServiceName
 ```
 
-### 3. Build and Deploy
+### 3. Build and deploy
 
-```bash
+```shell
 npm run build
 # Review generated manifests
 # Deploy via ArgoCD or kubectl apply
@@ -56,7 +65,7 @@ npm run build
 
 ### 4. Verify
 
-```bash
+```shell
 # Check VinylCache status
 kubectl get vinylcache -n <namespace>
 
@@ -65,6 +74,33 @@ kubectl get pods -n <namespace> -l app.kubernetes.io/managed-by=cloud-vinyl
 ```
 
 ## Customization
+
+### Sizing the cache storage
+
+Without an explicit `storage` entry, the operator ships varnishd with its
+stock default (~100 MB malloc) — almost always too small. Set a malloc size
+below the pod's memory limit, leaving headroom for varnishd overhead:
+
+```typescript
+new PloneVinylCache(chart, 'cache', {
+  plone: plone,
+  requestMemory: '512Mi',
+  limitMemory: '2Gi',
+  storage: [
+    { name: 's0', type: 'malloc', size: '1500M' },
+  ],
+});
+```
+
+For larger working sets you can combine an in-memory tier with a file-backed
+tier (requires a writable volume mount at the given path):
+
+```typescript
+storage: [
+  { name: 'mem', type: 'malloc', size: '500M' },
+  { name: 'disk', type: 'file', path: '/var/lib/varnish/disk.bin', size: '10Gi' },
+]
+```
 
 ### Custom VCL
 
@@ -78,9 +114,14 @@ new PloneVinylCache(chart, 'cache', {
 });
 ```
 
-### Cache Invalidation
+### Cache invalidation
 
 Invalidation is enabled by default (PURGE, BAN, xkey). Configure `plone.cachepurging` to point to the VinylCache invalidation proxy endpoint.
+
+:::{note}
+BAN-based invalidation requires **cloud-vinyl operator ≥ 0.4.2**. Earlier versions accept the spec but do not emit the BAN ACL / handler.
+Starting with 0.4.2 the operator's own pod IP is automatically added to the PURGE ACL, so purges from the operator itself work without additional configuration.
+:::
 
 To disable invalidation:
 
@@ -90,6 +131,23 @@ new PloneVinylCache(chart, 'cache', {
   invalidation: false,
 });
 ```
+
+### Shard director tuning
+
+For shard-based load distribution (the default), you can fine-tune the consistent-hash behavior. These options require **cloud-vinyl ≥ 0.4.2** to be honored by the generated VCL.
+
+```typescript
+new PloneVinylCache(chart, 'cache', {
+  plone: plone,
+  director: 'shard',
+  shardBy: 'URL',        // hash the request URL instead of Varnish's hash
+  shardHealthy: 'ALL',   // require all backends healthy (vs. only "CHOSEN")
+  shardRampup: '45s',    // warm-up window for newly added backends
+  shardReplicas: 128,    // Ketama replicas per backend
+});
+```
+
+Shard options are ignored for non-shard directors (`round_robin`, `random`, `hash`).
 
 ## Migrating from PloneHttpcache
 

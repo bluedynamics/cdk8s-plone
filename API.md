@@ -726,6 +726,7 @@ const ploneBaseOptions: PloneBaseOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.replicas">replicas</a></code> | <code>number</code> | Number of pod replicas to run. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.requestCpu">requestCpu</a></code> | <code>string</code> | CPU request for the container. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.requestMemory">requestMemory</a></code> | <code>string</code> | Memory request for the container. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.securityContext">securityContext</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.PloneSecurityContext">PloneSecurityContext</a></code> | Security context for the container. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.serviceAnnotations">serviceAnnotations</a></code> | <code>{[ key: string ]: string}</code> | Annotations to add to the Service metadata. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.servicemonitor">servicemonitor</a></code> | <code>boolean</code> | Enable Prometheus ServiceMonitor for metrics collection. |
 
@@ -1159,6 +1160,28 @@ Memory request for the container.
 ```
 
 
+##### `securityContext`<sup>Optional</sup> <a name="securityContext" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.securityContext"></a>
+
+```typescript
+public readonly securityContext: PloneSecurityContext;
+```
+
+- *Type:* <a href="#@bluedynamics/cdk8s-plone.PloneSecurityContext">PloneSecurityContext</a>
+- *Default:* no security context
+
+Security context for the container.
+
+Use to set capabilities, run as non-root, read-only filesystem, etc.
+
+---
+
+*Example*
+
+```typescript
+{ capabilities: { add: ['SYS_PTRACE'] } }
+```
+
+
 ##### `serviceAnnotations`<sup>Optional</sup> <a name="serviceAnnotations" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.serviceAnnotations"></a>
 
 ```typescript
@@ -1194,6 +1217,53 @@ Enable Prometheus ServiceMonitor for metrics collection.
 
 Requires Prometheus Operator to be installed in the cluster.
 When enabled, a ServiceMonitor resource will be created to scrape metrics.
+
+---
+
+### PloneCapabilities <a name="PloneCapabilities" id="@bluedynamics/cdk8s-plone.PloneCapabilities"></a>
+
+Linux capabilities to add or drop on a container.
+
+#### Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.PloneCapabilities.Initializer"></a>
+
+```typescript
+import { PloneCapabilities } from '@bluedynamics/cdk8s-plone'
+
+const ploneCapabilities: PloneCapabilities = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneCapabilities.property.add">add</a></code> | <code>string[]</code> | Capabilities to add (e.g. 'SYS_PTRACE', 'NET_ADMIN'). |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneCapabilities.property.drop">drop</a></code> | <code>string[]</code> | Capabilities to drop (e.g. 'ALL', 'NET_RAW'). |
+
+---
+
+##### `add`<sup>Optional</sup> <a name="add" id="@bluedynamics/cdk8s-plone.PloneCapabilities.property.add"></a>
+
+```typescript
+public readonly add: string[];
+```
+
+- *Type:* string[]
+- *Default:* no capabilities added
+
+Capabilities to add (e.g. 'SYS_PTRACE', 'NET_ADMIN').
+
+---
+
+##### `drop`<sup>Optional</sup> <a name="drop" id="@bluedynamics/cdk8s-plone.PloneCapabilities.property.drop"></a>
+
+```typescript
+public readonly drop: string[];
+```
+
+- *Type:* string[]
+- *Default:* no capabilities dropped
+
+Capabilities to drop (e.g. 'ALL', 'NET_RAW').
 
 ---
 
@@ -1565,6 +1635,132 @@ This is used in Kubernetes labels and doesn't affect the actual image versions.
 
 ---
 
+### PloneSecurityContext <a name="PloneSecurityContext" id="@bluedynamics/cdk8s-plone.PloneSecurityContext"></a>
+
+Security context for a Plone container.
+
+Controls privilege and access settings.
+
+#### Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.PloneSecurityContext.Initializer"></a>
+
+```typescript
+import { PloneSecurityContext } from '@bluedynamics/cdk8s-plone'
+
+const ploneSecurityContext: PloneSecurityContext = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneSecurityContext.property.allowPrivilegeEscalation">allowPrivilegeEscalation</a></code> | <code>boolean</code> | Allow privilege escalation for the container process. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneSecurityContext.property.capabilities">capabilities</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.PloneCapabilities">PloneCapabilities</a></code> | Linux capabilities to add or drop. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneSecurityContext.property.privileged">privileged</a></code> | <code>boolean</code> | Run the container in privileged mode. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneSecurityContext.property.readOnlyRootFilesystem">readOnlyRootFilesystem</a></code> | <code>boolean</code> | Mount the root filesystem as read-only. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneSecurityContext.property.runAsGroup">runAsGroup</a></code> | <code>number</code> | Run the container as a specific group ID. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneSecurityContext.property.runAsNonRoot">runAsNonRoot</a></code> | <code>boolean</code> | Require the container to run as non-root. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneSecurityContext.property.runAsUser">runAsUser</a></code> | <code>number</code> | Run the container as a specific user ID. |
+
+---
+
+##### `allowPrivilegeEscalation`<sup>Optional</sup> <a name="allowPrivilegeEscalation" id="@bluedynamics/cdk8s-plone.PloneSecurityContext.property.allowPrivilegeEscalation"></a>
+
+```typescript
+public readonly allowPrivilegeEscalation: boolean;
+```
+
+- *Type:* boolean
+- *Default:* undefined
+
+Allow privilege escalation for the container process.
+
+---
+
+##### `capabilities`<sup>Optional</sup> <a name="capabilities" id="@bluedynamics/cdk8s-plone.PloneSecurityContext.property.capabilities"></a>
+
+```typescript
+public readonly capabilities: PloneCapabilities;
+```
+
+- *Type:* <a href="#@bluedynamics/cdk8s-plone.PloneCapabilities">PloneCapabilities</a>
+- *Default:* no capability changes
+
+Linux capabilities to add or drop.
+
+---
+
+*Example*
+
+```typescript
+{ add: ['SYS_PTRACE'] }
+```
+
+
+##### `privileged`<sup>Optional</sup> <a name="privileged" id="@bluedynamics/cdk8s-plone.PloneSecurityContext.property.privileged"></a>
+
+```typescript
+public readonly privileged: boolean;
+```
+
+- *Type:* boolean
+- *Default:* undefined
+
+Run the container in privileged mode.
+
+---
+
+##### `readOnlyRootFilesystem`<sup>Optional</sup> <a name="readOnlyRootFilesystem" id="@bluedynamics/cdk8s-plone.PloneSecurityContext.property.readOnlyRootFilesystem"></a>
+
+```typescript
+public readonly readOnlyRootFilesystem: boolean;
+```
+
+- *Type:* boolean
+- *Default:* undefined
+
+Mount the root filesystem as read-only.
+
+---
+
+##### `runAsGroup`<sup>Optional</sup> <a name="runAsGroup" id="@bluedynamics/cdk8s-plone.PloneSecurityContext.property.runAsGroup"></a>
+
+```typescript
+public readonly runAsGroup: number;
+```
+
+- *Type:* number
+- *Default:* container default
+
+Run the container as a specific group ID.
+
+---
+
+##### `runAsNonRoot`<sup>Optional</sup> <a name="runAsNonRoot" id="@bluedynamics/cdk8s-plone.PloneSecurityContext.property.runAsNonRoot"></a>
+
+```typescript
+public readonly runAsNonRoot: boolean;
+```
+
+- *Type:* boolean
+- *Default:* undefined
+
+Require the container to run as non-root.
+
+---
+
+##### `runAsUser`<sup>Optional</sup> <a name="runAsUser" id="@bluedynamics/cdk8s-plone.PloneSecurityContext.property.runAsUser"></a>
+
+```typescript
+public readonly runAsUser: number;
+```
+
+- *Type:* number
+- *Default:* container default
+
+Run the container as a specific user ID.
+
+---
+
 ### PloneVinylCacheOptions <a name="PloneVinylCacheOptions" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions"></a>
 
 Configuration options for PloneVinylCache (cloud-vinyl operator).
@@ -1588,17 +1784,36 @@ const ploneVinylCacheOptions: PloneVinylCacheOptions = { ... }
 | --- | --- | --- |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.plone">plone</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.Plone">Plone</a></code> | The Plone construct to attach the cache to. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.director">director</a></code> | <code>string</code> | Director type for load distribution. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.extraBackends">extraBackends</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheBackend">VinylCacheBackend</a>[]</code> | Additional backends to add after the auto-generated Plone backends. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.image">image</a></code> | <code>string</code> | Container image for the Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.invalidation">invalidation</a></code> | <code>boolean</code> | Enable cache invalidation (PURGE, BAN, xkey). |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.limitCpu">limitCpu</a></code> | <code>string</code> | CPU limit for Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.limitMemory">limitMemory</a></code> | <code>string</code> | Memory limit for Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.monitoring">monitoring</a></code> | <code>boolean</code> | Enable Prometheus monitoring (metrics + ServiceMonitor). |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.nodeSelector">nodeSelector</a></code> | <code>{[ key: string ]: string}</code> | Node selector labels for the Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.replicas">replicas</a></code> | <code>number</code> | Number of Varnish pod replicas. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.requestCpu">requestCpu</a></code> | <code>string</code> | CPU request for Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.requestMemory">requestMemory</a></code> | <code>string</code> | Memory request for Varnish pods. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardBy">shardBy</a></code> | <code>string</code> | Shard director: what value is hashed for shard selection. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardHealthy">shardHealthy</a></code> | <code>string</code> | Shard director: which backends the director considers when selecting a shard. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardRampup">shardRampup</a></code> | <code>string</code> | Shard director: time after adding a backend before it receives its full share of traffic, preventing thundering-herd. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardReplicas">shardReplicas</a></code> | <code>number</code> | Shard director: number of Ketama replicas per backend in the hash ring. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.storage">storage</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheStorage">VinylCacheStorage</a>[]</code> | Varnish storage backends (`spec.storage`). |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.tolerations">tolerations</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheToleration">VinylCacheToleration</a>[]</code> | Tolerations for the Varnish pods. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclBackendErrorSnippet">vclBackendErrorSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_backend_error subroutine. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclBackendFetchSnippet">vclBackendFetchSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_backend_fetch subroutine. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclBackendResponseSnippet">vclBackendResponseSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_backend_response subroutine. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclDeliverSnippet">vclDeliverSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_deliver subroutine. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclFiniSnippet">vclFiniSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_fini subroutine. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclHashSnippet">vclHashSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_hash subroutine. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclHitSnippet">vclHitSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_hit subroutine. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclInitSnippet">vclInitSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_init subroutine. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclMissSnippet">vclMissSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_miss subroutine. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclPassSnippet">vclPassSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_pass subroutine. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclPipeSnippet">vclPipeSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_pipe subroutine. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclPurgeSnippet">vclPurgeSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_purge subroutine. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclRecvSnippet">vclRecvSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_recv subroutine. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclSynthSnippet">vclSynthSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_synth subroutine. |
 
 ---
 
@@ -1626,6 +1841,21 @@ public readonly director: string;
 - *Default:* 'shard'
 
 Director type for load distribution.
+
+---
+
+##### `extraBackends`<sup>Optional</sup> <a name="extraBackends" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.extraBackends"></a>
+
+```typescript
+public readonly extraBackends: VinylCacheBackend[];
+```
+
+- *Type:* <a href="#@bluedynamics/cdk8s-plone.VinylCacheBackend">VinylCacheBackend</a>[]
+- *Default:* no extra backends
+
+Additional backends to add after the auto-generated Plone backends.
+
+Uses the same backend type structure as the VinylCache CRD.
 
 ---
 
@@ -1694,6 +1924,21 @@ Enable Prometheus monitoring (metrics + ServiceMonitor).
 
 ---
 
+##### `nodeSelector`<sup>Optional</sup> <a name="nodeSelector" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.nodeSelector"></a>
+
+```typescript
+public readonly nodeSelector: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* no node selector
+
+Node selector labels for the Varnish pods.
+
+Constrains pods to nodes matching all specified labels.
+
+---
+
 ##### `replicas`<sup>Optional</sup> <a name="replicas" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.replicas"></a>
 
 ```typescript
@@ -1733,6 +1978,96 @@ Memory request for Varnish pods.
 
 ---
 
+##### `shardBy`<sup>Optional</sup> <a name="shardBy" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardBy"></a>
+
+```typescript
+public readonly shardBy: string;
+```
+
+- *Type:* string
+- *Default:* operator default ("HASH")
+
+Shard director: what value is hashed for shard selection.
+
+"HASH" uses the Varnish hash (default); "URL" uses the request URL.
+Only applied when director is "shard".
+Requires cloud-vinyl operator >= 0.4.2.
+
+---
+
+##### `shardHealthy`<sup>Optional</sup> <a name="shardHealthy" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardHealthy"></a>
+
+```typescript
+public readonly shardHealthy: string;
+```
+
+- *Type:* string
+- *Default:* operator default ("CHOSEN")
+
+Shard director: which backends the director considers when selecting a shard.
+
+"CHOSEN" (default) only considers the chosen backend healthy; "ALL" requires all
+backends to be healthy.
+Only applied when director is "shard".
+Requires cloud-vinyl operator >= 0.4.2.
+
+---
+
+##### `shardRampup`<sup>Optional</sup> <a name="shardRampup" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardRampup"></a>
+
+```typescript
+public readonly shardRampup: string;
+```
+
+- *Type:* string
+- *Default:* operator default ("30s")
+
+Shard director: time after adding a backend before it receives its full share of traffic, preventing thundering-herd.
+
+Only applied when director is "shard".
+
+---
+
+##### `shardReplicas`<sup>Optional</sup> <a name="shardReplicas" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardReplicas"></a>
+
+```typescript
+public readonly shardReplicas: number;
+```
+
+- *Type:* number
+- *Default:* operator default (67)
+
+Shard director: number of Ketama replicas per backend in the hash ring.
+
+Only applied when director is "shard".
+
+---
+
+##### `storage`<sup>Optional</sup> <a name="storage" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.storage"></a>
+
+```typescript
+public readonly storage: VinylCacheStorage[];
+```
+
+- *Type:* <a href="#@bluedynamics/cdk8s-plone.VinylCacheStorage">VinylCacheStorage</a>[]
+- *Default:* no storage configured; operator uses varnishd default (~100MB malloc)
+
+Varnish storage backends (`spec.storage`).
+
+Each entry becomes a `-s <name>=<type>,<options>` argument to varnishd.
+If omitted, the operator ships varnishd with its stock default (~100 MB
+malloc) — almost always too small. Set an explicit malloc size at least
+matching the pod's memory request to use the allocated memory for caching.
+
+---
+
+*Example*
+
+```typescript
+storage: [{ name: 's0', type: 'malloc', size: '1Gi' }]
+```
+
+
 ##### `tolerations`<sup>Optional</sup> <a name="tolerations" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.tolerations"></a>
 
 ```typescript
@@ -1743,6 +2078,32 @@ public readonly tolerations: VinylCacheToleration[];
 - *Default:* no tolerations
 
 Tolerations for the Varnish pods.
+
+---
+
+##### `vclBackendErrorSnippet`<sup>Optional</sup> <a name="vclBackendErrorSnippet" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclBackendErrorSnippet"></a>
+
+```typescript
+public readonly vclBackendErrorSnippet: string;
+```
+
+- *Type:* string
+- *Default:* no snippet
+
+Custom VCL snippet for vcl_backend_error subroutine.
+
+---
+
+##### `vclBackendFetchSnippet`<sup>Optional</sup> <a name="vclBackendFetchSnippet" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclBackendFetchSnippet"></a>
+
+```typescript
+public readonly vclBackendFetchSnippet: string;
+```
+
+- *Type:* string
+- *Default:* no snippet
+
+Custom VCL snippet for vcl_backend_fetch subroutine.
 
 ---
 
@@ -1761,6 +2122,123 @@ Replaces the default Plone backend_response snippet.
 
 ---
 
+##### `vclDeliverSnippet`<sup>Optional</sup> <a name="vclDeliverSnippet" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclDeliverSnippet"></a>
+
+```typescript
+public readonly vclDeliverSnippet: string;
+```
+
+- *Type:* string
+- *Default:* no snippet
+
+Custom VCL snippet for vcl_deliver subroutine.
+
+---
+
+##### `vclFiniSnippet`<sup>Optional</sup> <a name="vclFiniSnippet" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclFiniSnippet"></a>
+
+```typescript
+public readonly vclFiniSnippet: string;
+```
+
+- *Type:* string
+- *Default:* no snippet
+
+Custom VCL snippet for vcl_fini subroutine.
+
+---
+
+##### `vclHashSnippet`<sup>Optional</sup> <a name="vclHashSnippet" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclHashSnippet"></a>
+
+```typescript
+public readonly vclHashSnippet: string;
+```
+
+- *Type:* string
+- *Default:* no snippet
+
+Custom VCL snippet for vcl_hash subroutine.
+
+---
+
+##### `vclHitSnippet`<sup>Optional</sup> <a name="vclHitSnippet" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclHitSnippet"></a>
+
+```typescript
+public readonly vclHitSnippet: string;
+```
+
+- *Type:* string
+- *Default:* no snippet
+
+Custom VCL snippet for vcl_hit subroutine.
+
+---
+
+##### `vclInitSnippet`<sup>Optional</sup> <a name="vclInitSnippet" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclInitSnippet"></a>
+
+```typescript
+public readonly vclInitSnippet: string;
+```
+
+- *Type:* string
+- *Default:* no snippet
+
+Custom VCL snippet for vcl_init subroutine.
+
+---
+
+##### `vclMissSnippet`<sup>Optional</sup> <a name="vclMissSnippet" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclMissSnippet"></a>
+
+```typescript
+public readonly vclMissSnippet: string;
+```
+
+- *Type:* string
+- *Default:* no snippet
+
+Custom VCL snippet for vcl_miss subroutine.
+
+---
+
+##### `vclPassSnippet`<sup>Optional</sup> <a name="vclPassSnippet" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclPassSnippet"></a>
+
+```typescript
+public readonly vclPassSnippet: string;
+```
+
+- *Type:* string
+- *Default:* no snippet
+
+Custom VCL snippet for vcl_pass subroutine.
+
+---
+
+##### `vclPipeSnippet`<sup>Optional</sup> <a name="vclPipeSnippet" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclPipeSnippet"></a>
+
+```typescript
+public readonly vclPipeSnippet: string;
+```
+
+- *Type:* string
+- *Default:* no snippet
+
+Custom VCL snippet for vcl_pipe subroutine.
+
+---
+
+##### `vclPurgeSnippet`<sup>Optional</sup> <a name="vclPurgeSnippet" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclPurgeSnippet"></a>
+
+```typescript
+public readonly vclPurgeSnippet: string;
+```
+
+- *Type:* string
+- *Default:* no snippet
+
+Custom VCL snippet for vcl_purge subroutine.
+
+---
+
 ##### `vclRecvSnippet`<sup>Optional</sup> <a name="vclRecvSnippet" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclRecvSnippet"></a>
 
 ```typescript
@@ -1773,6 +2251,298 @@ public readonly vclRecvSnippet: string;
 Custom VCL snippet for vcl_recv subroutine.
 
 Replaces the default Plone recv snippet.
+
+---
+
+##### `vclSynthSnippet`<sup>Optional</sup> <a name="vclSynthSnippet" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclSynthSnippet"></a>
+
+```typescript
+public readonly vclSynthSnippet: string;
+```
+
+- *Type:* string
+- *Default:* no snippet
+
+Custom VCL snippet for vcl_synth subroutine.
+
+---
+
+### VinylCacheBackend <a name="VinylCacheBackend" id="@bluedynamics/cdk8s-plone.VinylCacheBackend"></a>
+
+An additional backend for the VinylCache.
+
+#### Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.VinylCacheBackend.Initializer"></a>
+
+```typescript
+import { VinylCacheBackend } from '@bluedynamics/cdk8s-plone'
+
+const vinylCacheBackend: VinylCacheBackend = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheBackend.property.name">name</a></code> | <code>string</code> | VCL identifier for this backend. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheBackend.property.port">port</a></code> | <code>number</code> | Port to use for this backend. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheBackend.property.serviceName">serviceName</a></code> | <code>string</code> | Kubernetes Service name to use as backend. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheBackend.property.probe">probe</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheBackendProbe">VinylCacheBackendProbe</a></code> | Health probe configuration. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheBackend.property.weight">weight</a></code> | <code>number</code> | Relative weight for the director. |
+
+---
+
+##### `name`<sup>Required</sup> <a name="name" id="@bluedynamics/cdk8s-plone.VinylCacheBackend.property.name"></a>
+
+```typescript
+public readonly name: string;
+```
+
+- *Type:* string
+
+VCL identifier for this backend.
+
+Must match ^[a-zA-Z][a-zA-Z0-9_]*$.
+
+---
+
+##### `port`<sup>Required</sup> <a name="port" id="@bluedynamics/cdk8s-plone.VinylCacheBackend.property.port"></a>
+
+```typescript
+public readonly port: number;
+```
+
+- *Type:* number
+
+Port to use for this backend.
+
+---
+
+##### `serviceName`<sup>Required</sup> <a name="serviceName" id="@bluedynamics/cdk8s-plone.VinylCacheBackend.property.serviceName"></a>
+
+```typescript
+public readonly serviceName: string;
+```
+
+- *Type:* string
+
+Kubernetes Service name to use as backend.
+
+---
+
+##### `probe`<sup>Optional</sup> <a name="probe" id="@bluedynamics/cdk8s-plone.VinylCacheBackend.property.probe"></a>
+
+```typescript
+public readonly probe: VinylCacheBackendProbe;
+```
+
+- *Type:* <a href="#@bluedynamics/cdk8s-plone.VinylCacheBackendProbe">VinylCacheBackendProbe</a>
+- *Default:* no probe
+
+Health probe configuration.
+
+---
+
+##### `weight`<sup>Optional</sup> <a name="weight" id="@bluedynamics/cdk8s-plone.VinylCacheBackend.property.weight"></a>
+
+```typescript
+public readonly weight: number;
+```
+
+- *Type:* number
+- *Default:* operator default
+
+Relative weight for the director.
+
+0 means standby.
+
+---
+
+### VinylCacheBackendProbe <a name="VinylCacheBackendProbe" id="@bluedynamics/cdk8s-plone.VinylCacheBackendProbe"></a>
+
+Health probe configuration for a VinylCache backend.
+
+#### Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.VinylCacheBackendProbe.Initializer"></a>
+
+```typescript
+import { VinylCacheBackendProbe } from '@bluedynamics/cdk8s-plone'
+
+const vinylCacheBackendProbe: VinylCacheBackendProbe = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheBackendProbe.property.expectedResponse">expectedResponse</a></code> | <code>number</code> | Expected HTTP response status code. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheBackendProbe.property.interval">interval</a></code> | <code>string</code> | How often to probe the backend. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheBackendProbe.property.threshold">threshold</a></code> | <code>number</code> | Minimum successful probes within window for healthy status. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheBackendProbe.property.timeout">timeout</a></code> | <code>string</code> | Maximum time to wait for a probe response. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheBackendProbe.property.url">url</a></code> | <code>string</code> | URL to probe. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheBackendProbe.property.window">window</a></code> | <code>number</code> | Number of most recent probes to consider. |
+
+---
+
+##### `expectedResponse`<sup>Optional</sup> <a name="expectedResponse" id="@bluedynamics/cdk8s-plone.VinylCacheBackendProbe.property.expectedResponse"></a>
+
+```typescript
+public readonly expectedResponse: number;
+```
+
+- *Type:* number
+- *Default:* 200
+
+Expected HTTP response status code.
+
+---
+
+##### `interval`<sup>Optional</sup> <a name="interval" id="@bluedynamics/cdk8s-plone.VinylCacheBackendProbe.property.interval"></a>
+
+```typescript
+public readonly interval: string;
+```
+
+- *Type:* string
+- *Default:* '5s'
+
+How often to probe the backend.
+
+---
+
+##### `threshold`<sup>Optional</sup> <a name="threshold" id="@bluedynamics/cdk8s-plone.VinylCacheBackendProbe.property.threshold"></a>
+
+```typescript
+public readonly threshold: number;
+```
+
+- *Type:* number
+- *Default:* 8
+
+Minimum successful probes within window for healthy status.
+
+---
+
+##### `timeout`<sup>Optional</sup> <a name="timeout" id="@bluedynamics/cdk8s-plone.VinylCacheBackendProbe.property.timeout"></a>
+
+```typescript
+public readonly timeout: string;
+```
+
+- *Type:* string
+- *Default:* '2s'
+
+Maximum time to wait for a probe response.
+
+---
+
+##### `url`<sup>Optional</sup> <a name="url" id="@bluedynamics/cdk8s-plone.VinylCacheBackendProbe.property.url"></a>
+
+```typescript
+public readonly url: string;
+```
+
+- *Type:* string
+- *Default:* '/'
+
+URL to probe.
+
+---
+
+##### `window`<sup>Optional</sup> <a name="window" id="@bluedynamics/cdk8s-plone.VinylCacheBackendProbe.property.window"></a>
+
+```typescript
+public readonly window: number;
+```
+
+- *Type:* number
+- *Default:* 10
+
+Number of most recent probes to consider.
+
+---
+
+### VinylCacheStorage <a name="VinylCacheStorage" id="@bluedynamics/cdk8s-plone.VinylCacheStorage"></a>
+
+A Varnish storage backend configuration.
+
+Maps to `spec.storage[]` on the VinylCache CRD. The operator emits one
+`-s <name>=<type>,<options>` argument per entry to varnishd.
+
+Without any storage entry the operator falls back to the varnishd default
+(~100 MB malloc), which is almost always too small for real workloads.
+
+#### Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.VinylCacheStorage.Initializer"></a>
+
+```typescript
+import { VinylCacheStorage } from '@bluedynamics/cdk8s-plone'
+
+const vinylCacheStorage: VinylCacheStorage = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheStorage.property.name">name</a></code> | <code>string</code> | Internal storage identifier used in the varnishd `-s` argument. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheStorage.property.type">type</a></code> | <code>string</code> | Storage backend type. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheStorage.property.path">path</a></code> | <code>string</code> | Filesystem path for file-type storage. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheStorage.property.size">size</a></code> | <code>string</code> | Storage allocation as a Kubernetes resource quantity (e.g. "1Gi", "500M"). Required for malloc; required for file. |
+
+---
+
+##### `name`<sup>Required</sup> <a name="name" id="@bluedynamics/cdk8s-plone.VinylCacheStorage.property.name"></a>
+
+```typescript
+public readonly name: string;
+```
+
+- *Type:* string
+
+Internal storage identifier used in the varnishd `-s` argument.
+
+Must be unique within the VinylCache and match `^[a-zA-Z][a-zA-Z0-9_]*$`.
+
+---
+
+##### `type`<sup>Required</sup> <a name="type" id="@bluedynamics/cdk8s-plone.VinylCacheStorage.property.type"></a>
+
+```typescript
+public readonly type: string;
+```
+
+- *Type:* string
+
+Storage backend type.
+
+Only "malloc" and "file" are permitted by the
+admission webhook.
+
+---
+
+##### `path`<sup>Optional</sup> <a name="path" id="@bluedynamics/cdk8s-plone.VinylCacheStorage.property.path"></a>
+
+```typescript
+public readonly path: string;
+```
+
+- *Type:* string
+- *Default:* required for type "file"
+
+Filesystem path for file-type storage.
+
+Ignored for malloc.
+
+---
+
+##### `size`<sup>Optional</sup> <a name="size" id="@bluedynamics/cdk8s-plone.VinylCacheStorage.property.size"></a>
+
+```typescript
+public readonly size: string;
+```
+
+- *Type:* string
+- *Default:* required for both malloc and file
+
+Storage allocation as a Kubernetes resource quantity (e.g. "1Gi", "500M"). Required for malloc; required for file.
 
 ---
 

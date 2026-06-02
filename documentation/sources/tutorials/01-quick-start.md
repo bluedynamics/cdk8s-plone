@@ -1,4 +1,13 @@
-# Quick Start
+---
+myst:
+  html_meta:
+    "description": "Deploy your first Plone instance to Kubernetes using cdk8s-plone, from project setup to a running Volto site."
+    "property=og:description": "Deploy your first Plone instance to Kubernetes using cdk8s-plone, from project setup to a running Volto site."
+    "property=og:title": "Quick start"
+    "keywords": "Plone, cdk8s, Kubernetes, tutorial, Volto, getting started"
+---
+
+# Quick start
 
 This tutorial will guide you through deploying your first Plone instance using cdk8s-plone.
 
@@ -13,11 +22,11 @@ Before you start, ensure you have:
 
 For detailed prerequisites, see [Setup Prerequisites](../how-to/setup-prerequisites.md).
 
-## Step 1: Create a CDK8S Project
+## Step 1: Create a CDK8S project
 
 Create a new CDK8S TypeScript project:
 
-```bash
+```shell
 # Create project directory
 mkdir my-plone-deployment
 cd my-plone-deployment
@@ -32,17 +41,17 @@ This creates a basic CDK8S project structure.
 
 Install the cdk8s-plone library:
 
-```bash
+```shell
 npm install @bluedynamics/cdk8s-plone
 ```
 
 The library is also available for Python via PyPI:
 
-```bash
+```shell
 pip install cdk8s-plone
 ```
 
-## Step 3: Create a Basic Plone Deployment
+## Step 3: Create a basic Plone deployment
 
 Edit `main.ts` with the following code:
 
@@ -73,11 +82,11 @@ This creates:
 - A Volto frontend with 2 replicas
 - All necessary Kubernetes services and deployments
 
-## Step 4: Generate Kubernetes Manifests
+## Step 4: Generate Kubernetes manifests
 
 Generate the Kubernetes manifests:
 
-```bash
+```shell
 cdk8s synth
 ```
 
@@ -87,22 +96,22 @@ This creates YAML files in the `dist/` directory containing all Kubernetes resou
 
 Apply the generated manifests to your cluster:
 
-```bash
+```shell
 kubectl apply -f dist/
 ```
 
 Check the deployment status:
 
-```bash
+```shell
 kubectl get pods
 kubectl get services
 ```
 
-## Step 6: Access Your Plone Site
+## Step 6: Access your Plone site
 
 Once all pods are running, access your Plone site:
 
-```bash
+```shell
 # Port-forward to the frontend service
 kubectl port-forward service/my-plone-frontend 3000:3000
 
@@ -110,7 +119,7 @@ kubectl port-forward service/my-plone-frontend 3000:3000
 open http://localhost:3000
 ```
 
-## Adding HTTP Caching (Optional)
+## Adding HTTP caching (optional)
 
 For production deployments, add Varnish HTTP caching:
 
@@ -132,13 +141,14 @@ new PloneHttpcache(chart, 'cache', {
 
 This adds a Varnish caching layer with cluster-wide cache invalidation using [kube-httpcache](https://github.com/mittwald/kube-httpcache).
 
-## Next Steps
+## Next steps
 
 Now that you have a basic Plone deployment:
 
-- **Configure resources**: See [Scale Resources](../how-to/scale-resources.md) to adjust CPU and memory
-- **Add monitoring**: Configure [Prometheus metrics](../how-to/configure-monitoring.md)
-- **Explore variants**: Learn about [Classic UI vs Volto](../explanation/plone-variants.md)
+- **Configure resources**: See {doc}`/reference/configuration-options` for CPU and memory options.
+- **Add monitoring**: Follow {doc}`/how-to/enable-prometheus-monitoring`.
+- **Explore variants**: Read about Volto and Classic UI in {doc}`/explanation/features`.
+- **Harden pods**: Apply {doc}`/how-to/configure-security-context`.
 
 ## Troubleshooting
 
@@ -149,8 +159,6 @@ Now that you have a basic Plone deployment:
 **Can't access the site?**
 - Ensure port-forward is running
 - Check service endpoints: `kubectl get endpoints`
-
-For more help, see the [Troubleshooting guide](../how-to/troubleshooting.md).
 
 ---
 

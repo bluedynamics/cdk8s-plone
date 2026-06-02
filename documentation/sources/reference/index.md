@@ -1,3 +1,12 @@
+---
+myst:
+  html_meta:
+    "description": "Information-oriented technical reference for cdk8s-plone constructs, configuration options, and APIs."
+    "property=og:description": "Information-oriented technical reference for cdk8s-plone constructs, configuration options, and APIs."
+    "property=og:title": "Reference"
+    "keywords": "Plone, cdk8s, Kubernetes, reference, API, configuration"
+---
+
 ```{image} ../_static/kup6s-icon-reference.svg
 :align: center
 :class: section-icon-large
@@ -9,7 +18,7 @@
 
 Reference guides provide detailed technical information about cdk8s-plone's API, configuration options, and component specifications. They describe how things work and what parameters are available.
 
-## API Reference
+## API reference
 
 *This section will contain auto-generated or detailed documentation for:*
 - Main chart classes
@@ -17,7 +26,7 @@ Reference guides provide detailed technical information about cdk8s-plone's API,
 - Individual construct classes
 - Utility functions and validators
 
-## Configuration Reference
+## Configuration reference
 
 ```{toctree}
 ---
@@ -27,7 +36,7 @@ titlesonly: true
 configuration-options
 ```
 
-## Component Specifications
+## Component specifications
 
 ```{toctree}
 ---
@@ -38,7 +47,7 @@ titlesonly: true
 
 *Component specifications will be added in future releases.*
 
-## API Documentation
+## API documentation
 
 See the `api/` directory for detailed construct documentation:
 

@@ -4,11 +4,125 @@ import { Names } from 'cdk8s';
 import { Construct } from 'constructs';
 import {
   VinylCache,
+  VinylCacheSpecDirectorShardBy,
+  VinylCacheSpecDirectorShardHealthy,
   VinylCacheSpecDirectorType,
   VinylCacheSpecResourcesLimits,
   VinylCacheSpecResourcesRequests,
+  VinylCacheSpecStorage,
+  VinylCacheSpecStorageSize,
+  VinylCacheSpecStorageType,
 } from './imports/vinyl.bluedynamics.eu';
 import { Plone } from './plone';
+
+/**
+ * Health probe configuration for a VinylCache backend.
+ */
+export interface VinylCacheBackendProbe {
+  /**
+   * URL to probe.
+   * @default '/'
+   */
+  readonly url?: string;
+
+  /**
+   * How often to probe the backend.
+   * @default '5s'
+   */
+  readonly interval?: string;
+
+  /**
+   * Maximum time to wait for a probe response.
+   * @default '2s'
+   */
+  readonly timeout?: string;
+
+  /**
+   * Number of most recent probes to consider.
+   * @default 10
+   */
+  readonly window?: number;
+
+  /**
+   * Minimum successful probes within window for healthy status.
+   * @default 8
+   */
+  readonly threshold?: number;
+
+  /**
+   * Expected HTTP response status code.
+   * @default 200
+   */
+  readonly expectedResponse?: number;
+}
+
+/**
+ * An additional backend for the VinylCache.
+ */
+export interface VinylCacheBackend {
+  /**
+   * VCL identifier for this backend. Must match ^[a-zA-Z][a-zA-Z0-9_]*$.
+   */
+  readonly name: string;
+
+  /**
+   * Kubernetes Service name to use as backend.
+   */
+  readonly serviceName: string;
+
+  /**
+   * Port to use for this backend.
+   */
+  readonly port: number;
+
+  /**
+   * Health probe configuration.
+   * @default - no probe
+   */
+  readonly probe?: VinylCacheBackendProbe;
+
+  /**
+   * Relative weight for the director. 0 means standby.
+   * @default - operator default
+   */
+  readonly weight?: number;
+}
+
+/**
+ * A Varnish storage backend configuration.
+ *
+ * Maps to `spec.storage[]` on the VinylCache CRD. The operator emits one
+ * `-s <name>=<type>,<options>` argument per entry to varnishd.
+ *
+ * Without any storage entry the operator falls back to the varnishd default
+ * (~100 MB malloc), which is almost always too small for real workloads.
+ */
+export interface VinylCacheStorage {
+  /**
+   * Internal storage identifier used in the varnishd `-s` argument.
+   * Must be unique within the VinylCache and match `^[a-zA-Z][a-zA-Z0-9_]*$`.
+   */
+  readonly name: string;
+
+  /**
+   * Storage backend type. Only "malloc" and "file" are permitted by the
+   * admission webhook.
+   */
+  readonly type: 'malloc' | 'file';
+
+  /**
+   * Storage allocation as a Kubernetes resource quantity (e.g. "1Gi", "500M").
+   * Required for malloc; required for file.
+   * @default - required for both malloc and file
+   */
+  readonly size?: string;
+
+  /**
+   * Filesystem path for file-type storage. Ignored for malloc.
+   * @default - required for type "file"
+   */
+  readonly path?: string;
+}
 
 /**
  * A Kubernetes toleration for the Varnish pods.
@@ -54,6 +168,13 @@ export interface PloneVinylCacheOptions {
   readonly plone: Plone;
 
   /**
+   * Additional backends to add after the auto-generated Plone backends.
+   * Uses the same backend type structure as the VinylCache CRD.
+   * @default - no extra backends
+   */
+  readonly extraBackends?: VinylCacheBackend[];
+
+  /**
    * Number of Varnish pod replicas.
    * @default 2
    */
@@ -84,10 +205,58 @@ export interface PloneVinylCacheOptions {
   readonly limitMemory?: string;
 
   /**
+   * Varnish storage backends (`spec.storage`).
+   *
+   * Each entry becomes a `-s <name>=<type>,<options>` argument to varnishd.
+   * If omitted, the operator ships varnishd with its stock default (~100 MB
+   * malloc) — almost always too small. Set an explicit malloc size at least
+   * matching the pod's memory request to use the allocated memory for caching.
+   *
+   * @default - no storage configured; operator uses varnishd default (~100MB malloc)
+   * @example
+   * storage: [{ name: 's0', type: 'malloc', size: '1Gi' }]
+   */
+  readonly storage?: VinylCacheStorage[];
+
+  /**
    * Director type for load distribution.
    * @default 'shard'
    */
   readonly director?: string;
+
+  /**
+   * Shard director: what value is hashed for shard selection.
+   * "HASH" uses the Varnish hash (default); "URL" uses the request URL.
+   * Only applied when director is "shard".
+   * Requires cloud-vinyl operator >= 0.4.2.
+   * @default - operator default ("HASH")
+   */
+  readonly shardBy?: string;
+
+  /**
+   * Shard director: which backends the director considers when selecting a shard.
+   * "CHOSEN" (default) only considers the chosen backend healthy; "ALL" requires all
+   * backends to be healthy.
+   * Only applied when director is "shard".
+   * Requires cloud-vinyl operator >= 0.4.2.
+   * @default - operator default ("CHOSEN")
+   */
+  readonly shardHealthy?: string;
+
+  /**
+   * Shard director: time after adding a backend before it receives its full share of
+   * traffic, preventing thundering-herd.
+   * Only applied when director is "shard".
+   * @default - operator default ("30s")
+   */
+  readonly shardRampup?: string;
+
+  /**
+   * Shard director: number of Ketama replicas per backend in the hash ring.
+   * Only applied when director is "shard".
+   * @default - operator default (67)
+   */
+  readonly shardReplicas?: number;
 
   /**
    * Custom VCL snippet for vcl_recv subroutine.
@@ -126,6 +295,85 @@ export interface PloneVinylCacheOptions {
    * @default - no tolerations
    */
   readonly tolerations?: VinylCacheToleration[];
+
+  /**
+   * Node selector labels for the Varnish pods.
+   * Constrains pods to nodes matching all specified labels.
+   * @default - no node selector
+   */
+  readonly nodeSelector?: { [key: string]: string };
+
+  /**
+   * Custom VCL snippet for vcl_deliver subroutine.
+   * @default - no snippet
+   */
+  readonly vclDeliverSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_hit subroutine.
+   * @default - no snippet
+   */
+  readonly vclHitSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_miss subroutine.
+   * @default - no snippet
+   */
+  readonly vclMissSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_pass subroutine.
+   * @default - no snippet
+   */
+  readonly vclPassSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_pipe subroutine.
+   * @default - no snippet
+   */
+  readonly vclPipeSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_synth subroutine.
+   * @default - no snippet
+   */
+  readonly vclSynthSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_purge subroutine.
+   * @default - no snippet
+   */
+  readonly vclPurgeSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_hash subroutine.
+   * @default - no snippet
+   */
+  readonly vclHashSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_init subroutine.
+   * @default - no snippet
+   */
+  readonly vclInitSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_fini subroutine.
+   * @default - no snippet
+   */
+  readonly vclFiniSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_backend_fetch subroutine.
+   * @default - no snippet
+   */
+  readonly vclBackendFetchSnippet?: string;
+
+  /**
+   * Custom VCL snippet for vcl_backend_error subroutine.
+   * @default - no snippet
+   */
+  readonly vclBackendErrorSnippet?: string;
 }
 
 /**
@@ -176,6 +424,32 @@ export class PloneVinylCache extends Construct {
         directorType = VinylCacheSpecDirectorType.SHARD;
     }
 
+    // Shard director tuning: only honored by the operator when director type is "shard".
+    // Emit the shard block only for shard directors so manifests stay minimal.
+    let shardSpec: {
+      by?: VinylCacheSpecDirectorShardBy;
+      healthy?: VinylCacheSpecDirectorShardHealthy;
+      rampup?: string;
+      replicas?: number;
+    } | undefined;
+    if (directorType === VinylCacheSpecDirectorType.SHARD &&
+        (options.shardBy || options.shardHealthy || options.shardRampup || options.shardReplicas !== undefined)) {
+      let shardBy: VinylCacheSpecDirectorShardBy | undefined;
+      if (options.shardBy === 'URL') shardBy = VinylCacheSpecDirectorShardBy.URL;
+      else if (options.shardBy === 'HASH') shardBy = VinylCacheSpecDirectorShardBy.HASH;
+
+      let shardHealthy: VinylCacheSpecDirectorShardHealthy | undefined;
+      if (options.shardHealthy === 'ALL') shardHealthy = VinylCacheSpecDirectorShardHealthy.ALL;
+      else if (options.shardHealthy === 'CHOSEN') shardHealthy = VinylCacheSpecDirectorShardHealthy.CHOSEN;
+
+      shardSpec = {
+        by: shardBy,
+        healthy: shardHealthy,
+        rampup: options.shardRampup,
+        replicas: options.shardReplicas,
+      };
+    }
+
     // Load default VCL snippets
     const vclRecv = options.vclRecvSnippet ??
       fs.readFileSync(path.join(__dirname, 'config', 'plone-vinyl-recv.vcl'), 'utf8');
@@ -183,7 +457,19 @@ export class PloneVinylCache extends Construct {
       fs.readFileSync(path.join(__dirname, 'config', 'plone-vinyl-backend-response.vcl'), 'utf8');
 
     // Build backends from Plone services
-    const backends = [
+    const backends: Array<{
+      name: string;
+      serviceRef: { name: string };
+      port: number;
+      probe?: {
+        url: string;
+        interval: string;
+        timeout: string;
+        window: number;
+        threshold: number;
+      };
+      weight?: number;
+    }> = [
       {
         name: 'plone_backend',
         serviceRef: { name: options.plone.backendServiceName },
@@ -213,16 +499,53 @@ export class PloneVinylCache extends Construct {
       });
     }
 
+    if (options.extraBackends) {
+      for (const eb of options.extraBackends) {
+        backends.push({
+          name: eb.name,
+          serviceRef: { name: eb.serviceName },
+          port: eb.port,
+          probe: eb.probe ? {
+            url: eb.probe.url ?? '/',
+            interval: eb.probe.interval ?? '5s',
+            timeout: eb.probe.timeout ?? '2s',
+            window: eb.probe.window ?? 10,
+            threshold: eb.probe.threshold ?? 8,
+          } : undefined,
+        });
+      }
+    }
+
+    const storage: VinylCacheSpecStorage[] | undefined = options.storage?.map(s => ({
+      name: s.name,
+      type: s.type === 'file' ? VinylCacheSpecStorageType.FILE : VinylCacheSpecStorageType.MALLOC,
+      size: s.size !== undefined ? VinylCacheSpecStorageSize.fromString(s.size) : undefined,
+      path: s.path,
+    }));
+
     const vinylCache = new VinylCache(this, 'vinylcache', {
       spec: {
         replicas,
         image: options.image ?? 'varnish:7.6',
         backends,
-        director: { type: directorType },
+        director: { type: directorType, shard: shardSpec },
+        storage,
         vcl: {
           snippets: {
             vclRecv: vclRecv,
             vclBackendResponse: vclBackendResponse,
+            vclDeliver: options.vclDeliverSnippet,
+            vclHit: options.vclHitSnippet,
+            vclMiss: options.vclMissSnippet,
+            vclPass: options.vclPassSnippet,
+            vclPipe: options.vclPipeSnippet,
+            vclSynth: options.vclSynthSnippet,
+            vclPurge: options.vclPurgeSnippet,
+            vclHash: options.vclHashSnippet,
+            vclInit: options.vclInitSnippet,
+            vclFini: options.vclFiniSnippet,
+            vclBackendFetch: options.vclBackendFetchSnippet,
+            vclBackendError: options.vclBackendErrorSnippet,
           },
         },
         resources: {
@@ -244,13 +567,14 @@ export class PloneVinylCache extends Construct {
           enabled: true,
           serviceMonitor: { enabled: true },
         } : undefined,
-        pod: (options.tolerations && options.tolerations.length > 0) ? {
-          tolerations: options.tolerations.map(t => ({
+        pod: (options.tolerations?.length || options.nodeSelector) ? {
+          tolerations: options.tolerations?.map(t => ({
             key: t.key,
             operator: t.operator,
             value: t.value,
             effect: t.effect,
           })),
+          nodeSelector: options.nodeSelector,
         } : undefined,
       },
     });
