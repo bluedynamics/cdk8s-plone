@@ -309,6 +309,7 @@ exports[`with-pdp 1`] = `
           "app": "plone-with_pdb-c80f43fe",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
 ]

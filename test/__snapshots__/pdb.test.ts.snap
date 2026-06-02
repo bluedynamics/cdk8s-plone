@@ -20,6 +20,7 @@ exports[`both 1`] = `
           "app": "plone",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
 ]
@@ -44,6 +45,7 @@ exports[`defaults 1`] = `
           "app": "plone",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
 ]
@@ -68,6 +70,7 @@ exports[`maxUnavailableNumber 1`] = `
           "app": "plone",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
 ]
@@ -92,6 +95,7 @@ exports[`maxUnavailableString 1`] = `
           "app": "plone",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
 ]
@@ -116,6 +120,7 @@ exports[`minAvailableNumber 1`] = `
           "app": "plone",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
 ]
@@ -140,6 +145,7 @@ exports[`minAvailableString 1`] = `
           "app": "plone",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
 ]

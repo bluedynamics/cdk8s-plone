@@ -83,6 +83,7 @@ exports[`defaults 1`] = `
           "app": "plone-backend-c8acbe0a",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -196,6 +197,7 @@ exports[`defaults 1`] = `
           "app": "plone-frontend-c88fef5c",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -440,6 +442,7 @@ exports[`with classic-ui variant (no frontend) 1`] = `
           "app": "plone-backend-c8acbe0a",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -670,6 +673,7 @@ exports[`with custom VCL snippets 1`] = `
           "app": "plone-backend-c8acbe0a",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -783,6 +787,7 @@ exports[`with custom VCL snippets 1`] = `
           "app": "plone-frontend-c88fef5c",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -967,6 +972,7 @@ exports[`with custom replicas and resources 1`] = `
           "app": "plone-backend-c8acbe0a",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -1080,6 +1086,7 @@ exports[`with custom replicas and resources 1`] = `
           "app": "plone-frontend-c88fef5c",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -1324,6 +1331,7 @@ exports[`with invalidation disabled 1`] = `
           "app": "plone-backend-c8acbe0a",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -1437,6 +1445,7 @@ exports[`with invalidation disabled 1`] = `
           "app": "plone-frontend-c88fef5c",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -1670,6 +1679,7 @@ exports[`with monitoring enabled 1`] = `
           "app": "plone-backend-c8acbe0a",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -1783,6 +1793,7 @@ exports[`with monitoring enabled 1`] = `
           "app": "plone-frontend-c88fef5c",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -2033,6 +2044,7 @@ exports[`with shard director 1`] = `
           "app": "plone-backend-c8acbe0a",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -2146,6 +2158,7 @@ exports[`with shard director 1`] = `
           "app": "plone-frontend-c88fef5c",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -2390,6 +2403,7 @@ exports[`with tolerations 1`] = `
           "app": "plone-backend-c8acbe0a",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -2503,6 +2517,7 @@ exports[`with tolerations 1`] = `
           "app": "plone-frontend-c88fef5c",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
