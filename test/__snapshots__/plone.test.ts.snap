@@ -894,6 +894,7 @@ exports[`with securityContext for capabilities 1`] = `
           "app": "app-plone-backend-c82290e6",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -1007,6 +1008,7 @@ exports[`with securityContext for capabilities 1`] = `
           "app": "app-plone-frontend-c8d010d1",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {

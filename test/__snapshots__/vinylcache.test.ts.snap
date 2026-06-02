@@ -1331,6 +1331,7 @@ exports[`with extraBackends 1`] = `
           "app": "plone-backend-c8acbe0a",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -1444,6 +1445,7 @@ exports[`with extraBackends 1`] = `
           "app": "plone-frontend-c88fef5c",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -1702,6 +1704,7 @@ exports[`with full shard tuning (healthy, rampup, replicas) 1`] = `
           "app": "plone-backend-c8acbe0a",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -1815,6 +1818,7 @@ exports[`with full shard tuning (healthy, rampup, replicas) 1`] = `
           "app": "plone-frontend-c88fef5c",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -2778,6 +2782,7 @@ exports[`with nodeSelector 1`] = `
           "app": "plone-backend-c8acbe0a",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -2891,6 +2896,7 @@ exports[`with nodeSelector 1`] = `
           "app": "plone-frontend-c88fef5c",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -3141,6 +3147,7 @@ exports[`with nodeSelector and tolerations 1`] = `
           "app": "plone-backend-c8acbe0a",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -3254,6 +3261,7 @@ exports[`with nodeSelector and tolerations 1`] = `
           "app": "plone-frontend-c88fef5c",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -3870,6 +3878,7 @@ exports[`with shard director and shardBy URL 1`] = `
           "app": "plone-backend-c8acbe0a",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -3983,6 +3992,7 @@ exports[`with shard director and shardBy URL 1`] = `
           "app": "plone-frontend-c88fef5c",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -4230,6 +4240,7 @@ exports[`with storage file + malloc 1`] = `
           "app": "plone-backend-c8acbe0a",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -4343,6 +4354,7 @@ exports[`with storage file + malloc 1`] = `
           "app": "plone-frontend-c88fef5c",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -4600,6 +4612,7 @@ exports[`with storage malloc 1`] = `
           "app": "plone-backend-c8acbe0a",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -4713,6 +4726,7 @@ exports[`with storage malloc 1`] = `
           "app": "plone-frontend-c88fef5c",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
