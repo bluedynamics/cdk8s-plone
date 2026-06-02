@@ -1,4 +1,13 @@
-# cdk8s-plone Documentation
+---
+myst:
+  html_meta:
+    "description": "Documentation for cdk8s-plone, a TypeScript and Python library for deploying Plone CMS to Kubernetes with CDK8S."
+    "property=og:description": "Documentation for cdk8s-plone, a TypeScript and Python library for deploying Plone CMS to Kubernetes with CDK8S."
+    "property=og:title": "cdk8s-plone documentation"
+    "keywords": "Plone, cdk8s, Kubernetes, Volto, CMS, infrastructure as code"
+---
+
+# cdk8s-plone documentation
 
 ```{image} _static/kup6s-icon-plone.svg
 :alt: cdk8s-plone logo
@@ -22,7 +31,7 @@ cdk8s-plone is a TypeScript construct library for [CDK8S](https://cdk8s.io/) tha
 - Component-level configuration options
 - Built on CDK8S for infrastructure as code
 
-## Documentation Structure
+## Documentation structure
 
 This documentation follows the [Diátaxis framework](https://diataxis.fr/), organizing content into four categories based on what you need:
 
@@ -71,23 +80,23 @@ This documentation follows the [Diátaxis framework](https://diataxis.fr/), orga
 
 ::::
 
-## Quick Links
+## Quick links
 
-### Getting Started
-- [Quick Start](tutorials/01-quick-start.md) - Deploy your first Plone instance
-- [Setup Prerequisites](how-to/setup-prerequisites.md) - Prepare cluster infrastructure
-- [Features Overview](explanation/features.md) - Explore capabilities
+### Getting started
+- {doc}`tutorials/01-quick-start` — Deploy your first Plone instance
+- {doc}`how-to/setup-prerequisites` — Prepare cluster infrastructure
+- {doc}`explanation/features` — Explore capabilities
 
 ### Configuration
-- [Configuration Options](reference/configuration-options.md) - Complete configuration reference
-- [Architecture Overview](explanation/architecture.md) - High-level design
+- {doc}`reference/configuration-options` — Complete configuration reference
+- {doc}`explanation/architecture` — High-level design
 
-### Common Tasks
-- Scale Resources - Adjust CPU and memory limits (coming soon)
-- Configure Monitoring - Set up Prometheus metrics (coming soon)
-- Backup and Restore - Protect your data (coming soon)
+### Common tasks
+- {doc}`how-to/configure-security-context` — Harden backend and frontend pods
+- {doc}`how-to/enable-prometheus-monitoring` — Wire up `ServiceMonitor`
+- {doc}`how-to/schedule-pods` — `nodeSelector` and tolerations
 
-## Table of Contents
+## Table of contents
 
 ```{toctree}
 ---

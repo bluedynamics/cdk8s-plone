@@ -1,3 +1,12 @@
+---
+myst:
+  html_meta:
+    "description": "Learning-oriented tutorials that guide you through using cdk8s-plone to deploy Plone CMS on Kubernetes."
+    "property=og:description": "Learning-oriented tutorials that guide you through using cdk8s-plone to deploy Plone CMS on Kubernetes."
+    "property=og:title": "Tutorials"
+    "keywords": "Plone, cdk8s, Kubernetes, tutorials, getting started"
+---
+
 ```{image} ../_static/kup6s-icon-tutorials.svg
 :align: center
 :class: section-icon-large
@@ -18,7 +27,7 @@ These tutorials will teach you how to:
 - Customize component resources and settings
 - Test your deployment
 
-## Available Tutorials
+## Available tutorials
 
 ```{toctree}
 ---

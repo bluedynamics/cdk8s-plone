@@ -1,8 +1,17 @@
-# Configuration Options
+---
+myst:
+  html_meta:
+    "description": "Complete reference for cdk8s-plone constructs and configuration options: Plone, PloneHttpcache, PloneVinylCache."
+    "property=og:description": "Complete reference for cdk8s-plone constructs and configuration options: Plone, PloneHttpcache, PloneVinylCache."
+    "property=og:title": "Configuration options"
+    "keywords": "Plone, cdk8s, Kubernetes, configuration, reference, Volto, Varnish"
+---
+
+# Configuration options
 
 Complete reference for all configuration options in cdk8s-plone.
 
-## Key Constructs
+## Key constructs
 
 ### `Plone`
 
@@ -56,7 +65,7 @@ new PloneHttpcache(chart, 'cache', {
 
 ---
 
-## Configuration Interfaces
+## Configuration interfaces
 
 ### `PloneOptions`
 
@@ -218,6 +227,8 @@ backend: {
   },
 }
 ```
+
+(monitoring)=
 
 #### Prometheus monitoring
 
@@ -526,7 +537,7 @@ Without an explicit `storage` entry, varnishd runs with its stock default (~100 
 
 ---
 
-## PloneVariant Enum
+## PloneVariant enum
 
 Defines the deployment variant:
 
@@ -548,7 +559,7 @@ variant: PloneVariant.CLASSICUI
 
 ---
 
-## Complete Example
+## Complete example
 
 ```typescript
 import { App, Chart } from 'cdk8s';

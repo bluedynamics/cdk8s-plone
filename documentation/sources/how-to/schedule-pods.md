@@ -1,3 +1,12 @@
+---
+myst:
+  html_meta:
+    "description": "Constrain Plone backend, frontend, and Varnish pods to specific Kubernetes nodes using nodeSelector and tolerations."
+    "property=og:description": "Constrain Plone backend, frontend, and Varnish pods to specific Kubernetes nodes using nodeSelector and tolerations."
+    "property=og:title": "Schedule pods to specific nodes"
+    "keywords": "Plone, cdk8s, Kubernetes, nodeSelector, tolerations, scheduling, taints"
+---
+
 ```{image} ../_static/kup6s-icon-howto.svg
 :align: center
 :class: section-icon-large
@@ -21,7 +30,7 @@ Use `nodeSelector` to require specific node labels and tolerations to schedule o
 - A working Plone deployment using `cdk8s-plone`.
 - Cluster labels and taints already configured on the target nodes.
 
-  ```bash
+  ```shell
   kubectl get nodes --show-labels
   kubectl describe node <node> | grep Taints
   ```
@@ -124,7 +133,7 @@ new PloneVinylCache(chart, 'cache', {
 
 ## Verify the rollout
 
-```bash
+```shell
 cdk8s synth
 kubectl apply -f dist/
 
