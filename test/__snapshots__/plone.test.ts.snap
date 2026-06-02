@@ -83,6 +83,7 @@ exports[`defaults 1`] = `
           "app": "app-plone-backend-c82290e6",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -196,6 +197,7 @@ exports[`defaults 1`] = `
           "app": "app-plone-frontend-c8d010d1",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -309,6 +311,7 @@ exports[`defaults-classicui 1`] = `
           "app": "app-plone-backend-c82290e6",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -422,6 +425,7 @@ exports[`defaults-with-pdps 1`] = `
           "app": "app-plone_with_pdbs-backend-c885cd24",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -535,6 +539,7 @@ exports[`defaults-with-pdps 1`] = `
           "app": "app-plone_with_pdbs-frontend-c850bc83",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -651,6 +656,7 @@ exports[`with nodeSelector for region affinity 1`] = `
           "app": "app-plone-backend-c82290e6",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -767,6 +773,7 @@ exports[`with nodeSelector for region affinity 1`] = `
           "app": "app-plone-frontend-c8d010d1",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -887,6 +894,7 @@ exports[`with securityContext for capabilities 1`] = `
           "app": "app-plone-backend-c82290e6",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -1000,6 +1008,7 @@ exports[`with securityContext for capabilities 1`] = `
           "app": "app-plone-frontend-c8d010d1",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -1113,6 +1122,7 @@ exports[`with-backend-servicemonitor 1`] = `
           "app": "app-plone-backend-c82290e6",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -1251,6 +1261,7 @@ exports[`with-both-servicemonitors 1`] = `
           "app": "app-plone-backend-c82290e6",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -1389,6 +1400,7 @@ exports[`with-both-servicemonitors 1`] = `
           "app": "app-plone-frontend-c8d010d1",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -1527,6 +1539,7 @@ exports[`with-frontend-servicemonitor 1`] = `
           "app": "app-plone-backend-c82290e6",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {
@@ -1640,6 +1653,7 @@ exports[`with-frontend-servicemonitor 1`] = `
           "app": "app-plone-frontend-c8d010d1",
         },
       },
+      "unhealthyPodEvictionPolicy": "AlwaysAllow",
     },
   },
   {

@@ -29,6 +29,33 @@ test('with-pdp', () => {
   expect(Testing.synth(chart)).toMatchSnapshot();
 });
 
+test('no PDB for single replica', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new PloneDeployment(chart, 'single', { port: 8080, replicas: 1, pdb: {} });
+
+  // THEN
+  const pdbs = Testing.synth(chart).filter((r: any) => r.kind === 'PodDisruptionBudget');
+  expect(pdbs).toHaveLength(0);
+});
+
+test('PDB for multi replica carries AlwaysAllow', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new PloneDeployment(chart, 'multi', { port: 8080, replicas: 2, pdb: {} });
+
+  // THEN
+  const pdbs = Testing.synth(chart).filter((r: any) => r.kind === 'PodDisruptionBudget');
+  expect(pdbs).toHaveLength(1);
+  expect(pdbs[0].spec.unhealthyPodEvictionPolicy).toBe('AlwaysAllow');
+});
+
 test('with-environment', () => {
   // GIVEN
   const app = Testing.app();
