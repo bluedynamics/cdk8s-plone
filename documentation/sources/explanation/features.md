@@ -1,10 +1,21 @@
+---
+myst:
+  html_meta:
+    "description": "Overview of cdk8s-plone features: deployment variants, high availability, caching, resource management, monitoring, and multi-language support."
+    "property=og:description": "Overview of cdk8s-plone features: deployment variants, high availability, caching, resource management, monitoring, and multi-language support."
+    "property=og:title": "Features"
+    "keywords": "Plone, cdk8s, Kubernetes, features, Volto, Varnish, Prometheus"
+---
+
 # Features
 
 Complete overview of cdk8s-plone features and capabilities.
 
-## Core Features
+## Core features
 
-### Deployment Variants
+(deployment-variants)=
+
+### Deployment variants
 
 cdk8s-plone supports two deployment modes to match your requirements:
 
@@ -20,9 +31,9 @@ cdk8s-plone supports two deployment modes to match your requirements:
 - Traditional Plone experience
 - Best for: Legacy migrations, existing add-ons, simpler deployments
 
-See [Plone Variants](plone-variants.md) for detailed comparison.
+See {doc}`architecture` for a deeper architectural comparison of the two variants.
 
-### High Availability
+### High availability
 
 **Configurable Replicas**
 - Set any number of replicas for backend and frontend
@@ -42,7 +53,7 @@ backend: {
 }
 ```
 
-### HTTP Caching with Varnish
+### HTTP caching with Varnish
 
 cdk8s-plone supports two caching backends: the self-contained mittwald kube-httpcache Helm chart (`PloneHttpcache`) and the operator-managed cloud-vinyl VinylCache (`PloneVinylCache`).
 
@@ -69,7 +80,7 @@ cdk8s-plone supports two caching backends: the self-contained mittwald kube-http
 - Cache hit/miss metrics
 - Performance monitoring
 
-### Resource Management
+### Resource management
 
 **Fine-Grained Control**
 - CPU requests and limits
@@ -87,7 +98,7 @@ backend: {
 }
 ```
 
-### Health Monitoring
+### Health monitoring
 
 **Readiness Probes**
 - Ensures pods are ready before receiving traffic
@@ -112,7 +123,7 @@ frontend: {
 }
 ```
 
-### Environment Configuration
+### Environment configuration
 
 **Flexible Environment Variables**
 - Use cdk8s-plus-30 Env API
@@ -134,7 +145,7 @@ backend: {
 }
 ```
 
-### Kubernetes Annotations
+### Kubernetes annotations
 
 **Three Levels of Annotations**
 - **Deployment annotations**: Metadata for the deployment resource
@@ -154,7 +165,7 @@ backend: {
 }
 ```
 
-### Private Registry Support
+### Private registry support
 
 **Image Pull Secrets**
 - Support for private container registries
@@ -169,17 +180,17 @@ new Plone(chart, 'my-plone', {
 })
 ```
 
-## Multi-Language Support
+## Multi-language support
 
-### TypeScript/JavaScript
+### TypeScript and JavaScript
 
-**Native CDK8S Experience**
+**Native CDK8S experience**
 - Full TypeScript type definitions
 - IDE autocomplete and validation
 - Familiar syntax for web developers
 
 **Installation:**
-```bash
+```shell
 npm install @bluedynamics/cdk8s-plone
 ```
 
@@ -195,13 +206,13 @@ new Plone(chart, 'my-plone', {
 
 ### Python
 
-**JSII-Generated Bindings**
+**JSII-generated bindings**
 - Pythonic API
 - Type hints support
 - Familiar syntax for Python developers
 
 **Installation:**
-```bash
+```shell
 pip install cdk8s-plone
 ```
 
@@ -215,11 +226,11 @@ Plone(chart, "my-plone",
 )
 ```
 
-## Infrastructure as Code Benefits
+## Infrastructure as code benefits
 
-### Type Safety
+### Type safety
 
-**Compile-Time Validation**
+**Compile-time validation**
 - Catch configuration errors before deployment
 - IDE validation and autocomplete
 - Refactoring support
@@ -235,7 +246,7 @@ backend: {
 
 ### Reusability
 
-**Construct Composition**
+**Construct composition**
 - Create custom constructs
 - Encapsulate best practices
 - Share across projects
@@ -266,7 +277,7 @@ class ProductionPlone extends Construct {
 
 ### Testing
 
-**Unit Testing**
+**Unit testing**
 - Test infrastructure definitions
 - Validate resource creation
 - Catch regressions early
@@ -284,9 +295,9 @@ test('creates backend deployment', () => {
 });
 ```
 
-### Programmatic Control
+### Programmatic control
 
-**Dynamic Configuration**
+**Dynamic configuration**
 - Use loops and conditionals
 - Environment-based configuration
 - Dynamic resource generation
@@ -305,9 +316,9 @@ environments.forEach(env => {
 });
 ```
 
-## Production-Ready Features
+## Production-ready features
 
-### Manifest Generation
+### Manifest generation
 
 **Standard Kubernetes YAML**
 - Generates standard Kubernetes manifests
@@ -315,22 +326,22 @@ environments.forEach(env => {
 - Apply with `kubectl apply -f`
 
 **Output:**
-```bash
+```shell
 cdk8s synth
 # Creates dist/ directory with YAML files
 kubectl apply -f dist/
 ```
 
-### Helm Chart Integration
+### Helm chart integration
 
-**PloneHttpcache Uses Helm**
+**PloneHttpcache uses Helm**
 - Leverages battle-tested kube-httpcache chart
 - Automatic updates available
 - Community-maintained
 
-### Monitoring Integration
+### Monitoring integration
 
-**Prometheus Ready**
+**Prometheus ready**
 - ServiceMonitor support for Varnish
 - Pod annotations for scraping
 - Standard metrics endpoints
@@ -344,7 +355,7 @@ new PloneHttpcache(chart, 'cache', {
 });
 ```
 
-## Upcoming Features
+## Upcoming features
 
 Features planned for future releases:
 
@@ -353,9 +364,9 @@ Features planned for future releases:
 
 **Note:** Ingress and TLS management are intentionally out of scope - these should be handled by your cluster's ingress controller and cert-manager. RelStorage with PostgreSQL is already supported through external database configuration (separation of concerns).
 
-## See Also
+## See also
 
-- [Architecture Overview](architecture.md) - System architecture and design
-- [Configuration Options](../reference/configuration-options.md) - Complete configuration reference
-- [Quick Start](../tutorials/01-quick-start.md) - Getting started tutorial
-- [Example Project](https://github.com/bluedynamics/cdk8s-plone-example) - Complete working example
+- {doc}`architecture` — System architecture and design.
+- {doc}`/reference/configuration-options` — Complete configuration reference.
+- {doc}`/tutorials/01-quick-start` — Getting started tutorial.
+- [Example project](https://github.com/bluedynamics/cdk8s-plone-example) — Complete working example.

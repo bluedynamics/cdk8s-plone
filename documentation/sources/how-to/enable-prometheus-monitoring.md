@@ -1,3 +1,12 @@
+---
+myst:
+  html_meta:
+    "description": "Create a Prometheus ServiceMonitor for the Plone backend, frontend, or Varnish cache to expose metrics."
+    "property=og:description": "Create a Prometheus ServiceMonitor for the Plone backend, frontend, or Varnish cache to expose metrics."
+    "property=og:title": "Enable Prometheus monitoring"
+    "keywords": "Plone, cdk8s, Kubernetes, Prometheus, ServiceMonitor, monitoring, metrics"
+---
+
 ```{image} ../_static/kup6s-icon-howto.svg
 :align: center
 :class: section-icon-large
@@ -86,7 +95,7 @@ new PloneVinylCache(chart, 'cache', {
 
 ## Verify the rollout
 
-```bash
+```shell
 # Generate manifests and confirm the ServiceMonitor exists
 cdk8s synth
 grep -l 'kind: ServiceMonitor' dist/*.yaml
@@ -103,7 +112,7 @@ If Prometheus is not picking up the new target, confirm:
 - The `ServiceMonitor` labels match the `Prometheus` resource's `serviceMonitorSelector`.
 - The metrics endpoint returns HTTP 200 from a pod in the cluster:
 
-  ```bash
+  ```shell
   kubectl run -it --rm curl --image=curlimages/curl --restart=Never -- \
     curl -sf http://<service>.<namespace>:<port>/metrics | head
   ```

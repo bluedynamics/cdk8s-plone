@@ -1,9 +1,18 @@
+---
+myst:
+  html_meta:
+    "description": "Goal-oriented how-to guides for solving specific cdk8s-plone deployment and configuration problems."
+    "property=og:description": "Goal-oriented how-to guides for solving specific cdk8s-plone deployment and configuration problems."
+    "property=og:title": "How-to guides"
+    "keywords": "Plone, cdk8s, Kubernetes, how-to, deployment, configuration"
+---
+
 ```{image} ../_static/kup6s-icon-howto.svg
 :align: center
 :class: section-icon-large
 ```
 
-# How-To Guides
+# How-to guides
 
 **Goal-oriented guides showing you how to solve specific problems with cdk8s-plone.**
 

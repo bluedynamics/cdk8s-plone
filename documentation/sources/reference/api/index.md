@@ -1,4 +1,13 @@
-# API Reference
+---
+myst:
+  html_meta:
+    "description": "Auto-generated API reference for cdk8s-plone constructs, interfaces, and enums."
+    "property=og:description": "Auto-generated API reference for cdk8s-plone constructs, interfaces, and enums."
+    "property=og:title": "API reference"
+    "keywords": "Plone, cdk8s, Kubernetes, API, reference, TypeScript, Python"
+---
+
+# API reference
 
 Complete API reference for cdk8s-plone constructs, generated from TypeScript source code.
 
@@ -9,7 +18,7 @@ The cdk8s-plone library provides the following main constructs:
 - **Plone**: Main construct for deploying Plone CMS with support for both Volto (React frontend) and Classic UI variants
 - **PloneHttpcache**: HTTP caching layer using Varnish for improved performance
 
-## Language Support
+## Language support
 
 This API documentation shows TypeScript usage examples. The library is also available for Python via JSII transpilation:
 
