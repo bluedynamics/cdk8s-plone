@@ -72,11 +72,14 @@ export interface PloneServiceSpec {
   readonly labels?: { [name: string]: string };
 
   /**
-   * Raw ServiceSpec overrides. Highest precedence — merged on top of all curated
-   * fields and the construct-managed base. Use for any field not covered above.
+   * Raw ServiceSpec overrides as a free-form map (e.g. `{ ipFamilyPolicy:
+   * 'PreferDualStack' }`). Highest precedence — merged on top of all curated
+   * fields and the construct-managed base. Use for any ServiceSpec field not
+   * covered above. Keys and values are passed through to the Service spec
+   * verbatim and are not validated by this construct.
    * @default - none
    */
-  readonly overrides?: k8s.ServiceSpec;
+  readonly overrides?: { [key: string]: any };
 }
 
 export interface PloneServiceOptions {
