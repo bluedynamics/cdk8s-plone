@@ -1,8 +1,17 @@
-# Deploy Production Volto Example
+---
+myst:
+  html_meta:
+    "description": "Deploy the production-ready Volto example: React frontend, Plone REST API backend, PostgreSQL, Varnish caching, and ingress with TLS."
+    "property=og:description": "Deploy the production-ready Volto example: React frontend, Plone REST API backend, PostgreSQL, Varnish caching, and ingress with TLS."
+    "property=og:title": "Deploy production Volto example"
+    "keywords": "Plone, cdk8s, Kubernetes, Volto, production, PostgreSQL, Varnish, ingress, TLS"
+---
+
+# Deploy production Volto example
 
 This guide shows you how to deploy the production-ready Volto example to your Kubernetes cluster.
 
-## What You'll Deploy
+## What you'll deploy
 
 The [Production Volto example](https://github.com/bluedynamics/cdk8s-plone/tree/main/examples/production-volto) includes:
 
@@ -11,6 +20,8 @@ The [Production Volto example](https://github.com/bluedynamics/cdk8s-plone/tree/
 - **Varnish HTTP caching** with kube-httpcache
 - **Ingress** with TLS (Traefik or Kong)
 - **Three access domains** (cached, uncached, maintenance)
+
+(production-volto-prerequisites)=
 
 ## Prerequisites
 
@@ -23,45 +34,45 @@ Ensure you have these installed on your cluster:
    - [Kong Gateway](https://docs.konghq.com/gateway/latest/install/kubernetes/)
 
 2. **cert-manager** - For TLS certificates:
-   ```bash
+   ```shell
    kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.0/cert-manager.yaml
    ```
 
 3. **kube-httpcache Operator** - For Varnish caching:
-   ```bash
+   ```shell
    kubectl apply -f https://github.com/mittwald/kube-httpcache/releases/latest/download/kube-httpcache.yaml
    ```
 
 4. **PostgreSQL Operator** - Choose one:
 
    **Option A: CloudNativePG** (recommended for production):
-   ```bash
+   ```shell
    kubectl apply -f https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.24/releases/cnpg-1.24.0.yaml
    ```
 
    **Option B: Bitnami** (simpler for testing):
-   ```bash
+   ```shell
    kubectl create namespace plone
    ```
 
-### Local Tools
+### Local tools
 
 - **Node.js 18+** and npm
 - **kubectl** configured for your cluster
 - **git** to clone the repository
 
-## Step 1: Get the Example
+## Step 1: Get the example
 
 Clone the repository and navigate to the example:
 
-```bash
+```shell
 git clone https://github.com/bluedynamics/cdk8s-plone.git
 cd cdk8s-plone/examples/production-volto
 ```
 
-## Step 2: Install Dependencies
+## Step 2: Install dependencies
 
-```bash
+```shell
 npm install
 ```
 
@@ -69,7 +80,7 @@ npm install
 
 Generate TypeScript bindings for Kubernetes CRDs:
 
-```bash
+```shell
 npm run import
 ```
 
@@ -78,17 +89,17 @@ This imports:
 - CloudNativePG Cluster CRDs
 - Traefik Middleware CRDs
 
-## Step 4: Configure Environment
+## Step 4: Configure environment
 
 Create a `.env` file from the example:
 
-```bash
+```shell
 cp .env.example .env
 ```
 
 Edit `.env` with your settings:
 
-```bash
+```shell
 # Your domains
 DOMAIN_CACHED=plone.example.com
 DOMAIN_UNCACHED=plone-test.example.com
@@ -109,21 +120,21 @@ DATABASE=cloudnativepg
 For production, use `cloudnativepg` for high availability. For testing, `bitnami` is simpler.
 :::
 
-## Step 5: Generate Manifests
+## Step 5: Generate manifests
 
 Synthesize Kubernetes YAML:
 
-```bash
+```shell
 npm run synth
 ```
 
 This creates `dist/plone-example.k8s.yaml` with all resources.
 
-## Step 6: Review Generated Manifests
+## Step 6: Review generated manifests
 
 Inspect what will be deployed:
 
-```bash
+```shell
 # Count resources
 grep "^kind:" dist/plone-example.k8s.yaml | sort | uniq -c
 
@@ -135,21 +146,21 @@ kubectl apply --dry-run=client -f dist/plone-example.k8s.yaml
 
 Deploy to your cluster:
 
-```bash
+```shell
 kubectl apply -f dist/plone-example.k8s.yaml
 ```
 
 Or deploy to a specific namespace:
 
-```bash
+```shell
 kubectl apply -f dist/plone-example.k8s.yaml -n plone
 ```
 
-## Step 8: Monitor Deployment
+## Step 8: Monitor deployment
 
 Watch pods starting:
 
-```bash
+```shell
 # Watch all pods
 kubectl get pods -l app.kubernetes.io/part-of=plone -w
 
@@ -161,15 +172,15 @@ kubectl get pods -l app.kubernetes.io/name=plone-httpcache
 
 Wait for all pods to be `Running`:
 
-```bash
+```shell
 kubectl wait --for=condition=ready pod -l app.kubernetes.io/part-of=plone --timeout=300s
 ```
 
-## Step 9: Verify Services
+## Step 9: Verify services
 
 Check that services are created:
 
-```bash
+```shell
 kubectl get svc -l app.kubernetes.io/part-of=plone
 ```
 
@@ -179,21 +190,21 @@ You should see:
 - `plone-httpcache` (Varnish cache)
 - Database service (Bitnami or CloudNativePG)
 
-## Step 10: Check Ingress
+## Step 10: Check ingress
 
 Verify ingress routes:
 
-```bash
+```shell
 kubectl get ingress
 ```
 
 Check TLS certificates:
 
-```bash
+```shell
 kubectl get certificate
 ```
 
-## Step 11: Access Your Site
+## Step 11: Access your site
 
 Once DNS is configured and TLS certificates are issued:
 
@@ -201,7 +212,7 @@ Once DNS is configured and TLS certificates are issued:
 - **Testing (uncached)**: https://plone-test.example.com
 - **Maintenance**: https://plone-admin.example.com
 
-### Create Plone Site
+### Create Plone site
 
 On first access to the maintenance domain:
 
@@ -215,11 +226,11 @@ On first access to the maintenance domain:
 
 ## Troubleshooting
 
-### Pods Not Starting
+### Pods not starting
 
 Check pod logs:
 
-```bash
+```shell
 # Backend logs
 kubectl logs -l app.kubernetes.io/name=plone-backend -f
 
@@ -230,11 +241,11 @@ kubectl logs -l app.kubernetes.io/name=plone-frontend -f
 kubectl logs -l postgresql=plone-postgresql -f
 ```
 
-### Database Connection Issues
+### Database connection issues
 
 **CloudNativePG:**
 
-```bash
+```shell
 # Check cluster status
 kubectl get cluster
 
@@ -244,7 +255,7 @@ kubectl get secret -l cnpg.io/cluster
 
 **Bitnami:**
 
-```bash
+```shell
 # Check service
 kubectl get svc -l app.kubernetes.io/name=postgresql
 
@@ -252,9 +263,9 @@ kubectl get svc -l app.kubernetes.io/name=postgresql
 kubectl describe secret <postgresql-secret-name>
 ```
 
-### TLS Certificate Issues
+### TLS certificate issues
 
-```bash
+```shell
 # Check certificate status
 kubectl describe certificate
 
@@ -262,9 +273,9 @@ kubectl describe certificate
 kubectl logs -n cert-manager deployment/cert-manager
 ```
 
-### Varnish Cache Not Working
+### Varnish cache not working
 
-```bash
+```shell
 # Check httpcache logs
 kubectl logs -l app.kubernetes.io/name=plone-httpcache
 
@@ -272,7 +283,7 @@ kubectl logs -l app.kubernetes.io/name=plone-httpcache
 kubectl get pods -n kube-httpcache-system
 ```
 
-## Updating Your Deployment
+## Updating your deployment
 
 After making changes to the example:
 
@@ -301,19 +312,18 @@ Then regenerate and reapply.
 
 Remove all resources:
 
-```bash
+```shell
 kubectl delete -f dist/plone-example.k8s.yaml
 ```
 
-## Next Steps
+## Next steps
 
-- Configure [monitoring and metrics](../reference/configuration-options.md#monitoring)
-- Set up [backups](../explanation/features.md#database-integration) for CloudNativePG
-- Customize [Varnish caching rules](https://github.com/bluedynamics/cdk8s-plone/blob/main/examples/production-volto/config/varnish.tpl.vcl)
-- Review [security best practices](../explanation/architecture.md#security)
+- Configure monitoring and metrics through {doc}`enable-prometheus-monitoring`.
+- Customize [Varnish caching rules](https://github.com/bluedynamics/cdk8s-plone/blob/main/examples/production-volto/config/varnish.tpl.vcl).
+- Harden pods with {doc}`configure-security-context`.
 
-## See Also
+## See also
 
-- [Deploy Classic UI Example](deploy-classic-ui.md) - For traditional Plone interface
-- [Setup Prerequisites](setup-prerequisites.md) - Detailed cluster setup
-- [Configuration Options](../reference/configuration-options.md) - API reference
+- {doc}`deploy-classic-ui` — For the traditional Plone interface.
+- {doc}`setup-prerequisites` — Detailed cluster setup.
+- {doc}`/reference/configuration-options` — API reference.

@@ -1,4 +1,4 @@
-import { cdk, JsonPatch, github } from 'projen';
+import { cdk, JsonPatch, YamlFile, github } from 'projen';
 import { NpmAccess } from 'projen/lib/javascript';
 
 const kplus = 'cdk8s-plus-30';
@@ -90,5 +90,24 @@ if (releaseWorkflow) {
   releaseWorkflow.patch(JsonPatch.replace('/jobs/release_npm/steps/0/with/node-version', '24.x'));
   releaseWorkflow.patch(JsonPatch.add('/jobs/release_npm/steps/0/with/registry-url', 'https://registry.npmjs.org'));
 }
+
+// Dependabot config for GitHub Actions only.
+// npm deps are handled by projen's upgrade-main workflow; the in-tree examples
+// under examples/* have their package-lock.json gitignored intentionally, so
+// nothing to scan there either.
+new YamlFile(project, '.github/dependabot.yml', {
+  obj: {
+    version: 2,
+    updates: [
+      {
+        'package-ecosystem': 'github-actions',
+        'directory': '/',
+        'schedule': { interval: 'weekly' },
+        'labels': ['auto-approve', 'dependencies'],
+        'open-pull-requests-limit': 5,
+      },
+    ],
+  },
+});
 
 project.synth();

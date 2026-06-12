@@ -1,8 +1,17 @@
-# Setup Prerequisites
+---
+myst:
+  html_meta:
+    "description": "Install kubectl, Node.js or Python, CDK8S, and prepare a Kubernetes cluster to deploy Plone with cdk8s-plone."
+    "property=og:description": "Install kubectl, Node.js or Python, CDK8S, and prepare a Kubernetes cluster to deploy Plone with cdk8s-plone."
+    "property=og:title": "Setup prerequisites"
+    "keywords": "Plone, cdk8s, Kubernetes, kubectl, Node.js, Python, prerequisites"
+---
+
+# Setup prerequisites
 
 Prepare your environment for deploying Plone with cdk8s-plone.
 
-## Required Tools
+## Required tools
 
 ### kubectl
 
@@ -12,12 +21,12 @@ Command-line tool for deploying and managing Kubernetes resources.
 - [Install kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
 
 **Verify installation:**
-```bash
+```shell
 kubectl version --client
 ```
 
 **Configure cluster access:**
-```bash
+```shell
 # Verify you can connect to your cluster
 kubectl cluster-info
 kubectl get nodes
@@ -33,18 +42,18 @@ Required for TypeScript/JavaScript development.
 **Installation:**
 - [Install Node.js](https://nodejs.org/)
 - Or use [nvm](https://github.com/nvm-sh/nvm):
-  ```bash
+  ```shell
   nvm install --lts
   nvm use --lts
   ```
 
 **Verify installation:**
-```bash
+```shell
 node --version
 npm --version
 ```
 
-### Python (for Python Development)
+### Python (for Python development)
 
 Required for Python development.
 
@@ -55,7 +64,7 @@ Required for Python development.
 - [Install Python](https://www.python.org/downloads/)
 
 **Verify installation:**
-```bash
+```shell
 python --version
 pip --version
 ```
@@ -65,16 +74,16 @@ pip --version
 The CDK8S command-line tool for project initialization and synthesis.
 
 **Installation:**
-```bash
+```shell
 npm install -g cdk8s-cli
 ```
 
 **Verify installation:**
-```bash
+```shell
 cdk8s --version
 ```
 
-## Optional Tools
+## Optional tools
 
 ### Helm
 
@@ -84,7 +93,7 @@ Required only if you want to generate Helm charts instead of raw Kubernetes mani
 - [Install Helm](https://helm.sh/docs/intro/install/)
 
 **Verify installation:**
-```bash
+```shell
 helm version
 ```
 
@@ -96,7 +105,7 @@ Terminal-based UI for managing Kubernetes clusters (recommended for development)
 - [Install k9s](https://k9scli.io/topics/install/)
 
 **Usage:**
-```bash
+```shell
 k9s
 ```
 
@@ -108,7 +117,7 @@ Tools for switching between Kubernetes contexts and namespaces.
 - [Install kubectx](https://github.com/ahmetb/kubectx#installation)
 
 **Usage:**
-```bash
+```shell
 kubectx                  # List contexts
 kubectx my-cluster       # Switch context
 kubens my-namespace      # Switch namespace
@@ -118,10 +127,10 @@ kubens my-namespace      # Switch namespace
 
 You need access to a Kubernetes cluster for deployment.
 
-### Local Development Clusters
+### Local development clusters
 
 **Minikube**
-```bash
+```shell
 # Install
 # https://minikube.sigs.k8s.io/docs/start/
 
@@ -133,7 +142,7 @@ kubectl cluster-info
 ```
 
 **kind (Kubernetes in Docker)**
-```bash
+```shell
 # Install
 # https://kind.sigs.k8s.io/docs/user/quick-start/
 
@@ -149,7 +158,7 @@ kubectl cluster-info
 - Verify with `kubectl cluster-info`
 
 **k3d (Lightweight Kubernetes)**
-```bash
+```shell
 # Install
 # https://k3d.io/
 
@@ -160,10 +169,10 @@ k3d cluster create plone-dev
 kubectl cluster-info
 ```
 
-### Cloud Kubernetes Services
+### Cloud Kubernetes services
 
 **Google Kubernetes Engine (GKE)**
-```bash
+```shell
 # Create cluster
 gcloud container clusters create plone-cluster \
   --num-nodes=3 \
@@ -174,7 +183,7 @@ gcloud container clusters get-credentials plone-cluster
 ```
 
 **Amazon EKS**
-```bash
+```shell
 # Create cluster using eksctl
 eksctl create cluster \
   --name plone-cluster \
@@ -186,7 +195,7 @@ kubectl get nodes
 ```
 
 **Azure Kubernetes Service (AKS)**
-```bash
+```shell
 # Create cluster
 az aks create \
   --resource-group myResourceGroup \
@@ -200,9 +209,9 @@ az aks get-credentials \
   --name plone-cluster
 ```
 
-## Cluster Requirements
+## Cluster requirements
 
-### Minimum Resources
+### Minimum resources
 
 **For development/testing:**
 - **Nodes:** 1-2 nodes
@@ -216,7 +225,7 @@ az aks get-credentials \
 - **Memory:** 8GB+ per node
 - **Storage:** 50GB+ per node
 
-### Required Kubernetes Features
+### Required Kubernetes features
 
 - **Version:** Kubernetes 1.20+
 - **Networking:** CNI plugin installed
@@ -224,17 +233,17 @@ az aks get-credentials \
 - **DNS:** CoreDNS or equivalent
 
 **Verify storage classes:**
-```bash
+```shell
 kubectl get storageclasses
 ```
 
 If no storage class exists, you need to configure one for your cluster.
 
-## Namespace Setup
+## Namespace setup
 
 Create a namespace for your Plone deployment:
 
-```bash
+```shell
 # Create namespace
 kubectl create namespace plone
 
@@ -245,20 +254,20 @@ kubectl config set-context --current --namespace=plone
 kubectl config view --minify | grep namespace:
 ```
 
-## Image Registry Access
+## Image registry access
 
-### Public Registries
+### Public registries
 
 No configuration needed for public Plone images:
 - `plone/plone-backend:6.1.3`
 - `plone/plone-frontend:16.0.0`
 
-### Private Registries
+### Private registries
 
 Create a pull secret for private registries:
 
 **Docker Hub:**
-```bash
+```shell
 kubectl create secret docker-registry docker-hub \
   --docker-server=docker.io \
   --docker-username=YOUR_USERNAME \
@@ -267,7 +276,7 @@ kubectl create secret docker-registry docker-hub \
 ```
 
 **Google Container Registry:**
-```bash
+```shell
 kubectl create secret docker-registry gcr-secret \
   --docker-server=gcr.io \
   --docker-username=_json_key \
@@ -276,7 +285,7 @@ kubectl create secret docker-registry gcr-secret \
 ```
 
 **Azure Container Registry:**
-```bash
+```shell
 kubectl create secret docker-registry acr-secret \
   --docker-server=myregistry.azurecr.io \
   --docker-username=YOUR_USERNAME \
@@ -291,7 +300,7 @@ new Plone(chart, 'my-plone', {
 });
 ```
 
-## Verification Checklist
+## Verification checklist
 
 Before proceeding, verify:
 
@@ -304,7 +313,7 @@ Before proceeding, verify:
 - [ ] Image pull secrets created (if using private registries)
 
 **Verify everything:**
-```bash
+```shell
 # Check tools
 kubectl version --client
 cdk8s --version
@@ -319,13 +328,13 @@ kubectl get storageclasses
 kubectl get namespace plone
 ```
 
-## Next Steps
+## Next steps
 
 Now that your environment is ready:
 
-1. **Start the tutorial**: Follow the [Quick Start](../tutorials/01-quick-start.md) guide
-2. **Explore examples**: Check the [example project](https://github.com/bluedynamics/cdk8s-plone-example)
-3. **Read about variants**: Learn about [Plone variants](../explanation/features.md#deployment-variants)
+1. **Start the tutorial**: Follow the {doc}`/tutorials/01-quick-start` guide.
+2. **Explore examples**: Check the [example project](https://github.com/bluedynamics/cdk8s-plone-example).
+3. **Read about variants**: Learn about {ref}`deployment-variants` in the features overview.
 
 ## Troubleshooting
 
@@ -347,8 +356,8 @@ Now that your environment is ready:
 - Verify RBAC permissions: `kubectl auth can-i create deployments`
 - Contact your cluster administrator for proper permissions
 
-## See Also
+## See also
 
-- [Quick Start Tutorial](../tutorials/01-quick-start.md) - Get started with deployment
-- [Architecture Overview](../explanation/architecture.md) - Understanding the system
-- [Configuration Options](../reference/configuration-options.md) - Complete configuration reference
+- {doc}`/tutorials/01-quick-start` — Get started with deployment.
+- {doc}`/explanation/architecture` — Understand the system.
+- {doc}`/reference/configuration-options` — Complete configuration reference.

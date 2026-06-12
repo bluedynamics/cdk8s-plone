@@ -72,6 +72,7 @@ export class PlonePDB extends Construct {
     spec = {
       ...spec,
       selector: { matchLabels: selectorLabel },
+      unhealthyPodEvictionPolicy: 'AlwaysAllow',
     };
     const pdb_labels = {
       ...options.labels ?? {},

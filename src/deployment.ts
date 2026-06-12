@@ -238,7 +238,12 @@ export class PloneDeployment extends Construct {
 
     if (options.pdb ?? false) {
       const pdbOptions = options.pdb ?? {};
-      new PlonePDB(this, 'pdb', label, pdbOptions);
+      const pdbExplicit = pdbOptions.minAvailable !== undefined || pdbOptions.maxUnavailable !== undefined;
+      // A PDB on a single-replica deployment is always undrainable and guarantees
+      // no availability. Only emit one for >=2 replicas, or when explicitly configured.
+      if (replicas >= 2 || pdbExplicit) {
+        new PlonePDB(this, 'pdb', label, pdbOptions);
+      }
     }
   }
 }

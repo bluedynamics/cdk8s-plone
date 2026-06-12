@@ -1,4 +1,13 @@
-# Architecture Overview
+---
+myst:
+  html_meta:
+    "description": "Architecture and design of cdk8s-plone deployments: components, caching options, and production considerations."
+    "property=og:description": "Architecture and design of cdk8s-plone deployments: components, caching options, and production considerations."
+    "property=og:title": "Architecture overview"
+    "keywords": "Plone, cdk8s, Kubernetes, architecture, design, Volto, Varnish, caching"
+---
+
+# Architecture overview
 
 Understanding the architecture and design of cdk8s-plone deployments.
 
@@ -6,9 +15,9 @@ Understanding the architecture and design of cdk8s-plone deployments.
 
 cdk8s-plone provides CDK8S constructs for deploying Plone CMS on Kubernetes. The library handles all Kubernetes resources needed for a production-grade Plone deployment.
 
-## Key Features
+## Key features
 
-### Deployment Variants
+### Deployment variants
 
 cdk8s-plone supports two deployment variants:
 
@@ -25,7 +34,7 @@ cdk8s-plone supports two deployment variants:
 - Traditional Plone experience
 - Simpler deployment model
 
-### High Availability
+### High availability
 
 **Replica Management**
 - Configurable number of replicas for backend and frontend
@@ -42,7 +51,7 @@ cdk8s-plone supports two deployment variants:
 - Liveness probes: Automatic restart of unhealthy pods
 - Configurable delays, timeouts, and thresholds
 
-### HTTP Caching Layer
+### HTTP caching layer
 
 **Varnish Integration**
 - Uses [kube-httpcache](https://github.com/mittwald/kube-httpcache) Helm chart
@@ -57,7 +66,7 @@ cdk8s-plone supports two deployment variants:
 - Better scalability
 - Automatic cache invalidation on content changes
 
-### Caching Options
+### Caching options
 
 cdk8s-plone supports two HTTP caching approaches:
 
@@ -75,7 +84,7 @@ cdk8s-plone supports two HTTP caching approaches:
 
 Choose PloneHttpcache for standalone deployments without cloud-vinyl. Choose PloneVinylCache when the operator is available for centralized cache management.
 
-### Multi-Language Support
+### Multi-language support
 
 The library is published in multiple languages:
 
@@ -89,7 +98,7 @@ The library is published in multiple languages:
 - Pythonic API
 - Published to PyPI: `cdk8s-plone`
 
-## Architecture Diagram
+## Architecture diagram
 
 ```mermaid
 graph TB
@@ -139,7 +148,7 @@ graph TB
     Backend3 --> DB
 ```
 
-## Component Responsibilities
+## Component responsibilities
 
 ### Backend
 
@@ -195,7 +204,7 @@ graph TB
 - Horizontal: Add replicas for cache distribution
 - Vertical: Increase memory for larger cache
 
-## Kubernetes Resources Created
+## Kubernetes resources created
 
 For a typical Volto deployment, cdk8s-plone creates:
 
@@ -217,9 +226,9 @@ For a typical Volto deployment, cdk8s-plone creates:
 - Secret (admin credentials)
 - ServiceMonitor (optional, for Prometheus)
 
-## Design Decisions
+## Design decisions
 
-### CDK8S Constructs
+### CDK8S constructs
 
 **Why CDK8S?**
 - Type-safe infrastructure as code
@@ -234,7 +243,7 @@ For a typical Volto deployment, cdk8s-plone creates:
 - Easier testing
 - Composition over configuration
 
-### Separate Frontend/Backend
+### Separate frontend and backend
 
 **Volto Architecture:**
 - Independent scaling of frontend and backend
@@ -248,7 +257,7 @@ For a typical Volto deployment, cdk8s-plone creates:
 - Legacy integrations
 - Specific add-on requirements
 
-### Optional Varnish Layer
+### Optional Varnish layer
 
 **Design Choice:**
 - Varnish is optional, not mandatory
@@ -262,7 +271,7 @@ For a typical Volto deployment, cdk8s-plone creates:
 - Better performance at scale
 - Reduced backend load
 
-### Health Probes
+### Health probes
 
 **Readiness Probe:**
 - Enabled by default for backend
@@ -274,9 +283,9 @@ For a typical Volto deployment, cdk8s-plone creates:
 - Recommended enabled for frontend (detect SSR hangs)
 - Configurable thresholds
 
-## Production Considerations
+## Production considerations
 
-### Resource Planning
+### Resource planning
 
 **Backend:**
 - Plan for catalog size and query complexity
@@ -292,7 +301,7 @@ For a typical Volto deployment, cdk8s-plone creates:
 - Memory size determines cache capacity
 - Monitor hit rates and adjust sizing
 
-### High Availability
+### High availability
 
 **Recommendations:**
 - Minimum 2 replicas per component
@@ -321,9 +330,8 @@ For a typical Volto deployment, cdk8s-plone creates:
 - Grafana for visualization
 - Kubernetes events monitoring
 
-## See Also
+## See also
 
-- [Plone Variants](plone-variants.md) - Detailed comparison of Volto vs Classic UI
-- [Scaling Patterns](scaling-patterns.md) - Horizontal and vertical scaling strategies
-- [Configuration Options](../reference/configuration-options.md) - Complete configuration reference
-- [Quick Start](../tutorials/01-quick-start.md) - Getting started tutorial
+- {doc}`features` — Feature overview and deployment variants.
+- {doc}`/reference/configuration-options` — Complete configuration reference.
+- {doc}`/tutorials/01-quick-start` — Getting started tutorial.
