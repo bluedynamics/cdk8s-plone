@@ -52,13 +52,22 @@ export interface PloneServiceSpec {
   readonly labels?: { [name: string]: string };
 
   // Escape-Hatch für alles Übrige (ipFamilyPolicy, clusterIP, ...):
-  readonly overrides?: k8s.ServiceSpec;
+  readonly overrides?: { [key: string]: any };
 }
 ```
 
-Der `overrides`-Typ ist der generierte JSII-Struct `k8s.ServiceSpec` — voll
-JSII-/Python-fähig, deckt jedes aktuelle und künftige k8s-Service-Feld ab, ohne
-dass Code angefasst werden muss.
+Der `overrides`-Typ ist ein freiform-Record `{ [key: string]: any }` — deckt
+jedes aktuelle und künftige k8s-Service-Feld ab, ohne dass Code angefasst werden
+muss.
+
+> **JSII-Constraint (entdeckt bei der Umsetzung):** Ursprünglich war
+> `overrides?: k8s.ServiceSpec` geplant. JSII lehnt das ab
+> (`JSII3000: Exported APIs cannot use un-exported type`), weil die generierten
+> Typen aus `src/imports/k8s.ts` nicht Teil der JSII-Assembly sind. Den gesamten
+> k8s-Import zu re-exportieren würde die öffentliche API mit der kompletten
+> Kubernetes-API zumüllen. Ein freiform-Record ist die idiomatische, voll
+> JSII-/Python-fähige (Python: `dict`) Lösung für einen generischen Escape-Hatch
+> und bleibt „für alles" offen. Die kuratierten Felder bleiben typisiert.
 
 ### 2. `PloneServiceOptions` erweitern
 

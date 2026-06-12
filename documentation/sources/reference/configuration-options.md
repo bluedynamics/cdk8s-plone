@@ -203,7 +203,7 @@ frontend: {
 |----------|------|-------------|
 | `annotations` | `Record<string, string>` | Deployment metadata annotations |
 | `podAnnotations` | `Record<string, string>` | Pod template annotations (e.g., for Prometheus) |
-| `serviceAnnotations` | `Record<string, string>` | Service annotations (e.g., for external-dns) |
+| `serviceAnnotations` | `Record<string, string>` | **Deprecated.** Use `service.annotations` instead. Service annotations (e.g., for external-dns) |
 
 **Example:**
 ```typescript
@@ -215,6 +215,44 @@ backend: {
   },
   serviceAnnotations: {
     'external-dns.alpha.kubernetes.io/hostname': 'backend.example.com',
+  },
+}
+```
+
+#### Service
+
+Configure the generated Kubernetes `Service` through the grouped `service` option.
+The `service` option is available on both `backend` and `frontend`.
+Curated fields cover the common cases.
+The `overrides` field is an escape hatch for any other `ServiceSpec` field, and it has the highest precedence.
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `service.type` | `string` | Service type: `ClusterIP` (default), `NodePort`, `LoadBalancer`, or `ExternalName` |
+| `service.trafficDistribution` | `string` | Traffic distribution preference, for example `PreferClose` |
+| `service.sessionAffinity` | `string` | Session affinity: `ClientIP` or `None` |
+| `service.externalTrafficPolicy` | `string` | External traffic policy: `Cluster` or `Local` |
+| `service.internalTrafficPolicy` | `string` | Internal traffic policy: `Cluster` or `Local` |
+| `service.publishNotReadyAddresses` | `boolean` | Publish not-ready addresses |
+| `service.loadBalancerClass` | `string` | Load balancer implementation class |
+| `service.loadBalancerSourceRanges` | `string[]` | Allowed source IP ranges for a `LoadBalancer` service |
+| `service.annotations` | `Record<string, string>` | Service metadata annotations (replaces `serviceAnnotations`) |
+| `service.labels` | `Record<string, string>` | Extra Service metadata labels |
+| `service.overrides` | `Record<string, any>` | Raw `ServiceSpec` overrides as a free-form map, with the highest precedence |
+
+**Example:**
+```typescript
+backend: {
+  service: {
+    type: 'LoadBalancer',
+    trafficDistribution: 'PreferClose',
+    loadBalancerSourceRanges: ['10.0.0.0/8'],
+    annotations: {
+      'external-dns.alpha.kubernetes.io/hostname': 'backend.example.com',
+    },
+    overrides: {
+      ipFamilyPolicy: 'PreferDualStack',
+    },
   },
 }
 ```

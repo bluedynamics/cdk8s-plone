@@ -727,6 +727,7 @@ const ploneBaseOptions: PloneBaseOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.requestCpu">requestCpu</a></code> | <code>string</code> | CPU request for the container. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.requestMemory">requestMemory</a></code> | <code>string</code> | Memory request for the container. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.securityContext">securityContext</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.PloneSecurityContext">PloneSecurityContext</a></code> | Security context for the container. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.service">service</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.PloneServiceSpec">PloneServiceSpec</a></code> | Service configuration: type, trafficDistribution, sessionAffinity, annotations/labels, and a raw `overrides` escape hatch for any other ServiceSpec field. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.serviceAnnotations">serviceAnnotations</a></code> | <code>{[ key: string ]: string}</code> | Annotations to add to the Service metadata. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.servicemonitor">servicemonitor</a></code> | <code>boolean</code> | Enable Prometheus ServiceMonitor for metrics collection. |
 
@@ -1182,7 +1183,31 @@ Use to set capabilities, run as non-root, read-only filesystem, etc.
 ```
 
 
-##### `serviceAnnotations`<sup>Optional</sup> <a name="serviceAnnotations" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.serviceAnnotations"></a>
+##### `service`<sup>Optional</sup> <a name="service" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.service"></a>
+
+```typescript
+public readonly service: PloneServiceSpec;
+```
+
+- *Type:* <a href="#@bluedynamics/cdk8s-plone.PloneServiceSpec">PloneServiceSpec</a>
+- *Default:* construct-managed defaults only
+
+Service configuration: type, trafficDistribution, sessionAffinity, annotations/labels, and a raw `overrides` escape hatch for any other ServiceSpec field.
+
+Applies to this component's Service.
+
+---
+
+*Example*
+
+```typescript
+{ type: 'LoadBalancer', trafficDistribution: 'PreferClose' }
+```
+
+
+##### ~~`serviceAnnotations`~~<sup>Optional</sup> <a name="serviceAnnotations" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.serviceAnnotations"></a>
+
+- *Deprecated:* use `service.annotations` instead
 
 ```typescript
 public readonly serviceAnnotations: {[ key: string ]: string};
@@ -1758,6 +1783,184 @@ public readonly runAsUser: number;
 - *Default:* container default
 
 Run the container as a specific user ID.
+
+---
+
+### PloneServiceSpec <a name="PloneServiceSpec" id="@bluedynamics/cdk8s-plone.PloneServiceSpec"></a>
+
+Configuration for the generated Kubernetes Service spec.
+
+Curated fields cover the common cases; use `overrides` as an escape hatch
+for any other `ServiceSpec` field. `overrides` has the highest precedence and
+can override every field, including the construct-managed `ports`/`selector`
+(at your own risk).
+
+#### Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.PloneServiceSpec.Initializer"></a>
+
+```typescript
+import { PloneServiceSpec } from '@bluedynamics/cdk8s-plone'
+
+const ploneServiceSpec: PloneServiceSpec = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneServiceSpec.property.annotations">annotations</a></code> | <code>{[ key: string ]: string}</code> | Annotations to add to the Service metadata. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneServiceSpec.property.externalTrafficPolicy">externalTrafficPolicy</a></code> | <code>string</code> | External traffic policy, 'Cluster' \| 'Local'. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneServiceSpec.property.internalTrafficPolicy">internalTrafficPolicy</a></code> | <code>string</code> | Internal traffic policy, 'Cluster' \| 'Local'. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneServiceSpec.property.labels">labels</a></code> | <code>{[ key: string ]: string}</code> | Extra labels to add to the Service metadata. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneServiceSpec.property.loadBalancerClass">loadBalancerClass</a></code> | <code>string</code> | Load balancer implementation class. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneServiceSpec.property.loadBalancerSourceRanges">loadBalancerSourceRanges</a></code> | <code>string[]</code> | Source IP ranges allowed to access a LoadBalancer service. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneServiceSpec.property.overrides">overrides</a></code> | <code>{[ key: string ]: any}</code> | Raw ServiceSpec overrides as a free-form map (e.g. `{ ipFamilyPolicy: 'PreferDualStack' }`). Highest precedence — merged on top of all curated fields and the construct-managed base. Use for any ServiceSpec field not covered above. Keys and values are passed through to the Service spec verbatim and are not validated by this construct. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneServiceSpec.property.publishNotReadyAddresses">publishNotReadyAddresses</a></code> | <code>boolean</code> | Publish not-ready addresses (e.g. for headless services with StatefulSets). |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneServiceSpec.property.sessionAffinity">sessionAffinity</a></code> | <code>string</code> | Session affinity, 'ClientIP' \| 'None'. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneServiceSpec.property.trafficDistribution">trafficDistribution</a></code> | <code>string</code> | Traffic distribution preference, e.g. 'PreferClose' for topology-aware routing. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneServiceSpec.property.type">type</a></code> | <code>string</code> | Service type, e.g. ClusterIP \| NodePort \| LoadBalancer \| ExternalName. |
+
+---
+
+##### `annotations`<sup>Optional</sup> <a name="annotations" id="@bluedynamics/cdk8s-plone.PloneServiceSpec.property.annotations"></a>
+
+```typescript
+public readonly annotations: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* none
+
+Annotations to add to the Service metadata.
+
+---
+
+##### `externalTrafficPolicy`<sup>Optional</sup> <a name="externalTrafficPolicy" id="@bluedynamics/cdk8s-plone.PloneServiceSpec.property.externalTrafficPolicy"></a>
+
+```typescript
+public readonly externalTrafficPolicy: string;
+```
+
+- *Type:* string
+- *Default:* Cluster (Kubernetes default)
+
+External traffic policy, 'Cluster' | 'Local'.
+
+---
+
+##### `internalTrafficPolicy`<sup>Optional</sup> <a name="internalTrafficPolicy" id="@bluedynamics/cdk8s-plone.PloneServiceSpec.property.internalTrafficPolicy"></a>
+
+```typescript
+public readonly internalTrafficPolicy: string;
+```
+
+- *Type:* string
+- *Default:* Cluster (Kubernetes default)
+
+Internal traffic policy, 'Cluster' | 'Local'.
+
+---
+
+##### `labels`<sup>Optional</sup> <a name="labels" id="@bluedynamics/cdk8s-plone.PloneServiceSpec.property.labels"></a>
+
+```typescript
+public readonly labels: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* none
+
+Extra labels to add to the Service metadata.
+
+---
+
+##### `loadBalancerClass`<sup>Optional</sup> <a name="loadBalancerClass" id="@bluedynamics/cdk8s-plone.PloneServiceSpec.property.loadBalancerClass"></a>
+
+```typescript
+public readonly loadBalancerClass: string;
+```
+
+- *Type:* string
+- *Default:* none
+
+Load balancer implementation class.
+
+---
+
+##### `loadBalancerSourceRanges`<sup>Optional</sup> <a name="loadBalancerSourceRanges" id="@bluedynamics/cdk8s-plone.PloneServiceSpec.property.loadBalancerSourceRanges"></a>
+
+```typescript
+public readonly loadBalancerSourceRanges: string[];
+```
+
+- *Type:* string[]
+- *Default:* none
+
+Source IP ranges allowed to access a LoadBalancer service.
+
+---
+
+##### `overrides`<sup>Optional</sup> <a name="overrides" id="@bluedynamics/cdk8s-plone.PloneServiceSpec.property.overrides"></a>
+
+```typescript
+public readonly overrides: {[ key: string ]: any};
+```
+
+- *Type:* {[ key: string ]: any}
+- *Default:* none
+
+Raw ServiceSpec overrides as a free-form map (e.g. `{ ipFamilyPolicy: 'PreferDualStack' }`). Highest precedence — merged on top of all curated fields and the construct-managed base. Use for any ServiceSpec field not covered above. Keys and values are passed through to the Service spec verbatim and are not validated by this construct.
+
+---
+
+##### `publishNotReadyAddresses`<sup>Optional</sup> <a name="publishNotReadyAddresses" id="@bluedynamics/cdk8s-plone.PloneServiceSpec.property.publishNotReadyAddresses"></a>
+
+```typescript
+public readonly publishNotReadyAddresses: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Publish not-ready addresses (e.g. for headless services with StatefulSets).
+
+---
+
+##### `sessionAffinity`<sup>Optional</sup> <a name="sessionAffinity" id="@bluedynamics/cdk8s-plone.PloneServiceSpec.property.sessionAffinity"></a>
+
+```typescript
+public readonly sessionAffinity: string;
+```
+
+- *Type:* string
+- *Default:* None (Kubernetes default)
+
+Session affinity, 'ClientIP' | 'None'.
+
+---
+
+##### `trafficDistribution`<sup>Optional</sup> <a name="trafficDistribution" id="@bluedynamics/cdk8s-plone.PloneServiceSpec.property.trafficDistribution"></a>
+
+```typescript
+public readonly trafficDistribution: string;
+```
+
+- *Type:* string
+- *Default:* none
+
+Traffic distribution preference, e.g. 'PreferClose' for topology-aware routing.
+
+---
+
+##### `type`<sup>Optional</sup> <a name="type" id="@bluedynamics/cdk8s-plone.PloneServiceSpec.property.type"></a>
+
+```typescript
+public readonly type: string;
+```
+
+- *Type:* string
+- *Default:* ClusterIP (Kubernetes default)
+
+Service type, e.g. ClusterIP | NodePort | LoadBalancer | ExternalName.
 
 ---
 
