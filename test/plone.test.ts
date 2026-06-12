@@ -135,3 +135,22 @@ test('with nodeSelector for region affinity', () => {
   // THEN
   expect(Testing.synth(chart)).toMatchSnapshot();
 });
+
+test('backend service config is plumbed through', () => {
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  new Plone(chart, 'plone', {
+    backend: {
+      service: {
+        type: 'LoadBalancer',
+        trafficDistribution: 'PreferClose',
+      },
+    },
+  });
+  const manifests = Testing.synth(chart);
+  const backendSvc = manifests.find(
+    (m: any) => m.kind === 'Service' && m.metadata.labels['app.kubernetes.io/name'] === 'plone-backend-service',
+  );
+  expect(backendSvc.spec.type).toBe('LoadBalancer');
+  expect(backendSvc.spec.trafficDistribution).toBe('PreferClose');
+});
