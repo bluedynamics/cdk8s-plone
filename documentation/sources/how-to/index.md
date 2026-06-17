@@ -40,7 +40,7 @@ maxdepth: 1
 titlesonly: true
 ---
 deploy-production-volto
-deploy-classic-ui
+deploy-blicca
 deploy-with-vinyl-cache
 ```
 

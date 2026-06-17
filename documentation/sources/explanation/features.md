@@ -19,17 +19,19 @@ Complete overview of cdk8s-plone features and capabilities.
 
 cdk8s-plone supports two deployment modes to match your requirements:
 
-**Volto (Modern React Frontend)**
-- Modern React-based user interface
+**Volto (React single-page frontend)**
+- React-based user interface
 - Headless CMS architecture
 - Separate frontend and backend services
-- Best for: New projects, modern UX requirements, API-first architectures
+- Best for: API-first architectures, SPA frontends
 
-**Classic UI (Traditional Plone)**
-- Server-side rendered interface
+**Blicca (server-side rendered Plone)**
+- The Plone backend renders the UI and serves HTML directly
 - Integrated single-service deployment
-- Traditional Plone experience
-- Best for: Legacy migrations, existing add-ons, simpler deployments
+- Best for: single-service setups, legacy migrations, existing add-ons
+
+Blicca is the new name for the variant Plone formerly called "Classic UI".
+Both are equally current; they differ in their rendering approach.
 
 See {doc}`architecture` for a deeper architectural comparison of the two variants.
 

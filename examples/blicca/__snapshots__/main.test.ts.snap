@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Classic UI Example Synthesizes correctly 1`] = `
+exports[`Blicca Example Synthesizes correctly 1`] = `
 [
   {
     "apiVersion": "networking.k8s.io/v1",
@@ -486,7 +486,7 @@ exports[`Classic UI Example Synthesizes correctly 1`] = `
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-backend",
             "app.kubernetes.io/part-of": "plone",
-            "app.kubernetes.io/version": "classic.version",
+            "app.kubernetes.io/version": "blicca.version",
           },
         },
         "spec": {
@@ -729,7 +729,7 @@ sub vcl_recv {
   # Annotate request with x-auth indicating if request is authenticated or not
   call detect_auth;
 
-  # Routing: All traffic goes to Plone backend for Classic UI
+  # Routing: All traffic goes to Plone backend for Blicca
   set req.backend_hint = lbPloneBackend.backend();
 
   # short cut authenticated requests to pass

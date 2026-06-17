@@ -58,7 +58,7 @@ sub vcl_recv {
   # Annotate request with x-auth indicating if request is authenticated or not
   call detect_auth;
 
-  # Routing: All traffic goes to Plone backend for Classic UI
+  # Routing: All traffic goes to Plone backend for Blicca
   set req.backend_hint = lbPloneBackend.backend();
 
   # short cut authenticated requests to pass

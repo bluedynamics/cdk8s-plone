@@ -324,6 +324,6 @@ kubectl delete -f dist/plone-example.k8s.yaml
 
 ## See also
 
-- {doc}`deploy-classic-ui` — For the traditional Plone interface.
+- {doc}`deploy-blicca` — For the server-side rendered Plone UI.
 - {doc}`setup-prerequisites` — Detailed cluster setup.
 - {doc}`/reference/configuration-options` — API reference.

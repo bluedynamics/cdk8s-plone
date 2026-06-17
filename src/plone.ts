@@ -300,14 +300,23 @@ export interface PloneBaseOptions {
  */
 export enum PloneVariant {
   /**
-   * Volto variant: ReactJS frontend (Volto) with REST API backend.
+   * Volto variant: ReactJS single-page frontend (Volto) talking to the Plone REST API.
    * Deploys both frontend and backend services.
    */
   VOLTO = 'volto',
 
   /**
-   * Classic UI variant: Traditional Plone with server-side rendering.
+   * Blicca variant: the Plone backend renders the UI server-side and serves the HTML directly.
    * Deploys only the backend service.
+   */
+  BLICCA = 'blicca',
+
+  /**
+   * Deprecated alias for the Blicca variant (formerly "Classic UI").
+   *
+   * @deprecated Renamed to {@link BLICCA}. Kept for backward compatibility and selects the
+   * same backend-only deployment. Existing configuration using `CLASSICUI` (or the literal
+   * value `'classicui'`) keeps working unchanged. Will be removed in a future major release.
    */
   CLASSICUI = 'classicui',
 }
@@ -367,8 +376,8 @@ export interface PloneOptions {
  * - Optional PodDisruptionBudget for high availability
  *
  * Supports two deployment variants:
- * - VOLTO: Modern React frontend with REST API backend (default)
- * - CLASSICUI: Traditional server-side rendered Plone
+ * - VOLTO: React single-page frontend talking to the REST API backend (default)
+ * - BLICCA: the Plone backend renders the UI server-side and serves HTML directly
  *
  * @example
  * new Plone(chart, 'my-plone', {
@@ -396,7 +405,7 @@ export class Plone extends Construct {
   public readonly frontendServiceName: string | undefined;
 
   /**
-   * The deployment variant being used (VOLTO or CLASSICUI).
+   * The deployment variant being used (VOLTO or BLICCA).
    */
   public readonly variant: PloneVariant;
 

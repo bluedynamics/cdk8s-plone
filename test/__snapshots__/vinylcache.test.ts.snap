@@ -359,7 +359,7 @@ if (req.http.Cookie) {
 ]
 `;
 
-exports[`with classic-ui variant (no frontend) 1`] = `
+exports[`with blicca variant (no frontend) 1`] = `
 [
   {
     "apiVersion": "apps/v1",

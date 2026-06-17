@@ -16,13 +16,13 @@ Complete reference for all configuration options in cdk8s-plone.
 ### `Plone`
 
 Main construct for deploying Plone CMS. Supports two variants:
-- **VOLTO**: Modern React frontend with REST API backend (default)
-- **CLASSICUI**: Traditional server-side rendered Plone
+- **VOLTO**: React single-page frontend talking to the REST API backend (default)
+- **BLICCA**: the Plone backend renders the UI server-side and serves HTML directly
 
 **Properties:**
 - `backendServiceName` - Name of the backend Kubernetes service
 - `frontendServiceName` - Name of the frontend service (VOLTO only)
-- `variant` - Deployment variant (VOLTO or CLASSICUI)
+- `variant` - Deployment variant (VOLTO or BLICCA)
 - `siteId` - Plone site ID in ZODB (default: 'Plone')
 
 **Example:**
@@ -75,7 +75,7 @@ Main configuration interface for the Plone construct.
 |----------|------|----------|---------|-------------|
 | `version` | `string` | No | - | Version of your project |
 | `siteId` | `string` | No | `'Plone'` | Plone site ID in ZODB |
-| `variant` | `PloneVariant` | No | `VOLTO` | Deployment variant (VOLTO or CLASSICUI) |
+| `variant` | `PloneVariant` | No | `VOLTO` | Deployment variant (VOLTO or BLICCA) |
 | `backend` | `PloneBaseOptions` | Yes | - | Backend configuration |
 | `frontend` | `PloneBaseOptions` | Conditional | - | Frontend configuration (required for VOLTO) |
 | `imagePullSecrets` | `string[]` | No | - | Image pull secrets for private registries |
@@ -581,18 +581,24 @@ Defines the deployment variant:
 
 | Value | Description |
 |-------|-------------|
-| `PloneVariant.VOLTO` | Modern React frontend with REST API backend (default) |
-| `PloneVariant.CLASSICUI` | Traditional server-side rendered Plone |
+| `PloneVariant.VOLTO` | React single-page frontend talking to the REST API backend (default) |
+| `PloneVariant.BLICCA` | The Plone backend renders the UI server-side and serves HTML directly |
+| `PloneVariant.CLASSICUI` | Deprecated alias for `PloneVariant.BLICCA`, kept for backward compatibility |
+
+`BLICCA` is the new name for the former `CLASSICUI` variant.
+Both select the same backend-only deployment.
+`CLASSICUI` keeps its legacy value (`'classicui'`), so existing configuration using `CLASSICUI` or that literal keeps working unchanged.
+The `CLASSICUI` alias will be removed in a future major release.
 
 **Example:**
 ```typescript
 import { PloneVariant } from '@bluedynamics/cdk8s-plone';
 
-// Volto (modern)
+// Volto (React single-page frontend)
 variant: PloneVariant.VOLTO
 
-// Classic UI
-variant: PloneVariant.CLASSICUI
+// Blicca (server-side rendered)
+variant: PloneVariant.BLICCA
 ```
 
 ---
@@ -663,7 +669,7 @@ app.synth();
 
 - {doc}`/tutorials/01-quick-start` — Get started guide
 - {doc}`/how-to/deploy-production-volto` — Production-ready Volto deployment
-- {doc}`/how-to/deploy-classic-ui` — Classic UI deployment
+- {doc}`/how-to/deploy-blicca` — Blicca deployment
 - {doc}`/how-to/deploy-with-vinyl-cache` — `PloneVinylCache` walk-through
 - {doc}`/how-to/enable-prometheus-monitoring` — Wire up `ServiceMonitor`
 - {doc}`/how-to/configure-security-context` — Harden backend and frontend pods

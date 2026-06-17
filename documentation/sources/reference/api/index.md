@@ -15,7 +15,7 @@ Complete API reference for cdk8s-plone constructs, generated from TypeScript sou
 
 The cdk8s-plone library provides the following main constructs:
 
-- **Plone**: Main construct for deploying Plone CMS with support for both Volto (React frontend) and Classic UI variants
+- **Plone**: Main construct for deploying Plone CMS with support for both Volto (React frontend) and Blicca (server-side rendered) variants
 - **PloneHttpcache**: HTTP caching layer using Varnish for improved performance
 
 ## Language support
