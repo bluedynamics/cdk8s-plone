@@ -11,7 +11,7 @@
 cdk8s-plone provides CDK8S constructs for deploying [Plone CMS](https://plone.org/) on Kubernetes. Define your infrastructure using TypeScript or Python and generate Kubernetes manifests automatically.
 
 **Key Features:**
-- 🚀 Supports Volto (modern React frontend) and Classic UI
+- 🚀 Supports Volto (React frontend) and Blicca (formerly Classic UI)
 - 📦 High availability with configurable replicas
 - ⚡ Optional Varnish HTTP caching via kube-httpcache (`PloneHttpcache`) or cloud-vinyl VinylCache operator (`PloneVinylCache`)
 - 🔧 Fine-grained resource and probe configuration
