@@ -91,10 +91,11 @@ test('with tolerations', () => {
   expect(Testing.synth(chart)).toMatchSnapshot();
 });
 
-test('with classic-ui variant (no frontend)', () => {
+test('with blicca variant (no frontend)', () => {
   // GIVEN
   const app = Testing.app();
   const chart = new Chart(app, 'plone');
+  // legacy wire value 'classicui' must keep selecting the Blicca (backend-only) variant
   const plone = new Plone(chart, 'plone', { variant: 'classicui' as any });
 
   // WHEN

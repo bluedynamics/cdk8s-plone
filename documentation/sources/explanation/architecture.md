@@ -21,18 +21,19 @@ cdk8s-plone provides CDK8S constructs for deploying Plone CMS on Kubernetes. The
 
 cdk8s-plone supports two deployment variants:
 
-**Volto (Modern)**
+**Volto (React single-page frontend)**
 - React-based frontend (Volto)
 - REST API backend (Plone)
 - Separate services for frontend and backend
-- Modern user experience
 - Headless CMS architecture
 
-**Classic UI (Traditional)**
-- Server-side rendered Plone
+**Blicca (server-side rendered)**
+- The Plone backend renders the UI and serves HTML directly
 - Single integrated service
-- Traditional Plone experience
 - Simpler deployment model
+
+Blicca is the new name for the variant Plone formerly called "Classic UI".
+Both approaches are equally current; they differ in where rendering happens, not in how modern they are.
 
 ### High availability
 
@@ -251,7 +252,7 @@ For a typical Volto deployment, cdk8s-plone creates:
 - Better resource utilization
 - Clear separation of concerns
 
-**When to use Classic UI:**
+**When to use Blicca:**
 - Simpler deployment model
 - Lower resource requirements
 - Legacy integrations

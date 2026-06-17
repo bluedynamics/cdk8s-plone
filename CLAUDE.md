@@ -4,7 +4,7 @@ This document provides context and guidelines for Claude Code when working on th
 
 ## Project Overview
 
-**cdk8s-plone** is a TypeScript/Python library for deploying Plone CMS to Kubernetes using CDK8S constructs. It provides type-safe infrastructure as code with support for Volto (React frontend) and Classic UI deployments.
+**cdk8s-plone** is a TypeScript/Python library for deploying Plone CMS to Kubernetes using CDK8S constructs. It provides type-safe infrastructure as code with support for Volto (React frontend) and Blicca (server-side rendered, formerly Classic UI) deployments.
 
 ## Git Workflow
 

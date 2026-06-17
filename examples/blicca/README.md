@@ -1,29 +1,29 @@
-# Classic UI Example
+# Blicca Example
 
-This example demonstrates a **production-ready Plone Classic UI deployment** using the [@bluedynamics/cdk8s-plone](https://www.npmjs.com/package/@bluedynamics/cdk8s-plone) TypeScript package.
+This example demonstrates a **production-ready Plone Blicca deployment** using the [@bluedynamics/cdk8s-plone](https://www.npmjs.com/package/@bluedynamics/cdk8s-plone) TypeScript package.
 
-## What is Plone Classic UI?
+> **Note:** Blicca is the new name for what was formerly called Plone "Classic UI".
 
-Plone Classic UI is the traditional server-side rendered interface for Plone CMS. Unlike Volto (which uses a separate React frontend), Classic UI is served directly from the Plone backend, providing:
+## What is Plone Blicca?
 
-- **Traditional server-side rendering** - All pages rendered by Plone/Zope
+Blicca is the server-side rendered UI of Plone CMS: the Plone backend renders the HTML and serves it directly. Unlike Volto (a separate React single-page frontend talking to the REST API), Blicca needs no separate frontend service:
+
+- **Server-side rendering** - All pages rendered by Plone/Zope
 - **Simpler architecture** - Single backend service (no separate frontend)
-- **Familiar interface** - Classic Plone user interface many users know
 - **Full Plone features** - Complete access to all Plone functionality
 
-**When to use Classic UI:**
-- Migration from older Plone versions (maintaining familiar UX)
-- Internal tools and intranets where modern UI isn't required
-- Projects requiring specific Classic UI add-ons
-- Environments where simpler deployment is preferred
+**When to use Blicca:**
+- You want a single backend service without a separate frontend deployment
+- Migration from older Plone versions (keeping the familiar server-rendered UX)
+- Projects requiring Blicca-specific add-ons
 
-**When to use Volto instead:** See the [production-volto](../production-volto/) example for modern React-based UI with better performance and UX.
+**When to use Volto instead:** See the [production-volto](../production-volto/) example for the React single-page frontend approach.
 
 ## Features
 
 This example includes:
 
-- **Plone 6.1 with Classic UI** (traditional server-side rendering)
+- **Plone 6.1 with Blicca** (server-side rendering)
 - **PostgreSQL with RelStorage** - Choose between:
   - [CloudNativePG](https://cloudnative-pg.io/) (CNCF project, production-ready with HA)
   - [Bitnami PostgreSQL](https://github.com/bitnami/charts/tree/main/bitnami/postgresql) Helm chart (simple, for dev/testing)
@@ -115,30 +115,29 @@ DATABASE=cloudnativepg
 npm run synth
 ```
 
-This generates `dist/plone-classic.k8s.yaml` with all Kubernetes resources.
+This generates `dist/plone-blicca.k8s.yaml` with all Kubernetes resources.
 
 ### 4. Deploy to Kubernetes
 
 ```bash
-kubectl apply -f dist/plone-classic.k8s.yaml
+kubectl apply -f dist/plone-blicca.k8s.yaml
 ```
 
 Or deploy to a specific namespace:
 ```bash
-kubectl apply -f dist/plone-classic.k8s.yaml -n plone
+kubectl apply -f dist/plone-blicca.k8s.yaml -n plone
 ```
 
-## Classic UI vs Volto
+## Blicca vs Volto
 
-| Feature | Classic UI | Volto |
+| Feature | Blicca | Volto |
 |---------|-----------|-------|
 | **Architecture** | Single backend service | Separate frontend + backend |
 | **Rendering** | Server-side (Zope) | Client-side (React) |
 | **Performance** | Good with caching | Excellent (SPA) |
-| **UX** | Traditional | Modern |
 | **Deployment** | Simpler | More complex |
-| **Add-ons** | Full classic support | Volto-specific needed |
-| **Best for** | Migrations, intranets | New projects, public sites |
+| **Add-ons** | Full Blicca support | Volto-specific needed |
+| **Best for** | Single-service setups, migrations | API-first projects, SPA frontends |
 
 ## Architecture
 
@@ -157,7 +156,7 @@ kubectl apply -f dist/plone-classic.k8s.yaml -n plone
               │                                    │
     ┌─────────▼─────────┐              ┌─────────▼─────────┐
     │  HTTP Cache       │              │  Plone Backend    │
-    │  (Varnish)        │              │  (Classic UI)     │
+    │  (Varnish)        │              │  (Blicca)         │
     └─────────┬─────────┘              │                   │
               │                        └─────────┬─────────┘
               │                                  │
@@ -255,7 +254,7 @@ Edit [ingress.ts](ingress.ts) to:
 
 ## Accessing Your Plone Site
 
-After deployment, you can access your Plone Classic UI site at:
+After deployment, you can access your Plone Blicca site at:
 
 - **Cached (public)**: https://plone.example.com (via Varnish)
 - **Uncached (testing)**: https://plone-test.example.com (direct to backend)
@@ -319,7 +318,7 @@ kubectl get secret -l app.kubernetes.io/part-of=plone
 kubectl get all -l app.kubernetes.io/part-of=plone
 ```
 
-## Migrating from Classic UI to Volto
+## Migrating from Blicca to Volto
 
 If you later want to migrate to Volto:
 
@@ -333,7 +332,7 @@ If you later want to migrate to Volto:
 
 - [cdk8s-plone Documentation](https://bluedynamics.github.io/cdk8s-plone/)
 - [Plone 6 Documentation](https://6.docs.plone.org/)
-- [Plone Classic UI Guide](https://6.docs.plone.org/classic-ui/)
+- [Plone Classic UI Guide](https://6.docs.plone.org/classic-ui/) (upstream docs; Blicca is the new name for Classic UI)
 - [CloudNativePG Documentation](https://cloudnative-pg.io/documentation/)
 - [CDK8S Documentation](https://cdk8s.io/)
 - [Varnish Documentation](https://varnish-cache.org/docs/)

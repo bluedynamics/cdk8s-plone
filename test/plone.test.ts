@@ -14,7 +14,26 @@ test('defaults', () => {
   expect(Testing.synth(chart)).toMatchSnapshot();
 });
 
-test('defaults-classicui', () => {
+test('defaults-blicca', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'app');
+
+  // WHEN
+  new Plone(chart, 'plone', { variant: PloneVariant.BLICCA });
+
+  // THEN
+  expect(Testing.synth(chart)).toMatchSnapshot();
+});
+
+test('deprecated CLASSICUI keeps its legacy value', () => {
+  // The CLASSICUI alias is kept for backward compatibility: existing configuration
+  // using the literal value 'classicui' must keep working unchanged.
+  expect(PloneVariant.CLASSICUI).toBe('classicui');
+  expect(PloneVariant.BLICCA).toBe('blicca');
+});
+
+test('deprecated CLASSICUI deploys backend-only like BLICCA', () => {
   // GIVEN
   const app = Testing.app();
   const chart = new Chart(app, 'app');
@@ -22,8 +41,9 @@ test('defaults-classicui', () => {
   // WHEN
   new Plone(chart, 'plone', { variant: PloneVariant.CLASSICUI });
 
-  // THEN
-  expect(Testing.synth(chart)).toMatchSnapshot();
+  // THEN — same backend-only shape as the BLICCA snapshot (no frontend resources)
+  const manifest = Testing.synth(chart);
+  expect(JSON.stringify(manifest)).not.toContain('plone-frontend');
 });
 
 test('defaults-with-pdps', () => {
@@ -52,7 +72,7 @@ test('with-backend-servicemonitor', () => {
 
   // WHEN
   new Plone(chart, 'plone', {
-    variant: PloneVariant.CLASSICUI,
+    variant: PloneVariant.BLICCA,
     backend: {
       servicemonitor: true,
     },

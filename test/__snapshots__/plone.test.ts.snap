@@ -228,7 +228,7 @@ exports[`defaults 1`] = `
 ]
 `;
 
-exports[`defaults-classicui 1`] = `
+exports[`defaults-blicca 1`] = `
 [
   {
     "apiVersion": "apps/v1",

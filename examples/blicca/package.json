@@ -1,7 +1,7 @@
 {
-  "name": "cdk8s-plone-example-classic-ui",
+  "name": "cdk8s-plone-example-blicca",
   "version": "1.0.0",
-  "description": "Classic UI Plone deployment example using cdk8s-plone",
+  "description": "Blicca Plone deployment example using cdk8s-plone",
   "main": "main.js",
   "types": "main.ts",
   "license": "Apache-2.0",

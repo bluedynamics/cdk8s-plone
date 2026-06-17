@@ -12,8 +12,8 @@ This construct creates all necessary Kubernetes resources for running Plone:
 - Optional PodDisruptionBudget for high availability
 
 Supports two deployment variants:
-- VOLTO: Modern React frontend with REST API backend (default)
-- CLASSICUI: Traditional server-side rendered Plone
+- VOLTO: React single-page frontend talking to the REST API backend (default)
+- BLICCA: the Plone backend renders the UI server-side and serves HTML directly
 
 *Example*
 
@@ -150,7 +150,7 @@ Any object.
 | <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
 | <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.backendServiceName">backendServiceName</a></code> | <code>string</code> | Name of the backend Kubernetes service. |
 | <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.siteId">siteId</a></code> | <code>string</code> | The Plone site ID in ZODB. |
-| <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.variant">variant</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.PloneVariant">PloneVariant</a></code> | The deployment variant being used (VOLTO or CLASSICUI). |
+| <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.variant">variant</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.PloneVariant">PloneVariant</a></code> | The deployment variant being used (VOLTO or BLICCA). |
 | <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.frontendServiceName">frontendServiceName</a></code> | <code>string</code> | Name of the frontend Kubernetes service. |
 
 ---
@@ -201,7 +201,7 @@ public readonly variant: PloneVariant;
 
 - *Type:* <a href="#@bluedynamics/cdk8s-plone.PloneVariant">PloneVariant</a>
 
-The deployment variant being used (VOLTO or CLASSICUI).
+The deployment variant being used (VOLTO or BLICCA).
 
 ---
 
@@ -2835,25 +2835,37 @@ Plone deployment variants.
 
 | **Name** | **Description** |
 | --- | --- |
-| <code><a href="#@bluedynamics/cdk8s-plone.PloneVariant.VOLTO">VOLTO</a></code> | Volto variant: ReactJS frontend (Volto) with REST API backend. |
-| <code><a href="#@bluedynamics/cdk8s-plone.PloneVariant.CLASSICUI">CLASSICUI</a></code> | Classic UI variant: Traditional Plone with server-side rendering. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVariant.VOLTO">VOLTO</a></code> | Volto variant: ReactJS single-page frontend (Volto) talking to the Plone REST API. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVariant.BLICCA">BLICCA</a></code> | Blicca variant: the Plone backend renders the UI server-side and serves the HTML directly. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVariant.CLASSICUI">CLASSICUI</a></code> | Deprecated alias for the Blicca variant (formerly "Classic UI"). |
 
 ---
 
 ##### `VOLTO` <a name="VOLTO" id="@bluedynamics/cdk8s-plone.PloneVariant.VOLTO"></a>
 
-Volto variant: ReactJS frontend (Volto) with REST API backend.
+Volto variant: ReactJS single-page frontend (Volto) talking to the Plone REST API.
 
 Deploys both frontend and backend services.
 
 ---
 
 
-##### `CLASSICUI` <a name="CLASSICUI" id="@bluedynamics/cdk8s-plone.PloneVariant.CLASSICUI"></a>
+##### `BLICCA` <a name="BLICCA" id="@bluedynamics/cdk8s-plone.PloneVariant.BLICCA"></a>
 
-Classic UI variant: Traditional Plone with server-side rendering.
+Blicca variant: the Plone backend renders the UI server-side and serves the HTML directly.
 
 Deploys only the backend service.
+
+---
+
+
+##### ~~`CLASSICUI`~~ <a name="CLASSICUI" id="@bluedynamics/cdk8s-plone.PloneVariant.CLASSICUI"></a>
+
+- *Deprecated:* Renamed to {@link BLICCA }. Kept for backward compatibility and selects the
+same backend-only deployment. Existing configuration using `CLASSICUI` (or the literal
+value `'classicui'`) keeps working unchanged. Will be removed in a future major release.
+
+Deprecated alias for the Blicca variant (formerly "Classic UI").
 
 ---
 

@@ -9,7 +9,7 @@ import { PGBitnamiChart } from './postgres.bitnami';
 import { PGCloudNativePGChart } from './postgres.cloudnativepg';
 
 
-export class ClassicUIChart extends Chart {
+export class BliccaChart extends Chart {
   constructor(scope: Construct, id: string, props: ChartProps = {}) {
     super(scope, id, props);
 
@@ -36,7 +36,7 @@ export class ClassicUIChart extends Chart {
     }
 
     // ================================================================================================================
-    // Plone Classic UI
+    // Plone Blicca
 
     // prepare the environment variables for the plone deployment
     const dbMDName = db.dbServiceName
@@ -55,10 +55,10 @@ export class ClassicUIChart extends Chart {
       },
     );
 
-    // create the plone deployment with Classic UI variant
+    // create the plone deployment with Blicca variant
     const plone = new Plone(this, 'plone', {
-      version: 'classic.version',
-      variant: PloneVariant.CLASSICUI,
+      version: 'blicca.version',
+      variant: PloneVariant.BLICCA,
       backend: {
         image: process.env.PLONE_BACKEND_IMAGE ?? 'plone/plone-backend:6.1.3',
         environment: env,
@@ -96,5 +96,5 @@ export class ClassicUIChart extends Chart {
 
 
 const app = new App();
-new ClassicUIChart(app, 'plone-classic');
+new BliccaChart(app, 'plone-blicca');
 app.synth();

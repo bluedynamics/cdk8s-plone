@@ -147,7 +147,7 @@ Now that you have a basic Plone deployment:
 
 - **Configure resources**: See {doc}`/reference/configuration-options` for CPU and memory options.
 - **Add monitoring**: Follow {doc}`/how-to/enable-prometheus-monitoring`.
-- **Explore variants**: Read about Volto and Classic UI in {doc}`/explanation/features`.
+- **Explore variants**: Read about Volto and Blicca in {doc}`/explanation/features`.
 - **Harden pods**: Apply {doc}`/how-to/configure-security-context`.
 
 ## Troubleshooting
