@@ -5,7 +5,7 @@ import { PloneDeployment, PloneDeploymentOptions } from './deployment';
 import { IntOrString } from './imports/k8s';
 import * as k8s from './imports/k8s';
 import { ServiceMonitor, ServiceMonitorSpecEndpointsTargetPort } from './imports/monitoring.coreos.com';
-import { PloneService } from './service';
+import { PloneService, PloneServiceSpec } from './service';
 
 /**
  * Linux capabilities to add or drop on a container.
@@ -243,9 +243,19 @@ export interface PloneBaseOptions {
    * Annotations to add to the Service metadata.
    * Common for external-dns, load balancers, service mesh, etc.
    * @example { 'external-dns.alpha.kubernetes.io/hostname': 'plone.example.com' }
+   * @deprecated use `service.annotations` instead
    * @default - no additional annotations
    */
   readonly serviceAnnotations?: { [name: string]: string };
+
+  /**
+   * Service configuration: type, trafficDistribution, sessionAffinity,
+   * annotations/labels, and a raw `overrides` escape hatch for any other
+   * ServiceSpec field. Applies to this component's Service.
+   * @example { type: 'LoadBalancer', trafficDistribution: 'PreferClose' }
+   * @default - construct-managed defaults only
+   */
+  readonly service?: PloneServiceSpec;
 
   /**
    * Enable Prometheus ServiceMonitor for metrics collection.
@@ -473,7 +483,10 @@ export class Plone extends Construct {
       targetPort: backendPort,
       selectorLabel: { app: Names.toLabelValue(backendDeployment) },
       portName: 'backend-http',
-      annotations: backend.serviceAnnotations,
+      spec: {
+        ...backend.service,
+        annotations: { ...backend.serviceAnnotations, ...backend.service?.annotations },
+      },
     });
     this.backendServiceName = backendService.name;
 
@@ -567,7 +580,10 @@ export class Plone extends Construct {
         targetPort: frontendPort,
         selectorLabel: { app: Names.toLabelValue(frontendDeployment) },
         portName: 'frontend-http',
-        annotations: frontend.serviceAnnotations,
+        spec: {
+          ...frontend.service,
+          annotations: { ...frontend.serviceAnnotations, ...frontend.service?.annotations },
+        },
       });
       this.frontendServiceName = frontendService.name;
 
