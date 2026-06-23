@@ -1,63 +1,41 @@
 ---
 myst:
   html_meta:
-    "description": "Information-oriented technical reference for cdk8s-plone constructs, configuration options, and APIs."
-    "property=og:description": "Information-oriented technical reference for cdk8s-plone constructs, configuration options, and APIs."
+    "description": "Information-oriented technical reference for cdk8s-plone: the generated API reference and a task-oriented configuration guide."
+    "property=og:description": "Information-oriented technical reference for cdk8s-plone: the generated API reference and a task-oriented configuration guide."
     "property=og:title": "Reference"
     "keywords": "Plone, cdk8s, Kubernetes, reference, API, configuration"
 ---
 
 # Reference
 
-**Information-oriented technical specifications and configurations for cdk8s-plone.**
+**Information-oriented technical specifications for cdk8s-plone.**
 
-Reference guides provide detailed technical information about cdk8s-plone's API, configuration options, and component specifications. They describe how things work and what parameters are available.
+The reference has two parts that play different roles:
 
-## API reference
+{doc}`API reference <api/index>`
+:   The complete, authoritative list of every construct, interface, option, type, default value, and enum.
+    It is generated from the TypeScript source with `npx projen docgen`, so it never drifts from the code.
+    Use it to look up exactly what an option does, its type, and whether it is required.
 
-*This section will contain auto-generated or detailed documentation for:*
-- Main chart classes
-- Configuration interfaces
-- Individual construct classes
-- Utility functions and validators
-
-## Configuration reference
+{doc}`Configuration guide <configuration-options>`
+:   A hand-written, task-oriented tour of the most common configuration, with copy-pasteable examples.
+    It links into the API reference rather than repeating it.
+    Use it to see how options fit together for a real deployment.
 
 ```{toctree}
 ---
 maxdepth: 1
 titlesonly: true
 ---
+api/index
 configuration-options
 ```
 
-## Component specifications
-
-```{toctree}
----
-maxdepth: 1
-titlesonly: true
----
-```
-
-*Component specifications will be added in future releases.*
-
-## API documentation
-
-See the `api/` directory for detailed construct documentation:
-
-```{toctree}
----
-maxdepth: 1
-glob: true
----
-api/*
-```
-
 ---
 
-**Getting started?** Begin with the [Tutorials](../tutorials/index.md) for hands-on learning.
+**Getting started?** Begin with the {doc}`/tutorials/index` for hands-on learning.
 
-**Solving a specific problem?** Check the [How-To Guides](../how-to/index.md) for task-oriented solutions.
+**Solving a specific problem?** Check the {doc}`/how-to/index` for task-oriented solutions.
 
-**Understanding concepts?** Read the [Explanation](../explanation/index.md) section for architecture and design.
+**Understanding concepts?** Read the {doc}`/explanation/index` for architecture and design.
