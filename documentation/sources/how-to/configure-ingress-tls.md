@@ -81,7 +81,7 @@ A production setup commonly uses three domains:
 Add one `host` rule per domain, each with its own `tls` entry, pointing at the matching Service.
 
 ```{tip}
-The [production-volto example](https://github.com/bluedynamics/cdk8s-plone/tree/main/examples/production-volto) implements this three-domain pattern with Traefik `IngressRoute` resources in `ingress.ts`.
+The [volto example](https://github.com/bluedynamics/cdk8s-plone/tree/main/examples/volto) implements this three-domain pattern with Traefik `IngressRoute` resources in `ingress.ts`.
 Use it as a complete, tested reference, including the Kong and Traefik variants.
 ```
 
@@ -104,5 +104,5 @@ curl -sI https://plone.example.com/
 ## See also
 
 - {doc}`/how-to/deploy-with-httpcache` — route public traffic through Varnish.
-- {doc}`/how-to/deploy-production-volto` — a full deployment that includes ingress and TLS.
+- {doc}`/how-to/deploy-volto` — a full deployment that includes ingress and TLS.
 - {doc}`/reference/api/index` — `backendServiceName` and `frontendServiceName` reference.

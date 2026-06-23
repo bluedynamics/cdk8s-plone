@@ -1,4 +1,4 @@
-# Production Volto Example
+# Volto Example
 
 This example demonstrates a **production-ready Plone deployment** using the [@bluedynamics/cdk8s-plone](https://www.npmjs.com/package/@bluedynamics/cdk8s-plone) TypeScript package.
 

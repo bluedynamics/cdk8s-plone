@@ -108,6 +108,6 @@ See {doc}`/how-to/enable-prometheus-monitoring` for the full setup.
 
 ## See also
 
-- {doc}`/how-to/deploy-production-volto` — a complete deployment to compare against.
+- {doc}`/how-to/deploy-volto` — a complete deployment to compare against.
 - {doc}`/reference/api/index` — authoritative option and default reference.
 - {doc}`/explanation/architecture` — how the components depend on each other.

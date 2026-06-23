@@ -34,12 +34,12 @@ The [Blicca example](https://github.com/bluedynamics/cdk8s-plone/tree/main/examp
 
 :::{tip}
 Choose Blicca if you want a single backend service without a separate frontend, or if you need Blicca-specific add-ons.
-For the React single-page frontend approach, consider [Volto](deploy-production-volto.md).
+For the React single-page frontend approach, consider [Volto](deploy-volto.md).
 :::
 
 ## Prerequisites
 
-Same as the {ref}`production-volto-prerequisites` in the Production Volto guide, you need:
+Same as the {ref}`volto-prerequisites` in the Volto guide, you need:
 
 - Ingress controller (Traefik or Kong)
 - cert-manager
@@ -258,11 +258,11 @@ Some add-ons are Volto-specific. For Blicca:
 If you want to migrate from Blicca to Volto later:
 
 1. Keep your backend deployment (same configuration)
-2. Add Volto frontend from the [Volto example](deploy-production-volto.md)
+2. Add Volto frontend from the [Volto example](deploy-volto.md)
 3. Update ingress to route to frontend
 4. Both UIs can run simultaneously during migration
 
-See the [Production Volto deployment guide](deploy-production-volto.md) for details.
+See the [Volto deployment guide](deploy-volto.md) for details.
 
 ## Customization
 
@@ -328,7 +328,7 @@ kubectl delete -f dist/plone-blicca.k8s.yaml
 
 ## See also
 
-- {doc}`deploy-production-volto` — For the React single-page frontend.
+- {doc}`deploy-volto` — For the React single-page frontend.
 - {doc}`setup-prerequisites` — Cluster requirements.
 - {doc}`/reference/configuration-options` — API reference.
 - [Plone 6 Classic UI documentation](https://6.docs.plone.org/classic-ui/)

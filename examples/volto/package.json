@@ -1,5 +1,5 @@
 {
-  "name": "cdk8s-plone-example-production-volto",
+  "name": "cdk8s-plone-example-volto",
   "version": "1.0.0",
   "description": "Production-ready Plone deployment example using cdk8s-plone",
   "main": "main.js",

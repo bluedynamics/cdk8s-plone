@@ -17,7 +17,7 @@ Blicca is the server-side rendered UI of Plone CMS: the Plone backend renders th
 - Migration from older Plone versions (keeping the familiar server-rendered UX)
 - Projects requiring Blicca-specific add-ons
 
-**When to use Volto instead:** See the [production-volto](../production-volto/) example for the React single-page frontend approach.
+**When to use Volto instead:** See the [volto](../volto/) example for the React single-page frontend approach.
 
 ## Features
 
@@ -319,7 +319,7 @@ kubectl get all -l app.kubernetes.io/part-of=plone
 
 If you later want to migrate to Volto:
 
-1. See the [production-volto](../production-volto/) example
+1. See the [volto](../volto/) example
 2. Keep the same backend configuration (database, caching)
 3. Add Volto frontend deployment
 4. Update ingress to route to frontend

@@ -75,15 +75,15 @@ kubectl apply -f dist/
 
 Complete working examples are available in the [`examples/`](examples/) directory:
 
-- **[Production Volto](examples/production-volto/)** - Production-ready Plone 6 deployment with the React single-page frontend:
+- **[Volto](examples/volto/)** - Production-ready Plone 6 deployment with the React single-page frontend:
   - Volto frontend (React) + REST API backend
-  - PostgreSQL with RelStorage (CloudNativePG or Bitnami)
+  - PostgreSQL with RelStorage (plain PostgreSQL or CloudNativePG)
   - Varnish HTTP caching with kube-httpcache
   - Ingress support (Traefik/Kong) with TLS
 
 - **[Blicca](examples/blicca/)** - Plone deployment with server-side rendering (formerly Classic UI):
   - Blicca (backend renders the UI, no separate frontend)
-  - PostgreSQL with RelStorage (CloudNativePG or Bitnami)
+  - PostgreSQL with RelStorage (plain PostgreSQL or CloudNativePG)
   - Varnish HTTP caching with kube-httpcache
   - Ingress support (Traefik/Kong) with TLS
   - Simpler architecture (no separate frontend)

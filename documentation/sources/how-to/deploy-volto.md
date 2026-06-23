@@ -3,17 +3,17 @@ myst:
   html_meta:
     "description": "Deploy the production-ready Volto example: React frontend, Plone REST API backend, PostgreSQL, Varnish caching, and ingress with TLS."
     "property=og:description": "Deploy the production-ready Volto example: React frontend, Plone REST API backend, PostgreSQL, Varnish caching, and ingress with TLS."
-    "property=og:title": "Deploy production Volto example"
+    "property=og:title": "Deploy the Volto example"
     "keywords": "Plone, cdk8s, Kubernetes, Volto, production, PostgreSQL, Varnish, ingress, TLS"
 ---
 
-# Deploy production Volto example
+# Deploy the Volto example
 
 This guide shows you how to deploy the production-ready Volto example to your Kubernetes cluster.
 
 ## What you'll deploy
 
-The [Production Volto example](https://github.com/bluedynamics/cdk8s-plone/tree/main/examples/production-volto) includes:
+The [Volto example](https://github.com/bluedynamics/cdk8s-plone/tree/main/examples/volto) includes:
 
 - **Plone 6.1 with Volto** (React frontend + REST API backend)
 - **PostgreSQL** with RelStorage (plain PostgreSQL or CloudNativePG)
@@ -21,7 +21,7 @@ The [Production Volto example](https://github.com/bluedynamics/cdk8s-plone/tree/
 - **Ingress** with TLS (Traefik or Kong)
 - **Three access domains** (cached, uncached, maintenance)
 
-(production-volto-prerequisites)=
+(volto-prerequisites)=
 
 ## Prerequisites
 
@@ -64,7 +64,7 @@ Clone the repository and navigate to the example:
 
 ```shell
 git clone https://github.com/bluedynamics/cdk8s-plone.git
-cd cdk8s-plone/examples/production-volto
+cd cdk8s-plone/examples/volto
 ```
 
 ## Step 2: Install dependencies
@@ -314,7 +314,7 @@ kubectl delete -f dist/plone-example.k8s.yaml
 ## Next steps
 
 - Configure monitoring and metrics through {doc}`enable-prometheus-monitoring`.
-- Customize [Varnish caching rules](https://github.com/bluedynamics/cdk8s-plone/blob/main/examples/production-volto/config/varnish.tpl.vcl).
+- Customize [Varnish caching rules](https://github.com/bluedynamics/cdk8s-plone/blob/main/examples/volto/config/varnish.tpl.vcl).
 - Harden pods with {doc}`configure-security-context`.
 
 ## See also
