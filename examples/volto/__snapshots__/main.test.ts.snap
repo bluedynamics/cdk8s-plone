@@ -499,7 +499,7 @@ exports[`Production Volto Example Synthesizes correctly 1`] = `
   {
     "apiVersion": "v1",
     "data": {
-      "secret": "ZEhRU2lMbmlBazl4U01FY3dhM2Y5S3FXUE1rWjJweUQ=",
+      "secret": "<redacted-for-snapshot>",
     },
     "kind": "Secret",
     "metadata": {
