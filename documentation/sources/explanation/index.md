@@ -7,11 +7,6 @@ myst:
     "keywords": "Plone, cdk8s, Kubernetes, architecture, design, concepts"
 ---
 
-```{image} ../_static/kup6s-icon-explanation.svg
-:align: center
-:class: section-icon-large
-```
-
 # Explanation
 
 **Understanding-oriented discussion of concepts, architecture, and design decisions.**

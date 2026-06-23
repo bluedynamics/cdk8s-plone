@@ -7,11 +7,6 @@ myst:
     "keywords": "Plone, cdk8s, Kubernetes, reference, API, configuration"
 ---
 
-```{image} ../_static/kup6s-icon-reference.svg
-:align: center
-:class: section-icon-large
-```
-
 # Reference
 
 **Information-oriented technical specifications and configurations for cdk8s-plone.**
