@@ -16,7 +16,7 @@ This guide shows you how to deploy the production-ready Volto example to your Ku
 The [Production Volto example](https://github.com/bluedynamics/cdk8s-plone/tree/main/examples/production-volto) includes:
 
 - **Plone 6.1 with Volto** (React frontend + REST API backend)
-- **PostgreSQL** with RelStorage (CloudNativePG or Bitnami)
+- **PostgreSQL** with RelStorage (plain PostgreSQL or CloudNativePG)
 - **Varnish HTTP caching** with kube-httpcache
 - **Ingress** with TLS (Traefik or Kong)
 - **Three access domains** (cached, uncached, maintenance)
@@ -45,14 +45,11 @@ Ensure you have these installed on your cluster:
 
 4. **PostgreSQL** - The example provisions the database itself; choose the backend with the `DATABASE` variable in Step 4. Prepare the cluster for your choice:
 
-   **Option A: CloudNativePG** (recommended for production) - install the operator:
+   **Option A: plain** (default; no operator needed) - the example deploys a single-instance PostgreSQL StatefulSet using the official `postgres` image, so there is nothing to install.
+
+   **Option B: CloudNativePG** (recommended for production HA) - install the operator:
    ```shell
    kubectl apply -f https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.24/releases/cnpg-1.24.0.yaml
-   ```
-
-   **Option B: Bitnami** (default; no operator needed) - the example deploys the Bitnami PostgreSQL Helm chart for you, so only the target namespace must exist:
-   ```shell
-   kubectl create namespace plone
    ```
 
 ### Local tools
@@ -112,12 +109,12 @@ CLUSTER_ISSUER=letsencrypt-prod
 #PLONE_BACKEND_IMAGE=plone/plone-backend:6.1.3
 #PLONE_FRONTEND_IMAGE=plone/plone-frontend:16.0.0
 
-# Database: 'bitnami' or 'cloudnativepg'
-DATABASE=cloudnativepg
+# Database: 'plain' or 'cloudnativepg'
+DATABASE=plain
 ```
 
 :::{tip}
-For production, use `cloudnativepg` for high availability. For testing, `bitnami` is simpler.
+For production high availability, use `cloudnativepg`. For development and small setups, `plain` is simpler and needs no operator.
 :::
 
 ## Step 5: Generate manifests
@@ -188,7 +185,7 @@ You should see:
 - `plone-backend` (backend service)
 - `plone-frontend` (frontend service)
 - `plone-httpcache` (Varnish cache)
-- Database service (Bitnami or CloudNativePG)
+- Database service (plain PostgreSQL or CloudNativePG)
 
 ## Step 10: Check ingress
 
@@ -253,14 +250,12 @@ kubectl get cluster
 kubectl get secret -l cnpg.io/cluster
 ```
 
-**Bitnami:**
+**Plain PostgreSQL:**
 
 ```shell
-# Check service
-kubectl get svc -l app.kubernetes.io/name=postgresql
-
-# Check secret
-kubectl describe secret <postgresql-secret-name>
+# Check the StatefulSet and pod
+kubectl get statefulset -l app.kubernetes.io/name=plone-postgresql
+kubectl get pods -l app.kubernetes.io/name=plone-postgresql
 ```
 
 ### TLS certificate issues

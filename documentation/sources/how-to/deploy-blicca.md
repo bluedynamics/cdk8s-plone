@@ -18,7 +18,7 @@ Blicca is the new name for what Plone formerly called "Classic UI".
 The [Blicca example](https://github.com/bluedynamics/cdk8s-plone/tree/main/examples/blicca) provides Plone with server-side rendering:
 
 - **Plone 6.1 Blicca** (backend renders the UI, no separate frontend)
-- **PostgreSQL** with RelStorage (CloudNativePG or Bitnami)
+- **PostgreSQL** with RelStorage (plain PostgreSQL or CloudNativePG)
 - **Varnish HTTP caching** with kube-httpcache
 - **Ingress** with TLS (Traefik or Kong)
 - **Simpler architecture** (single backend service)
@@ -44,7 +44,7 @@ Same as the {ref}`production-volto-prerequisites` in the Production Volto guide,
 - Ingress controller (Traefik or Kong)
 - cert-manager
 - kube-httpcache operator
-- PostgreSQL operator (CloudNativePG or Bitnami)
+- PostgreSQL: plain single-instance (default, no operator) or the CloudNativePG operator
 
 See [Setup Prerequisites](setup-prerequisites.md) for detailed instructions.
 
@@ -89,7 +89,7 @@ CLUSTER_ISSUER=letsencrypt-prod
 # Optional: Custom backend image
 #PLONE_BACKEND_IMAGE=plone/plone-backend:6.1.3
 
-# Database: 'bitnami' or 'cloudnativepg'
+# Database: 'plain' or 'cloudnativepg'
 DATABASE=cloudnativepg
 ```
 
