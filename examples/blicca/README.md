@@ -25,8 +25,8 @@ This example includes:
 
 - **Plone 6.1 with Blicca** (server-side rendering)
 - **PostgreSQL with RelStorage** - Choose between:
+  - Plain single-instance PostgreSQL using the official `postgres` image (default, operator-free, for dev and small setups)
   - [CloudNativePG](https://cloudnative-pg.io/) (CNCF project, production-ready with HA)
-  - [Bitnami PostgreSQL](https://github.com/bitnami/charts/tree/main/bitnami/postgresql) Helm chart (simple, for dev/testing)
 - **HTTP Caching with Varnish** - Using [kube-httpcache](https://github.com/mittwald/kube-httpcache)
 - **Ingress** - Supports both Traefik and Kong with TLS/cert-manager
 - **Three access domains**:
@@ -52,13 +52,12 @@ npm install
 
 Your cluster needs:
 
-1. **PostgreSQL Operator** (choose one):
-   - **CloudNativePG** (recommended for production):
+1. **PostgreSQL** (choose one):
+   - **Plain** (default, no operator needed): the example deploys a single-instance PostgreSQL StatefulSet using the official `postgres` image, so there is nothing to install.
+   - **CloudNativePG** (recommended for production HA): install the operator
      ```bash
      kubectl apply -f https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.24/releases/cnpg-1.24.0.yaml
      ```
-   - **Bitnami** (no operator needed, uses Helm):
-     - Requires namespace `plone` to exist: `kubectl create namespace plone`
 
 2. **Ingress Controller** (choose one):
    - Traefik v3 with CRDs installed
@@ -105,8 +104,8 @@ CLUSTER_ISSUER=letsencrypt-prod
 # Plone backend image (defaults to official image if not set)
 PLONE_BACKEND_IMAGE=plone/plone-backend:6.1.3
 
-# Database backend: 'bitnami' (default) or 'cloudnativepg'
-DATABASE=cloudnativepg
+# Database backend: 'plain' (default) or 'cloudnativepg'
+DATABASE=plain
 ```
 
 ### 3. Generate Kubernetes Manifests
@@ -185,23 +184,23 @@ kubectl apply -f dist/plone-blicca.k8s.yaml -n plone
 DATABASE=cloudnativepg
 ```
 
-### Bitnami PostgreSQL (Development/Testing)
+### Plain PostgreSQL (default, operator-free)
 
 **Pros:**
-- No operator required
-- Simple setup
-- Good for development and testing
-- Helm-based deployment
+- No operator and no third-party Helm chart required
+- Uses the official `postgres` image, which is actively maintained
+- Single-instance StatefulSet with a PersistentVolumeClaim
+- Good for development and small production setups
 
 **Cons:**
-- Requires namespace `plone` to be pre-created
-- No built-in HA features
-- Less suitable for production
+- No built-in high availability, failover, or automated backups
 
 **Configuration:**
 ```bash
-DATABASE=bitnami
+DATABASE=plain
 ```
+
+**Secrets:** the example creates a Secret with `username`, `password`, and `database` keys.
 
 ## Development
 
@@ -302,13 +301,11 @@ kubectl get cluster
 kubectl get secret -l cnpg.io/cluster
 ```
 
-**Bitnami:**
+**Plain PostgreSQL:**
 ```bash
-# Check service
-kubectl get svc -l app.kubernetes.io/part-of=plone
-
-# Check secret
-kubectl get secret -l app.kubernetes.io/part-of=plone
+# Check the StatefulSet and pod
+kubectl get statefulset -l app.kubernetes.io/name=plone-postgresql
+kubectl get pods -l app.kubernetes.io/name=plone-postgresql
 ```
 
 ### Access Logs
