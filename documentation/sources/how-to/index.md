@@ -7,11 +7,6 @@ myst:
     "keywords": "Plone, cdk8s, Kubernetes, how-to, deployment, configuration"
 ---
 
-```{image} ../_static/kup6s-icon-howto.svg
-:align: center
-:class: section-icon-large
-```
-
 # How-to guides
 
 **Goal-oriented guides showing you how to solve specific problems with cdk8s-plone.**
