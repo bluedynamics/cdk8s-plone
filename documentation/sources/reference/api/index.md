@@ -9,14 +9,16 @@ myst:
 
 # API reference
 
-Complete API reference for cdk8s-plone constructs, generated from TypeScript source code.
+Complete API reference for cdk8s-plone constructs, generated from the TypeScript source code.
+This is the authoritative reference for every option, type, default, and required flag.
 
 ## Overview
 
-The cdk8s-plone library provides the following main constructs:
+The cdk8s-plone library provides the following constructs:
 
-- **Plone**: Main construct for deploying Plone CMS with support for both Volto (React frontend) and Blicca (server-side rendered) variants
-- **PloneHttpcache**: HTTP caching layer using Varnish for improved performance
+- **Plone**: main construct for deploying Plone CMS, with support for both the Volto (React frontend) and Blicca (server-side rendered) variants
+- **PloneHttpcache**: Varnish caching layer via the mittwald kube-httpcache Helm chart (self-contained)
+- **PloneVinylCache**: Varnish caching layer via the cloud-vinyl operator (requires the operator in-cluster)
 
 ## Language support
 
