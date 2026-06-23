@@ -60,10 +60,6 @@ titlesonly: true
 enable-prometheus-monitoring
 ```
 
-## Troubleshooting
-
-*This section will be populated with troubleshooting guides in future releases.*
-
 ---
 
 **New to cdk8s-plone?** Start with the [Tutorials](../tutorials/index.md) for step-by-step lessons.

@@ -36,7 +36,7 @@ titlesonly: true
 
 These tutorials assume you have:
 - Basic familiarity with Kubernetes concepts
-- Node.js 16+ and npm installed
+- Node.js 18+ and npm installed
 - A Kubernetes cluster (local or remote)
 - kubectl configured to access your cluster
 - Basic TypeScript knowledge

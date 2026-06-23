@@ -43,14 +43,14 @@ Ensure you have these installed on your cluster:
    kubectl apply -f https://github.com/mittwald/kube-httpcache/releases/latest/download/kube-httpcache.yaml
    ```
 
-4. **PostgreSQL Operator** - Choose one:
+4. **PostgreSQL** - The example provisions the database itself; choose the backend with the `DATABASE` variable in Step 4. Prepare the cluster for your choice:
 
-   **Option A: CloudNativePG** (recommended for production):
+   **Option A: CloudNativePG** (recommended for production) - install the operator:
    ```shell
    kubectl apply -f https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.24/releases/cnpg-1.24.0.yaml
    ```
 
-   **Option B: Bitnami** (simpler for testing):
+   **Option B: Bitnami** (default; no operator needed) - the example deploys the Bitnami PostgreSQL Helm chart for you, so only the target namespace must exist:
    ```shell
    kubectl create namespace plone
    ```
@@ -110,7 +110,7 @@ CLUSTER_ISSUER=letsencrypt-prod
 
 # Optional: Custom images
 #PLONE_BACKEND_IMAGE=plone/plone-backend:6.1.3
-#PLONE_FRONTEND_IMAGE=plone/plone-frontend:latest
+#PLONE_FRONTEND_IMAGE=plone/plone-frontend:16.0.0
 
 # Database: 'bitnami' or 'cloudnativepg'
 DATABASE=cloudnativepg
