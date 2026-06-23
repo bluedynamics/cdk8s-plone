@@ -34,7 +34,7 @@ setup-prerequisites
 maxdepth: 1
 titlesonly: true
 ---
-deploy-production-volto
+deploy-volto
 deploy-blicca
 deploy-with-httpcache
 deploy-with-vinyl-cache

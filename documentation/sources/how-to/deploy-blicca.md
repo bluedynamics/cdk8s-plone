@@ -18,7 +18,7 @@ Blicca is the new name for what Plone formerly called "Classic UI".
 The [Blicca example](https://github.com/bluedynamics/cdk8s-plone/tree/main/examples/blicca) provides Plone with server-side rendering:
 
 - **Plone 6.1 Blicca** (backend renders the UI, no separate frontend)
-- **PostgreSQL** with RelStorage (CloudNativePG or Bitnami)
+- **PostgreSQL** with RelStorage (plain PostgreSQL or CloudNativePG)
 - **Varnish HTTP caching** with kube-httpcache
 - **Ingress** with TLS (Traefik or Kong)
 - **Simpler architecture** (single backend service)
@@ -34,17 +34,17 @@ The [Blicca example](https://github.com/bluedynamics/cdk8s-plone/tree/main/examp
 
 :::{tip}
 Choose Blicca if you want a single backend service without a separate frontend, or if you need Blicca-specific add-ons.
-For the React single-page frontend approach, consider [Volto](deploy-production-volto.md).
+For the React single-page frontend approach, consider [Volto](deploy-volto.md).
 :::
 
 ## Prerequisites
 
-Same as the {ref}`production-volto-prerequisites` in the Production Volto guide, you need:
+Same as the {ref}`volto-prerequisites` in the Volto guide, you need:
 
 - Ingress controller (Traefik or Kong)
 - cert-manager
 - kube-httpcache operator
-- PostgreSQL operator (CloudNativePG or Bitnami)
+- PostgreSQL: plain single-instance (default, no operator) or the CloudNativePG operator
 
 See [Setup Prerequisites](setup-prerequisites.md) for detailed instructions.
 
@@ -89,7 +89,7 @@ CLUSTER_ISSUER=letsencrypt-prod
 # Optional: Custom backend image
 #PLONE_BACKEND_IMAGE=plone/plone-backend:6.1.3
 
-# Database: 'bitnami' or 'cloudnativepg'
+# Database: 'plain' or 'cloudnativepg'
 DATABASE=cloudnativepg
 ```
 
@@ -258,11 +258,11 @@ Some add-ons are Volto-specific. For Blicca:
 If you want to migrate from Blicca to Volto later:
 
 1. Keep your backend deployment (same configuration)
-2. Add Volto frontend from the [Volto example](deploy-production-volto.md)
+2. Add Volto frontend from the [Volto example](deploy-volto.md)
 3. Update ingress to route to frontend
 4. Both UIs can run simultaneously during migration
 
-See the [Production Volto deployment guide](deploy-production-volto.md) for details.
+See the [Volto deployment guide](deploy-volto.md) for details.
 
 ## Customization
 
@@ -328,7 +328,7 @@ kubectl delete -f dist/plone-blicca.k8s.yaml
 
 ## See also
 
-- {doc}`deploy-production-volto` — For the React single-page frontend.
+- {doc}`deploy-volto` — For the React single-page frontend.
 - {doc}`setup-prerequisites` — Cluster requirements.
 - {doc}`/reference/configuration-options` — API reference.
 - [Plone 6 Classic UI documentation](https://6.docs.plone.org/classic-ui/)

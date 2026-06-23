@@ -54,7 +54,7 @@ spec:
 
 See the [CloudNativePG backup documentation](https://cloudnative-pg.io/documentation/current/backup/) for object-store credentials and retention policies.
 
-## Back up a Bitnami or standalone database
+## Back up a plain or standalone database
 
 For a database without an operator, take a logical dump with `pg_dump` from a client pod:
 

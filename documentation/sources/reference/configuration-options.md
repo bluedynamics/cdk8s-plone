@@ -240,6 +240,6 @@ app.synth();
 
 - {doc}`API reference <api/index>` — every option, type, and default (generated)
 - {doc}`/tutorials/01-quick-start` — first deployment, step by step
-- {doc}`/how-to/deploy-production-volto` — production-ready Volto deployment
+- {doc}`/how-to/deploy-volto` — production-ready Volto deployment
 - {doc}`/how-to/deploy-blicca` — Blicca deployment
 - {doc}`/explanation/architecture` — how the pieces fit together

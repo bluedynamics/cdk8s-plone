@@ -5,7 +5,7 @@ import * as kplus from 'cdk8s-plus-30';
 import * as path from 'path';
 import { IngressChart } from './ingress';
 import { config } from 'dotenv';
-import { PGBitnamiChart } from './postgres.bitnami';
+import { PGPlainChart } from './postgres.plain';
 import { PGCloudNativePGChart } from './postgres.cloudnativepg';
 
 
@@ -17,10 +17,10 @@ export class ExampleChart extends Chart {
 
     // ================================================================================================================
     // Postgresql
-    let db: PGBitnamiChart | PGCloudNativePGChart;
+    let db: PGPlainChart | PGCloudNativePGChart;
     let postgresql_username;
     let postgresql_password;
-    if ((process.env.DATABASE ?? 'bitnami') == 'cloudnativepg') {
+    if ((process.env.DATABASE ?? 'plain') == 'cloudnativepg') {
       const cloudnativepgDb = new PGCloudNativePGChart(this, 'db');
       db = cloudnativepgDb;
       // CloudNativePG creates secrets with format: {cluster-name}-app
@@ -29,10 +29,11 @@ export class ExampleChart extends Chart {
       postgresql_username = { valueFrom: { secretKeyRef: { name: secretName, key: 'username' }}};
       postgresql_password = { valueFrom: { secretKeyRef: { name: secretName, key: 'password' }}};
     } else {
-      const bitnamiDb = new PGBitnamiChart(this, 'db');
-      db = bitnamiDb;
-      postgresql_username = { value: 'plone' };
-      postgresql_password = { valueFrom: { secretKeyRef: { name: `${bitnamiDb.dbServiceName}`, key: 'password' }}};
+      // Operator-free single-instance PostgreSQL using the official image.
+      const plainDb = new PGPlainChart(this, 'db');
+      db = plainDb;
+      postgresql_username = { valueFrom: { secretKeyRef: { name: plainDb.secretName, key: 'username' }}};
+      postgresql_password = { valueFrom: { secretKeyRef: { name: plainDb.secretName, key: 'password' }}};
     }
 
     // ================================================================================================================
