@@ -77,43 +77,69 @@ mermaid_output_format = "raw"  # Use client-side rendering with mermaid.js
 # This makes absolute paths in logo_target work correctly with path prefix
 html_baseurl = "https://bluedynamics.github.io/cdk8s-plone"
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-#
+# The theme to use for HTML and HTML Help pages.
+# Shibuya, matching the rest of the Cloudbrine ecosystem.
 html_theme = "shibuya"
 
 html_theme_options = {
-    # Logo configuration - absolute path resolves relative to html_baseurl
-    "logo_target": "/",
-
-    # Color scheme - using cyan from brand palette (#00d4ff)
+    "logo_target": "/cdk8s-plone/",
     "accent_color": "cyan",
-
-    # Color mode - force dark mode (brand is dark-first cyberpunk aesthetic)
     "color_mode": "dark",
-
-    # Dark code blocks
     "dark_code": True,
-
-    # Navigation
-    "nav_links": [],
+    "nav_links": [
+        {
+            "title": "Ecosystem",
+            "url": "https://bluedynamics.github.io/zodb-pgjsonb/ecosystem.html",
+            "children": [
+                {
+                    "title": "Dashboard",
+                    "url": "https://bluedynamics.github.io/zodb-pgjsonb/ecosystem.html",
+                    "summary": "Overview of all packages",
+                },
+                {
+                    "title": "zodb-pgjsonb",
+                    "url": "https://bluedynamics.github.io/zodb-pgjsonb/",
+                    "summary": "PostgreSQL JSONB storage",
+                },
+                {
+                    "title": "zodb-json-codec",
+                    "url": "https://bluedynamics.github.io/zodb-json-codec/",
+                    "summary": "Rust pickle↔JSON transcoder",
+                },
+                {
+                    "title": "plone-pgcatalog",
+                    "url": "https://bluedynamics.github.io/plone-pgcatalog/",
+                    "summary": "PostgreSQL-backed catalog",
+                },
+                {
+                    "title": "plone-pgthumbor",
+                    "url": "https://bluedynamics.github.io/plone-pgthumbor/",
+                    "summary": "Thumbor image scaling",
+                },
+                {
+                    "title": "cdk8s-plone",
+                    "url": "https://bluedynamics.github.io/cdk8s-plone/",
+                    "summary": "Deploy Plone to Kubernetes",
+                },
+            ],
+        },
+        {
+            "title": "GitHub",
+            "url": "https://github.com/bluedynamics/cdk8s-plone",
+        },
+        {
+            "title": "PyPI",
+            "url": "https://pypi.org/project/cdk8s-plone/",
+        },
+        {
+            "title": "npm",
+            "url": "https://www.npmjs.com/package/@bluedynamics/cdk8s-plone",
+        },
+    ],
 }
 
-# Logo configuration (Shibuya uses different approach)
-html_logo = "_static/kup6s-icon-plone.svg"
+html_logo = "_static/logo.svg"
 
 # Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
+# relative to this directory.
 html_static_path = ["_static"]
-
-# Custom CSS files
-html_css_files = [
-    "brand-theme.css",  # Main brand theme (includes fonts, colors, cyberpunk design, icons)
-    "custom-icons.css",  # Custom icon styling for section headers
-]
-
-# Custom JavaScript files
-html_js_files = [
-    "logo-fix.js",  # Fix logo link for path prefix deployment
-]
