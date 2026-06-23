@@ -15,12 +15,13 @@ Tutorials are lessons that help you gain practical skills and familiarity with c
 
 ## What you'll learn
 
-These tutorials will teach you how to:
+The quick start teaches you how to:
 
-- Deploy a basic Plone instance using cdk8s-plone
-- Configure PostgreSQL backend
-- Customize component resources and settings
-- Test your deployment
+- Define a Plone deployment with the `Plone` construct
+- Synthesize Kubernetes manifests with `cdk8s synth`
+- Apply the manifests and reach the running site
+
+For tasks beyond the first deployment, such as configuring a database, caching, or scaling, see the {doc}`/how-to/index`.
 
 ## Available tutorials
 

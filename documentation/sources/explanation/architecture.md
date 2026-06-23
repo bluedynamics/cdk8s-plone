@@ -103,35 +103,35 @@ The library is published in multiple languages:
 
 ```mermaid
 graph TB
-    subgraph "External Access"
-        Client[Client/Browser]
+    subgraph "External access"
+        Client[Client / Browser]
         Ingress[Ingress Controller]
     end
 
-    subgraph "HTTP Cache Layer (Optional)"
-        Varnish[Varnish Cache<br/>kube-httpcache]
+    subgraph "Cache layer (optional)"
+        Varnish[Varnish<br/>PloneHttpcache or PloneVinylCache]
     end
 
-    subgraph "Plone Frontend (Volto)"
+    subgraph "Frontend (Volto variant only)"
         FrontendSvc[Frontend Service]
-        Frontend1[Frontend Pod 1]
-        Frontend2[Frontend Pod 2]
+        Frontend1[Frontend Pod]
+        Frontend2[Frontend Pod]
     end
 
-    subgraph "Plone Backend (API)"
+    subgraph "Backend (REST API for Volto, HTML for Blicca)"
         BackendSvc[Backend Service]
-        Backend1[Backend Pod 1]
-        Backend2[Backend Pod 2]
-        Backend3[Backend Pod 3]
+        Backend1[Backend Pod]
+        Backend2[Backend Pod]
     end
 
-    subgraph "Data Layer"
-        DB[(External Database<br/>PostgreSQL/MySQL/Oracle<br/>with RelStorage)]
+    subgraph "Data layer"
+        DB[(PostgreSQL<br/>with RelStorage)]
     end
 
     Client --> Ingress
     Ingress --> Varnish
-    Varnish -.cache miss.-> FrontendSvc
+    Varnish -.Volto: cache miss.-> FrontendSvc
+    Varnish -.Blicca: cache miss.-> BackendSvc
     Varnish -.invalidation.-> BackendSvc
 
     FrontendSvc --> Frontend1
@@ -142,11 +142,9 @@ graph TB
 
     BackendSvc --> Backend1
     BackendSvc --> Backend2
-    BackendSvc --> Backend3
 
     Backend1 --> DB
     Backend2 --> DB
-    Backend3 --> DB
 ```
 
 ## Component responsibilities

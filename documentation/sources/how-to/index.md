@@ -36,6 +36,7 @@ titlesonly: true
 ---
 deploy-production-volto
 deploy-blicca
+deploy-with-httpcache
 deploy-with-vinyl-cache
 ```
 
@@ -46,11 +47,13 @@ deploy-with-vinyl-cache
 maxdepth: 1
 titlesonly: true
 ---
+configure-env-and-secrets
 configure-security-context
 schedule-pods
+configure-ingress-tls
 ```
 
-## Operations & maintenance
+## Operations and maintenance
 
 ```{toctree}
 ---
@@ -58,6 +61,19 @@ maxdepth: 1
 titlesonly: true
 ---
 enable-prometheus-monitoring
+scale-and-high-availability
+upgrade-and-rollout
+backup-and-restore
+```
+
+## Troubleshooting
+
+```{toctree}
+---
+maxdepth: 1
+titlesonly: true
+---
+troubleshooting
 ```
 
 ---
