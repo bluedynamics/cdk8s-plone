@@ -6,6 +6,13 @@ describe('Production Volto Example', () => {
     const app = Testing.app();
     const chart = new ExampleChart(app, 'test-chart');
     const results = Testing.synth(chart);
+    // kube-httpcache generates a random Varnish admin secret on each synth.
+    // Redact it so the snapshot stays deterministic.
+    for (const obj of results) {
+      if (obj.kind === 'Secret' && obj.data && typeof obj.data.secret === 'string') {
+        obj.data.secret = '<redacted-for-snapshot>';
+      }
+    }
     expect(results).toMatchSnapshot();
   });
 });
