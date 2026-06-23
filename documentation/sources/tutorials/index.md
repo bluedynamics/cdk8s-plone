@@ -7,11 +7,6 @@ myst:
     "keywords": "Plone, cdk8s, Kubernetes, tutorials, getting started"
 ---
 
-```{image} ../_static/kup6s-icon-tutorials.svg
-:align: center
-:class: section-icon-large
-```
-
 # Tutorials
 
 **Learning-oriented guides that take you through a series of steps to complete a project.**

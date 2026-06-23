@@ -7,11 +7,6 @@ myst:
     "keywords": "Plone, cdk8s, Kubernetes, security context, Pod Security Standards, hardening"
 ---
 
-```{image} ../_static/kup6s-icon-howto.svg
-:align: center
-:class: section-icon-large
-```
-
 # Configure security context
 
 <div class="page-metadata">

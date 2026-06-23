@@ -7,11 +7,6 @@ myst:
     "keywords": "Plone, cdk8s, Kubernetes, Prometheus, ServiceMonitor, monitoring, metrics"
 ---
 
-```{image} ../_static/kup6s-icon-howto.svg
-:align: center
-:class: section-icon-large
-```
-
 # Enable Prometheus monitoring
 
 <div class="page-metadata">

@@ -7,11 +7,6 @@ myst:
     "keywords": "Plone, cdk8s, Kubernetes, Varnish, cloud-vinyl, VinylCache, operator, caching"
 ---
 
-```{image} ../_static/kup6s-icon-howto.svg
-:align: center
-:class: section-icon-large
-```
-
 # Deploy with cloud-vinyl cache
 
 <div class="page-metadata">

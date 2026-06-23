@@ -9,7 +9,9 @@ myst:
 
 # cdk8s-plone documentation
 
-```{image} _static/kup6s-icon-plone.svg
+<!-- diataxis: landing -->
+
+```{image} _static/logo.svg
 :alt: cdk8s-plone logo
 :width: 200px
 :align: center
@@ -39,7 +41,6 @@ This documentation follows the [Diátaxis framework](https://diataxis.fr/), orga
 :gutter: 3
 
 :::{grid-item-card} Tutorials
-:img-top: _static/kup6s-icon-tutorials.svg
 :link: tutorials/index
 :link-type: doc
 
@@ -49,7 +50,6 @@ This documentation follows the [Diátaxis framework](https://diataxis.fr/), orga
 :::
 
 :::{grid-item-card} How-To Guides
-:img-top: _static/kup6s-icon-howto.svg
 :link: how-to/index
 :link-type: doc
 
@@ -59,7 +59,6 @@ This documentation follows the [Diátaxis framework](https://diataxis.fr/), orga
 :::
 
 :::{grid-item-card} Reference
-:img-top: _static/kup6s-icon-reference.svg
 :link: reference/index
 :link-type: doc
 
@@ -69,7 +68,6 @@ This documentation follows the [Diátaxis framework](https://diataxis.fr/), orga
 :::
 
 :::{grid-item-card} Explanation
-:img-top: _static/kup6s-icon-explanation.svg
 :link: explanation/index
 :link-type: doc
 
@@ -109,9 +107,3 @@ how-to/index
 reference/index
 explanation/index
 ```
-
----
-
-**Last updated:** 2025-01-12
-**cdk8s-plone version:** 0.0.0
-**CDK8S version:** ^2.70.27

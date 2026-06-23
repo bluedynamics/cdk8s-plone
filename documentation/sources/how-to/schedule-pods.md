@@ -7,11 +7,6 @@ myst:
     "keywords": "Plone, cdk8s, Kubernetes, nodeSelector, tolerations, scheduling, taints"
 ---
 
-```{image} ../_static/kup6s-icon-howto.svg
-:align: center
-:class: section-icon-large
-```
-
 # Schedule pods to specific nodes
 
 <div class="page-metadata">
