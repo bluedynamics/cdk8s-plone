@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Enable Prometheus monitoring - cdk8s-plone 0.1.43 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Scale and run highly available" href="scale-and-high-availability.html" /><link rel="prev" title="Configure ingress and TLS" href="configure-ingress-tls.html" />
+      <link rel="canonical" href="https://bluedynamics.github.io/cdk8s-plone/how-to/enable-prometheus-monitoring.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=9454f7d5" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://bluedynamics.github.io/cdk8s-plone/how-to/enable-prometheus-monitoring.html"/>
+  <meta property="og:title" content="Enable Prometheus monitoring"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="/cdk8s-plone/">
+      <img class="light-logo" src="../_static/logo.svg" alt="cdk8s-plone" height="28" loading="lazy" />
+      <img class="dark-logo" src="../_static/logo.svg" alt="cdk8s-plone" height="28" loading="lazy" />
+      <strong>cdk8s-plone</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul>
+      <li class="link"><a class="js-menu" href="https://bluedynamics.github.io/zodb-pgjsonb/ecosystem.html" id="nav-trigger-1" aria-controls="nav-children-1">
+            <span>Ecosystem</span>
+            <i class="i-lucide chevron-down"></i>
+          </a>
+        <ul id="nav-children-1" aria-labelledby="nav-trigger-1"><li><a href="https://bluedynamics.github.io/zodb-pgjsonb/ecosystem.html">
+                <span>Dashboard</span>
+                <small>Overview of all packages</small>
+              </a></li><li><a href="https://bluedynamics.github.io/zodb-pgjsonb/">
+                <span>zodb-pgjsonb</span>
+                <small>PostgreSQL JSONB storage</small>
+              </a></li><li><a href="https://bluedynamics.github.io/zodb-json-codec/">
+                <span>zodb-json-codec</span>
+                <small>Rust pickle↔JSON transcoder</small>
+              </a></li><li><a href="https://bluedynamics.github.io/plone-pgcatalog/">
+                <span>plone-pgcatalog</span>
+                <small>PostgreSQL-backed catalog</small>
+              </a></li><li><a href="https://bluedynamics.github.io/plone-pgthumbor/">
+                <span>plone-pgthumbor</span>
+                <small>Thumbor image scaling</small>
+              </a></li><li><a href="https://bluedynamics.github.io/cdk8s-plone/">
+                <span>cdk8s-plone</span>
+                <small>Deploy Plone to Kubernetes</small>
+              </a></li></ul>
+      </li><li class="link">
+          <a href="https://github.com/bluedynamics/cdk8s-plone">
+            <span>GitHub</span></a>
+        </li><li class="link">
+          <a href="https://pypi.org/project/cdk8s-plone/">
+            <span>PyPI</span></a>
+        </li><li class="link">
+          <a href="https://www.npmjs.com/package/@bluedynamics/cdk8s-plone">
+            <span>npm</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials"></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/01-quick-start.html">Quick start</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">How-to guides</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="setup-prerequisites.html">Setup prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy-volto.html">Deploy the Volto example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy-blicca.html">Deploy Blicca example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy-with-httpcache.html">Deploy with PloneHttpcache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy-with-vinyl-cache.html">Deploy with cloud-vinyl cache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configure-env-and-secrets.html">Configure environment variables and secrets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configure-security-context.html">Configure security context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schedule-pods.html">Schedule pods to specific nodes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configure-ingress-tls.html">Configure ingress and TLS</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Enable Prometheus monitoring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scale-and-high-availability.html">Scale and run highly available</a></li>
+<li class="toctree-l2"><a class="reference internal" href="upgrade-and-rollout.html">Upgrade and roll out</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backup-and-restore.html">Back up and restore</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html">Troubleshoot a deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/api/index.html">API reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configuration-options.html">Configuration guide</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Explanation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/features.html">Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/architecture.html">Architecture overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/cdk8s-workflow.html">About the cdk8s workflow</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#enable-the-servicemonitor-on-the-backend">Enable the ServiceMonitor on the backend</a></li>
+<li><a class="reference internal" href="#scrape-the-frontend-on-a-dedicated-port">Scrape the frontend on a dedicated port</a></li>
+<li><a class="reference internal" href="#scrape-the-varnish-cache">Scrape the Varnish cache</a></li>
+<li><a class="reference internal" href="#verify-the-rollout">Verify the rollout</a></li>
+<li><a class="reference internal" href="#see-also">See also</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">cdk8s-plone</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">How-to guides</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Enable Prometheus monitoring</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://bluedynamics.github.io/cdk8s-plone/_sources/how-to/enable-prometheus-monitoring.md.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://bluedynamics.github.io/cdk8s-plone/_sources/how-to/enable-prometheus-monitoring.md.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://bluedynamics.github.io/cdk8s-plone/_sources/how-to/enable-prometheus-monitoring.md.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:markdown"></iconify-icon>
+            <span>View as Markdown</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//bluedynamics.github.io/cdk8s-plone/_sources/how-to/enable-prometheus-monitoring.md.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//bluedynamics.github.io/cdk8s-plone/_sources/how-to/enable-prometheus-monitoring.md.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue dark-code" role="main">
+          <section id="enable-prometheus-monitoring">
+<h1>Enable Prometheus monitoring<a class="headerlink" href="#enable-prometheus-monitoring" title="Link to this heading">¶</a></h1>
+<div class="page-metadata">
+  <div class="metadata-content">
+    <p><strong>Type</strong>: How-To (Task-oriented)</p>
+    <p><strong>Difficulty</strong>: Intermediate</p>
+    <p><strong>Time</strong>: 15 minutes</p>
+  </div>
+</div>
+<p>This guide shows you how to expose Plone metrics to Prometheus by creating a <code class="docutils literal notranslate"><span class="pre">ServiceMonitor</span></code> for the backend, the frontend, or the Varnish cache.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>The <a class="reference external" href="https://github.com/prometheus-operator/prometheus-operator">Prometheus Operator</a> installed in the cluster (it provides the <code class="docutils literal notranslate"><span class="pre">ServiceMonitor</span></code> CRD).</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">Prometheus</span></code> resource that selects the <code class="docutils literal notranslate"><span class="pre">ServiceMonitor</span></code> resources you create (check <code class="docutils literal notranslate"><span class="pre">serviceMonitorSelector</span></code> and <code class="docutils literal notranslate"><span class="pre">serviceMonitorNamespaceSelector</span></code>).</p></li>
+<li><p>A Plone container instrumented to expose metrics over HTTP. Plone itself does not ship a Prometheus endpoint; you need an add-on (such as a WSGI middleware) or a sidecar exporter.</p></li>
+</ul>
+</section>
+<section id="enable-the-servicemonitor-on-the-backend">
+<h2>Enable the ServiceMonitor on the backend<a class="headerlink" href="#enable-the-servicemonitor-on-the-backend" title="Link to this heading">¶</a></h2>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Plone</span><span class="p">,</span><span class="w"> </span><span class="nx">PloneVariant</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@bluedynamics/cdk8s-plone&#39;</span><span class="p">;</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="ow">new</span><span class="w"> </span><span class="nx">Plone</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plone&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">variant</span><span class="o">:</span><span class="w"> </span><span class="kt">PloneVariant.VOLTO</span><span class="p">,</span>
+</span><span data-line="5"><span class="w">  </span><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="6"><span class="w">    </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;plone/plone-backend:6.1.3&#39;</span><span class="p">,</span>
+</span><span data-line="7"><span class="w">    </span><span class="nx">servicemonitor</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+</span><span data-line="8"><span class="w">    </span><span class="nx">metricsPath</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;/metrics&#39;</span><span class="p">,</span>
+</span><span data-line="9"><span class="w">  </span><span class="p">},</span>
+</span><span data-line="10"><span class="w">  </span><span class="nx">frontend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="11"><span class="w">    </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;plone/plone-frontend:16.0.0&#39;</span><span class="p">,</span>
+</span><span data-line="12"><span class="w">  </span><span class="p">},</span>
+</span><span data-line="13"><span class="p">});</span>
+</span></pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">servicemonitor:</span> <span class="pre">true</span></code> instructs <code class="docutils literal notranslate"><span class="pre">cdk8s-plone</span></code> to emit a <code class="docutils literal notranslate"><span class="pre">ServiceMonitor</span></code> that scrapes the backend Service on its main port at <code class="docutils literal notranslate"><span class="pre">/metrics</span></code>.</p>
+</section>
+<section id="scrape-the-frontend-on-a-dedicated-port">
+<h2>Scrape the frontend on a dedicated port<a class="headerlink" href="#scrape-the-frontend-on-a-dedicated-port" title="Link to this heading">¶</a></h2>
+<p>Volto can expose metrics on a separate port through middleware such as <a class="reference external" href="https://www.npmjs.com/package/express-prometheus-middleware"><code class="docutils literal notranslate"><span class="pre">express-prometheus-middleware</span></code></a>.
+Point <code class="docutils literal notranslate"><span class="pre">cdk8s-plone</span></code> at that port:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="nx">frontend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;plone/plone-frontend:16.0.0&#39;</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">servicemonitor</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">metricsPort</span><span class="o">:</span><span class="w"> </span><span class="kt">9090</span><span class="p">,</span>
+</span><span data-line="5"><span class="w">  </span><span class="nx">metricsPath</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;/metrics&#39;</span><span class="p">,</span>
+</span><span data-line="6"><span class="p">}</span>
+</span></pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">metricsPort</span></code> accepts a port number or a Service port name.</p>
+</section>
+<section id="scrape-the-varnish-cache">
+<h2>Scrape the Varnish cache<a class="headerlink" href="#scrape-the-varnish-cache" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">PloneHttpcache</span></code> and <code class="docutils literal notranslate"><span class="pre">PloneVinylCache</span></code> each accept their own monitoring switch.</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@bluedynamics/cdk8s-plone&#39;</span><span class="p">;</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="ow">new</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;cache&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">plone</span><span class="o">:</span><span class="w"> </span><span class="kt">ploneInstance</span><span class="p">,</span>
+</span><span data-line="5"><span class="w">  </span><span class="nx">servicemonitor</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+</span><span data-line="6"><span class="w">  </span><span class="nx">exporterEnabled</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+</span><span data-line="7"><span class="p">});</span>
+</span></pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">exporterEnabled</span></code> (default <code class="docutils literal notranslate"><span class="pre">true</span></code>) deploys the Varnish exporter sidecar that the <code class="docutils literal notranslate"><span class="pre">ServiceMonitor</span></code> scrapes.</p>
+<p>For the cloud-vinyl operator:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">PloneVinylCache</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@bluedynamics/cdk8s-plone&#39;</span><span class="p">;</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="ow">new</span><span class="w"> </span><span class="nx">PloneVinylCache</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;cache&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">plone</span><span class="o">:</span><span class="w"> </span><span class="kt">ploneInstance</span><span class="p">,</span>
+</span><span data-line="5"><span class="w">  </span><span class="nx">monitoring</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+</span><span data-line="6"><span class="p">});</span>
+</span></pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The option name differs by construct: backend, frontend, and <code class="docutils literal notranslate"><span class="pre">PloneHttpcache</span></code> use <code class="docutils literal notranslate"><span class="pre">servicemonitor</span></code>, while <code class="docutils literal notranslate"><span class="pre">PloneVinylCache</span></code> uses <code class="docutils literal notranslate"><span class="pre">monitoring</span></code>. Both create a Prometheus <code class="docutils literal notranslate"><span class="pre">ServiceMonitor</span></code>.</p>
+</div>
+</section>
+<section id="verify-the-rollout">
+<h2>Verify the rollout<a class="headerlink" href="#verify-the-rollout" title="Link to this heading">¶</a></h2>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Generate manifests and confirm the ServiceMonitor exists</span>
+</span><span data-line="2">cdk8s<span class="w"> </span>synth
+</span><span data-line="3">grep<span class="w"> </span>-l<span class="w"> </span><span class="s1">&#39;kind: ServiceMonitor&#39;</span><span class="w"> </span>dist/*.yaml
+</span><span data-line="4">
+</span><span data-line="5"><span class="c1"># Apply and inspect on the cluster</span>
+</span><span data-line="6">kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>dist/
+</span><span data-line="7">kubectl<span class="w"> </span>get<span class="w"> </span>servicemonitor<span class="w"> </span>-n<span class="w"> </span>&lt;namespace&gt;
+</span><span data-line="8">kubectl<span class="w"> </span>describe<span class="w"> </span>servicemonitor<span class="w"> </span>&lt;name&gt;<span class="w"> </span>-n<span class="w"> </span>&lt;namespace&gt;
+</span></pre></div>
+</div>
+<p>If Prometheus is not picking up the new target, confirm:</p>
+<ul>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">ServiceMonitor</span></code> namespace matches the <code class="docutils literal notranslate"><span class="pre">Prometheus</span></code> resource’s <code class="docutils literal notranslate"><span class="pre">serviceMonitorNamespaceSelector</span></code>.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">ServiceMonitor</span></code> labels match the <code class="docutils literal notranslate"><span class="pre">Prometheus</span></code> resource’s <code class="docutils literal notranslate"><span class="pre">serviceMonitorSelector</span></code>.</p></li>
+<li><p>The metrics endpoint returns HTTP 200 from a pod in the cluster:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectl<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--rm<span class="w"> </span>curl<span class="w"> </span>--image<span class="o">=</span>curlimages/curl<span class="w"> </span>--restart<span class="o">=</span>Never<span class="w"> </span>--<span class="w"> </span><span class="se">\</span>
+</span><span data-line="2"><span class="w">  </span>curl<span class="w"> </span>-sf<span class="w"> </span>http://&lt;service&gt;.&lt;namespace&gt;:&lt;port&gt;/metrics<span class="w"> </span><span class="p">|</span><span class="w"> </span>head
+</span></pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="see-also">
+<h2>See also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../reference/configuration-options.html"><span class="doc">Configuration guide</span></a> — Reference for <code class="docutils literal notranslate"><span class="pre">servicemonitor</span></code>, <code class="docutils literal notranslate"><span class="pre">metricsPort</span></code>, <code class="docutils literal notranslate"><span class="pre">metricsPath</span></code>.</p></li>
+<li><p><a class="reference external" href="https://prometheus-operator.dev/">Prometheus Operator documentation</a> — <code class="docutils literal notranslate"><span class="pre">ServiceMonitor</span></code> selectors and lifecycle.</p></li>
+</ul>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="configure-ingress-tls.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Configure ingress and TLS</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="scale-and-high-availability.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Scale and run highly available</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024-2025, Blue Dynamics Alliance</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials"></div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=a183c34f"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script src="../_static/shibuya.js?v=50760d75"></script></body>
+</html>
