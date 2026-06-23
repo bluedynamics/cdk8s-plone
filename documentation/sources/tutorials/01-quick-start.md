@@ -15,7 +15,7 @@ This tutorial will guide you through deploying your first Plone instance using c
 
 Before you start, ensure you have:
 
-- **Node.js 16+** and npm installed
+- **Node.js 18+** and npm installed
 - **kubectl** configured to access your Kubernetes cluster
 - Basic familiarity with Kubernetes and TypeScript
 - A Kubernetes cluster (local or remote)

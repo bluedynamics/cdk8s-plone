@@ -24,28 +24,6 @@ features
 architecture
 ```
 
-## Key topics
-
-*This section will explain:*
-- Plone architecture and component relationships
-- Backend and Frontend integration
-- Storage architecture for Plone data
-- CDK8S construct patterns and best practices
-- Configuration management strategies
-
-*Future topics:*
-- Security considerations
-- Scaling and high availability considerations
-- Performance optimization
-
-## Design decisions
-
-*This section will document:*
-- Why certain defaults were chosen
-- Trade-offs in configuration approaches
-- Integration strategies with external services
-- Testing philosophy
-
 ---
 
 **Ready to get started?** Jump into the [Tutorials](../tutorials/index.md) for hands-on lessons.

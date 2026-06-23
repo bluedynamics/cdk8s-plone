@@ -88,6 +88,10 @@ new PloneVinylCache(chart, 'cache', {
 });
 ```
 
+```{note}
+The option name differs by construct: backend, frontend, and `PloneHttpcache` use `servicemonitor`, while `PloneVinylCache` uses `monitoring`. Both create a Prometheus `ServiceMonitor`.
+```
+
 ## Verify the rollout
 
 ```shell
