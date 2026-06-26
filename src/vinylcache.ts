@@ -279,7 +279,9 @@ export interface PloneVinylCacheOptions {
   readonly invalidation?: boolean;
 
   /**
-   * Enable Prometheus monitoring (metrics + ServiceMonitor).
+   * Enable Prometheus monitoring. When true this turns on operator metrics,
+   * a ServiceMonitor, and the prometheus_varnish_exporter sidecar (required
+   * for cache hit-ratio and backend-health metrics).
    * @default false
    */
   readonly monitoring?: boolean;
@@ -566,6 +568,7 @@ export class PloneVinylCache extends Construct {
         monitoring: monitoring ? {
           enabled: true,
           serviceMonitor: { enabled: true },
+          exporter: { enabled: true },
         } : undefined,
         pod: (options.tolerations?.length || options.nodeSelector) ? {
           tolerations: options.tolerations?.map(t => ({
