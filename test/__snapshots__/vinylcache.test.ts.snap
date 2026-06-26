@@ -2613,6 +2613,9 @@ exports[`with monitoring enabled 1`] = `
       },
       "monitoring": {
         "enabled": true,
+        "exporter": {
+          "enabled": true,
+        },
         "serviceMonitor": {
           "enabled": true,
         },

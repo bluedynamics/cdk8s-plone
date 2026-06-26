@@ -1992,7 +1992,7 @@ const ploneVinylCacheOptions: PloneVinylCacheOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.invalidation">invalidation</a></code> | <code>boolean</code> | Enable cache invalidation (PURGE, BAN, xkey). |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.limitCpu">limitCpu</a></code> | <code>string</code> | CPU limit for Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.limitMemory">limitMemory</a></code> | <code>string</code> | Memory limit for Varnish pods. |
-| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.monitoring">monitoring</a></code> | <code>boolean</code> | Enable Prometheus monitoring (metrics + ServiceMonitor). |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.monitoring">monitoring</a></code> | <code>boolean</code> | Enable Prometheus monitoring. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.nodeSelector">nodeSelector</a></code> | <code>{[ key: string ]: string}</code> | Node selector labels for the Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.replicas">replicas</a></code> | <code>number</code> | Number of Varnish pod replicas. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.requestCpu">requestCpu</a></code> | <code>string</code> | CPU request for Varnish pods. |
@@ -2123,7 +2123,11 @@ public readonly monitoring: boolean;
 - *Type:* boolean
 - *Default:* false
 
-Enable Prometheus monitoring (metrics + ServiceMonitor).
+Enable Prometheus monitoring.
+
+When true this turns on operator metrics,
+a ServiceMonitor, and the prometheus_varnish_exporter sidecar (required
+for cache hit-ratio and backend-health metrics).
 
 ---
 
