@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>About the cdk8s workflow - cdk8s-plone 0.1.46 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="prev" title="Architecture overview" href="architecture.html" />
+      <link rel="canonical" href="https://bluedynamics.github.io/cdk8s-plone/explanation/cdk8s-workflow.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=2ceb65ce" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://bluedynamics.github.io/cdk8s-plone/explanation/cdk8s-workflow.html"/>
+  <meta property="og:title" content="About the cdk8s workflow"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="/cdk8s-plone/">
+      <img class="light-logo" src="../_static/logo.svg" alt="cdk8s-plone" height="28" loading="lazy" />
+      <img class="dark-logo" src="../_static/logo.svg" alt="cdk8s-plone" height="28" loading="lazy" />
+      <strong>cdk8s-plone</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul>
+      <li class="link"><a class="js-menu" href="https://bluedynamics.github.io/zodb-pgjsonb/ecosystem.html" id="nav-trigger-1" aria-controls="nav-children-1">
+            <span>Ecosystem</span>
+            <i class="i-lucide chevron-down"></i>
+          </a>
+        <ul id="nav-children-1" aria-labelledby="nav-trigger-1"><li><a href="https://bluedynamics.github.io/zodb-pgjsonb/ecosystem.html">
+                <span>Dashboard</span>
+                <small>Overview of all packages</small>
+              </a></li><li><a href="https://bluedynamics.github.io/zodb-pgjsonb/">
+                <span>zodb-pgjsonb</span>
+                <small>PostgreSQL JSONB storage</small>
+              </a></li><li><a href="https://bluedynamics.github.io/zodb-json-codec/">
+                <span>zodb-json-codec</span>
+                <small>Rust pickle↔JSON transcoder</small>
+              </a></li><li><a href="https://bluedynamics.github.io/plone-pgcatalog/">
+                <span>plone-pgcatalog</span>
+                <small>PostgreSQL-backed catalog</small>
+              </a></li><li><a href="https://bluedynamics.github.io/plone-pgthumbor/">
+                <span>plone-pgthumbor</span>
+                <small>Thumbor image scaling</small>
+              </a></li><li><a href="https://bluedynamics.github.io/cdk8s-plone/">
+                <span>cdk8s-plone</span>
+                <small>Deploy Plone to Kubernetes</small>
+              </a></li></ul>
+      </li><li class="link">
+          <a href="https://github.com/bluedynamics/cdk8s-plone">
+            <span>GitHub</span></a>
+        </li><li class="link">
+          <a href="https://pypi.org/project/cdk8s-plone/">
+            <span>PyPI</span></a>
+        </li><li class="link">
+          <a href="https://www.npmjs.com/package/@bluedynamics/cdk8s-plone">
+            <span>npm</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials"></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/01-quick-start.html">Quick start</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../how-to/index.html">How-to guides</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/setup-prerequisites.html">Setup prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/deploy-volto.html">Deploy the Volto example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/deploy-blicca.html">Deploy Blicca example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/deploy-with-httpcache.html">Deploy with PloneHttpcache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/deploy-with-vinyl-cache.html">Deploy with cloud-vinyl cache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/configure-env-and-secrets.html">Configure environment variables and secrets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/configure-security-context.html">Configure security context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/schedule-pods.html">Schedule pods to specific nodes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/configure-ingress-tls.html">Configure ingress and TLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/enable-prometheus-monitoring.html">Enable Prometheus monitoring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/scale-and-high-availability.html">Scale and run highly available</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/upgrade-and-rollout.html">Upgrade and roll out</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/backup-and-restore.html">Back up and restore</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/troubleshooting.html">Troubleshoot a deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/api/index.html">API reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configuration-options.html">Configuration guide</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Explanation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Architecture overview</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">About the cdk8s workflow</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#code-synth-apply">Code, synth, apply</a></li>
+<li><a class="reference internal" href="#where-cdk8s-plone-fits">Where cdk8s-plone fits</a></li>
+<li><a class="reference internal" href="#synthesis-time-versus-apply-time">Synthesis time versus apply time</a></li>
+<li><a class="reference internal" href="#applying-by-hand-or-through-gitops">Applying by hand or through GitOps</a></li>
+<li><a class="reference internal" href="#see-also">See also</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">cdk8s-plone</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">Explanation</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">About the cdk8s workflow</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://bluedynamics.github.io/cdk8s-plone/_sources/explanation/cdk8s-workflow.md.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://bluedynamics.github.io/cdk8s-plone/_sources/explanation/cdk8s-workflow.md.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://bluedynamics.github.io/cdk8s-plone/_sources/explanation/cdk8s-workflow.md.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:markdown"></iconify-icon>
+            <span>View as Markdown</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//bluedynamics.github.io/cdk8s-plone/_sources/explanation/cdk8s-workflow.md.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//bluedynamics.github.io/cdk8s-plone/_sources/explanation/cdk8s-workflow.md.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue dark-code" role="main">
+          <section id="about-the-cdk8s-workflow">
+<h1>About the cdk8s workflow<a class="headerlink" href="#about-the-cdk8s-workflow" title="Link to this heading">#</a></h1>
+<p>This page explains where <code class="docutils literal notranslate"><span class="pre">cdk8s-plone</span></code> sits in the cdk8s workflow and why that workflow looks the way it does.
+It is background reading, not a set of steps; for the steps, see <a class="reference internal" href="../tutorials/01-quick-start.html"><span class="doc">Quick start</span></a>.</p>
+<section id="code-synth-apply">
+<h2>Code, synth, apply<a class="headerlink" href="#code-synth-apply" title="Link to this heading">#</a></h2>
+<p><a class="reference external" href="https://cdk8s.io/">cdk8s</a> is a framework for defining Kubernetes resources in a general-purpose programming language.
+You write TypeScript or Python that constructs objects, run a synthesis step, and get plain Kubernetes YAML.
+Nothing about cdk8s talks to a cluster: it is a manifest generator.</p>
+<p>The workflow has three distinct phases, and keeping them apart explains most of how cdk8s-plone behaves.
+First you write code that instantiates constructs inside an <code class="docutils literal notranslate"><span class="pre">App</span></code> and one or more <code class="docutils literal notranslate"><span class="pre">Chart</span></code> objects.
+Then you run <code class="docutils literal notranslate"><span class="pre">cdk8s</span> <span class="pre">synth</span></code>, which evaluates that code and writes Kubernetes manifests into the <code class="docutils literal notranslate"><span class="pre">dist/</span></code> directory.
+Finally you apply those manifests to a cluster, either with <code class="docutils literal notranslate"><span class="pre">kubectl</span> <span class="pre">apply</span></code> or through a GitOps controller.</p>
+<p>The separation matters because the manifests are an ordinary, reviewable artifact.
+You can read the YAML, diff it across changes, and run policy checks on it before anything reaches the cluster.</p>
+</section>
+<section id="where-cdk8s-plone-fits">
+<h2>Where cdk8s-plone fits<a class="headerlink" href="#where-cdk8s-plone-fits" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">cdk8s-plone</span></code> is a construct library, not an application you run.
+You compose its constructs, mainly <code class="docutils literal notranslate"><span class="pre">Plone</span></code> and one of the cache constructs, inside your own cdk8s app.
+A construct is a reusable building block: <code class="docutils literal notranslate"><span class="pre">Plone</span></code> expands into the Deployments, Services, and optional PodDisruptionBudget and ServiceMonitor that a Plone site needs, with production-minded defaults you can override.</p>
+<p>This is the same idea as a Helm chart or a Kustomize base, but expressed in code rather than templated YAML.
+Because the inputs are typed options rather than free-form values, your editor and the compiler catch mistakes before synthesis, and the <a class="reference internal" href="../reference/api/index.html"><span class="doc">API reference</span></a> is generated from those types.</p>
+</section>
+<section id="synthesis-time-versus-apply-time">
+<h2>Synthesis time versus apply time<a class="headerlink" href="#synthesis-time-versus-apply-time" title="Link to this heading">#</a></h2>
+<p>The two cache constructs illustrate the phase distinction well, because they resolve at different times.</p>
+<p><code class="docutils literal notranslate"><span class="pre">PloneHttpcache</span></code> renders the mittwald kube-httpcache Helm chart during synthesis.
+It shells out to the <code class="docutils literal notranslate"><span class="pre">helm</span></code> CLI, so <code class="docutils literal notranslate"><span class="pre">helm</span></code> must be present where you run <code class="docutils literal notranslate"><span class="pre">cdk8s</span> <span class="pre">synth</span></code>, and the chart’s resources land in your <code class="docutils literal notranslate"><span class="pre">dist/</span></code> output as ordinary manifests.</p>
+<p><code class="docutils literal notranslate"><span class="pre">PloneVinylCache</span></code> instead emits a <code class="docutils literal notranslate"><span class="pre">VinylCache</span></code> custom resource.
+That resource does nothing on its own; the cloud-vinyl operator reconciles it at apply time and creates the underlying Varnish deployment in the cluster.
+The work happens later, and in a different place, than the synthesis that produced the manifest.</p>
+<p>Neither approach is universally better.
+Rendering at synthesis keeps everything in one reviewable artifact, while delegating to an operator keeps the cluster as the source of truth and lets the operator manage the cache over its lifetime.
+For the practical trade-offs between the two caches, see <a class="reference internal" href="architecture.html"><span class="doc">Architecture overview</span></a>.</p>
+</section>
+<section id="applying-by-hand-or-through-gitops">
+<h2>Applying by hand or through GitOps<a class="headerlink" href="#applying-by-hand-or-through-gitops" title="Link to this heading">#</a></h2>
+<p>Because synthesis produces plain YAML, you can apply it however you already deploy Kubernetes resources.
+A small project applies <code class="docutils literal notranslate"><span class="pre">dist/</span></code> directly with <code class="docutils literal notranslate"><span class="pre">kubectl</span></code>.
+A larger one commits the synthesized manifests to a repository and lets a GitOps controller such as Argo CD or Flux reconcile them, so the cluster always matches what is in version control.</p>
+<p>A common middle path runs <code class="docutils literal notranslate"><span class="pre">cdk8s</span> <span class="pre">synth</span></code> in continuous integration and publishes the result, so the synthesis is reproducible and the applied manifests are auditable.
+In every case the cdk8s-plone code stays the single definition of the deployment, and the manifests are a derived, inspectable product of it.</p>
+</section>
+<section id="see-also">
+<h2>See also<a class="headerlink" href="#see-also" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="architecture.html"><span class="doc">Architecture overview</span></a> — the components a <code class="docutils literal notranslate"><span class="pre">Plone</span></code> construct creates and how they relate.</p></li>
+<li><p><a class="reference internal" href="../tutorials/01-quick-start.html"><span class="doc">Quick start</span></a> — the workflow applied end to end.</p></li>
+<li><p><a class="reference external" href="https://cdk8s.io/docs/latest/">cdk8s documentation</a> — the framework this builds on.</p></li>
+</ul>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="architecture.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Architecture overview</div></div>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024-2025, Blue Dynamics Alliance</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials"></div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=f98a5df1"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script src="../_static/shibuya.js?v=50760d75"></script></body>
+</html>

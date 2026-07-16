@@ -1,0 +1,109 @@
+---
+myst:
+  html_meta:
+    "description": "Documentation for cdk8s-plone, a TypeScript and Python library for deploying Plone CMS to Kubernetes with CDK8S."
+    "property=og:description": "Documentation for cdk8s-plone, a TypeScript and Python library for deploying Plone CMS to Kubernetes with CDK8S."
+    "property=og:title": "cdk8s-plone documentation"
+    "keywords": "Plone, cdk8s, Kubernetes, Volto, CMS, infrastructure as code"
+---
+
+# cdk8s-plone documentation
+
+<!-- diataxis: landing -->
+
+```{image} _static/logo.svg
+:alt: cdk8s-plone logo
+:width: 200px
+:align: center
+```
+
+**CDK8S Construct Library for Plone CMS Deployment**
+
+Welcome to the cdk8s-plone documentation. This documentation covers everything from initial setup to advanced configuration and architectural concepts for deploying Plone CMS using CDK8S.
+
+## About cdk8s-plone
+
+cdk8s-plone is a TypeScript construct library for [CDK8S](https://cdk8s.io/) that enables programmatic deployment of [Plone](https://plone.org/) CMS on Kubernetes. It provides type-safe, reusable constructs for Plone Backend and Frontend with production-grade defaults.
+
+**Key Features:**
+- Type-safe TypeScript constructs for Plone Backend and Frontend
+- Production-grade defaults with full customization
+- Support for PostgreSQL backends
+- Comprehensive resource management (CPU, memory, storage)
+- Component-level configuration options
+- Built on CDK8S for infrastructure as code
+
+## Documentation structure
+
+This documentation follows the [Diátaxis framework](https://diataxis.fr/), organizing content into four categories based on what you need:
+
+::::{grid} 2
+:gutter: 3
+
+:::{grid-item-card} Tutorials
+:link: tutorials/index
+:link-type: doc
+
+**Learning-oriented**: Step-by-step lessons to build skills
+
+*Start here if you're new to cdk8s-plone*
+:::
+
+:::{grid-item-card} How-To Guides
+:link: how-to/index
+:link-type: doc
+
+**Goal-oriented**: Solutions to specific problems
+
+*Use these when you need to accomplish something*
+:::
+
+:::{grid-item-card} Reference
+:link: reference/index
+:link-type: doc
+
+**Information-oriented**: Technical specifications and configurations
+
+*Consult when you need detailed information*
+:::
+
+:::{grid-item-card} Explanation
+:link: explanation/index
+:link-type: doc
+
+**Understanding-oriented**: Concepts and design decisions
+
+*Read to deepen your understanding*
+:::
+
+::::
+
+## Quick links
+
+### Getting started
+- {doc}`tutorials/01-quick-start` — Deploy your first Plone instance
+- {doc}`how-to/setup-prerequisites` — Prepare cluster infrastructure
+- {doc}`explanation/features` — Explore capabilities
+
+### Configuration
+- {doc}`reference/configuration-options` — Complete configuration reference
+- {doc}`explanation/architecture` — High-level design
+
+### Common tasks
+- {doc}`how-to/configure-security-context` — Harden backend and frontend pods
+- {doc}`how-to/enable-prometheus-monitoring` — Wire up `ServiceMonitor`
+- {doc}`how-to/schedule-pods` — `nodeSelector` and tolerations
+
+## Table of contents
+
+```{toctree}
+---
+maxdepth: 3
+caption: Documentation
+titlesonly: true
+---
+tutorials/index
+how-to/index
+reference/index
+explanation/index
+```

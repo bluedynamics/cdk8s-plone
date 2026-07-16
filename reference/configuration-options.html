@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Configuration guide - cdk8s-plone 0.1.46 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Explanation" href="../explanation/index.html" /><link rel="prev" title="API reference" href="api/index.html" />
+      <link rel="canonical" href="https://bluedynamics.github.io/cdk8s-plone/reference/configuration-options.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=2ceb65ce" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://bluedynamics.github.io/cdk8s-plone/reference/configuration-options.html"/>
+  <meta property="og:title" content="Configuration guide"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="/cdk8s-plone/">
+      <img class="light-logo" src="../_static/logo.svg" alt="cdk8s-plone" height="28" loading="lazy" />
+      <img class="dark-logo" src="../_static/logo.svg" alt="cdk8s-plone" height="28" loading="lazy" />
+      <strong>cdk8s-plone</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul>
+      <li class="link"><a class="js-menu" href="https://bluedynamics.github.io/zodb-pgjsonb/ecosystem.html" id="nav-trigger-1" aria-controls="nav-children-1">
+            <span>Ecosystem</span>
+            <i class="i-lucide chevron-down"></i>
+          </a>
+        <ul id="nav-children-1" aria-labelledby="nav-trigger-1"><li><a href="https://bluedynamics.github.io/zodb-pgjsonb/ecosystem.html">
+                <span>Dashboard</span>
+                <small>Overview of all packages</small>
+              </a></li><li><a href="https://bluedynamics.github.io/zodb-pgjsonb/">
+                <span>zodb-pgjsonb</span>
+                <small>PostgreSQL JSONB storage</small>
+              </a></li><li><a href="https://bluedynamics.github.io/zodb-json-codec/">
+                <span>zodb-json-codec</span>
+                <small>Rust pickle↔JSON transcoder</small>
+              </a></li><li><a href="https://bluedynamics.github.io/plone-pgcatalog/">
+                <span>plone-pgcatalog</span>
+                <small>PostgreSQL-backed catalog</small>
+              </a></li><li><a href="https://bluedynamics.github.io/plone-pgthumbor/">
+                <span>plone-pgthumbor</span>
+                <small>Thumbor image scaling</small>
+              </a></li><li><a href="https://bluedynamics.github.io/cdk8s-plone/">
+                <span>cdk8s-plone</span>
+                <small>Deploy Plone to Kubernetes</small>
+              </a></li></ul>
+      </li><li class="link">
+          <a href="https://github.com/bluedynamics/cdk8s-plone">
+            <span>GitHub</span></a>
+        </li><li class="link">
+          <a href="https://pypi.org/project/cdk8s-plone/">
+            <span>PyPI</span></a>
+        </li><li class="link">
+          <a href="https://www.npmjs.com/package/@bluedynamics/cdk8s-plone">
+            <span>npm</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials"></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/01-quick-start.html">Quick start</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../how-to/index.html">How-to guides</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/setup-prerequisites.html">Setup prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/deploy-volto.html">Deploy the Volto example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/deploy-blicca.html">Deploy Blicca example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/deploy-with-httpcache.html">Deploy with PloneHttpcache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/deploy-with-vinyl-cache.html">Deploy with cloud-vinyl cache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/configure-env-and-secrets.html">Configure environment variables and secrets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/configure-security-context.html">Configure security context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/schedule-pods.html">Schedule pods to specific nodes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/configure-ingress-tls.html">Configure ingress and TLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/enable-prometheus-monitoring.html">Enable Prometheus monitoring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/scale-and-high-availability.html">Scale and run highly available</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/upgrade-and-rollout.html">Upgrade and roll out</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/backup-and-restore.html">Back up and restore</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/troubleshooting.html">Troubleshoot a deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="api/index.html">API reference</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Configuration guide</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Explanation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/features.html">Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/architecture.html">Architecture overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/cdk8s-workflow.html">About the cdk8s workflow</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#constructs-at-a-glance">Constructs at a glance</a></li>
+<li><a class="reference internal" href="#choose-a-frontend-variant">Choose a frontend variant</a></li>
+<li><a class="reference internal" href="#configure-the-backend-and-frontend">Configure the backend and frontend</a><ul>
+<li><a class="reference internal" href="#images-and-replicas">Images and replicas</a></li>
+<li><a class="reference internal" href="#resource-requests-and-limits">Resource requests and limits</a></li>
+<li><a class="reference internal" href="#high-availability">High availability</a></li>
+<li><a class="reference internal" href="#probes">Probes</a></li>
+<li><a class="reference internal" href="#service">Service</a></li>
+<li><a class="reference internal" href="#environment-variables">Environment variables</a></li>
+<li><a class="reference internal" href="#annotations-scheduling-security-and-monitoring">Annotations, scheduling, security, and monitoring</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#add-a-cache">Add a cache</a></li>
+<li><a class="reference internal" href="#complete-example">Complete example</a></li>
+<li><a class="reference internal" href="#see-also">See also</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">cdk8s-plone</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">Reference</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Configuration guide</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://bluedynamics.github.io/cdk8s-plone/_sources/reference/configuration-options.md.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://bluedynamics.github.io/cdk8s-plone/_sources/reference/configuration-options.md.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://bluedynamics.github.io/cdk8s-plone/_sources/reference/configuration-options.md.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:markdown"></iconify-icon>
+            <span>View as Markdown</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//bluedynamics.github.io/cdk8s-plone/_sources/reference/configuration-options.md.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//bluedynamics.github.io/cdk8s-plone/_sources/reference/configuration-options.md.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue dark-code" role="main">
+          <section id="configuration-guide">
+<h1>Configuration guide<a class="headerlink" href="#configuration-guide" title="Link to this heading">#</a></h1>
+<p>This guide shows the most common ways to configure cdk8s-plone, grouped by task, with copy-pasteable examples.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>For the complete and authoritative list of every construct, option, type, default value, and whether it is required, see the <a class="reference internal" href="api/index.html"><span class="doc">API reference</span></a>.
+That reference is generated from the TypeScript source, so it never drifts.
+This guide is hand-written orientation and deliberately does <strong>not</strong> repeat the full option tables.</p>
+</div>
+<section id="constructs-at-a-glance">
+<h2>Constructs at a glance<a class="headerlink" href="#constructs-at-a-glance" title="Link to this heading">#</a></h2>
+<dl class="simple myst">
+<dt><code class="docutils literal notranslate"><span class="pre">Plone</span></code></dt><dd><p>Deploys the Plone backend and, for the Volto variant, the React frontend, plus their services and (optionally) a <code class="docutils literal notranslate"><span class="pre">PodDisruptionBudget</span></code> and <code class="docutils literal notranslate"><span class="pre">ServiceMonitor</span></code>. This is the entry point.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">PloneHttpcache</span></code></dt><dd><p>Adds a Varnish caching layer through the mittwald <a class="reference external" href="https://github.com/mittwald/kube-httpcache">kube-httpcache</a> Helm chart. Self-contained: it needs no operator in the cluster.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">PloneVinylCache</span></code></dt><dd><p>Adds a Varnish caching layer through the <a class="reference external" href="https://github.com/bluedynamics/cloud-vinyl">cloud-vinyl</a> operator. Requires the operator to be installed in the cluster.</p>
+</dd>
+</dl>
+<p>To choose between the two cache constructs, read <a class="reference internal" href="../explanation/architecture.html"><span class="doc">Architecture overview</span></a>.</p>
+</section>
+<section id="choose-a-frontend-variant">
+<h2>Choose a frontend variant<a class="headerlink" href="#choose-a-frontend-variant" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">Plone</span></code> construct deploys one of two frontends, selected with <code class="docutils literal notranslate"><span class="pre">variant</span></code>:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Plone</span><span class="p">,</span><span class="w"> </span><span class="nx">PloneVariant</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@bluedynamics/cdk8s-plone&#39;</span><span class="p">;</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="c1">// Volto: React single-page frontend talking to the REST API backend (default).</span>
+</span><span data-line="4"><span class="ow">new</span><span class="w"> </span><span class="nx">Plone</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plone&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="5"><span class="w">  </span><span class="nx">variant</span><span class="o">:</span><span class="w"> </span><span class="kt">PloneVariant.VOLTO</span><span class="p">,</span>
+</span><span data-line="6"><span class="w">  </span><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{},</span>
+</span><span data-line="7"><span class="w">  </span><span class="nx">frontend</span><span class="o">:</span><span class="w"> </span><span class="p">{},</span>
+</span><span data-line="8"><span class="p">});</span>
+</span><span data-line="9">
+</span><span data-line="10"><span class="c1">// Blicca: the backend renders the UI server-side, so there is no separate frontend.</span>
+</span><span data-line="11"><span class="ow">new</span><span class="w"> </span><span class="nx">Plone</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plone&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="12"><span class="w">  </span><span class="nx">variant</span><span class="o">:</span><span class="w"> </span><span class="kt">PloneVariant.BLICCA</span><span class="p">,</span>
+</span><span data-line="13"><span class="w">  </span><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{},</span>
+</span><span data-line="14"><span class="p">});</span>
+</span></pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">PloneVariant.CLASSICUI</span></code> is a deprecated alias for <code class="docutils literal notranslate"><span class="pre">PloneVariant.BLICCA</span></code>, kept for backward compatibility.
+It keeps its legacy value (<code class="docutils literal notranslate"><span class="pre">'classicui'</span></code>), so existing configuration keeps working unchanged.
+The alias will be removed in a future major release.</p>
+</div>
+<p>For the conceptual difference between the variants, see <a class="reference internal" href="../explanation/features.html#deployment-variants"><span class="std std-ref">Deployment variants</span></a>.</p>
+</section>
+<section id="configure-the-backend-and-frontend">
+<h2>Configure the backend and frontend<a class="headerlink" href="#configure-the-backend-and-frontend" title="Link to this heading">#</a></h2>
+<p>Both <code class="docutils literal notranslate"><span class="pre">backend</span></code> and <code class="docutils literal notranslate"><span class="pre">frontend</span></code> take the same options (<code class="docutils literal notranslate"><span class="pre">PloneBaseOptions</span></code>).
+The examples below cover the common groups.
+See the <a class="reference internal" href="api/index.html"><span class="doc">API reference</span></a> for every field, its type, and its default.</p>
+<section id="images-and-replicas">
+<h3>Images and replicas<a class="headerlink" href="#images-and-replicas" title="Link to this heading">#</a></h3>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;plone/plone-backend:6.1.3&#39;</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">replicas</span><span class="o">:</span><span class="w"> </span><span class="kt">3</span><span class="p">,</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">imagePullPolicy</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Always&#39;</span><span class="p">,</span>
+</span><span data-line="5"><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+<section id="resource-requests-and-limits">
+<h3>Resource requests and limits<a class="headerlink" href="#resource-requests-and-limits" title="Link to this heading">#</a></h3>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">requestCpu</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;500m&#39;</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">limitCpu</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;2&#39;</span><span class="p">,</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">requestMemory</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;512Mi&#39;</span><span class="p">,</span>
+</span><span data-line="5"><span class="w">  </span><span class="nx">limitMemory</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;2Gi&#39;</span><span class="p">,</span>
+</span><span data-line="6"><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+<section id="high-availability">
+<h3>High availability<a class="headerlink" href="#high-availability" title="Link to this heading">#</a></h3>
+<p>A <code class="docutils literal notranslate"><span class="pre">PodDisruptionBudget</span></code> is created automatically when <code class="docutils literal notranslate"><span class="pre">replicas</span></code> is <code class="docutils literal notranslate"><span class="pre">2</span></code> or more, or when you set <code class="docutils literal notranslate"><span class="pre">minAvailable</span></code> or <code class="docutils literal notranslate"><span class="pre">maxUnavailable</span></code> explicitly.
+Both accept an absolute number or a percentage string such as <code class="docutils literal notranslate"><span class="pre">&quot;50%&quot;</span></code>.</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">replicas</span><span class="o">:</span><span class="w"> </span><span class="kt">5</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">minAvailable</span><span class="o">:</span><span class="w"> </span><span class="kt">3</span><span class="p">,</span><span class="w"> </span><span class="c1">// keep at least 3 pods available during voluntary disruptions</span>
+</span><span data-line="4"><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+<section id="probes">
+<h3>Probes<a class="headerlink" href="#probes" title="Link to this heading">#</a></h3>
+<p>Readiness probes are enabled by default; liveness probes are <strong>disabled</strong> by default.</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="nx">frontend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">readinessEnabled</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">readinessInitialDelaySeconds</span><span class="o">:</span><span class="w"> </span><span class="kt">10</span><span class="p">,</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">livenessEnabled</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span><span class="w"> </span><span class="c1">// opt in; useful for the frontend</span>
+</span><span data-line="5"><span class="w">  </span><span class="nx">livenessInitialDelaySeconds</span><span class="o">:</span><span class="w"> </span><span class="kt">30</span><span class="p">,</span>
+</span><span data-line="6"><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+<section id="service">
+<h3>Service<a class="headerlink" href="#service" title="Link to this heading">#</a></h3>
+<p>Configure the generated Kubernetes <code class="docutils literal notranslate"><span class="pre">Service</span></code> through the grouped <code class="docutils literal notranslate"><span class="pre">service</span></code> option.
+Curated fields cover the common cases; <code class="docutils literal notranslate"><span class="pre">service.overrides</span></code> is an escape hatch for any other <code class="docutils literal notranslate"><span class="pre">ServiceSpec</span></code> field and has the highest precedence.</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">service</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="3"><span class="w">    </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;LoadBalancer&#39;</span><span class="p">,</span>
+</span><span data-line="4"><span class="w">    </span><span class="nx">trafficDistribution</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;PreferClose&#39;</span><span class="p">,</span>
+</span><span data-line="5"><span class="w">    </span><span class="nx">loadBalancerSourceRanges</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;10.0.0.0/8&#39;</span><span class="p">],</span>
+</span><span data-line="6"><span class="w">    </span><span class="nx">annotations</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="7"><span class="w">      </span><span class="s1">&#39;external-dns.alpha.kubernetes.io/hostname&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;backend.example.com&#39;</span><span class="p">,</span>
+</span><span data-line="8"><span class="w">    </span><span class="p">},</span>
+</span><span data-line="9"><span class="w">    </span><span class="nx">overrides</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="10"><span class="w">      </span><span class="nx">ipFamilyPolicy</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;PreferDualStack&#39;</span><span class="p">,</span>
+</span><span data-line="11"><span class="w">    </span><span class="p">},</span>
+</span><span data-line="12"><span class="w">  </span><span class="p">},</span>
+</span><span data-line="13"><span class="p">}</span>
+</span></pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The top-level <code class="docutils literal notranslate"><span class="pre">serviceAnnotations</span></code> option is deprecated. Use <code class="docutils literal notranslate"><span class="pre">service.annotations</span></code> instead.</p>
+</div>
+</section>
+<section id="environment-variables">
+<h3>Environment variables<a class="headerlink" href="#environment-variables" title="Link to this heading">#</a></h3>
+<p>Pass environment variables with the cdk8s-plus <code class="docutils literal notranslate"><span class="pre">Env</span></code> API, including values sourced from a <code class="docutils literal notranslate"><span class="pre">Secret</span></code>.</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Env</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;cdk8s-plus-30&#39;</span><span class="p">;</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">environment</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="5"><span class="w">    </span><span class="nx">variables</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="6"><span class="w">      </span><span class="nx">RELSTORAGE_DSN</span><span class="o">:</span><span class="w"> </span><span class="kt">Env.fromSecret</span><span class="p">(</span><span class="nx">dbSecret</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;dsn&#39;</span><span class="p">),</span>
+</span><span data-line="7"><span class="w">    </span><span class="p">},</span>
+</span><span data-line="8"><span class="w">  </span><span class="p">},</span>
+</span><span data-line="9"><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+<section id="annotations-scheduling-security-and-monitoring">
+<h3>Annotations, scheduling, security, and monitoring<a class="headerlink" href="#annotations-scheduling-security-and-monitoring" title="Link to this heading">#</a></h3>
+<p>These groups each have a dedicated how-to guide:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../how-to/schedule-pods.html"><span class="doc">Schedule pods to specific nodes</span></a> — <code class="docutils literal notranslate"><span class="pre">nodeSelector</span></code> and <code class="docutils literal notranslate"><span class="pre">tolerations</span></code></p></li>
+<li><p><a class="reference internal" href="../how-to/configure-security-context.html"><span class="doc">Configure security context</span></a> — <code class="docutils literal notranslate"><span class="pre">securityContext</span></code> hardening</p></li>
+<li><p><a class="reference internal" href="../how-to/enable-prometheus-monitoring.html"><span class="doc">Enable Prometheus monitoring</span></a> — <code class="docutils literal notranslate"><span class="pre">servicemonitor</span></code>, <code class="docutils literal notranslate"><span class="pre">metricsPort</span></code>, <code class="docutils literal notranslate"><span class="pre">metricsPath</span></code></p></li>
+</ul>
+</section>
+</section>
+<section id="add-a-cache">
+<h2>Add a cache<a class="headerlink" href="#add-a-cache" title="Link to this heading">#</a></h2>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@bluedynamics/cdk8s-plone&#39;</span><span class="p">;</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="c1">// Self-contained Varnish via the kube-httpcache Helm chart.</span>
+</span><span data-line="4"><span class="ow">new</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;cache&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="5"><span class="w">  </span><span class="nx">plone</span><span class="o">:</span><span class="w"> </span><span class="kt">ploneInstance</span><span class="p">,</span>
+</span><span data-line="6"><span class="w">  </span><span class="nx">existingSecret</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;varnish-secret&#39;</span><span class="p">,</span>
+</span><span data-line="7"><span class="w">  </span><span class="nx">replicas</span><span class="o">:</span><span class="w"> </span><span class="kt">2</span><span class="p">,</span>
+</span><span data-line="8"><span class="p">});</span>
+</span></pre></div>
+</div>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">PloneVinylCache</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@bluedynamics/cdk8s-plone&#39;</span><span class="p">;</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="c1">// Operator-managed Varnish via the cloud-vinyl operator.</span>
+</span><span data-line="4"><span class="kd">const</span><span class="w"> </span><span class="nx">cache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">PloneVinylCache</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;cache&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="5"><span class="w">  </span><span class="nx">plone</span><span class="o">:</span><span class="w"> </span><span class="kt">ploneInstance</span><span class="p">,</span>
+</span><span data-line="6"><span class="w">  </span><span class="nx">storage</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;s0&#39;</span><span class="p">,</span><span class="w"> </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;malloc&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">size</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;1500M&#39;</span><span class="w"> </span><span class="p">}],</span>
+</span><span data-line="7"><span class="w">  </span><span class="nx">monitoring</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+</span><span data-line="8"><span class="p">});</span>
+</span></pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><code class="docutils literal notranslate"><span class="pre">PloneVinylCache</span></code> without an explicit <code class="docutils literal notranslate"><span class="pre">storage</span></code> entry runs varnishd with its stock default (~100 MB malloc) regardless of the container memory limit.
+Size malloc storage below the pod’s memory limit to leave headroom for varnishd overhead.</p>
+</div>
+<p>For the full walk-through, including custom VCL snippets and shard-director tuning, see <a class="reference internal" href="../how-to/deploy-with-vinyl-cache.html"><span class="doc">Deploy with cloud-vinyl cache</span></a>.</p>
+</section>
+<section id="complete-example">
+<h2>Complete example<a class="headerlink" href="#complete-example" title="Link to this heading">#</a></h2>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">App</span><span class="p">,</span><span class="w"> </span><span class="nx">Chart</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;cdk8s&#39;</span><span class="p">;</span>
+</span><span data-line="2"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Plone</span><span class="p">,</span><span class="w"> </span><span class="nx">PloneVariant</span><span class="p">,</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@bluedynamics/cdk8s-plone&#39;</span><span class="p">;</span>
+</span><span data-line="3"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Env</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;cdk8s-plus-30&#39;</span><span class="p">;</span>
+</span><span data-line="4">
+</span><span data-line="5"><span class="kd">const</span><span class="w"> </span><span class="nx">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">App</span><span class="p">();</span>
+</span><span data-line="6"><span class="kd">const</span><span class="w"> </span><span class="nx">chart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Chart</span><span class="p">(</span><span class="nx">app</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;PloneDeployment&#39;</span><span class="p">);</span>
+</span><span data-line="7">
+</span><span data-line="8"><span class="kd">const</span><span class="w"> </span><span class="nx">plone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Plone</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;my-plone&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="9"><span class="w">  </span><span class="nx">siteId</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;MySite&#39;</span><span class="p">,</span>
+</span><span data-line="10"><span class="w">  </span><span class="nx">variant</span><span class="o">:</span><span class="w"> </span><span class="kt">PloneVariant.VOLTO</span><span class="p">,</span>
+</span><span data-line="11"><span class="w">  </span><span class="nx">imagePullSecrets</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;registry-secret&#39;</span><span class="p">],</span>
+</span><span data-line="12"><span class="w">  </span><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="13"><span class="w">    </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;plone/plone-backend:6.1.3&#39;</span><span class="p">,</span>
+</span><span data-line="14"><span class="w">    </span><span class="nx">replicas</span><span class="o">:</span><span class="w"> </span><span class="kt">3</span><span class="p">,</span>
+</span><span data-line="15"><span class="w">    </span><span class="nx">requestCpu</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;500m&#39;</span><span class="p">,</span>
+</span><span data-line="16"><span class="w">    </span><span class="nx">limitCpu</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;2&#39;</span><span class="p">,</span>
+</span><span data-line="17"><span class="w">    </span><span class="nx">requestMemory</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;512Mi&#39;</span><span class="p">,</span>
+</span><span data-line="18"><span class="w">    </span><span class="nx">limitMemory</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;2Gi&#39;</span><span class="p">,</span>
+</span><span data-line="19"><span class="w">    </span><span class="nx">minAvailable</span><span class="o">:</span><span class="w"> </span><span class="kt">2</span><span class="p">,</span>
+</span><span data-line="20"><span class="w">    </span><span class="nx">environment</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="21"><span class="w">      </span><span class="nx">variables</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="22"><span class="w">        </span><span class="nx">SITE</span><span class="o">:</span><span class="w"> </span><span class="kt">Env.value</span><span class="p">(</span><span class="s1">&#39;MySite&#39;</span><span class="p">),</span>
+</span><span data-line="23"><span class="w">      </span><span class="p">},</span>
+</span><span data-line="24"><span class="w">    </span><span class="p">},</span>
+</span><span data-line="25"><span class="w">  </span><span class="p">},</span>
+</span><span data-line="26"><span class="w">  </span><span class="nx">frontend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="27"><span class="w">    </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;plone/plone-frontend:16.0.0&#39;</span><span class="p">,</span>
+</span><span data-line="28"><span class="w">    </span><span class="nx">replicas</span><span class="o">:</span><span class="w"> </span><span class="kt">2</span><span class="p">,</span>
+</span><span data-line="29"><span class="w">    </span><span class="nx">livenessEnabled</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+</span><span data-line="30"><span class="w">  </span><span class="p">},</span>
+</span><span data-line="31"><span class="p">});</span>
+</span><span data-line="32">
+</span><span data-line="33"><span class="ow">new</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;cache&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="34"><span class="w">  </span><span class="nx">plone</span><span class="o">:</span><span class="w"> </span><span class="kt">plone</span><span class="p">,</span>
+</span><span data-line="35"><span class="w">  </span><span class="nx">existingSecret</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;varnish-secret&#39;</span><span class="p">,</span>
+</span><span data-line="36"><span class="w">  </span><span class="nx">replicas</span><span class="o">:</span><span class="w"> </span><span class="kt">2</span><span class="p">,</span>
+</span><span data-line="37"><span class="w">  </span><span class="nx">servicemonitor</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+</span><span data-line="38"><span class="p">});</span>
+</span><span data-line="39">
+</span><span data-line="40"><span class="nx">app</span><span class="p">.</span><span class="nx">synth</span><span class="p">();</span>
+</span></pre></div>
+</div>
+</section>
+<section id="see-also">
+<h2>See also<a class="headerlink" href="#see-also" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="api/index.html"><span class="doc">API reference</span></a> — every option, type, and default (generated)</p></li>
+<li><p><a class="reference internal" href="../tutorials/01-quick-start.html"><span class="doc">Quick start</span></a> — first deployment, step by step</p></li>
+<li><p><a class="reference internal" href="../how-to/deploy-volto.html"><span class="doc">Deploy the Volto example</span></a> — production-ready Volto deployment</p></li>
+<li><p><a class="reference internal" href="../how-to/deploy-blicca.html"><span class="doc">Deploy Blicca example</span></a> — Blicca deployment</p></li>
+<li><p><a class="reference internal" href="../explanation/architecture.html"><span class="doc">Architecture overview</span></a> — how the pieces fit together</p></li>
+</ul>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="api/index.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">API reference</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="../explanation/index.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Explanation</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024-2025, Blue Dynamics Alliance</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials"></div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=f98a5df1"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script src="../_static/shibuya.js?v=50760d75"></script></body>
+</html>

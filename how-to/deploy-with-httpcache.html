@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="cyan" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Deploy with PloneHttpcache - cdk8s-plone 0.1.46 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Deploy with cloud-vinyl cache" href="deploy-with-vinyl-cache.html" /><link rel="prev" title="Deploy Blicca example" href="deploy-blicca.html" />
+      <link rel="canonical" href="https://bluedynamics.github.io/cdk8s-plone/how-to/deploy-with-httpcache.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"dark");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=2ceb65ce" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://bluedynamics.github.io/cdk8s-plone/how-to/deploy-with-httpcache.html"/>
+  <meta property="og:title" content="Deploy with PloneHttpcache"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="/cdk8s-plone/">
+      <img class="light-logo" src="../_static/logo.svg" alt="cdk8s-plone" height="28" loading="lazy" />
+      <img class="dark-logo" src="../_static/logo.svg" alt="cdk8s-plone" height="28" loading="lazy" />
+      <strong>cdk8s-plone</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul>
+      <li class="link"><a class="js-menu" href="https://bluedynamics.github.io/zodb-pgjsonb/ecosystem.html" id="nav-trigger-1" aria-controls="nav-children-1">
+            <span>Ecosystem</span>
+            <i class="i-lucide chevron-down"></i>
+          </a>
+        <ul id="nav-children-1" aria-labelledby="nav-trigger-1"><li><a href="https://bluedynamics.github.io/zodb-pgjsonb/ecosystem.html">
+                <span>Dashboard</span>
+                <small>Overview of all packages</small>
+              </a></li><li><a href="https://bluedynamics.github.io/zodb-pgjsonb/">
+                <span>zodb-pgjsonb</span>
+                <small>PostgreSQL JSONB storage</small>
+              </a></li><li><a href="https://bluedynamics.github.io/zodb-json-codec/">
+                <span>zodb-json-codec</span>
+                <small>Rust pickle↔JSON transcoder</small>
+              </a></li><li><a href="https://bluedynamics.github.io/plone-pgcatalog/">
+                <span>plone-pgcatalog</span>
+                <small>PostgreSQL-backed catalog</small>
+              </a></li><li><a href="https://bluedynamics.github.io/plone-pgthumbor/">
+                <span>plone-pgthumbor</span>
+                <small>Thumbor image scaling</small>
+              </a></li><li><a href="https://bluedynamics.github.io/cdk8s-plone/">
+                <span>cdk8s-plone</span>
+                <small>Deploy Plone to Kubernetes</small>
+              </a></li></ul>
+      </li><li class="link">
+          <a href="https://github.com/bluedynamics/cdk8s-plone">
+            <span>GitHub</span></a>
+        </li><li class="link">
+          <a href="https://pypi.org/project/cdk8s-plone/">
+            <span>PyPI</span></a>
+        </li><li class="link">
+          <a href="https://www.npmjs.com/package/@bluedynamics/cdk8s-plone">
+            <span>npm</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials"></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/01-quick-start.html">Quick start</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">How-to guides</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="setup-prerequisites.html">Setup prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy-volto.html">Deploy the Volto example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy-blicca.html">Deploy Blicca example</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Deploy with PloneHttpcache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy-with-vinyl-cache.html">Deploy with cloud-vinyl cache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configure-env-and-secrets.html">Configure environment variables and secrets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configure-security-context.html">Configure security context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schedule-pods.html">Schedule pods to specific nodes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configure-ingress-tls.html">Configure ingress and TLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enable-prometheus-monitoring.html">Enable Prometheus monitoring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scale-and-high-availability.html">Scale and run highly available</a></li>
+<li class="toctree-l2"><a class="reference internal" href="upgrade-and-rollout.html">Upgrade and roll out</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backup-and-restore.html">Back up and restore</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html">Troubleshoot a deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/api/index.html">API reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/configuration-options.html">Configuration guide</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Explanation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/features.html">Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/architecture.html">Architecture overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../explanation/cdk8s-workflow.html">About the cdk8s workflow</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#attach-a-basic-plonehttpcache">Attach a basic PloneHttpcache</a></li>
+<li><a class="reference internal" href="#set-resources">Set resources</a></li>
+<li><a class="reference internal" href="#customize-the-vcl">Customize the VCL</a></li>
+<li><a class="reference internal" href="#schedule-the-cache-pods">Schedule the cache pods</a></li>
+<li><a class="reference internal" href="#enable-monitoring">Enable monitoring</a></li>
+<li><a class="reference internal" href="#pin-the-chart-and-image-versions">Pin the chart and image versions</a></li>
+<li><a class="reference internal" href="#point-your-ingress-at-the-cache">Point your ingress at the cache</a></li>
+<li><a class="reference internal" href="#verify-the-cache">Verify the cache</a></li>
+<li><a class="reference internal" href="#plonehttpcache-compared-with-plonevinylcache">PloneHttpcache compared with PloneVinylCache</a></li>
+<li><a class="reference internal" href="#see-also">See also</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">cdk8s-plone</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">How-to guides</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Deploy with PloneHttpcache</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <div class="copy-page-wrapper relative pb-4 lg:absolute lg:top-8 lg:right-6 xl:right-12">
+  <div id="copy-page-trigger">
+    <button
+      type="button"
+      class="js-copy px-3 py-1 inline-flex items-center gap-1"
+      data-url="https://bluedynamics.github.io/cdk8s-plone/_sources/how-to/deploy-with-httpcache.md.txt"
+    >
+      <i class="i-lucide" data-icon="copy"></i>
+      <span>Copy page</span>
+    </button>
+    <button class="js-menu px-2 py-1" type="button" aria-label="More actions"
+      aria-haspopup="menu" aria-expanded="false" aria-controls="copy-page-content">
+      <i class="i-lucide chevron-down"></i>
+    </button>
+  </div>
+  <div id="copy-page-content" role="menu" aria-orientation="vertical" aria-hidden="true">
+    <div role="presentation">
+      <div class="flex flex-col" role="group">
+        <button class="js-copy" type="button" role="menuitem"
+          data-url="https://bluedynamics.github.io/cdk8s-plone/_sources/how-to/deploy-with-httpcache.md.txt">
+          <span class="iconify-icon">
+            <i class="i-lucide" data-icon="copy"></i>
+          </span>
+          <span>Copy page</span>
+        </button>
+        <a role="menuitem" href="https://bluedynamics.github.io/cdk8s-plone/_sources/how-to/deploy-with-httpcache.md.txt" target="_blank" rel="nofollow"><iconify-icon icon="bi:markdown"></iconify-icon>
+            <span>View as Markdown</span></a><a role="menuitem" href="https://chatgpt.com/?hints=search&q=Read%20https%3A//bluedynamics.github.io/cdk8s-plone/_sources/how-to/deploy-with-httpcache.md.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:openai"></iconify-icon>
+          <span>Open in ChatGPT</span>
+        </a><a role="menuitem" href="https://claude.ai/new?q=Read%20https%3A//bluedynamics.github.io/cdk8s-plone/_sources/how-to/deploy-with-httpcache.md.txt%20so%20I%20can%20ask%20questions%20about%20it." target="_blank" rel="nofollow">
+          <iconify-icon icon="bi:claude"></iconify-icon>
+          <span>Open in Claude</span>
+        </a></div>
+    </div>
+  </div>
+</div><article class="yue dark-code" role="main">
+          <section id="deploy-with-plonehttpcache">
+<h1>Deploy with PloneHttpcache<a class="headerlink" href="#deploy-with-plonehttpcache" title="Link to this heading">#</a></h1>
+<p>This guide shows you how to deploy the <code class="docutils literal notranslate"><span class="pre">PloneHttpcache</span></code> Varnish cache and attach it to an existing Plone instance.</p>
+<p><code class="docutils literal notranslate"><span class="pre">PloneHttpcache</span></code> deploys Varnish through the <a class="reference external" href="https://github.com/mittwald/kube-httpcache">mittwald kube-httpcache</a> Helm chart.
+The construct renders that chart at synth time, so the cache is part of your own manifests.
+For an operator-managed alternative, see <a class="reference internal" href="deploy-with-vinyl-cache.html"><span class="doc">Deploy with cloud-vinyl cache</span></a>.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>A running Plone deployment created with <code class="docutils literal notranslate"><span class="pre">cdk8s-plone</span></code> (see <a class="reference internal" href="../tutorials/01-quick-start.html"><span class="doc">Quick start</span></a>).</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">helm</span></code> CLI available wherever you run <code class="docutils literal notranslate"><span class="pre">cdk8s</span> <span class="pre">synth</span></code>.</p></li>
+<li><p>A Kubernetes <code class="docutils literal notranslate"><span class="pre">Secret</span></code> holding the Varnish admin credentials, referenced through <code class="docutils literal notranslate"><span class="pre">existingSecret</span></code>.</p></li>
+<li><p>amd64 worker nodes.</p></li>
+</ul>
+<p>The construct renders the kube-httpcache Helm chart locally, so you do not pre-install a controller in the cluster.
+The pod <code class="docutils literal notranslate"><span class="pre">nodeSelector</span></code> is hard-coded to <code class="docutils literal notranslate"><span class="pre">kubernetes.io/arch=amd64</span></code> (a kube-httpcache workaround), so <code class="docutils literal notranslate"><span class="pre">PloneHttpcache</span></code> pods only schedule on amd64 nodes.
+There is no <code class="docutils literal notranslate"><span class="pre">nodeSelector</span></code> option on this construct.</p>
+<p>Create the admin credentials Secret before you deploy:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectl<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>generic<span class="w"> </span>varnish-admin<span class="w"> </span><span class="se">\</span>
+</span><span data-line="2"><span class="w">  </span>--namespace<span class="w"> </span>&lt;namespace&gt;<span class="w"> </span><span class="se">\</span>
+</span><span data-line="3"><span class="w">  </span>--from-literal<span class="o">=</span><span class="nv">secret</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>head<span class="w"> </span>-c32<span class="w"> </span>/dev/urandom<span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="k">)</span><span class="s2">&quot;</span>
+</span></pre></div>
+</div>
+</section>
+<section id="attach-a-basic-plonehttpcache">
+<h2>Attach a basic PloneHttpcache<a class="headerlink" href="#attach-a-basic-plonehttpcache" title="Link to this heading">#</a></h2>
+<p>Construct <code class="docutils literal notranslate"><span class="pre">PloneHttpcache</span></code> with a <code class="docutils literal notranslate"><span class="pre">plone</span></code> reference, the <code class="docutils literal notranslate"><span class="pre">existingSecret</span></code>, and a <code class="docutils literal notranslate"><span class="pre">replicas</span></code> count.</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Plone</span><span class="p">,</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@bluedynamics/cdk8s-plone&#39;</span><span class="p">;</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="kd">const</span><span class="w"> </span><span class="nx">plone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Plone</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;plone&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">backend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;plone/plone-backend:6.1.3&#39;</span><span class="w"> </span><span class="p">},</span>
+</span><span data-line="5"><span class="w">  </span><span class="nx">frontend</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">image</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;plone/plone-frontend:16.0.0&#39;</span><span class="w"> </span><span class="p">},</span>
+</span><span data-line="6"><span class="p">});</span>
+</span><span data-line="7">
+</span><span data-line="8"><span class="ow">new</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;cache&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="9"><span class="w">  </span><span class="nx">plone</span><span class="o">:</span><span class="w"> </span><span class="kt">plone</span><span class="p">,</span>
+</span><span data-line="10"><span class="w">  </span><span class="nx">existingSecret</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;varnish-admin&#39;</span><span class="p">,</span>
+</span><span data-line="11"><span class="w">  </span><span class="nx">replicas</span><span class="o">:</span><span class="w"> </span><span class="kt">2</span><span class="p">,</span>
+</span><span data-line="12"><span class="p">});</span>
+</span></pre></div>
+</div>
+<p>RBAC for the rendered controller is always enabled; there is nothing to configure.</p>
+</section>
+<section id="set-resources">
+<h2>Set resources<a class="headerlink" href="#set-resources" title="Link to this heading">#</a></h2>
+<p>Tune the CPU and memory requests and limits to match your workload.</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="ow">new</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;cache&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">plone</span><span class="o">:</span><span class="w"> </span><span class="kt">plone</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">existingSecret</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;varnish-admin&#39;</span><span class="p">,</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">requestCpu</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;200m&#39;</span><span class="p">,</span>
+</span><span data-line="5"><span class="w">  </span><span class="nx">limitCpu</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;1&#39;</span><span class="p">,</span>
+</span><span data-line="6"><span class="w">  </span><span class="nx">requestMemory</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;256Mi&#39;</span><span class="p">,</span>
+</span><span data-line="7"><span class="w">  </span><span class="nx">limitMemory</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;1Gi&#39;</span><span class="p">,</span>
+</span><span data-line="8"><span class="p">});</span>
+</span></pre></div>
+</div>
+<p>The defaults are <code class="docutils literal notranslate"><span class="pre">requestCpu:</span> <span class="pre">'100m'</span></code>, <code class="docutils literal notranslate"><span class="pre">limitCpu:</span> <span class="pre">'500m'</span></code>, <code class="docutils literal notranslate"><span class="pre">requestMemory:</span> <span class="pre">'100Mi'</span></code>, and <code class="docutils literal notranslate"><span class="pre">limitMemory:</span> <span class="pre">'500Mi'</span></code>.</p>
+</section>
+<section id="customize-the-vcl">
+<h2>Customize the VCL<a class="headerlink" href="#customize-the-vcl" title="Link to this heading">#</a></h2>
+<p>Provide an inline VCL through <code class="docutils literal notranslate"><span class="pre">varnishVcl</span></code>, which takes precedence over <code class="docutils literal notranslate"><span class="pre">varnishVclFile</span></code>.</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="ow">new</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;cache&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">plone</span><span class="o">:</span><span class="w"> </span><span class="kt">plone</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">existingSecret</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;varnish-admin&#39;</span><span class="p">,</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">varnishVcl</span><span class="o">:</span><span class="w"> </span><span class="sb">`</span>
+</span><span data-line="5"><span class="sb">vcl 4.1;</span>
+</span><span data-line="6"><span class="sb">backend default {</span>
+</span><span data-line="7"><span class="sb">  .host = &quot;{{ .Env.BACKEND_SERVICE_NAME }}&quot;;</span>
+</span><span data-line="8"><span class="sb">  .port = &quot;{{ .Env.BACKEND_SERVICE_PORT }}&quot;;</span>
+</span><span data-line="9"><span class="sb">}</span>
+</span><span data-line="10"><span class="sb">`</span><span class="p">,</span>
+</span><span data-line="11"><span class="p">});</span>
+</span></pre></div>
+</div>
+<p>Alternatively, point <code class="docutils literal notranslate"><span class="pre">varnishVclFile</span></code> at a VCL template file on disk; the construct reads it at synth time.
+When you set neither option, the construct uses the built-in <code class="docutils literal notranslate"><span class="pre">config/varnish.tpl.vcl</span></code>.</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="ow">new</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;cache&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">plone</span><span class="o">:</span><span class="w"> </span><span class="kt">plone</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">existingSecret</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;varnish-admin&#39;</span><span class="p">,</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">varnishVclFile</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;./config/varnish.tpl.vcl&#39;</span><span class="p">,</span>
+</span><span data-line="5"><span class="p">});</span>
+</span></pre></div>
+</div>
+<p>VCL templates use Go template syntax.
+The construct supplies these environment variables: <code class="docutils literal notranslate"><span class="pre">BACKEND_SERVICE_NAME</span></code>, <code class="docutils literal notranslate"><span class="pre">BACKEND_SERVICE_PORT</span></code>, <code class="docutils literal notranslate"><span class="pre">BACKEND_SITE_ID</span></code>, <code class="docutils literal notranslate"><span class="pre">FRONTEND_SERVICE_NAME</span></code>, and <code class="docutils literal notranslate"><span class="pre">FRONTEND_SERVICE_PORT</span></code>.
+Reference them as <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">.Env.NAME</span> <span class="pre">}}</span></code>.</p>
+<p>Add your own variables through <code class="docutils literal notranslate"><span class="pre">extraEnvVars</span></code>, which are appended to the built-in set.</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="ow">new</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;cache&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">plone</span><span class="o">:</span><span class="w"> </span><span class="kt">plone</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">existingSecret</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;varnish-admin&#39;</span><span class="p">,</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">extraEnvVars</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+</span><span data-line="5"><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;THUMBOR_SERVICE_NAME&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;my-thumbor&#39;</span><span class="w"> </span><span class="p">},</span>
+</span><span data-line="6"><span class="w">  </span><span class="p">],</span>
+</span><span data-line="7"><span class="p">});</span>
+</span></pre></div>
+</div>
+<p>Reference an extra variable in your VCL template as <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">.Env.THUMBOR_SERVICE_NAME</span> <span class="pre">}}</span></code>.</p>
+</section>
+<section id="schedule-the-cache-pods">
+<h2>Schedule the cache pods<a class="headerlink" href="#schedule-the-cache-pods" title="Link to this heading">#</a></h2>
+<p>Add <code class="docutils literal notranslate"><span class="pre">tolerations</span></code> so the cache pods can run on tainted nodes.</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="ow">new</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;cache&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">plone</span><span class="o">:</span><span class="w"> </span><span class="kt">plone</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">existingSecret</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;varnish-admin&#39;</span><span class="p">,</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">tolerations</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+</span><span data-line="5"><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nx">key</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;dedicated&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">operator</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Equal&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;cache&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">effect</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;NoSchedule&#39;</span><span class="w"> </span><span class="p">},</span>
+</span><span data-line="6"><span class="w">  </span><span class="p">],</span>
+</span><span data-line="7"><span class="p">});</span>
+</span></pre></div>
+</div>
+<p>Omit <code class="docutils literal notranslate"><span class="pre">effect</span></code> to tolerate every taint for the given key.
+<code class="docutils literal notranslate"><span class="pre">operator</span></code> defaults to <code class="docutils literal notranslate"><span class="pre">'Equal'</span></code>.</p>
+</section>
+<section id="enable-monitoring">
+<h2>Enable monitoring<a class="headerlink" href="#enable-monitoring" title="Link to this heading">#</a></h2>
+<p>Set <code class="docutils literal notranslate"><span class="pre">servicemonitor</span></code> to emit a Prometheus <code class="docutils literal notranslate"><span class="pre">ServiceMonitor</span></code>, and keep <code class="docutils literal notranslate"><span class="pre">exporterEnabled</span></code> so the Varnish exporter sidecar is present for it to scrape.</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="ow">new</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;cache&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">plone</span><span class="o">:</span><span class="w"> </span><span class="kt">plone</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">existingSecret</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;varnish-admin&#39;</span><span class="p">,</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">servicemonitor</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+</span><span data-line="5"><span class="w">  </span><span class="nx">exporterEnabled</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+</span><span data-line="6"><span class="p">});</span>
+</span></pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">exporterEnabled</span></code> defaults to <code class="docutils literal notranslate"><span class="pre">true</span></code>, and <code class="docutils literal notranslate"><span class="pre">servicemonitor</span></code> defaults to <code class="docutils literal notranslate"><span class="pre">false</span></code>.
+Use <code class="docutils literal notranslate"><span class="pre">servicemonitor</span></code> here; there is no <code class="docutils literal notranslate"><span class="pre">monitoring</span></code> option on this construct.
+For the full monitoring setup, see <a class="reference internal" href="enable-prometheus-monitoring.html"><span class="doc">Enable Prometheus monitoring</span></a>.</p>
+</section>
+<section id="pin-the-chart-and-image-versions">
+<h2>Pin the chart and image versions<a class="headerlink" href="#pin-the-chart-and-image-versions" title="Link to this heading">#</a></h2>
+<p>Set <code class="docutils literal notranslate"><span class="pre">chartVersion</span></code> to pin the kube-httpcache Helm chart, and <code class="docutils literal notranslate"><span class="pre">appVersion</span></code> to pin the image tag.</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="ow">new</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;cache&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">plone</span><span class="o">:</span><span class="w"> </span><span class="kt">plone</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">existingSecret</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;varnish-admin&#39;</span><span class="p">,</span>
+</span><span data-line="4"><span class="w">  </span><span class="nx">chartVersion</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;0.13.1&#39;</span><span class="p">,</span>
+</span><span data-line="5"><span class="w">  </span><span class="nx">appVersion</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;0.13.1&#39;</span><span class="p">,</span>
+</span><span data-line="6"><span class="p">});</span>
+</span></pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">chartVersion</span></code> defaults to the latest chart, and <code class="docutils literal notranslate"><span class="pre">appVersion</span></code> defaults to <code class="docutils literal notranslate"><span class="pre">chartVersion</span></code>.</p>
+</section>
+<section id="point-your-ingress-at-the-cache">
+<h2>Point your ingress at the cache<a class="headerlink" href="#point-your-ingress-at-the-cache" title="Link to this heading">#</a></h2>
+<p>Route external traffic through the cache by using the read-only <code class="docutils literal notranslate"><span class="pre">httpcacheServiceName</span></code> output as your Ingress or IngressRoute upstream instead of the Plone frontend service.</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kd">const</span><span class="w"> </span><span class="nx">cache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">PloneHttpcache</span><span class="p">(</span><span class="nx">chart</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;cache&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="2"><span class="w">  </span><span class="nx">plone</span><span class="o">:</span><span class="w"> </span><span class="kt">plone</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">  </span><span class="nx">existingSecret</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;varnish-admin&#39;</span><span class="p">,</span>
+</span><span data-line="4"><span class="p">});</span>
+</span><span data-line="5">
+</span><span data-line="6"><span class="kd">const</span><span class="w"> </span><span class="nx">upstream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">cache</span><span class="p">.</span><span class="nx">httpcacheServiceName</span><span class="p">;</span>
+</span></pre></div>
+</div>
+<p>For the routing and TLS details, see <a class="reference internal" href="configure-ingress-tls.html"><span class="doc">Configure ingress and TLS</span></a>.</p>
+</section>
+<section id="verify-the-cache">
+<h2>Verify the cache<a class="headerlink" href="#verify-the-cache" title="Link to this heading">#</a></h2>
+<p>Generate the manifests and confirm the cache resources are present.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span data-line="1">cdk8s<span class="w"> </span>synth
+</span><span data-line="2">grep<span class="w"> </span>-l<span class="w"> </span><span class="s1">&#39;kube-httpcache&#39;</span><span class="w"> </span>dist/*.yaml
+</span></pre></div>
+</div>
+<p>Apply the manifests and inspect the rollout on the cluster.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>dist/
+</span><span data-line="2">kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-n<span class="w"> </span>&lt;namespace&gt;
+</span><span data-line="3">kubectl<span class="w"> </span>get<span class="w"> </span>service<span class="w"> </span>-n<span class="w"> </span>&lt;namespace&gt;
+</span></pre></div>
+</div>
+<p>Send a request through the cache service and check the Varnish response headers.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span data-line="1">kubectl<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--rm<span class="w"> </span>curl<span class="w"> </span>--image<span class="o">=</span>curlimages/curl<span class="w"> </span>--restart<span class="o">=</span>Never<span class="w"> </span>--<span class="w"> </span><span class="se">\</span>
+</span><span data-line="2"><span class="w">  </span>curl<span class="w"> </span>-sI<span class="w"> </span>http://&lt;httpcacheServiceName&gt;.&lt;namespace&gt;:80/
+</span></pre></div>
+</div>
+<p>A cached response carries an <code class="docutils literal notranslate"><span class="pre">X-Varnish</span></code> header, and an <code class="docutils literal notranslate"><span class="pre">Age</span></code> header greater than zero confirms a cache hit.</p>
+</section>
+<section id="plonehttpcache-compared-with-plonevinylcache">
+<h2>PloneHttpcache compared with PloneVinylCache<a class="headerlink" href="#plonehttpcache-compared-with-plonevinylcache" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">PloneHttpcache</span></code> runs Varnish from the mittwald kube-httpcache chart with a Secret and a VCL template that you supply.
+<code class="docutils literal notranslate"><span class="pre">PloneVinylCache</span></code> runs Varnish through the cloud-vinyl operator, which generates VCL from structured configuration and manages credentials for you.
+For the trade-offs between the two, see <a class="reference internal" href="../explanation/architecture.html"><span class="doc">Architecture overview</span></a> and <a class="reference internal" href="deploy-with-vinyl-cache.html"><span class="doc">Deploy with cloud-vinyl cache</span></a>.</p>
+</section>
+<section id="see-also">
+<h2>See also<a class="headerlink" href="#see-also" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../reference/api/index.html"><span class="doc">API reference</span></a> — authoritative <code class="docutils literal notranslate"><span class="pre">PloneHttpcache</span></code> and <code class="docutils literal notranslate"><span class="pre">PloneHttpcacheOptions</span></code> reference.</p></li>
+<li><p><a class="reference internal" href="../reference/configuration-options.html"><span class="doc">Configuration guide</span></a> — guide to <code class="docutils literal notranslate"><span class="pre">varnishVcl</span></code>, <code class="docutils literal notranslate"><span class="pre">existingSecret</span></code>, <code class="docutils literal notranslate"><span class="pre">extraEnvVars</span></code>, and <code class="docutils literal notranslate"><span class="pre">servicemonitor</span></code>.</p></li>
+<li><p><a class="reference internal" href="enable-prometheus-monitoring.html"><span class="doc">Enable Prometheus monitoring</span></a> — scrape the Varnish cache with Prometheus.</p></li>
+<li><p><a class="reference internal" href="deploy-with-vinyl-cache.html"><span class="doc">Deploy with cloud-vinyl cache</span></a> — operator-managed Varnish caching alternative.</p></li>
+<li><p><a class="reference external" href="https://github.com/mittwald/kube-httpcache">mittwald kube-httpcache</a> — upstream controller and Helm chart.</p></li>
+</ul>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="deploy-blicca.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Deploy Blicca example</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="deploy-with-vinyl-cache.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Deploy with cloud-vinyl cache</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024-2025, Blue Dynamics Alliance</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials"></div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=f98a5df1"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script src="../_static/shibuya.js?v=50760d75"></script></body>
+</html>
