@@ -155,7 +155,7 @@ jobs:
         with:
           node-version: lts/*
           package-manager-cache: false
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: 3.x
       - name: Download build artifacts
