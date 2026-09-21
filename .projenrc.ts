@@ -84,11 +84,13 @@ if (releaseWorkflow) {
     '*.md',
     '.github/workflows/documentation.yml',
   ]);
-  // npm OIDC trusted publishing needs Node 24+, the 'release' environment,
-  // and registry-url so setup-node creates .npmrc for OIDC auth
+  // npm OIDC trusted publishing needs Node 24+ (npm CLI 11.5.1+) and the
+  // 'release' environment. No registry-url on setup-node: publib-npm handles
+  // registry and OIDC itself, and the .npmrc setup-node would write breaks
+  // yarn install since setup-node v7 no longer exports a dummy
+  // NODE_AUTH_TOKEN ("Failed to replace env in config").
   releaseWorkflow.patch(JsonPatch.add('/jobs/release_npm/environment', 'release'));
   releaseWorkflow.patch(JsonPatch.replace('/jobs/release_npm/steps/0/with/node-version', '24.x'));
-  releaseWorkflow.patch(JsonPatch.add('/jobs/release_npm/steps/0/with/registry-url', 'https://registry.npmjs.org'));
 }
 
 // Dependabot config for GitHub Actions only.
