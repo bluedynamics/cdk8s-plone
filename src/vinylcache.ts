@@ -212,11 +212,38 @@ export interface PloneVinylCacheOptions {
    * malloc) — almost always too small. Set an explicit malloc size at least
    * matching the pod's memory request to use the allocated memory for caching.
    *
+   * Do not name an entry `s0`: the stock varnish image's entrypoint always adds
+   * its own unnamed `-s malloc,...`, which varnishd names `s0`, and the names
+   * collide. varnishd also spreads objects round-robin over all storages,
+   * including that implicit `s0`; pin your storage in `vcl_backend_response`
+   * with `set beresp.storage = storage.<name>;` (bluedynamics/cloud-vinyl#113).
+   *
    * @default - no storage configured; operator uses varnishd default (~100MB malloc)
    * @example
-   * storage: [{ name: 's0', type: 'malloc', size: '1Gi' }]
+   * storage: [{ name: 'cache', type: 'malloc', size: '1Gi' }]
    */
   readonly storage?: VinylCacheStorage[];
+
+  /**
+   * Enable clustering between the Varnish pods (`spec.cluster.enabled`).
+   *
+   * With clustering, a pod that does not own a URL passes the request to the
+   * pod that does, so every object is cached once across all replicas and the
+   * effective cache size grows with the replica count. Without it, every pod
+   * caches every object, and a load balancer spreading requests evenly makes
+   * each pod fetch and store the same objects.
+   *
+   * @default - not set; the operator does not cluster the pods
+   */
+  readonly cluster?: boolean;
+
+  /**
+   * Runtime parameters passed to varnishd as `-p name=value`
+   * (`spec.varnishParameters`), for example `{ nuke_limit: '1000' }`.
+   *
+   * @default - not set; varnishd defaults apply
+   */
+  readonly varnishParameters?: { [name: string]: string };
 
   /**
    * Director type for load distribution.
@@ -532,6 +559,8 @@ export class PloneVinylCache extends Construct {
         backends,
         director: { type: directorType, shard: shardSpec },
         storage,
+        cluster: options.cluster !== undefined ? { enabled: options.cluster } : undefined,
+        varnishParameters: options.varnishParameters,
         vcl: {
           snippets: {
             vclRecv: vclRecv,

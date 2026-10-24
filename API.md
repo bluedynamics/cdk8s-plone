@@ -1986,6 +1986,7 @@ const ploneVinylCacheOptions: PloneVinylCacheOptions = { ... }
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.plone">plone</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.Plone">Plone</a></code> | The Plone construct to attach the cache to. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.cluster">cluster</a></code> | <code>boolean</code> | Enable clustering between the Varnish pods (`spec.cluster.enabled`). |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.director">director</a></code> | <code>string</code> | Director type for load distribution. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.extraBackends">extraBackends</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheBackend">VinylCacheBackend</a>[]</code> | Additional backends to add after the auto-generated Plone backends. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.image">image</a></code> | <code>string</code> | Container image for the Varnish pods. |
@@ -2003,6 +2004,7 @@ const ploneVinylCacheOptions: PloneVinylCacheOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardReplicas">shardReplicas</a></code> | <code>number</code> | Shard director: number of Ketama replicas per backend in the hash ring. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.storage">storage</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheStorage">VinylCacheStorage</a>[]</code> | Varnish storage backends (`spec.storage`). |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.tolerations">tolerations</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheToleration">VinylCacheToleration</a>[]</code> | Tolerations for the Varnish pods. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.varnishParameters">varnishParameters</a></code> | <code>{[ key: string ]: string}</code> | Runtime parameters passed to varnishd as `-p name=value` (`spec.varnishParameters`), for example `{ nuke_limit: '1000' }`. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclBackendErrorSnippet">vclBackendErrorSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_backend_error subroutine. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclBackendFetchSnippet">vclBackendFetchSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_backend_fetch subroutine. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclBackendResponseSnippet">vclBackendResponseSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_backend_response subroutine. |
@@ -2031,6 +2033,25 @@ public readonly plone: Plone;
 The Plone construct to attach the cache to.
 
 Backends are auto-configured from the Plone services.
+
+---
+
+##### `cluster`<sup>Optional</sup> <a name="cluster" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.cluster"></a>
+
+```typescript
+public readonly cluster: boolean;
+```
+
+- *Type:* boolean
+- *Default:* not set; the operator does not cluster the pods
+
+Enable clustering between the Varnish pods (`spec.cluster.enabled`).
+
+With clustering, a pod that does not own a URL passes the request to the
+pod that does, so every object is cached once across all replicas and the
+effective cache size grows with the replica count. Without it, every pod
+caches every object, and a load balancer spreading requests evenly makes
+each pod fetch and store the same objects.
 
 ---
 
@@ -2266,12 +2287,18 @@ If omitted, the operator ships varnishd with its stock default (~100 MB
 malloc) — almost always too small. Set an explicit malloc size at least
 matching the pod's memory request to use the allocated memory for caching.
 
+Do not name an entry `s0`: the stock varnish image's entrypoint always adds
+its own unnamed `-s malloc,...`, which varnishd names `s0`, and the names
+collide. varnishd also spreads objects round-robin over all storages,
+including that implicit `s0`; pin your storage in `vcl_backend_response`
+with `set beresp.storage = storage.<name>;` (bluedynamics/cloud-vinyl#113).
+
 ---
 
 *Example*
 
 ```typescript
-storage: [{ name: 's0', type: 'malloc', size: '1Gi' }]
+storage: [{ name: 'cache', type: 'malloc', size: '1Gi' }]
 ```
 
 
@@ -2285,6 +2312,19 @@ public readonly tolerations: VinylCacheToleration[];
 - *Default:* no tolerations
 
 Tolerations for the Varnish pods.
+
+---
+
+##### `varnishParameters`<sup>Optional</sup> <a name="varnishParameters" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.varnishParameters"></a>
+
+```typescript
+public readonly varnishParameters: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* not set; varnishd defaults apply
+
+Runtime parameters passed to varnishd as `-p name=value` (`spec.varnishParameters`), for example `{ nuke_limit: '1000' }`.
 
 ---
 

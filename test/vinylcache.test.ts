@@ -349,3 +349,37 @@ test('exposes vinylCacheServiceName', () => {
   expect(cache.vinylCacheServiceName).toBeDefined();
   expect(typeof cache.vinylCacheServiceName).toBe('string');
 });
+
+test('cluster and varnishParameters are passed through', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const plone = new Plone(chart, 'plone');
+
+  // WHEN
+  new PloneVinylCache(chart, 'test', {
+    plone,
+    cluster: true,
+    varnishParameters: { nuke_limit: '1000' },
+  });
+
+  // THEN
+  const vc = Testing.synth(chart).find((o: any) => o.kind === 'VinylCache');
+  expect(vc.spec.cluster).toEqual({ enabled: true });
+  expect(vc.spec.varnishParameters).toEqual({ nuke_limit: '1000' });
+});
+
+test('cluster and varnishParameters are omitted by default', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const plone = new Plone(chart, 'plone');
+
+  // WHEN
+  new PloneVinylCache(chart, 'test', { plone });
+
+  // THEN
+  const vc = Testing.synth(chart).find((o: any) => o.kind === 'VinylCache');
+  expect(vc.spec.cluster).toBeUndefined();
+  expect(vc.spec.varnishParameters).toBeUndefined();
+});
