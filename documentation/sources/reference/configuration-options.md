@@ -179,7 +179,8 @@ import { PloneVinylCache } from '@bluedynamics/cdk8s-plone';
 // Operator-managed Varnish via the cloud-vinyl operator.
 const cache = new PloneVinylCache(chart, 'cache', {
   plone: ploneInstance,
-  storage: [{ name: 's0', type: 'malloc', size: '1500M' }],
+  storage: [{ name: 'cache', type: 'malloc', size: '1G' }],
+  cluster: true,
   monitoring: true,
 });
 ```
@@ -187,7 +188,13 @@ const cache = new PloneVinylCache(chart, 'cache', {
 ```{important}
 `PloneVinylCache` without an explicit `storage` entry runs varnishd with its stock default (~100 MB malloc) regardless of the container memory limit.
 Size malloc storage below the pod's memory limit to leave headroom for varnishd overhead.
+Never name a storage entry `s0`; the stock image's entrypoint already defines it.
 ```
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `cluster` | boolean | not set | Sets `spec.cluster.enabled`; with clustering, each object is cached once across all replicas |
+| `varnishParameters` | map of string | not set | Sets `spec.varnishParameters`, passed to varnishd as `-p name=value` |
 
 For the full walk-through, including custom VCL snippets and shard-director tuning, see {doc}`/how-to/deploy-with-vinyl-cache`.
 

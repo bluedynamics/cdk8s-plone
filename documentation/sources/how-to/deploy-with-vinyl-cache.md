@@ -72,30 +72,55 @@ kubectl get pods -n <namespace> -l app.kubernetes.io/managed-by=cloud-vinyl
 
 ### Sizing the cache storage
 
-Without an explicit `storage` entry, the operator ships varnishd with its
-stock default (~100 MB malloc) — almost always too small. Set a malloc size
-below the pod's memory limit, leaving headroom for varnishd overhead:
+Without an explicit `storage` entry, the operator ships varnishd with its stock default (~100 MB malloc), which is almost always too small.
+Set a malloc size well below the pod's memory limit.
+Name the storage anything but `s0`, and pin it in `vcl_backend_response`:
 
 ```typescript
 new PloneVinylCache(chart, 'cache', {
   plone: plone,
-  requestMemory: '512Mi',
-  limitMemory: '2Gi',
+  requestMemory: '2Gi',
+  limitMemory: '3Gi',
   storage: [
-    { name: 's0', type: 'malloc', size: '1500M' },
+    { name: 'cache', type: 'malloc', size: '1G' },
   ],
+  vclBackendResponseSnippet: `
+  set beresp.storage = storage.cache;
+  `,
 });
 ```
 
-For larger working sets you can combine an in-memory tier with a file-backed
-tier (requires a writable volume mount at the given path):
+The stock varnish image's entrypoint always adds its own unnamed `-s malloc,...`, which varnishd names `s0`.
+An entry named `s0` collides with it, and varnishd fails to start.
+With any other name, varnishd spreads cacheable objects round-robin over your storage and `s0`, unless the VCL sets `beresp.storage`.
+
+varnishd needs memory beyond the storage: its malloc heap fragments under eviction churn and can grow to more than twice the storage size.
+Keep large bodies out of a small cache, and set the memory request close to what the pod actually uses, so the scheduler sees it:
+
+```vcl
+if (std.integer(beresp.http.Content-Length, 0) > 8388608) {
+  set beresp.uncacheable = true;
+  set beresp.ttl = 120s;
+  return (deliver);
+}
+```
+
+### Clustering and varnishd parameters
+
+With two or more replicas behind a load balancer, every pod caches every object unless the pods are clustered.
+Set `cluster: true`, so that a pod passes requests for URLs it does not own to the pod that does:
 
 ```typescript
-storage: [
-  { name: 'mem', type: 'malloc', size: '500M' },
-  { name: 'disk', type: 'file', path: '/var/lib/varnish/disk.bin', size: '10Gi' },
-]
+new PloneVinylCache(chart, 'cache', {
+  plone: plone,
+  replicas: 2,
+  cluster: true,
+  varnishParameters: { nuke_limit: '1000' },
+});
 ```
+
+`varnishParameters` become `-p` flags for varnishd.
+varnishd's default `nuke_limit` of 50 makes a large fetch fail with `Could not get storage` when 50 evictions do not free enough space, and the client gets a 503.
 
 ### Custom VCL
 
