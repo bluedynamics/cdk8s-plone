@@ -717,6 +717,7 @@ const ploneBaseOptions: PloneBaseOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.minAvailable">minAvailable</a></code> | <code>string \| number</code> | Minimum number of pods that must be available during updates. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.nodeSelector">nodeSelector</a></code> | <code>{[ key: string ]: string}</code> | Node selector labels for pod scheduling. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.podAnnotations">podAnnotations</a></code> | <code>{[ key: string ]: string}</code> | Annotations to add to the Pod template metadata. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.preStopDelaySeconds">preStopDelaySeconds</a></code> | <code>number</code> | Seconds to wait in a preStop hook before the container receives SIGTERM. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessEnabled">readinessEnabled</a></code> | <code>boolean</code> | Enable readiness probe for the container. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessFailureThreshold">readinessFailureThreshold</a></code> | <code>number</code> | Minimum consecutive failures for the readiness probe to be considered failed. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessInitialDelaySeconds">readinessInitialDelaySeconds</a></code> | <code>number</code> | Number of seconds after container start before readiness probe is initiated. |
@@ -730,6 +731,7 @@ const ploneBaseOptions: PloneBaseOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.service">service</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.PloneServiceSpec">PloneServiceSpec</a></code> | Service configuration: type, trafficDistribution, sessionAffinity, annotations/labels, and a raw `overrides` escape hatch for any other ServiceSpec field. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.serviceAnnotations">serviceAnnotations</a></code> | <code>{[ key: string ]: string}</code> | Annotations to add to the Service metadata. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.servicemonitor">servicemonitor</a></code> | <code>boolean</code> | Enable Prometheus ServiceMonitor for metrics collection. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.terminationGracePeriodSeconds">terminationGracePeriodSeconds</a></code> | <code>number</code> | Seconds Kubernetes waits for the pod to stop before it kills it. |
 
 ---
 
@@ -1028,6 +1030,27 @@ Common for Prometheus, Istio, backup policies, etc.
 ```
 
 
+##### `preStopDelaySeconds`<sup>Optional</sup> <a name="preStopDelaySeconds" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.preStopDelaySeconds"></a>
+
+```typescript
+public readonly preStopDelaySeconds: number;
+```
+
+- *Type:* number
+- *Default:* 15
+
+Seconds to wait in a preStop hook before the container receives SIGTERM.
+
+Kubernetes removes a terminating pod from the Service endpoints while it
+starts the shutdown. kube-proxy, ingress controllers and caches that target
+pod IPs (such as Varnish via `PloneVinylCache`) need a few seconds to
+notice. The delay keeps the container serving until they have, so rolling
+updates do not cause `503` errors in front of it. Rendered as the native
+`sleep` action, so the image needs no `sleep` binary.
+Requires Kubernetes 1.30 or later. Set to 0 to disable the hook.
+
+---
+
 ##### `readinessEnabled`<sup>Optional</sup> <a name="readinessEnabled" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.readinessEnabled"></a>
 
 ```typescript
@@ -1242,6 +1265,22 @@ Enable Prometheus ServiceMonitor for metrics collection.
 
 Requires Prometheus Operator to be installed in the cluster.
 When enabled, a ServiceMonitor resource will be created to scrape metrics.
+
+---
+
+##### `terminationGracePeriodSeconds`<sup>Optional</sup> <a name="terminationGracePeriodSeconds" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.terminationGracePeriodSeconds"></a>
+
+```typescript
+public readonly terminationGracePeriodSeconds: number;
+```
+
+- *Type:* number
+- *Default:* `preStopDelaySeconds` + 30, which keeps the Kubernetes default of 30 seconds for the shutdown itself
+
+Seconds Kubernetes waits for the pod to stop before it kills it.
+
+The preStop delay counts against this budget, so it must be greater
+than `preStopDelaySeconds`.
 
 ---
 

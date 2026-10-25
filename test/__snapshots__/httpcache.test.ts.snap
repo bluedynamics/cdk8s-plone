@@ -37,6 +37,13 @@ exports[`defaults 1`] = `
               "envFrom": [],
               "image": "plone/plone-backend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "backend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -62,6 +69,7 @@ exports[`defaults 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -151,6 +159,13 @@ exports[`defaults 1`] = `
               "envFrom": [],
               "image": "plone/plone-frontend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "frontend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -176,6 +191,7 @@ exports[`defaults 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -576,6 +592,13 @@ exports[`with custom appVersion 1`] = `
               "envFrom": [],
               "image": "plone/plone-backend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "backend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -601,6 +624,7 @@ exports[`with custom appVersion 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -690,6 +714,13 @@ exports[`with custom appVersion 1`] = `
               "envFrom": [],
               "image": "plone/plone-frontend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "frontend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -715,6 +746,7 @@ exports[`with custom appVersion 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -1115,6 +1147,13 @@ exports[`with exporter disabled 1`] = `
               "envFrom": [],
               "image": "plone/plone-backend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "backend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -1140,6 +1179,7 @@ exports[`with exporter disabled 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -1229,6 +1269,13 @@ exports[`with exporter disabled 1`] = `
               "envFrom": [],
               "image": "plone/plone-frontend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "frontend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -1254,6 +1301,7 @@ exports[`with exporter disabled 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -1609,6 +1657,13 @@ exports[`with extra env vars 1`] = `
               "envFrom": [],
               "image": "plone/plone-backend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "backend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -1634,6 +1689,7 @@ exports[`with extra env vars 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -1723,6 +1779,13 @@ exports[`with extra env vars 1`] = `
               "envFrom": [],
               "image": "plone/plone-frontend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "frontend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -1748,6 +1811,7 @@ exports[`with extra env vars 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -2156,6 +2220,13 @@ exports[`with tolerations 1`] = `
               "envFrom": [],
               "image": "plone/plone-backend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "backend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -2181,6 +2252,7 @@ exports[`with tolerations 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -2270,6 +2342,13 @@ exports[`with tolerations 1`] = `
               "envFrom": [],
               "image": "plone/plone-frontend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "frontend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -2295,6 +2374,7 @@ exports[`with tolerations 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },

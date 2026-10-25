@@ -46,6 +46,26 @@ Upgrading to a new Plone major or minor version may require a Plone site upgrade
 After the new backend pods are ready, run the upgrade from the Plone control panel (`@@plone-upgrade`) on the maintenance or uncached route.
 ```
 
+## Avoid errors from stopping pods
+
+Each old pod keeps serving for 15 seconds after Kubernetes marks it for deletion.
+This gives kube-proxy, ingress controllers, and caches that address pods directly, such as Varnish via `PloneVinylCache`, time to stop sending it requests.
+
+If your cache or ingress controller still logs `503` errors or refused connections while old pods stop, increase the delay:
+
+```typescript
+backend: {
+  preStopDelaySeconds: 30,
+},
+frontend: {
+  preStopDelaySeconds: 30,
+}
+```
+
+The termination grace period grows with the delay.
+If your pods need more than 30 seconds to shut down after the delay, set `terminationGracePeriodSeconds` as well.
+See {ref}`graceful-shutdown` for the defaults and constraints.
+
 ## Watch the rollout
 
 Follow the rollout and confirm it completes.

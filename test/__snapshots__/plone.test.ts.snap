@@ -37,6 +37,13 @@ exports[`defaults 1`] = `
               "envFrom": [],
               "image": "plone/plone-backend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "backend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -62,6 +69,7 @@ exports[`defaults 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -151,6 +159,13 @@ exports[`defaults 1`] = `
               "envFrom": [],
               "image": "plone/plone-frontend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "frontend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -176,6 +191,7 @@ exports[`defaults 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -265,6 +281,13 @@ exports[`defaults-blicca 1`] = `
               "envFrom": [],
               "image": "plone/plone-backend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "backend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -290,6 +313,7 @@ exports[`defaults-blicca 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -379,6 +403,13 @@ exports[`defaults-with-pdps 1`] = `
               "envFrom": [],
               "image": "plone/plone-backend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "backend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -404,6 +435,7 @@ exports[`defaults-with-pdps 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -493,6 +525,13 @@ exports[`defaults-with-pdps 1`] = `
               "envFrom": [],
               "image": "plone/plone-frontend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "frontend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -518,6 +557,7 @@ exports[`defaults-with-pdps 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -607,6 +647,13 @@ exports[`with nodeSelector for region affinity 1`] = `
               "envFrom": [],
               "image": "plone/plone-backend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "backend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -635,6 +682,7 @@ exports[`with nodeSelector for region affinity 1`] = `
           "nodeSelector": {
             "topology.kubernetes.io/region": "fsn1",
           },
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -724,6 +772,13 @@ exports[`with nodeSelector for region affinity 1`] = `
               "envFrom": [],
               "image": "plone/plone-frontend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "frontend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -752,6 +807,7 @@ exports[`with nodeSelector for region affinity 1`] = `
           "nodeSelector": {
             "topology.kubernetes.io/region": "fsn1",
           },
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -841,6 +897,13 @@ exports[`with securityContext for capabilities 1`] = `
               "envFrom": [],
               "image": "plone/plone-backend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "backend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -873,6 +936,7 @@ exports[`with securityContext for capabilities 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -962,6 +1026,13 @@ exports[`with securityContext for capabilities 1`] = `
               "envFrom": [],
               "image": "plone/plone-frontend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "frontend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -987,6 +1058,7 @@ exports[`with securityContext for capabilities 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -1076,6 +1148,13 @@ exports[`with-backend-servicemonitor 1`] = `
               "envFrom": [],
               "image": "plone/plone-backend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "backend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -1101,6 +1180,7 @@ exports[`with-backend-servicemonitor 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -1215,6 +1295,13 @@ exports[`with-both-servicemonitors 1`] = `
               "envFrom": [],
               "image": "plone/plone-backend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "backend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -1240,6 +1327,7 @@ exports[`with-both-servicemonitors 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -1354,6 +1442,13 @@ exports[`with-both-servicemonitors 1`] = `
               "envFrom": [],
               "image": "plone/plone-frontend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "frontend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -1379,6 +1474,7 @@ exports[`with-both-servicemonitors 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -1493,6 +1589,13 @@ exports[`with-frontend-servicemonitor 1`] = `
               "envFrom": [],
               "image": "plone/plone-backend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "backend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -1518,6 +1621,7 @@ exports[`with-frontend-servicemonitor 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -1607,6 +1711,13 @@ exports[`with-frontend-servicemonitor 1`] = `
               "envFrom": [],
               "image": "plone/plone-frontend:latest",
               "imagePullPolicy": "IfNotPresent",
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "frontend-container",
               "readinessProbe": {
                 "failureThreshold": 3,
@@ -1632,6 +1743,7 @@ exports[`with-frontend-servicemonitor 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },

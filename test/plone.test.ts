@@ -174,3 +174,27 @@ test('backend service config is plumbed through', () => {
   expect(backendSvc.spec.type).toBe('LoadBalancer');
   expect(backendSvc.spec.trafficDistribution).toBe('PreferClose');
 });
+
+test('shutdown timing is plumbed through to backend and frontend', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new Plone(chart, 'plone', {
+    backend: { preStopDelaySeconds: 20, terminationGracePeriodSeconds: 90 },
+    frontend: { preStopDelaySeconds: 0 },
+  });
+
+  // THEN
+  const deployments = Testing.synth(chart).filter((m: any) => m.kind === 'Deployment');
+  const podSpec = (name: string) => deployments.find(
+    (d: any) => d.metadata.labels['app.kubernetes.io/name'] === `${name}-deployment`,
+  ).spec.template.spec;
+  const backend = podSpec('plone-backend');
+  expect(backend.containers[0].lifecycle).toEqual({ preStop: { sleep: { seconds: 20 } } });
+  expect(backend.terminationGracePeriodSeconds).toBe(90);
+  const frontend = podSpec('plone-frontend');
+  expect(frontend.containers[0].lifecycle).toBeUndefined();
+  expect(frontend.terminationGracePeriodSeconds).toBeUndefined();
+});

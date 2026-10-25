@@ -32,6 +32,13 @@ exports[`defaults 1`] = `
             {
               "env": [],
               "envFrom": [],
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "test-container",
               "resources": {
                 "limits": {
@@ -46,6 +53,7 @@ exports[`defaults 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -90,6 +98,13 @@ exports[`with-environment 1`] = `
                 },
               ],
               "envFrom": [],
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "with_environment-container",
               "resources": {
                 "limits": {
@@ -104,6 +119,7 @@ exports[`with-environment 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -158,6 +174,13 @@ exports[`with-environment-from-secret 1`] = `
                   },
                 },
               ],
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "with_environment_secret-container",
               "resources": {
                 "limits": {
@@ -172,6 +195,7 @@ exports[`with-environment-from-secret 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -221,6 +245,13 @@ exports[`with-environment-valueFrom 1`] = `
                 },
               ],
               "envFrom": [],
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "with_environment_valueFrom-container",
               "resources": {
                 "limits": {
@@ -235,6 +266,7 @@ exports[`with-environment-valueFrom 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -274,6 +306,13 @@ exports[`with-pdp 1`] = `
             {
               "env": [],
               "envFrom": [],
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "with_pdb-container",
               "resources": {
                 "limits": {
@@ -288,6 +327,7 @@ exports[`with-pdp 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
@@ -347,6 +387,13 @@ exports[`with-security-context 1`] = `
             {
               "env": [],
               "envFrom": [],
+              "lifecycle": {
+                "preStop": {
+                  "sleep": {
+                    "seconds": 15,
+                  },
+                },
+              },
               "name": "with_security_context-container",
               "resources": {
                 "limits": {
@@ -368,6 +415,7 @@ exports[`with-security-context 1`] = `
             },
           ],
           "imagePullSecrets": [],
+          "terminationGracePeriodSeconds": 45,
         },
       },
     },
