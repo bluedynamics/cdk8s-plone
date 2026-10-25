@@ -111,6 +111,29 @@ frontend: {
 }
 ```
 
+(graceful-shutdown)=
+
+### Graceful shutdown
+
+Each Plone container waits in a `preStop` hook before it receives `SIGTERM`.
+During that time kube-proxy, ingress controllers, and caches that address pods directly stop sending it requests.
+
+- `preStopDelaySeconds` defaults to `15`.
+  `0` disables the hook.
+- `terminationGracePeriodSeconds` defaults to `preStopDelaySeconds` plus `30`, so the shutdown after the delay keeps the 30 seconds that Kubernetes grants by default.
+  Without a hook, the field stays unset.
+- An explicit `terminationGracePeriodSeconds` must be greater than `preStopDelaySeconds`.
+
+```typescript
+backend: {
+  preStopDelaySeconds: 20,
+  terminationGracePeriodSeconds: 90, // long-running requests get 70 seconds to finish
+}
+```
+
+The hook uses the native `sleep` action, so the image needs no `sleep` binary.
+It requires Kubernetes 1.30 or later.
+
 ### Service
 
 Configure the generated Kubernetes `Service` through the grouped `service` option.

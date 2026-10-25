@@ -294,6 +294,28 @@ export interface PloneBaseOptions {
    * @default - no security context
    */
   readonly securityContext?: PloneSecurityContext;
+
+  /**
+   * Seconds to wait in a preStop hook before the container receives SIGTERM.
+   *
+   * Kubernetes removes a terminating pod from the Service endpoints while it
+   * starts the shutdown. kube-proxy, ingress controllers and caches that target
+   * pod IPs (such as Varnish via `PloneVinylCache`) need a few seconds to
+   * notice. The delay keeps the container serving until they have, so rolling
+   * updates do not cause `503` errors in front of it. Rendered as the native
+   * `sleep` action, so the image needs no `sleep` binary.
+   * Requires Kubernetes 1.30 or later. Set to 0 to disable the hook.
+   * @default 15
+   */
+  readonly preStopDelaySeconds?: number;
+
+  /**
+   * Seconds Kubernetes waits for the pod to stop before it kills it.
+   * The preStop delay counts against this budget, so it must be greater
+   * than `preStopDelaySeconds`.
+   * @default - `preStopDelaySeconds` + 30, which keeps the Kubernetes default of 30 seconds for the shutdown itself
+   */
+  readonly terminationGracePeriodSeconds?: number;
 }
 /**
  * Plone deployment variants.
@@ -453,6 +475,8 @@ export class Plone extends Construct {
       podAnnotations: backend.podAnnotations,
       nodeSelector: backend.nodeSelector,
       securityContext: backend.securityContext as k8s.SecurityContext,
+      preStopDelaySeconds: backend.preStopDelaySeconds,
+      terminationGracePeriodSeconds: backend.terminationGracePeriodSeconds,
     };
 
     // Probing
@@ -549,6 +573,8 @@ export class Plone extends Construct {
         podAnnotations: frontend.podAnnotations,
         nodeSelector: frontend.nodeSelector,
         securityContext: frontend.securityContext as k8s.SecurityContext,
+        preStopDelaySeconds: frontend.preStopDelaySeconds,
+        terminationGracePeriodSeconds: frontend.terminationGracePeriodSeconds,
       };
 
       // Probing

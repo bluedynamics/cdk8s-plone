@@ -150,6 +150,44 @@ export interface PloneDeploymentOptions {
    * @default - undefined (no readiness probe)
    */
   readinessProbe?: k8s.Probe;
+
+  /**
+   * Seconds to wait in a preStop hook before the container receives SIGTERM.
+   *
+   * Kubernetes removes a terminating pod from the Service endpoints while it
+   * starts the shutdown. kube-proxy, ingress controllers and caches that target
+   * pod IPs need a few seconds to notice. The delay keeps the container serving
+   * until they have. Rendered as the native `sleep` action, so the image needs
+   * no `sleep` binary. Requires Kubernetes 1.30 or later.
+   * Set to 0 to disable the hook.
+   * @default 15
+   */
+  readonly preStopDelaySeconds?: number;
+
+  /**
+   * Seconds Kubernetes waits for the pod to stop before it kills it.
+   * The preStop delay counts against this budget, so it must be greater
+   * than `preStopDelaySeconds`.
+   * @default - `preStopDelaySeconds` + 30, which keeps the Kubernetes default of 30 seconds for the shutdown itself
+   */
+  readonly terminationGracePeriodSeconds?: number;
+}
+
+/**
+ * Default delay of the preStop hook, see `preStopDelaySeconds`.
+ */
+const DEFAULT_PRE_STOP_DELAY_SECONDS = 15;
+
+/**
+ * Shutdown time granted after the preStop delay, the Kubernetes default
+ * of `terminationGracePeriodSeconds`.
+ */
+const DEFAULT_SHUTDOWN_SECONDS = 30;
+
+function validateSeconds(name: string, value: number | undefined): void {
+  if (value !== undefined && (!Number.isInteger(value) || value < 0)) {
+    throw new Error(`${name} must be a non-negative integer, got ${value}`);
+  }
 }
 
 /**
@@ -165,6 +203,24 @@ export class PloneDeployment extends Construct {
     super(scope, id);
     const image = options.image ?? {};
     const replicas = options.replicas ?? 2;
+    validateSeconds('preStopDelaySeconds', options.preStopDelaySeconds);
+    validateSeconds('terminationGracePeriodSeconds', options.terminationGracePeriodSeconds);
+    const preStopDelaySeconds = options.preStopDelaySeconds ?? DEFAULT_PRE_STOP_DELAY_SECONDS;
+    if (
+      preStopDelaySeconds > 0
+      && options.terminationGracePeriodSeconds !== undefined
+      && options.terminationGracePeriodSeconds <= preStopDelaySeconds
+    ) {
+      // The kubelet kills the container once the grace period is used up,
+      // even while the preStop hook is still sleeping: no graceful shutdown.
+      throw new Error(
+        `terminationGracePeriodSeconds (${options.terminationGracePeriodSeconds}) must be greater than `
+        + `preStopDelaySeconds (${preStopDelaySeconds})`,
+      );
+    }
+    // Without a hook, leave the grace period unset (Kubernetes default 30s).
+    const terminationGracePeriodSeconds = options.terminationGracePeriodSeconds
+      ?? (preStopDelaySeconds > 0 ? preStopDelaySeconds + DEFAULT_SHUTDOWN_SECONDS : undefined);
     const label = { app: Names.toLabelValue(this) };
     const optionLabels = options.labels ?? {};
     const deploymentLabels = {
@@ -206,6 +262,9 @@ export class PloneDeployment extends Construct {
       livenessProbe: options.livenessProbe ?? undefined,
       readinessProbe: options.readinessProbe ?? undefined,
       securityContext: options.securityContext,
+      lifecycle: preStopDelaySeconds > 0
+        ? { preStop: { sleep: { seconds: preStopDelaySeconds } } }
+        : undefined,
     };
     const deploymentOptions: k8s.KubeDeploymentProps = {
       metadata: {
@@ -225,6 +284,7 @@ export class PloneDeployment extends Construct {
           spec: {
             imagePullSecrets: (image.imagePullSecrets ?? []).map((name) => ({ name: name })),
             nodeSelector: options.nodeSelector,
+            terminationGracePeriodSeconds,
             containers: [
               ploneContainerSpec,
               ...options.sidecars ?? [],

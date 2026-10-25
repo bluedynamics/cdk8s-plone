@@ -227,7 +227,7 @@ az aks get-credentials \
 
 ### Required Kubernetes features
 
-- **Version:** Kubernetes 1.20+
+- **Version:** Kubernetes 1.30+ (the default `preStop` hook uses the native `sleep` action)
 - **Networking:** CNI plugin installed
 - **Storage:** StorageClass with dynamic provisioning
 - **DNS:** CoreDNS or equivalent
