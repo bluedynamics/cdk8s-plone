@@ -108,6 +108,10 @@
       "type": "build"
     },
     {
+      "name": "cdk8s",
+      "type": "peer"
+    },
+    {
       "name": "cdk8s-plus-30",
       "type": "peer"
     },

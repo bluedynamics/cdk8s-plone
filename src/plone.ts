@@ -1,4 +1,4 @@
-import { Names } from 'cdk8s';
+import { ApiObject, Names } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-30';
 import { Construct } from 'constructs';
 import { PloneDeployment, PloneDeploymentOptions } from './deployment';
@@ -427,6 +427,31 @@ export class Plone extends Construct {
   public readonly frontendServiceName: string | undefined;
 
   /**
+   * The backend Deployment, as an escape hatch for fields without a dedicated
+   * option. JSON patches apply to the final manifest, so plain values are kept:
+   * `plone.backendDeployment.addJsonPatch(JsonPatch.add('/spec/template/spec/containers/0/args', ['--debug']))`.
+   * The Plone container is always `containers/0`.
+   */
+  public readonly backendDeployment: ApiObject;
+
+  /**
+   * The backend Service, as an escape hatch, see `backendDeployment`.
+   */
+  public readonly backendService: ApiObject;
+
+  /**
+   * The frontend Deployment, as an escape hatch, see `backendDeployment`.
+   * Only set when variant is VOLTO, otherwise undefined.
+   */
+  public readonly frontendDeployment: ApiObject | undefined;
+
+  /**
+   * The frontend Service, as an escape hatch, see `backendDeployment`.
+   * Only set when variant is VOLTO, otherwise undefined.
+   */
+  public readonly frontendService: ApiObject | undefined;
+
+  /**
    * The deployment variant being used (VOLTO or BLICCA).
    */
   public readonly variant: PloneVariant;
@@ -439,6 +464,8 @@ export class Plone extends Construct {
   constructor(scope: Construct, id: string, options: PloneOptions = {}) {
     super(scope, id);
     this.frontendServiceName = undefined;
+    this.frontendDeployment = undefined;
+    this.frontendService = undefined;
     this.siteId = options.siteId ?? 'Plone';
     this.variant = options.variant ?? PloneVariant.VOLTO;
 
@@ -522,6 +549,8 @@ export class Plone extends Construct {
       },
     });
     this.backendServiceName = backendService.name;
+    this.backendDeployment = backendDeployment.deployment;
+    this.backendService = backendService.service;
 
     // ServiceMonitor for backend
     if (backend.servicemonitor) {
@@ -621,6 +650,8 @@ export class Plone extends Construct {
         },
       });
       this.frontendServiceName = frontendService.name;
+      this.frontendDeployment = frontendDeployment.deployment;
+      this.frontendService = frontendService.service;
 
       // ServiceMonitor for frontend
       if (frontend.servicemonitor) {

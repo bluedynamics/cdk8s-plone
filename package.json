@@ -65,6 +65,7 @@
     "yaml": "^2.8.1"
   },
   "peerDependencies": {
+    "cdk8s": "^2.70.116",
     "cdk8s-plus-30": "^2.4.10",
     "constructs": "^10.4.2"
   },
