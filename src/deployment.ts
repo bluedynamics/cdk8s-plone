@@ -1,5 +1,5 @@
 // import { log } from 'console';
-import { Names } from 'cdk8s';
+import { ApiObject, JsonPatch, Names } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-30';
 import { Construct } from 'constructs';
 import * as k8s from './imports/k8s';
@@ -105,11 +105,10 @@ export interface PloneDeploymentOptions {
   readonly podAnnotations?: { [name: string]: string };
 
   /**
-   * Additional container specification overrides.
-   * Advanced use only - merges with generated container spec.
-   * @default - undefined
+   * Raw overrides for the Plone container, see `PloneBaseOptions.containerOverrides`.
+   * @default - none
    */
-  readonly ploneContainer?: k8s.Container;
+  readonly containerOverrides?: { [key: string]: any };
 
   /**
    * Sidecar containers to run alongside the main container.
@@ -294,7 +293,20 @@ export class PloneDeployment extends Construct {
       },
     };
 
-    new k8s.KubeDeployment(this, 'deployment', deploymentOptions);
+    // A plain ApiObject built from the converted manifest, not a KubeDeployment:
+    // KubeDeployment applies JSON patches before its toJson conversion, which
+    // drops plain values for IntOrString and Quantity fields (`port: 8080`,
+    // `cpu: '2'`). The same happens when overrides are spread into
+    // ploneContainerSpec. Patches on this object land on the final manifest.
+    const deployment = new ApiObject(this, 'deployment', k8s.KubeDeployment.manifest(deploymentOptions));
+
+    for (const [key, value] of Object.entries(options.containerOverrides ?? {})) {
+      if (value === undefined) {
+        continue;
+      }
+      const pointer = key.replace(/~/g, '~0').replace(/\//g, '~1');
+      deployment.addJsonPatch(JsonPatch.add(`/spec/template/spec/containers/0/${pointer}`, value));
+    }
 
     if (options.pdb ?? false) {
       const pdbOptions = options.pdb ?? {};

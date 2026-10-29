@@ -296,6 +296,22 @@ export interface PloneBaseOptions {
   readonly securityContext?: PloneSecurityContext;
 
   /**
+   * Raw overrides for the Plone container, as a free-form map of Kubernetes
+   * `Container` fields in their manifest form, e.g.
+   * `{ args: ['--debug'], startupProbe: { httpGet: { path: '/', port: 8080 } } }`.
+   *
+   * Escape hatch for fields without a dedicated option. Highest precedence:
+   * each top-level key replaces the generated field as a whole, so
+   * `{ resources: { limits: { cpu: '2' } } }` drops the generated requests and
+   * memory limit. A `null` value removes a field. Keys and values are written to
+   * the manifest verbatim and are not validated by this construct. Applies to
+   * the Plone container only.
+   * @example { args: ['--debug'], volumeMounts: [{ name: 'data', mountPath: '/data' }] }
+   * @default - none
+   */
+  readonly containerOverrides?: { [key: string]: any };
+
+  /**
    * Seconds to wait in a preStop hook before the container receives SIGTERM.
    *
    * Kubernetes removes a terminating pod from the Service endpoints while it
@@ -476,6 +492,7 @@ export class Plone extends Construct {
       nodeSelector: backend.nodeSelector,
       securityContext: backend.securityContext as k8s.SecurityContext,
       preStopDelaySeconds: backend.preStopDelaySeconds,
+      containerOverrides: backend.containerOverrides,
       terminationGracePeriodSeconds: backend.terminationGracePeriodSeconds,
     };
 
@@ -574,6 +591,7 @@ export class Plone extends Construct {
         nodeSelector: frontend.nodeSelector,
         securityContext: frontend.securityContext as k8s.SecurityContext,
         preStopDelaySeconds: frontend.preStopDelaySeconds,
+        containerOverrides: frontend.containerOverrides,
         terminationGracePeriodSeconds: frontend.terminationGracePeriodSeconds,
       };
 

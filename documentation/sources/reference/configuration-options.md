@@ -159,6 +159,26 @@ backend: {
 The top-level `serviceAnnotations` option is deprecated. Use `service.annotations` instead.
 ```
 
+### Container overrides
+
+`containerOverrides` is an escape hatch for any `Container` field of the Plone container without a dedicated option.
+Write the fields in their manifest form.
+
+```typescript
+backend: {
+  containerOverrides: {
+    args: ['--debug'],
+    startupProbe: { httpGet: { path: '/', port: 8080 }, failureThreshold: 30 },
+  },
+}
+```
+
+- Overrides have the highest precedence.
+  Each top-level key replaces the generated field as a whole: `resources: { limits: { cpu: '2' } }` drops the generated requests and memory limit.
+- A `null` value removes a generated field, for example `lifecycle: null`.
+- Keys and values reach the manifest verbatim and are not validated.
+- Sidecar containers are not affected.
+
 ### Environment variables
 
 Pass environment variables with the cdk8s-plus `Env` API, including values sourced from a `Secret`.

@@ -231,3 +231,58 @@ test.each([
   // THEN
   expect(() => new PloneDeployment(chart, 'test', { port: 8080, ...timing })).toThrow(message);
 });
+
+test('containerOverrides keep plain IntOrString and Quantity values', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new PloneDeployment(chart, 'test', {
+    port: 8080,
+    containerOverrides: {
+      args: ['--debug'],
+      startupProbe: { httpGet: { path: '/', port: 8080 }, failureThreshold: 30 },
+      resources: { limits: { cpu: '2' } },
+    },
+  });
+
+  // THEN
+  const container = synthDeployment(chart).spec.template.spec.containers[0];
+  expect(container.args).toEqual(['--debug']);
+  expect(container.startupProbe).toEqual({ httpGet: { path: '/', port: 8080 }, failureThreshold: 30 });
+  // a top-level key replaces the generated field as a whole
+  expect(container.resources).toEqual({ limits: { cpu: '2' } });
+  // untouched fields stay as generated
+  expect(container.lifecycle).toEqual({ preStop: { sleep: { seconds: 15 } } });
+});
+
+test('containerOverrides null removes a generated field', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new PloneDeployment(chart, 'test', { port: 8080, containerOverrides: { lifecycle: null } });
+
+  // THEN
+  expect(synthDeployment(chart).spec.template.spec.containers[0].lifecycle).toBeNull();
+});
+
+test('containerOverrides apply to the Plone container only', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new PloneDeployment(chart, 'test', {
+    port: 8080,
+    sidecars: [{ name: 'log-forwarder', image: 'fluentd:latest' }],
+    containerOverrides: { args: ['--debug'] },
+  });
+
+  // THEN
+  const containers = synthDeployment(chart).spec.template.spec.containers;
+  expect(containers[0].args).toEqual(['--debug']);
+  expect(containers[1]).toEqual({ name: 'log-forwarder', image: 'fluentd:latest' });
+});

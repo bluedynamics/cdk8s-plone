@@ -700,6 +700,7 @@ const ploneBaseOptions: PloneBaseOptions = { ... }
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.annotations">annotations</a></code> | <code>{[ key: string ]: string}</code> | Annotations to add to the Deployment metadata. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.containerOverrides">containerOverrides</a></code> | <code>{[ key: string ]: any}</code> | Raw overrides for the Plone container, as a free-form map of Kubernetes `Container` fields in their manifest form, e.g. `{ args: ['--debug'], startupProbe: { httpGet: { path: '/', port: 8080 } } }`. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.environment">environment</a></code> | <code>cdk8s-plus-30.Env</code> | Environment variables to set in the container. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.image">image</a></code> | <code>string</code> | Container image to use for the deployment. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.imagePullPolicy">imagePullPolicy</a></code> | <code>string</code> | Image pull policy for the container. |
@@ -752,6 +753,33 @@ Annotations to add to the Deployment metadata.
 
 ```typescript
 { 'deployment.kubernetes.io/revision': '1' }
+```
+
+
+##### `containerOverrides`<sup>Optional</sup> <a name="containerOverrides" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.containerOverrides"></a>
+
+```typescript
+public readonly containerOverrides: {[ key: string ]: any};
+```
+
+- *Type:* {[ key: string ]: any}
+- *Default:* none
+
+Raw overrides for the Plone container, as a free-form map of Kubernetes `Container` fields in their manifest form, e.g. `{ args: ['--debug'], startupProbe: { httpGet: { path: '/', port: 8080 } } }`.
+
+Escape hatch for fields without a dedicated option. Highest precedence:
+each top-level key replaces the generated field as a whole, so
+`{ resources: { limits: { cpu: '2' } } }` drops the generated requests and
+memory limit. A `null` value removes a field. Keys and values are written to
+the manifest verbatim and are not validated by this construct. Applies to
+the Plone container only.
+
+---
+
+*Example*
+
+```typescript
+{ args: ['--debug'], volumeMounts: [{ name: 'data', mountPath: '/data' }] }
 ```
 
 

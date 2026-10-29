@@ -198,3 +198,23 @@ test('shutdown timing is plumbed through to backend and frontend', () => {
   expect(frontend.containers[0].lifecycle).toBeUndefined();
   expect(frontend.terminationGracePeriodSeconds).toBeUndefined();
 });
+
+test('containerOverrides are plumbed through to backend and frontend', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new Plone(chart, 'plone', {
+    backend: { containerOverrides: { args: ['backend'] } },
+    frontend: { containerOverrides: { args: ['frontend'] } },
+  });
+
+  // THEN
+  const deployments = Testing.synth(chart).filter((m: any) => m.kind === 'Deployment');
+  const container = (name: string) => deployments.find(
+    (d: any) => d.metadata.labels['app.kubernetes.io/name'] === `${name}-deployment`,
+  ).spec.template.spec.containers[0];
+  expect(container('plone-backend').args).toEqual(['backend']);
+  expect(container('plone-frontend').args).toEqual(['frontend']);
+});
