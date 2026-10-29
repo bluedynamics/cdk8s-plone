@@ -138,6 +138,20 @@ new PloneVinylCache(chart, 'cache', {
 
 Invalidation is enabled by default (PURGE, BAN, xkey). Configure `plone.cachepurging` to point to the VinylCache invalidation proxy endpoint.
 
+The proxy serves the caches of all namespaces and routes by `Host`, so the address must include the namespace.
+Give the chart a namespace and read the address from `invalidationUrl`:
+
+```typescript
+const chart = new Chart(app, 'site', { namespace: 'plone' });
+const cache = new PloneVinylCache(chart, 'cache', { plone });
+// http://<cache>-invalidation.plone:8090
+console.log(cache.invalidationUrl);
+```
+
+Enter this value as a caching proxy in the `plone.cachepurging` settings.
+Do not build the address from `vinylCacheServiceName` yourself: the proxy rejects the bare `<cache>-invalidation` name with `404 unknown cache`, and `plone.cachepurging` does not log failed purges.
+`invalidationUrl` throws if the chart has no namespace or if `invalidation` is disabled.
+
 :::{note}
 BAN-based invalidation requires **cloud-vinyl operator ≥ 0.4.2**. Earlier versions accept the spec but do not emit the BAN ACL / handler.
 Starting with 0.4.2 the operator's own pod IP is automatically added to the PURGE ACL, so purges from the operator itself work without additional configuration.
