@@ -407,7 +407,8 @@ const cache = new PloneVinylCache(chart, 'cache', {
   plone: plone,
   replicas: 2,
 });
-// Use cache.vinylCacheServiceName for IngressRoute
+// Use cache.vinylCacheServiceName for IngressRoute,
+// cache.invalidationUrl for plone.cachepurging
 ```
 
 
@@ -528,6 +529,7 @@ Any object.
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCache.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCache.property.invalidationUrl">invalidationUrl</a></code> | <code>string</code> | URL of the cloud-vinyl invalidation proxy for this cache, e.g. for the purge proxy setting of `plone.cachepurging`. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCache.property.vinylCacheServiceName">vinylCacheServiceName</a></code> | <code>string</code> | Name of the VinylCache service created by the operator. |
 
 ---
@@ -541,6 +543,25 @@ public readonly node: Node;
 - *Type:* constructs.Node
 
 The tree node.
+
+---
+
+##### `invalidationUrl`<sup>Required</sup> <a name="invalidationUrl" id="@bluedynamics/cdk8s-plone.PloneVinylCache.property.invalidationUrl"></a>
+
+```typescript
+public readonly invalidationUrl: string;
+```
+
+- *Type:* string
+
+URL of the cloud-vinyl invalidation proxy for this cache, e.g. for the purge proxy setting of `plone.cachepurging`.
+
+Has the form `http://<cache>-invalidation.<namespace>:8090`, the same
+address the operator reports in `status.invalidationURL`. The proxy serves
+all namespaces and routes by `Host`, so the bare Service name is rejected.
+
+Throws if the chart has no namespace, because the URL cannot be built
+without one, or if `invalidation` is disabled.
 
 ---
 
