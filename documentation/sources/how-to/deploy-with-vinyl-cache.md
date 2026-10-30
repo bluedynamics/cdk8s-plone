@@ -176,6 +176,29 @@ new PloneVinylCache(chart, 'cache', {
 });
 ```
 
+### Tracing
+
+To export OpenTelemetry trace spans built from the Varnish log, point the vinyl-tracer sidecar at your collector:
+
+```typescript
+new PloneVinylCache(chart, 'cache', {
+  plone: plone,
+  tracing: {
+    otlpEndpoint: 'otel-collector.monitoring:4317', // host:port, no scheme
+    insecure: true,                                // plain gRPC inside the cluster
+  },
+});
+```
+
+`protocol` selects `'grpc'` (default) or `'http/protobuf'`, and `serviceName` sets the OpenTelemetry `service.name`, which defaults to the VinylCache name.
+The tracer needs a varnish 9 image, such as the default.
+
+### Edge Side Includes
+
+Set `esi: true` to process Edge Side Includes in backend responses that carry `Surrogate-Control: content="ESI/1.0"`.
+Do not enable ESI with `varnishParameters: { feature: '+esi' }`: that is not a varnishd feature bit, and varnishd fails to start.
+If response bodies do not start with `<`, also set `varnishParameters: { feature: '+esi_disable_xml_check' }`.
+
 ### Shard director tuning
 
 For shard-based load distribution (the default), you can fine-tune the consistent-hash behavior.

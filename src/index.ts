@@ -2,4 +2,4 @@ export { Plone, PloneOptions, PloneBaseOptions, PloneVariant, PloneSecurityConte
 export { PloneRollingUpdate } from './deployment';
 export { PloneServiceSpec } from './service';
 export { PloneHttpcache, PloneHttpcacheOptions, HttpcacheEnvVar, HttpcacheToleration } from './httpcache';
-export { PloneVinylCache, PloneVinylCacheOptions, VinylCacheToleration, VinylCacheBackend, VinylCacheBackendProbe, VinylCacheStorage } from './vinylcache';
+export { PloneVinylCache, PloneVinylCacheOptions, VinylCacheToleration, VinylCacheBackend, VinylCacheBackendProbe, VinylCacheStorage, VinylCacheTracing } from './vinylcache';
