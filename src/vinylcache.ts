@@ -494,6 +494,16 @@ export interface PloneVinylCacheOptions {
 }
 
 /**
+ * Builds a cpu/memory map from the values that are set, or undefined if none is.
+ */
+function quantities<T>(cpu: string | undefined, memory: string | undefined, from: (value: string) => T): { [key: string]: T } | undefined {
+  const result: { [key: string]: T } = {};
+  if (cpu !== undefined) result.cpu = from(cpu);
+  if (memory !== undefined) result.memory = from(memory);
+  return Object.keys(result).length > 0 ? result : undefined;
+}
+
+/**
  * PloneVinylCache construct for deploying Varnish Cache via cloud-vinyl operator.
  *
  * Creates a VinylCache custom resource with Plone backend/frontend services
@@ -678,18 +688,10 @@ export class PloneVinylCache extends Construct {
         throw new Error(`tracing.protocol must be "grpc" or "http/protobuf", got "${tracing.protocol}"`);
       }
     }
-    const tracingResources = tracing !== undefined
-      && [tracing.requestCpu, tracing.requestMemory, tracing.limitCpu, tracing.limitMemory].some(v => v !== undefined)
-      ? {
-        requests: {
-          cpu: tracing.requestCpu !== undefined ? VinylCacheSpecTracingResourcesRequests.fromString(tracing.requestCpu) : undefined,
-          memory: tracing.requestMemory !== undefined ? VinylCacheSpecTracingResourcesRequests.fromString(tracing.requestMemory) : undefined,
-        },
-        limits: {
-          cpu: tracing.limitCpu !== undefined ? VinylCacheSpecTracingResourcesLimits.fromString(tracing.limitCpu) : undefined,
-          memory: tracing.limitMemory !== undefined ? VinylCacheSpecTracingResourcesLimits.fromString(tracing.limitMemory) : undefined,
-        },
-      }
+    const tracingRequests = quantities(tracing?.requestCpu, tracing?.requestMemory, VinylCacheSpecTracingResourcesRequests.fromString);
+    const tracingLimits = quantities(tracing?.limitCpu, tracing?.limitMemory, VinylCacheSpecTracingResourcesLimits.fromString);
+    const tracingResources = tracingRequests || tracingLimits
+      ? { requests: tracingRequests, limits: tracingLimits }
       : undefined;
 
     const vinylCache = new VinylCache(this, 'vinylcache', {
