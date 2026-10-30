@@ -611,3 +611,73 @@ test.each([
   // THEN
   expect(() => new PloneVinylCache(chart, 'cache', { plone, tracing })).toThrow(message);
 });
+
+function backendNamed(chart: Chart, name: string): any {
+  return synthVinylCache(chart).spec.backends.find((b: any) => b.name === name);
+}
+
+test('ploneBackendProbe merges over the defaults', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new PloneVinylCache(chart, 'cache', { plone: new Plone(chart, 'plone'), ploneBackendProbe: { timeout: '5s' } });
+
+  // THEN
+  expect(backendNamed(chart, 'plone_backend').probe).toEqual({
+    url: '/ok', interval: '5s', timeout: '5s', window: 10, threshold: 8,
+  });
+  expect(backendNamed(chart, 'plone_frontend').probe.timeout).toBe('2s');
+});
+
+test('ploneFrontendProbe merges over the frontend defaults', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new PloneVinylCache(chart, 'cache', {
+    plone: new Plone(chart, 'plone'),
+    ploneFrontendProbe: { url: '/health', window: 5, threshold: 3, expectedResponse: 204 },
+  });
+
+  // THEN
+  expect(backendNamed(chart, 'plone_frontend').probe).toEqual({
+    url: '/health', interval: '5s', timeout: '2s', window: 5, threshold: 3, expectedResponse: 204,
+  });
+});
+
+test('extraBackends render weight and expectedResponse', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new PloneVinylCache(chart, 'cache', {
+    plone: new Plone(chart, 'plone'),
+    extraBackends: [{ name: 'thumbor', serviceName: 'thumbor', port: 8888, weight: 3, probe: { url: '/healthcheck', expectedResponse: 204 } }],
+  });
+
+  // THEN
+  const thumbor = backendNamed(chart, 'thumbor');
+  expect(thumbor.weight).toBe(3);
+  expect(thumbor.probe).toEqual({
+    url: '/healthcheck', interval: '5s', timeout: '2s', window: 10, threshold: 8, expectedResponse: 204,
+  });
+});
+
+test.each([
+  [{ ploneBackendProbe: { threshold: 12 } }, /ploneBackendProbe.threshold \(12\) cannot be greater than window \(10\)/],
+  [{ ploneFrontendProbe: { window: 65, threshold: 8 } }, /ploneFrontendProbe.window must be 64 or less/],
+  [{ ploneBackendProbe: { window: 0 } }, /ploneBackendProbe.window must be a positive integer/],
+  [{ extraBackends: [{ name: 'x', serviceName: 'x', port: 80, probe: { window: 3 } }] }, /extraBackends\[x\].probe.threshold \(8\) cannot be greater than window \(3\)/],
+])('rejects probes varnishd would not compile %#', (opts, message) => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const plone = new Plone(chart, 'plone');
+
+  // THEN
+  expect(() => new PloneVinylCache(chart, 'cache', { plone, ...opts })).toThrow(message);
+});

@@ -124,6 +124,23 @@ new PloneVinylCache(chart, 'cache', {
 `varnishParameters` become `-p` flags for varnishd.
 varnishd's default `nuke_limit` of 50 makes a large fetch fail with `Could not get storage` when 50 evictions do not free enough space, and the client gets a 503.
 
+### Backend health probes
+
+Varnish probes each Plone backend and stops sending requests to a backend that fails too many probes.
+The defaults are `{ url: '/ok', interval: '5s', timeout: '2s', window: 10, threshold: 8 }` for the backend and the same with `url: '/'` for the frontend.
+If slow requests, for example while the database warms up, make probes time out, raise the timeout:
+
+```typescript
+new PloneVinylCache(chart, 'cache', {
+  plone: plone,
+  ploneBackendProbe: { timeout: '5s' }, // other fields keep their defaults
+});
+```
+
+`ploneFrontendProbe` does the same for the Volto frontend, and `extraBackends[].probe` for additional backends.
+`threshold` must not exceed `window`, and `window` must be 64 or less, otherwise varnishd rejects the VCL.
+The construct checks this when you synthesize.
+
 ### Custom VCL
 
 Override the default Plone VCL snippets for custom caching logic:
