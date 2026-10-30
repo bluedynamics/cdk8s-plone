@@ -526,3 +526,88 @@ test('default vcl_recv snippet leaves PURGE and BAN to cloud-vinyl', () => {
   const recv: string = synthVinylCache(chart).spec.vcl.snippets.vclRecv;
   expect(recv).not.toMatch(/req\.method|~\s*purge\b/);
 });
+
+test('tracing renders an enabled tracer with OTLP settings', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new PloneVinylCache(chart, 'cache', {
+    plone: new Plone(chart, 'plone'),
+    tracing: {
+      otlpEndpoint: 'otel-collector.monitoring:4317',
+      insecure: true,
+      serviceName: 'plone-cache',
+      requestCpu: '50m',
+      limitMemory: '128Mi',
+    },
+  });
+
+  // THEN
+  expect(synthVinylCache(chart).spec.tracing).toEqual({
+    enabled: true,
+    otlp: { endpoint: 'otel-collector.monitoring:4317', insecure: true },
+    serviceName: 'plone-cache',
+    resources: { requests: { cpu: '50m' }, limits: { memory: '128Mi' } },
+  });
+});
+
+test('tracing with only an endpoint leaves the rest to the operator', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new PloneVinylCache(chart, 'cache', {
+    plone: new Plone(chart, 'plone'),
+    tracing: { otlpEndpoint: '[fd00::1]:4318', protocol: 'http/protobuf' },
+  });
+
+  // THEN
+  expect(synthVinylCache(chart).spec.tracing).toEqual({
+    enabled: true,
+    otlp: { endpoint: '[fd00::1]:4318', protocol: 'http/protobuf' },
+  });
+});
+
+test('no tracing and esi blocks by default', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new PloneVinylCache(chart, 'cache', { plone: new Plone(chart, 'plone') });
+
+  // THEN
+  const spec = synthVinylCache(chart).spec;
+  expect(spec.tracing).toBeUndefined();
+  expect(spec.esi).toBeUndefined();
+});
+
+test('esi renders spec.esi.enabled', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new PloneVinylCache(chart, 'cache', { plone: new Plone(chart, 'plone'), esi: true });
+
+  // THEN
+  expect(synthVinylCache(chart).spec.esi).toEqual({ enabled: true });
+});
+
+test.each([
+  [{ otlpEndpoint: 'http://collector:4317' }, /host:port without scheme/],
+  [{ otlpEndpoint: 'collector' }, /host:port without scheme/],
+  [{ otlpEndpoint: '' }, /host:port without scheme/],
+  [{ otlpEndpoint: 'collector:4317', protocol: 'http' }, /"grpc" or "http\/protobuf"/],
+])('rejects invalid tracing %j', (tracing, message) => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const plone = new Plone(chart, 'plone');
+
+  // THEN
+  expect(() => new PloneVinylCache(chart, 'cache', { plone, tracing })).toThrow(message);
+});

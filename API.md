@@ -2112,6 +2112,7 @@ const ploneVinylCacheOptions: PloneVinylCacheOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.plone">plone</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.Plone">Plone</a></code> | The Plone construct to attach the cache to. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.cluster">cluster</a></code> | <code>boolean</code> | Enable clustering between the Varnish pods (`spec.cluster.enabled`). |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.director">director</a></code> | <code>string</code> | Director type for load distribution. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.esi">esi</a></code> | <code>boolean</code> | Process Edge Side Includes (`spec.esi.enabled`) in backend responses that carry `Surrogate-Control: content="ESI/1.0"`. Do not use `varnishParameters: { feature: '+esi' }` instead: that is not a varnishd feature bit and makes varnishd fail to start. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.extraBackends">extraBackends</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheBackend">VinylCacheBackend</a>[]</code> | Additional backends to add after the auto-generated Plone backends. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.image">image</a></code> | <code>string</code> | Container image for the Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.invalidation">invalidation</a></code> | <code>boolean</code> | Enable cache invalidation (PURGE, BAN, xkey). |
@@ -2129,6 +2130,7 @@ const ploneVinylCacheOptions: PloneVinylCacheOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.shardReplicas">shardReplicas</a></code> | <code>number</code> | Shard director: number of Ketama replicas per backend in the hash ring. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.storage">storage</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheStorage">VinylCacheStorage</a>[]</code> | Varnish storage backends (`spec.storage`). |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.tolerations">tolerations</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheToleration">VinylCacheToleration</a>[]</code> | Tolerations for the Varnish pods. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.tracing">tracing</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheTracing">VinylCacheTracing</a></code> | Export OpenTelemetry trace spans built from the Varnish log through the vinyl-tracer sidecar (`spec.tracing`). Setting it enables the tracer. Tracing needs a varnish 9 image, such as the default. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.varnishParameters">varnishParameters</a></code> | <code>{[ key: string ]: string}</code> | Runtime parameters passed to varnishd as `-p name=value` (`spec.varnishParameters`), for example `{ nuke_limit: '1000' }`. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclBackendErrorSnippet">vclBackendErrorSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_backend_error subroutine. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclBackendFetchSnippet">vclBackendFetchSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_backend_fetch subroutine. |
@@ -2190,6 +2192,19 @@ public readonly director: string;
 - *Default:* 'shard'
 
 Director type for load distribution.
+
+---
+
+##### `esi`<sup>Optional</sup> <a name="esi" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.esi"></a>
+
+```typescript
+public readonly esi: boolean;
+```
+
+- *Type:* boolean
+- *Default:* not set; no ESI processing
+
+Process Edge Side Includes (`spec.esi.enabled`) in backend responses that carry `Surrogate-Control: content="ESI/1.0"`. Do not use `varnishParameters: { feature: '+esi' }` instead: that is not a varnishd feature bit and makes varnishd fail to start.
 
 ---
 
@@ -2457,6 +2472,19 @@ public readonly tolerations: VinylCacheToleration[];
 - *Default:* no tolerations
 
 Tolerations for the Varnish pods.
+
+---
+
+##### `tracing`<sup>Optional</sup> <a name="tracing" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.tracing"></a>
+
+```typescript
+public readonly tracing: VinylCacheTracing;
+```
+
+- *Type:* <a href="#@bluedynamics/cdk8s-plone.VinylCacheTracing">VinylCacheTracing</a>
+- *Default:* no tracing
+
+Export OpenTelemetry trace spans built from the Varnish log through the vinyl-tracer sidecar (`spec.tracing`). Setting it enables the tracer. Tracing needs a varnish 9 image, such as the default.
 
 ---
 
@@ -3009,6 +3037,136 @@ public readonly value: string;
 - *Default:* no value
 
 The taint value to match (when operator is Equal).
+
+---
+
+### VinylCacheTracing <a name="VinylCacheTracing" id="@bluedynamics/cdk8s-plone.VinylCacheTracing"></a>
+
+Tracer sidecar configuration (`spec.tracing`), see `PloneVinylCacheOptions.tracing`.
+
+#### Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.VinylCacheTracing.Initializer"></a>
+
+```typescript
+import { VinylCacheTracing } from '@bluedynamics/cdk8s-plone'
+
+const vinylCacheTracing: VinylCacheTracing = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheTracing.property.otlpEndpoint">otlpEndpoint</a></code> | <code>string</code> | OTLP collector address as `host:port`, without scheme, e.g. `'otel-collector.monitoring:4317'`. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheTracing.property.insecure">insecure</a></code> | <code>boolean</code> | Disable TLS for the OTLP connection. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheTracing.property.limitCpu">limitCpu</a></code> | <code>string</code> | CPU limit for the tracer sidecar. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheTracing.property.limitMemory">limitMemory</a></code> | <code>string</code> | Memory limit for the tracer sidecar. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheTracing.property.protocol">protocol</a></code> | <code>string</code> | OTLP transport: `'grpc'` or `'http/protobuf'`. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheTracing.property.requestCpu">requestCpu</a></code> | <code>string</code> | CPU request for the tracer sidecar. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheTracing.property.requestMemory">requestMemory</a></code> | <code>string</code> | Memory request for the tracer sidecar. |
+| <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheTracing.property.serviceName">serviceName</a></code> | <code>string</code> | OpenTelemetry `service.name` of the exported spans. |
+
+---
+
+##### `otlpEndpoint`<sup>Required</sup> <a name="otlpEndpoint" id="@bluedynamics/cdk8s-plone.VinylCacheTracing.property.otlpEndpoint"></a>
+
+```typescript
+public readonly otlpEndpoint: string;
+```
+
+- *Type:* string
+
+OTLP collector address as `host:port`, without scheme, e.g. `'otel-collector.monitoring:4317'`.
+
+---
+
+##### `insecure`<sup>Optional</sup> <a name="insecure" id="@bluedynamics/cdk8s-plone.VinylCacheTracing.property.insecure"></a>
+
+```typescript
+public readonly insecure: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Disable TLS for the OTLP connection.
+
+---
+
+##### `limitCpu`<sup>Optional</sup> <a name="limitCpu" id="@bluedynamics/cdk8s-plone.VinylCacheTracing.property.limitCpu"></a>
+
+```typescript
+public readonly limitCpu: string;
+```
+
+- *Type:* string
+- *Default:* operator default
+
+CPU limit for the tracer sidecar.
+
+---
+
+##### `limitMemory`<sup>Optional</sup> <a name="limitMemory" id="@bluedynamics/cdk8s-plone.VinylCacheTracing.property.limitMemory"></a>
+
+```typescript
+public readonly limitMemory: string;
+```
+
+- *Type:* string
+- *Default:* operator default
+
+Memory limit for the tracer sidecar.
+
+---
+
+##### `protocol`<sup>Optional</sup> <a name="protocol" id="@bluedynamics/cdk8s-plone.VinylCacheTracing.property.protocol"></a>
+
+```typescript
+public readonly protocol: string;
+```
+
+- *Type:* string
+- *Default:* operator default ('grpc')
+
+OTLP transport: `'grpc'` or `'http/protobuf'`.
+
+---
+
+##### `requestCpu`<sup>Optional</sup> <a name="requestCpu" id="@bluedynamics/cdk8s-plone.VinylCacheTracing.property.requestCpu"></a>
+
+```typescript
+public readonly requestCpu: string;
+```
+
+- *Type:* string
+- *Default:* operator default
+
+CPU request for the tracer sidecar.
+
+---
+
+##### `requestMemory`<sup>Optional</sup> <a name="requestMemory" id="@bluedynamics/cdk8s-plone.VinylCacheTracing.property.requestMemory"></a>
+
+```typescript
+public readonly requestMemory: string;
+```
+
+- *Type:* string
+- *Default:* operator default
+
+Memory request for the tracer sidecar.
+
+---
+
+##### `serviceName`<sup>Optional</sup> <a name="serviceName" id="@bluedynamics/cdk8s-plone.VinylCacheTracing.property.serviceName"></a>
+
+```typescript
+public readonly serviceName: string;
+```
+
+- *Type:* string
+- *Default:* operator default (the VinylCache name)
+
+OpenTelemetry `service.name` of the exported spans.
 
 ---
 

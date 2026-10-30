@@ -11,6 +11,9 @@ import {
   VinylCacheSpecStorage,
   VinylCacheSpecStorageSize,
   VinylCacheSpecStorageType,
+  VinylCacheSpecTracingOtlpProtocol,
+  VinylCacheSpecTracingResourcesLimits,
+  VinylCacheSpecTracingResourcesRequests,
 } from './imports/vinyl.bluedynamics.eu';
 import { Plone } from './plone';
 
@@ -85,6 +88,59 @@ export interface VinylCacheBackend {
    * @default - operator default
    */
   readonly weight?: number;
+}
+
+/**
+ * Tracer sidecar configuration (`spec.tracing`), see `PloneVinylCacheOptions.tracing`.
+ */
+export interface VinylCacheTracing {
+  /**
+   * OTLP collector address as `host:port`, without scheme,
+   * e.g. `'otel-collector.monitoring:4317'`.
+   */
+  readonly otlpEndpoint: string;
+
+  /**
+   * OTLP transport: `'grpc'` or `'http/protobuf'`.
+   * @default - operator default ('grpc')
+   */
+  readonly protocol?: string;
+
+  /**
+   * Disable TLS for the OTLP connection.
+   * @default false
+   */
+  readonly insecure?: boolean;
+
+  /**
+   * OpenTelemetry `service.name` of the exported spans.
+   * @default - operator default (the VinylCache name)
+   */
+  readonly serviceName?: string;
+
+  /**
+   * CPU request for the tracer sidecar.
+   * @default - operator default
+   */
+  readonly requestCpu?: string;
+
+  /**
+   * Memory request for the tracer sidecar.
+   * @default - operator default
+   */
+  readonly requestMemory?: string;
+
+  /**
+   * CPU limit for the tracer sidecar.
+   * @default - operator default
+   */
+  readonly limitCpu?: string;
+
+  /**
+   * Memory limit for the tracer sidecar.
+   * @default - operator default
+   */
+  readonly limitMemory?: string;
 }
 
 /**
@@ -244,6 +300,25 @@ export interface PloneVinylCacheOptions {
    * @default - not set; varnishd defaults apply
    */
   readonly varnishParameters?: { [name: string]: string };
+
+  /**
+   * Export OpenTelemetry trace spans built from the Varnish log through the
+   * vinyl-tracer sidecar (`spec.tracing`). Setting it enables the tracer.
+   * Tracing needs a varnish 9 image, such as the default.
+   *
+   * @default - no tracing
+   */
+  readonly tracing?: VinylCacheTracing;
+
+  /**
+   * Process Edge Side Includes (`spec.esi.enabled`) in backend responses that
+   * carry `Surrogate-Control: content="ESI/1.0"`. Do not use
+   * `varnishParameters: { feature: '+esi' }` instead: that is not a varnishd
+   * feature bit and makes varnishd fail to start.
+   *
+   * @default - not set; no ESI processing
+   */
+  readonly esi?: boolean;
 
   /**
    * Director type for load distribution.
@@ -592,6 +667,31 @@ export class PloneVinylCache extends Construct {
       path: s.path,
     }));
 
+    const tracing = options.tracing;
+    let tracingProtocol: VinylCacheSpecTracingOtlpProtocol | undefined;
+    if (tracing !== undefined) {
+      // cloud-vinyl's webhook rejects an enabled tracer without host:port.
+      if (!/^(\[[0-9a-fA-F:.]+\]|[^\s/:[\]]+):\d{1,5}$/.test(tracing.otlpEndpoint)) {
+        throw new Error(`tracing.otlpEndpoint must be host:port without scheme, got "${tracing.otlpEndpoint}"`);
+      }
+      if (tracing.protocol === 'grpc') {tracingProtocol = VinylCacheSpecTracingOtlpProtocol.GRPC;} else if (tracing.protocol === 'http/protobuf') {tracingProtocol = VinylCacheSpecTracingOtlpProtocol.HTTP_FORWARD_SLASH_PROTOBUF;} else if (tracing.protocol !== undefined) {
+        throw new Error(`tracing.protocol must be "grpc" or "http/protobuf", got "${tracing.protocol}"`);
+      }
+    }
+    const tracingResources = tracing !== undefined
+      && [tracing.requestCpu, tracing.requestMemory, tracing.limitCpu, tracing.limitMemory].some(v => v !== undefined)
+      ? {
+        requests: {
+          cpu: tracing.requestCpu !== undefined ? VinylCacheSpecTracingResourcesRequests.fromString(tracing.requestCpu) : undefined,
+          memory: tracing.requestMemory !== undefined ? VinylCacheSpecTracingResourcesRequests.fromString(tracing.requestMemory) : undefined,
+        },
+        limits: {
+          cpu: tracing.limitCpu !== undefined ? VinylCacheSpecTracingResourcesLimits.fromString(tracing.limitCpu) : undefined,
+          memory: tracing.limitMemory !== undefined ? VinylCacheSpecTracingResourcesLimits.fromString(tracing.limitMemory) : undefined,
+        },
+      }
+      : undefined;
+
     const vinylCache = new VinylCache(this, 'vinylcache', {
       spec: {
         replicas,
@@ -601,6 +701,13 @@ export class PloneVinylCache extends Construct {
         storage,
         cluster: options.cluster !== undefined ? { enabled: options.cluster } : undefined,
         varnishParameters: options.varnishParameters,
+        tracing: tracing !== undefined ? {
+          enabled: true,
+          otlp: { endpoint: tracing.otlpEndpoint, protocol: tracingProtocol, insecure: tracing.insecure },
+          serviceName: tracing.serviceName,
+          resources: tracingResources,
+        } : undefined,
+        esi: options.esi !== undefined ? { enabled: options.esi } : undefined,
         vcl: {
           snippets: {
             vclRecv: vclRecv,
