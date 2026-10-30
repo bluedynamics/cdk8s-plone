@@ -240,7 +240,7 @@ test('with full shard tuning (healthy, rampup, replicas)', () => {
   new PloneVinylCache(chart, 'test', {
     plone,
     director: 'shard',
-    shardBy: 'HASH',
+    shardBy: 'URL',
     shardHealthy: 'ALL',
     shardRampup: '45s',
     shardReplicas: 128,
@@ -440,4 +440,89 @@ test('invalidationUrl throws when invalidation is disabled', () => {
 
   // THEN
   expect(() => cache.invalidationUrl).toThrow(/invalidation is disabled/);
+});
+
+test('renders vinyl.bluedynamics.eu/v1 with varnish 9.1 by default', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new PloneVinylCache(chart, 'cache', { plone: new Plone(chart, 'plone') });
+
+  // THEN
+  const vc = synthVinylCache(chart);
+  expect(vc.apiVersion).toBe('vinyl.bluedynamics.eu/v1');
+  expect(vc.spec.image).toBe('varnish:9.1.0');
+});
+
+test('shardBy HASH is rejected with a reason', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const plone = new Plone(chart, 'plone');
+
+  // THEN
+  expect(() => new PloneVinylCache(chart, 'cache', { plone, shardBy: 'HASH' })).toThrow(/cloud-vinyl 1.0 removed "HASH"/);
+});
+
+test('purgeHosts render into spec.invalidation.purge.hosts', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new PloneVinylCache(chart, 'cache', {
+    plone: new Plone(chart, 'plone'),
+    purgeHosts: ['example.org', 'www.example.org'],
+  });
+
+  // THEN
+  expect(synthVinylCache(chart).spec.invalidation.purge).toEqual({
+    enabled: true,
+    hosts: ['example.org', 'www.example.org'],
+  });
+});
+
+test('without purgeHosts the purge block stays as before', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new PloneVinylCache(chart, 'cache', { plone: new Plone(chart, 'plone') });
+
+  // THEN
+  expect(synthVinylCache(chart).spec.invalidation.purge).toEqual({ enabled: true });
+});
+
+test.each([
+  [{ purgeHosts: ['example.org'], invalidation: false }, /needs invalidation enabled/],
+  [{ purgeHosts: ['Example.org'] }, /not a lowercase hostname/],
+  [{ purgeHosts: ['https://example.org'] }, /not a lowercase hostname/],
+  [{ purgeHosts: ['example.org', 'example.org'] }, /duplicates/],
+  [{ purgeHosts: Array.from({ length: 17 }, (_, i) => `h${i}.example.org`) }, /at most 16/],
+])('rejects invalid purgeHosts %#', (opts, message) => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const plone = new Plone(chart, 'plone');
+
+  // THEN
+  expect(() => new PloneVinylCache(chart, 'cache', { plone, ...opts })).toThrow(message);
+});
+
+test('default vcl_recv snippet leaves PURGE and BAN to cloud-vinyl', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new PloneVinylCache(chart, 'cache', { plone: new Plone(chart, 'plone') });
+
+  // THEN
+  // cloud-vinyl injects the snippet for GET/HEAD only and imports vmod_purge,
+  // so `client.ip ~ purge` fails to compile ("Symbol 'purge' type (vmod)").
+  const recv: string = synthVinylCache(chart).spec.vcl.snippets.vclRecv;
+  expect(recv).not.toMatch(/req\.method|~\s*purge\b/);
 });

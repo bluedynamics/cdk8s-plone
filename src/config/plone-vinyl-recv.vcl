@@ -1,23 +1,6 @@
 # Plone vcl_recv snippet for cloud-vinyl
-# Injected into vcl_recv after routing, before return()
-
-# Handle PURGE requests from Kubernetes network
-if (req.method == "PURGE") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  return (purge);
-}
-
-# Handle BAN requests
-if (req.method == "BAN") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  ban("obj.http.x-url ~ " + req.http.x-ban-url +
-      " && obj.http.x-host ~ " + req.http.x-ban-host);
-  return (synth(200, "Ban added"));
-}
+# Injected into vcl_recv for GET and HEAD only, before return(hash).
+# PURGE, BAN and xkey are handled by cloud-vinyl's own VCL before this point.
 
 # Detect authenticated requests
 if (req.http.Cookie ~ "__ac" || req.http.Authorization) {

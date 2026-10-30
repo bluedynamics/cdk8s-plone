@@ -242,7 +242,7 @@ exports[`defaults 1`] = `
     },
   },
   {
-    "apiVersion": "vinyl.bluedynamics.eu/v1alpha1",
+    "apiVersion": "vinyl.bluedynamics.eu/v1",
     "kind": "VinylCache",
     "metadata": {
       "name": "plone-test-vinylcache-c80a8790",
@@ -281,7 +281,7 @@ exports[`defaults 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "varnish:9.1.0",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -333,25 +333,8 @@ if (!beresp.http.Cache-Control) {
 }
 ",
           "vclRecv": "# Plone vcl_recv snippet for cloud-vinyl
-# Injected into vcl_recv after routing, before return()
-
-# Handle PURGE requests from Kubernetes network
-if (req.method == "PURGE") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  return (purge);
-}
-
-# Handle BAN requests
-if (req.method == "BAN") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  ban("obj.http.x-url ~ " + req.http.x-ban-url +
-      " && obj.http.x-host ~ " + req.http.x-ban-host);
-  return (synth(200, "Ban added"));
-}
+# Injected into vcl_recv for GET and HEAD only, before return(hash).
+# PURGE, BAN and xkey are handled by cloud-vinyl's own VCL before this point.
 
 # Detect authenticated requests
 if (req.http.Cookie ~ "__ac" || req.http.Authorization) {
@@ -495,7 +478,7 @@ exports[`with blicca variant (no frontend) 1`] = `
     },
   },
   {
-    "apiVersion": "vinyl.bluedynamics.eu/v1alpha1",
+    "apiVersion": "vinyl.bluedynamics.eu/v1",
     "kind": "VinylCache",
     "metadata": {
       "name": "plone-test-vinylcache-c80a8790",
@@ -520,7 +503,7 @@ exports[`with blicca variant (no frontend) 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "varnish:9.1.0",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -572,25 +555,8 @@ if (!beresp.http.Cache-Control) {
 }
 ",
           "vclRecv": "# Plone vcl_recv snippet for cloud-vinyl
-# Injected into vcl_recv after routing, before return()
-
-# Handle PURGE requests from Kubernetes network
-if (req.method == "PURGE") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  return (purge);
-}
-
-# Handle BAN requests
-if (req.method == "BAN") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  ban("obj.http.x-url ~ " + req.http.x-ban-url +
-      " && obj.http.x-host ~ " + req.http.x-ban-host);
-  return (synth(200, "Ban added"));
-}
+# Injected into vcl_recv for GET and HEAD only, before return(hash).
+# PURGE, BAN and xkey are handled by cloud-vinyl's own VCL before this point.
 
 # Detect authenticated requests
 if (req.http.Cookie ~ "__ac" || req.http.Authorization) {
@@ -856,7 +822,7 @@ exports[`with custom VCL snippets 1`] = `
     },
   },
   {
-    "apiVersion": "vinyl.bluedynamics.eu/v1alpha1",
+    "apiVersion": "vinyl.bluedynamics.eu/v1",
     "kind": "VinylCache",
     "metadata": {
       "name": "plone-test-vinylcache-c80a8790",
@@ -895,7 +861,7 @@ exports[`with custom VCL snippets 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "varnish:9.1.0",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -1171,7 +1137,7 @@ exports[`with custom replicas and resources 1`] = `
     },
   },
   {
-    "apiVersion": "vinyl.bluedynamics.eu/v1alpha1",
+    "apiVersion": "vinyl.bluedynamics.eu/v1",
     "kind": "VinylCache",
     "metadata": {
       "name": "plone-test-vinylcache-c80a8790",
@@ -1210,7 +1176,7 @@ exports[`with custom replicas and resources 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "varnish:9.1.0",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -1262,25 +1228,8 @@ if (!beresp.http.Cache-Control) {
 }
 ",
           "vclRecv": "# Plone vcl_recv snippet for cloud-vinyl
-# Injected into vcl_recv after routing, before return()
-
-# Handle PURGE requests from Kubernetes network
-if (req.method == "PURGE") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  return (purge);
-}
-
-# Handle BAN requests
-if (req.method == "BAN") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  ban("obj.http.x-url ~ " + req.http.x-ban-url +
-      " && obj.http.x-host ~ " + req.http.x-ban-host);
-  return (synth(200, "Ban added"));
-}
+# Injected into vcl_recv for GET and HEAD only, before return(hash).
+# PURGE, BAN and xkey are handled by cloud-vinyl's own VCL before this point.
 
 # Detect authenticated requests
 if (req.http.Cookie ~ "__ac" || req.http.Authorization) {
@@ -1546,7 +1495,7 @@ exports[`with extraBackends 1`] = `
     },
   },
   {
-    "apiVersion": "vinyl.bluedynamics.eu/v1alpha1",
+    "apiVersion": "vinyl.bluedynamics.eu/v1",
     "kind": "VinylCache",
     "metadata": {
       "name": "plone-test-vinylcache-c80a8790",
@@ -1599,7 +1548,7 @@ exports[`with extraBackends 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "varnish:9.1.0",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -1651,25 +1600,8 @@ if (!beresp.http.Cache-Control) {
 }
 ",
           "vclRecv": "# Plone vcl_recv snippet for cloud-vinyl
-# Injected into vcl_recv after routing, before return()
-
-# Handle PURGE requests from Kubernetes network
-if (req.method == "PURGE") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  return (purge);
-}
-
-# Handle BAN requests
-if (req.method == "BAN") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  ban("obj.http.x-url ~ " + req.http.x-ban-url +
-      " && obj.http.x-host ~ " + req.http.x-ban-host);
-  return (synth(200, "Ban added"));
-}
+# Injected into vcl_recv for GET and HEAD only, before return(hash).
+# PURGE, BAN and xkey are handled by cloud-vinyl's own VCL before this point.
 
 # Detect authenticated requests
 if (req.http.Cookie ~ "__ac" || req.http.Authorization) {
@@ -1935,7 +1867,7 @@ exports[`with full shard tuning (healthy, rampup, replicas) 1`] = `
     },
   },
   {
-    "apiVersion": "vinyl.bluedynamics.eu/v1alpha1",
+    "apiVersion": "vinyl.bluedynamics.eu/v1",
     "kind": "VinylCache",
     "metadata": {
       "name": "plone-test-vinylcache-c80a8790",
@@ -1973,14 +1905,14 @@ exports[`with full shard tuning (healthy, rampup, replicas) 1`] = `
       ],
       "director": {
         "shard": {
-          "by": "HASH",
+          "by": "URL",
           "healthy": "ALL",
           "rampup": "45s",
           "replicas": 128,
         },
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "varnish:9.1.0",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -2032,25 +1964,8 @@ if (!beresp.http.Cache-Control) {
 }
 ",
           "vclRecv": "# Plone vcl_recv snippet for cloud-vinyl
-# Injected into vcl_recv after routing, before return()
-
-# Handle PURGE requests from Kubernetes network
-if (req.method == "PURGE") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  return (purge);
-}
-
-# Handle BAN requests
-if (req.method == "BAN") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  ban("obj.http.x-url ~ " + req.http.x-ban-url +
-      " && obj.http.x-host ~ " + req.http.x-ban-host);
-  return (synth(200, "Ban added"));
-}
+# Injected into vcl_recv for GET and HEAD only, before return(hash).
+# PURGE, BAN and xkey are handled by cloud-vinyl's own VCL before this point.
 
 # Detect authenticated requests
 if (req.http.Cookie ~ "__ac" || req.http.Authorization) {
@@ -2316,7 +2231,7 @@ exports[`with invalidation disabled 1`] = `
     },
   },
   {
-    "apiVersion": "vinyl.bluedynamics.eu/v1alpha1",
+    "apiVersion": "vinyl.bluedynamics.eu/v1",
     "kind": "VinylCache",
     "metadata": {
       "name": "plone-test-vinylcache-c80a8790",
@@ -2355,7 +2270,7 @@ exports[`with invalidation disabled 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "varnish:9.1.0",
       "replicas": 2,
       "resources": {
         "limits": {
@@ -2396,25 +2311,8 @@ if (!beresp.http.Cache-Control) {
 }
 ",
           "vclRecv": "# Plone vcl_recv snippet for cloud-vinyl
-# Injected into vcl_recv after routing, before return()
-
-# Handle PURGE requests from Kubernetes network
-if (req.method == "PURGE") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  return (purge);
-}
-
-# Handle BAN requests
-if (req.method == "BAN") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  ban("obj.http.x-url ~ " + req.http.x-ban-url +
-      " && obj.http.x-host ~ " + req.http.x-ban-host);
-  return (synth(200, "Ban added"));
-}
+# Injected into vcl_recv for GET and HEAD only, before return(hash).
+# PURGE, BAN and xkey are handled by cloud-vinyl's own VCL before this point.
 
 # Detect authenticated requests
 if (req.http.Cookie ~ "__ac" || req.http.Authorization) {
@@ -2680,7 +2578,7 @@ exports[`with monitoring enabled 1`] = `
     },
   },
   {
-    "apiVersion": "vinyl.bluedynamics.eu/v1alpha1",
+    "apiVersion": "vinyl.bluedynamics.eu/v1",
     "kind": "VinylCache",
     "metadata": {
       "name": "plone-test-vinylcache-c80a8790",
@@ -2719,7 +2617,7 @@ exports[`with monitoring enabled 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "varnish:9.1.0",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -2780,25 +2678,8 @@ if (!beresp.http.Cache-Control) {
 }
 ",
           "vclRecv": "# Plone vcl_recv snippet for cloud-vinyl
-# Injected into vcl_recv after routing, before return()
-
-# Handle PURGE requests from Kubernetes network
-if (req.method == "PURGE") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  return (purge);
-}
-
-# Handle BAN requests
-if (req.method == "BAN") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  ban("obj.http.x-url ~ " + req.http.x-ban-url +
-      " && obj.http.x-host ~ " + req.http.x-ban-host);
-  return (synth(200, "Ban added"));
-}
+# Injected into vcl_recv for GET and HEAD only, before return(hash).
+# PURGE, BAN and xkey are handled by cloud-vinyl's own VCL before this point.
 
 # Detect authenticated requests
 if (req.http.Cookie ~ "__ac" || req.http.Authorization) {
@@ -3064,7 +2945,7 @@ exports[`with nodeSelector 1`] = `
     },
   },
   {
-    "apiVersion": "vinyl.bluedynamics.eu/v1alpha1",
+    "apiVersion": "vinyl.bluedynamics.eu/v1",
     "kind": "VinylCache",
     "metadata": {
       "name": "plone-test-vinylcache-c80a8790",
@@ -3103,7 +2984,7 @@ exports[`with nodeSelector 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "varnish:9.1.0",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -3161,25 +3042,8 @@ if (!beresp.http.Cache-Control) {
 }
 ",
           "vclRecv": "# Plone vcl_recv snippet for cloud-vinyl
-# Injected into vcl_recv after routing, before return()
-
-# Handle PURGE requests from Kubernetes network
-if (req.method == "PURGE") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  return (purge);
-}
-
-# Handle BAN requests
-if (req.method == "BAN") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  ban("obj.http.x-url ~ " + req.http.x-ban-url +
-      " && obj.http.x-host ~ " + req.http.x-ban-host);
-  return (synth(200, "Ban added"));
-}
+# Injected into vcl_recv for GET and HEAD only, before return(hash).
+# PURGE, BAN and xkey are handled by cloud-vinyl's own VCL before this point.
 
 # Detect authenticated requests
 if (req.http.Cookie ~ "__ac" || req.http.Authorization) {
@@ -3445,7 +3309,7 @@ exports[`with nodeSelector and tolerations 1`] = `
     },
   },
   {
-    "apiVersion": "vinyl.bluedynamics.eu/v1alpha1",
+    "apiVersion": "vinyl.bluedynamics.eu/v1",
     "kind": "VinylCache",
     "metadata": {
       "name": "plone-test-vinylcache-c80a8790",
@@ -3484,7 +3348,7 @@ exports[`with nodeSelector and tolerations 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "varnish:9.1.0",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -3549,25 +3413,8 @@ if (!beresp.http.Cache-Control) {
 }
 ",
           "vclRecv": "# Plone vcl_recv snippet for cloud-vinyl
-# Injected into vcl_recv after routing, before return()
-
-# Handle PURGE requests from Kubernetes network
-if (req.method == "PURGE") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  return (purge);
-}
-
-# Handle BAN requests
-if (req.method == "BAN") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  ban("obj.http.x-url ~ " + req.http.x-ban-url +
-      " && obj.http.x-host ~ " + req.http.x-ban-host);
-  return (synth(200, "Ban added"));
-}
+# Injected into vcl_recv for GET and HEAD only, before return(hash).
+# PURGE, BAN and xkey are handled by cloud-vinyl's own VCL before this point.
 
 # Detect authenticated requests
 if (req.http.Cookie ~ "__ac" || req.http.Authorization) {
@@ -3833,7 +3680,7 @@ exports[`with shard director 1`] = `
     },
   },
   {
-    "apiVersion": "vinyl.bluedynamics.eu/v1alpha1",
+    "apiVersion": "vinyl.bluedynamics.eu/v1",
     "kind": "VinylCache",
     "metadata": {
       "name": "plone-test-vinylcache-c80a8790",
@@ -3872,7 +3719,7 @@ exports[`with shard director 1`] = `
       "director": {
         "type": "round_robin",
       },
-      "image": "varnish:7.6",
+      "image": "varnish:9.1.0",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -3924,25 +3771,8 @@ if (!beresp.http.Cache-Control) {
 }
 ",
           "vclRecv": "# Plone vcl_recv snippet for cloud-vinyl
-# Injected into vcl_recv after routing, before return()
-
-# Handle PURGE requests from Kubernetes network
-if (req.method == "PURGE") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  return (purge);
-}
-
-# Handle BAN requests
-if (req.method == "BAN") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  ban("obj.http.x-url ~ " + req.http.x-ban-url +
-      " && obj.http.x-host ~ " + req.http.x-ban-host);
-  return (synth(200, "Ban added"));
-}
+# Injected into vcl_recv for GET and HEAD only, before return(hash).
+# PURGE, BAN and xkey are handled by cloud-vinyl's own VCL before this point.
 
 # Detect authenticated requests
 if (req.http.Cookie ~ "__ac" || req.http.Authorization) {
@@ -4208,7 +4038,7 @@ exports[`with shard director and shardBy URL 1`] = `
     },
   },
   {
-    "apiVersion": "vinyl.bluedynamics.eu/v1alpha1",
+    "apiVersion": "vinyl.bluedynamics.eu/v1",
     "kind": "VinylCache",
     "metadata": {
       "name": "plone-test-vinylcache-c80a8790",
@@ -4250,7 +4080,7 @@ exports[`with shard director and shardBy URL 1`] = `
         },
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "varnish:9.1.0",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -4302,25 +4132,8 @@ if (!beresp.http.Cache-Control) {
 }
 ",
           "vclRecv": "# Plone vcl_recv snippet for cloud-vinyl
-# Injected into vcl_recv after routing, before return()
-
-# Handle PURGE requests from Kubernetes network
-if (req.method == "PURGE") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  return (purge);
-}
-
-# Handle BAN requests
-if (req.method == "BAN") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  ban("obj.http.x-url ~ " + req.http.x-ban-url +
-      " && obj.http.x-host ~ " + req.http.x-ban-host);
-  return (synth(200, "Ban added"));
-}
+# Injected into vcl_recv for GET and HEAD only, before return(hash).
+# PURGE, BAN and xkey are handled by cloud-vinyl's own VCL before this point.
 
 # Detect authenticated requests
 if (req.http.Cookie ~ "__ac" || req.http.Authorization) {
@@ -4586,7 +4399,7 @@ exports[`with storage file + malloc 1`] = `
     },
   },
   {
-    "apiVersion": "vinyl.bluedynamics.eu/v1alpha1",
+    "apiVersion": "vinyl.bluedynamics.eu/v1",
     "kind": "VinylCache",
     "metadata": {
       "name": "plone-test-vinylcache-c80a8790",
@@ -4625,7 +4438,7 @@ exports[`with storage file + malloc 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "varnish:9.1.0",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -4690,25 +4503,8 @@ if (!beresp.http.Cache-Control) {
 }
 ",
           "vclRecv": "# Plone vcl_recv snippet for cloud-vinyl
-# Injected into vcl_recv after routing, before return()
-
-# Handle PURGE requests from Kubernetes network
-if (req.method == "PURGE") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  return (purge);
-}
-
-# Handle BAN requests
-if (req.method == "BAN") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  ban("obj.http.x-url ~ " + req.http.x-ban-url +
-      " && obj.http.x-host ~ " + req.http.x-ban-host);
-  return (synth(200, "Ban added"));
-}
+# Injected into vcl_recv for GET and HEAD only, before return(hash).
+# PURGE, BAN and xkey are handled by cloud-vinyl's own VCL before this point.
 
 # Detect authenticated requests
 if (req.http.Cookie ~ "__ac" || req.http.Authorization) {
@@ -4974,7 +4770,7 @@ exports[`with storage malloc 1`] = `
     },
   },
   {
-    "apiVersion": "vinyl.bluedynamics.eu/v1alpha1",
+    "apiVersion": "vinyl.bluedynamics.eu/v1",
     "kind": "VinylCache",
     "metadata": {
       "name": "plone-test-vinylcache-c80a8790",
@@ -5013,7 +4809,7 @@ exports[`with storage malloc 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "varnish:9.1.0",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -5072,25 +4868,8 @@ if (!beresp.http.Cache-Control) {
 }
 ",
           "vclRecv": "# Plone vcl_recv snippet for cloud-vinyl
-# Injected into vcl_recv after routing, before return()
-
-# Handle PURGE requests from Kubernetes network
-if (req.method == "PURGE") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  return (purge);
-}
-
-# Handle BAN requests
-if (req.method == "BAN") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  ban("obj.http.x-url ~ " + req.http.x-ban-url +
-      " && obj.http.x-host ~ " + req.http.x-ban-host);
-  return (synth(200, "Ban added"));
-}
+# Injected into vcl_recv for GET and HEAD only, before return(hash).
+# PURGE, BAN and xkey are handled by cloud-vinyl's own VCL before this point.
 
 # Detect authenticated requests
 if (req.http.Cookie ~ "__ac" || req.http.Authorization) {
@@ -5356,7 +5135,7 @@ exports[`with tolerations 1`] = `
     },
   },
   {
-    "apiVersion": "vinyl.bluedynamics.eu/v1alpha1",
+    "apiVersion": "vinyl.bluedynamics.eu/v1",
     "kind": "VinylCache",
     "metadata": {
       "name": "plone-test-vinylcache-c80a8790",
@@ -5395,7 +5174,7 @@ exports[`with tolerations 1`] = `
       "director": {
         "type": "shard",
       },
-      "image": "varnish:7.6",
+      "image": "varnish:9.1.0",
       "invalidation": {
         "ban": {
           "enabled": true,
@@ -5457,25 +5236,8 @@ if (!beresp.http.Cache-Control) {
 }
 ",
           "vclRecv": "# Plone vcl_recv snippet for cloud-vinyl
-# Injected into vcl_recv after routing, before return()
-
-# Handle PURGE requests from Kubernetes network
-if (req.method == "PURGE") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  return (purge);
-}
-
-# Handle BAN requests
-if (req.method == "BAN") {
-  if (!client.ip ~ purge) {
-    return (synth(405, "Not allowed"));
-  }
-  ban("obj.http.x-url ~ " + req.http.x-ban-url +
-      " && obj.http.x-host ~ " + req.http.x-ban-host);
-  return (synth(200, "Ban added"));
-}
+# Injected into vcl_recv for GET and HEAD only, before return(hash).
+# PURGE, BAN and xkey are handled by cloud-vinyl's own VCL before this point.
 
 # Detect authenticated requests
 if (req.http.Cookie ~ "__ac" || req.http.Authorization) {

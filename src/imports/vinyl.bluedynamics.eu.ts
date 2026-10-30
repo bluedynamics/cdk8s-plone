@@ -15,7 +15,7 @@ export class VinylCache extends ApiObject {
    * Returns the apiVersion and kind for "VinylCache"
    */
   public static readonly GVK: GroupVersionKind = {
-    apiVersion: 'vinyl.bluedynamics.eu/v1alpha1',
+    apiVersion: 'vinyl.bluedynamics.eu/v1',
     kind: 'VinylCache',
   }
 
@@ -132,6 +132,13 @@ export interface VinylCacheSpec {
   readonly director?: VinylCacheSpecDirector;
 
   /**
+   * esi configures Edge Side Includes (ESI) processing.
+   *
+   * @schema VinylCacheSpec#esi
+   */
+  readonly esi?: VinylCacheSpecEsi;
+
+  /**
    * image is the container image for the Varnish pods.
    *
    * @schema VinylCacheSpec#image
@@ -196,14 +203,46 @@ export interface VinylCacheSpec {
 
   /**
    * storage configures one or more Varnish storage backends (malloc or file).
+   * When set, these are the only cache storages. When empty, varnishd
+   * creates its default storage s0 (malloc, 100 MB).
    *
    * @schema VinylCacheSpec#storage
    */
   readonly storage?: VinylCacheSpecStorage[];
 
   /**
-   * varnishParameters are runtime parameters passed to varnishd via -p flags.
-   * Certain security-sensitive parameters are blocked by the admission webhook.
+   * tracing configures the vinyl-tracer sidecar that exports OpenTelemetry
+   * trace spans built from the Varnish Shared memory Log.
+   *
+   * @schema VinylCacheSpec#tracing
+   */
+  readonly tracing?: VinylCacheSpecTracing;
+
+  /**
+   * varnishParameters are runtime parameters passed to varnishd via -p flags,
+   * one flag per map entry: the key must be a bare varnishd parameter name
+   * (lowercase letters, digits, and underscores, starting with a letter —
+   * the admission webhook rejects anything else, including padding
+   * whitespace or uppercase) and the value is passed through unchanged,
+   * e.g. {"thread_pool_min": "100"} becomes "-p thread_pool_min=100".
+   * Entries are sorted by key before being rendered as args, so the pod
+   * template does not churn between reconciles.
+   *
+   * ESI processing is NOT controlled through this map — see spec.esi.
+   * varnishd's "feature" parameter is still useful alongside it: if ESI
+   * response bodies don't reliably start with '<', also set
+   * {"feature": "+esi_disable_xml_check"} (a real varnishd feature bit;
+   * see spec.esi's doc comment for why there is no "+esi" equivalent).
+   *
+   * Certain security-sensitive parameters (vcc_allow_inline_c, cc_command)
+   * are blocked by the admission webhook.
+   *
+   * The key shape is also enforced here via CEL, independently of the
+   * admission webhook: the webhook's failurePolicy=fail only protects
+   * against the webhook being down, not against it never having been
+   * installed (e.g. a cluster running these CRDs without the operator's
+   * webhook configuration applied), and varnishParamArgs renders these
+   * keys straight into varnishd's argv.
    *
    * @schema VinylCacheSpec#varnishParameters
    */
@@ -241,6 +280,7 @@ export function toJson_VinylCacheSpec(obj: VinylCacheSpec | undefined): Record<s
     'cluster': toJson_VinylCacheSpecCluster(obj.cluster),
     'debounce': toJson_VinylCacheSpecDebounce(obj.debounce),
     'director': toJson_VinylCacheSpecDirector(obj.director),
+    'esi': toJson_VinylCacheSpecEsi(obj.esi),
     'image': obj.image,
     'invalidation': toJson_VinylCacheSpecInvalidation(obj.invalidation),
     'monitoring': toJson_VinylCacheSpecMonitoring(obj.monitoring),
@@ -251,6 +291,7 @@ export function toJson_VinylCacheSpec(obj: VinylCacheSpec | undefined): Record<s
     'retry': toJson_VinylCacheSpecRetry(obj.retry),
     'service': toJson_VinylCacheSpecService(obj.service),
     'storage': obj.storage?.map(y => toJson_VinylCacheSpecStorage(y)),
+    'tracing': toJson_VinylCacheSpecTracing(obj.tracing),
     'varnishParameters': ((obj.varnishParameters) === undefined) ? undefined : (Object.entries(obj.varnishParameters).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
     'vcl': toJson_VinylCacheSpecVcl(obj.vcl),
     'volumeClaimTemplates': obj.volumeClaimTemplates?.map(y => toJson_VinylCacheSpecVolumeClaimTemplates(y)),
@@ -305,6 +346,17 @@ export interface VinylCacheSpecBackends {
   readonly probe?: VinylCacheSpecBackendsProbe;
 
   /**
+   * retry configures retrying a fetch on another backend of this group
+   * when the backend sent no response. Defaults to one retry for shard,
+   * round_robin and random directors; hash and fallback directors never
+   * retry, since they would pick the same backend again.
+   *
+   * @default one retry for shard,
+   * @schema VinylCacheSpecBackends#retry
+   */
+  readonly retry?: VinylCacheSpecBackendsRetry;
+
+  /**
    * serviceRef references the Kubernetes Service in the same namespace.
    *
    * @schema VinylCacheSpecBackends#serviceRef
@@ -331,6 +383,7 @@ export function toJson_VinylCacheSpecBackends(obj: VinylCacheSpecBackends | unde
     'name': obj.name,
     'port': obj.port,
     'probe': toJson_VinylCacheSpecBackendsProbe(obj.probe),
+    'retry': toJson_VinylCacheSpecBackendsRetry(obj.retry),
     'serviceRef': toJson_VinylCacheSpecBackendsServiceRef(obj.serviceRef),
     'weight': obj.weight,
   };
@@ -358,6 +411,16 @@ export interface VinylCacheSpecCluster {
    * @schema VinylCacheSpecCluster#peerRouting
    */
   readonly peerRouting?: VinylCacheSpecClusterPeerRouting;
+
+  /**
+   * retry configures retrying a request on another Varnish peer when the
+   * peer sent no response, e.g. because its pod was OOMKilled. The peer
+   * that receives the retry serves it from its own cache or backend.
+   * Default: one retry.
+   *
+   * @schema VinylCacheSpecCluster#retry
+   */
+  readonly retry?: VinylCacheSpecClusterRetry;
 }
 
 /**
@@ -369,6 +432,7 @@ export function toJson_VinylCacheSpecCluster(obj: VinylCacheSpecCluster | undefi
   const result = {
     'enabled': obj.enabled,
     'peerRouting': toJson_VinylCacheSpecClusterPeerRouting(obj.peerRouting),
+    'retry': toJson_VinylCacheSpecClusterRetry(obj.retry),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -445,6 +509,50 @@ export function toJson_VinylCacheSpecDirector(obj: VinylCacheSpecDirector | unde
     'hash': toJson_VinylCacheSpecDirectorHash(obj.hash),
     'shard': toJson_VinylCacheSpecDirectorShard(obj.shard),
     'type': obj.type,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * esi configures Edge Side Includes (ESI) processing.
+ *
+ * @schema VinylCacheSpecEsi
+ */
+export interface VinylCacheSpecEsi {
+  /**
+   * enabled gates the generated vcl_backend_response block that sets
+   * beresp.do_esi = true whenever a backend response carries
+   * Surrogate-Control: content="ESI/1.0". ESI is core varnishd
+   * functionality, not a VMOD and not something any "-p feature=..."
+   * flag turns on or off — an earlier convention asked for
+   * {"feature": "+esi"} in spec.varnishParameters, but "+esi" is not a
+   * real varnishd feature bit (varnishd -x parameter lists no bare
+   * "esi" token) and passing it crashes varnishd outright ("Unknown
+   * feature bit (+esi)"), atomically rejecting the whole -p feature=...
+   * value even when combined with a real token. This field replaces
+   * that convention as the only way to enable ESI.
+   *
+   * If response bodies don't reliably start with '<' (varnishd's ESI
+   * implementation sniffs the body to decide whether to scan it for
+   * <esi:...> tags), additionally set spec.varnishParameters'
+   * {"feature": "+esi_disable_xml_check"} — that token IS real and
+   * independent of this field.
+   *
+   * @schema VinylCacheSpecEsi#enabled
+   */
+  readonly enabled?: boolean;
+}
+
+/**
+ * Converts an object of type 'VinylCacheSpecEsi' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheSpecEsi(obj: VinylCacheSpecEsi | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'enabled': obj.enabled,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -569,6 +677,18 @@ export interface VinylCacheSpecPod {
   readonly annotations?: { [key: string]: string };
 
   /**
+   * env sets environment variables on the varnish container. An entry
+   * whose name matches an operator default replaces that default; all
+   * others are appended. The operator sets MALLOC_CONF to tune varnishd's
+   * jemalloc heap for a container (see the memory sizing how-to); setting
+   * MALLOC_CONF here replaces the whole value, and an empty value restores
+   * jemalloc's own defaults.
+   *
+   * @schema VinylCacheSpecPod#env
+   */
+  readonly env?: VinylCacheSpecPodEnv[];
+
+  /**
    * labels are added to each Varnish pod (merged with operator-managed labels).
    *
    * @schema VinylCacheSpecPod#labels
@@ -630,6 +750,7 @@ export function toJson_VinylCacheSpecPod(obj: VinylCacheSpecPod | undefined): Re
   const result = {
     'affinity': toJson_VinylCacheSpecPodAffinity(obj.affinity),
     'annotations': ((obj.annotations) === undefined) ? undefined : (Object.entries(obj.annotations).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    'env': obj.env?.map(y => toJson_VinylCacheSpecPodEnv(y)),
     'labels': ((obj.labels) === undefined) ? undefined : (Object.entries(obj.labels).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
     'nodeSelector': ((obj.nodeSelector) === undefined) ? undefined : (Object.entries(obj.nodeSelector).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
     'priorityClassName': obj.priorityClassName,
@@ -739,7 +860,8 @@ export function toJson_VinylCacheSpecResources(obj: VinylCacheSpecResources | un
  */
 export interface VinylCacheSpecRetry {
   /**
-   * backoffBase is the initial backoff duration between retry attempts. Default: 5s.
+   * backoffBase is how long the reconcile loop waits before retrying a failed
+   * VCL push. Default: 30s.
    *
    * @schema VinylCacheSpecRetry#backoffBase
    */
@@ -753,8 +875,15 @@ export interface VinylCacheSpecRetry {
   readonly backoffMax?: string;
 
   /**
-   * maxAttempts is the maximum number of VCL push attempts before the operator
-   * transitions to Error phase. Default: 3.
+   * maxAttempts has no effect.
+   *
+   * Deprecated: VCL pushes are retried by the reconcile loop, which pushes to
+   * every reachable pod that does not already carry the desired VCL. Bounding
+   * the attempts would leave a pod unconverged with no way back, so the field
+   * is inert and scheduled for removal in the next breaking version. It never
+   * had the semantics its name suggests: it bounded attempts per reconcile,
+   * never in total.
+   * See docs/superpowers/specs/2026-08-25-reconcile-starvation-design.md.
    *
    * @schema VinylCacheSpecRetry#maxAttempts
    */
@@ -821,6 +950,7 @@ export function toJson_VinylCacheSpecService(obj: VinylCacheSpecService | undefi
 export interface VinylCacheSpecStorage {
   /**
    * name is the internal storage identifier used in varnishd -s arguments.
+   * "synth" is reserved: varnishd 9.1 defines a storage of that name.
    *
    * @schema VinylCacheSpecStorage#name
    */
@@ -861,6 +991,62 @@ export function toJson_VinylCacheSpecStorage(obj: VinylCacheSpecStorage | undefi
     'path': obj.path,
     'size': obj.size?.value,
     'type': obj.type,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * tracing configures the vinyl-tracer sidecar that exports OpenTelemetry
+ * trace spans built from the Varnish Shared memory Log.
+ *
+ * @schema VinylCacheSpecTracing
+ */
+export interface VinylCacheSpecTracing {
+  /**
+   * enabled activates the vinyl-tracer sidecar.
+   *
+   * @schema VinylCacheSpecTracing#enabled
+   */
+  readonly enabled?: boolean;
+
+  /**
+   * otlp configures the OTLP trace exporter. endpoint is required when
+   * tracing is enabled.
+   *
+   * @schema VinylCacheSpecTracing#otlp
+   */
+  readonly otlp?: VinylCacheSpecTracingOtlp;
+
+  /**
+   * resources are the tracer container's resource requirements.
+   *
+   * @schema VinylCacheSpecTracing#resources
+   */
+  readonly resources?: VinylCacheSpecTracingResources;
+
+  /**
+   * serviceName is the OTel service.name resource attribute.
+   * Defaults to the VinylCache name.
+   *
+   * @default the VinylCache name.
+   * @schema VinylCacheSpecTracing#serviceName
+   */
+  readonly serviceName?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheSpecTracing' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheSpecTracing(obj: VinylCacheSpecTracing | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'enabled': obj.enabled,
+    'otlp': toJson_VinylCacheSpecTracingOtlp(obj.otlp),
+    'resources': toJson_VinylCacheSpecTracingResources(obj.resources),
+    'serviceName': obj.serviceName,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -1157,6 +1343,39 @@ export function toJson_VinylCacheSpecBackendsProbe(obj: VinylCacheSpecBackendsPr
 /* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
 
 /**
+ * retry configures retrying a fetch on another backend of this group
+ * when the backend sent no response. Defaults to one retry for shard,
+ * round_robin and random directors; hash and fallback directors never
+ * retry, since they would pick the same backend again.
+ *
+ * @default one retry for shard,
+ * @schema VinylCacheSpecBackendsRetry
+ */
+export interface VinylCacheSpecBackendsRetry {
+  /**
+   * maxRetries is the number of retries per fetch. 0 disables retrying.
+   * Default: 1.
+   *
+   * @schema VinylCacheSpecBackendsRetry#maxRetries
+   */
+  readonly maxRetries?: number;
+}
+
+/**
+ * Converts an object of type 'VinylCacheSpecBackendsRetry' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheSpecBackendsRetry(obj: VinylCacheSpecBackendsRetry | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'maxRetries': obj.maxRetries,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
  * serviceRef references the Kubernetes Service in the same namespace.
  *
  * @schema VinylCacheSpecBackendsServiceRef
@@ -1213,6 +1432,38 @@ export function toJson_VinylCacheSpecClusterPeerRouting(obj: VinylCacheSpecClust
 /* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
 
 /**
+ * retry configures retrying a request on another Varnish peer when the
+ * peer sent no response, e.g. because its pod was OOMKilled. The peer
+ * that receives the retry serves it from its own cache or backend.
+ * Default: one retry.
+ *
+ * @schema VinylCacheSpecClusterRetry
+ */
+export interface VinylCacheSpecClusterRetry {
+  /**
+   * maxRetries is the number of retries per fetch. 0 disables retrying.
+   * Default: 1.
+   *
+   * @schema VinylCacheSpecClusterRetry#maxRetries
+   */
+  readonly maxRetries?: number;
+}
+
+/**
+ * Converts an object of type 'VinylCacheSpecClusterRetry' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheSpecClusterRetry(obj: VinylCacheSpecClusterRetry | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'maxRetries': obj.maxRetries,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
  * hash configures the hash director. Only used when type is "hash".
  *
  * @schema VinylCacheSpecDirectorHash
@@ -1247,8 +1498,11 @@ export function toJson_VinylCacheSpecDirectorHash(obj: VinylCacheSpecDirectorHas
  */
 export interface VinylCacheSpecDirectorShard {
   /**
-   * by determines what value is hashed for shard selection. "HASH" uses the Varnish
-   * hash (default); "URL" uses the request URL.
+   * by determines what value the cluster-peer shard director hashes to pick a
+   * backend, at the point in vcl_recv where cluster routing runs. "URL" (default)
+   * hashes the request URL. "HASH" is not offered: it would hash Varnish's
+   * req.hash, which is only populated by vcl_hash, and vcl_recv's cluster routing
+   * never reaches vcl_hash — so HASH cannot work at this call site.
    *
    * @schema VinylCacheSpecDirectorShard#by
    */
@@ -1391,8 +1645,23 @@ export interface VinylCacheSpecInvalidationPurge {
   readonly enabled?: boolean;
 
   /**
+   * hosts are the site hostnames a PURGE through the invalidation proxy
+   * applies to, e.g. ["example.org"]. Varnish keys cached objects by URL
+   * and site host, while a client reaches the proxy through the cache's
+   * invalidation host, so the proxy has to forward the purge with the site
+   * host. A request may name its hosts in an X-Vinyl-Purge-Host header;
+   * without one, the proxy sends one purge per host listed here. Needed for
+   * clients that cannot set headers, such as plone.cachepurging. If both
+   * are absent, the purge matches only objects cached under the
+   * invalidation host itself.
+   *
+   * @schema VinylCacheSpecInvalidationPurge#hosts
+   */
+  readonly hosts?: string[];
+
+  /**
    * soft enables soft purges, which mark objects as expired rather than removing them.
-   * This allows Varnish to serve stale content while revalidating. Default: true.
+   * This allows Varnish to serve stale content while revalidating.
    *
    * @schema VinylCacheSpecInvalidationPurge#soft
    */
@@ -1408,6 +1677,7 @@ export function toJson_VinylCacheSpecInvalidationPurge(obj: VinylCacheSpecInvali
   const result = {
     'allowedSources': obj.allowedSources?.map(y => y),
     'enabled': obj.enabled,
+    'hosts': obj.hosts?.map(y => y),
     'soft': obj.soft,
   };
   // filter undefined values
@@ -1429,18 +1699,12 @@ export interface VinylCacheSpecInvalidationXkey {
   readonly allowedSources?: string[];
 
   /**
-   * enabled activates xkey-based invalidation.
+   * enabled activates xkey-based invalidation. The operator's invalidation
+   * API purges xkey keys hard, removing the tagged objects.
    *
    * @schema VinylCacheSpecInvalidationXkey#enabled
    */
   readonly enabled?: boolean;
-
-  /**
-   * softPurge enables soft purging via xkey. Default: true.
-   *
-   * @schema VinylCacheSpecInvalidationXkey#softPurge
-   */
-  readonly softPurge?: boolean;
 }
 
 /**
@@ -1452,7 +1716,6 @@ export function toJson_VinylCacheSpecInvalidationXkey(obj: VinylCacheSpecInvalid
   const result = {
     'allowedSources': obj.allowedSources?.map(y => y),
     'enabled': obj.enabled,
-    'softPurge': obj.softPurge,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -1475,9 +1738,9 @@ export interface VinylCacheSpecMonitoringExporter {
 
   /**
    * image overrides the exporter image. Defaults to
-   * ghcr.io/bluedynamics/varnish-exporter:1.6.1.
+   * ghcr.io/bluedynamics/varnish-exporter:1.6.1-varnish9.1.0.
    *
-   * @default ghcr.io/bluedynamics/varnish-exporter:1.6.1.
+   * @default ghcr.io/bluedynamics/varnish-exporter:1.6.1-varnish9.1.0.
    * @schema VinylCacheSpecMonitoringExporter#image
    */
   readonly image?: VinylCacheSpecMonitoringExporterImage;
@@ -1618,6 +1881,60 @@ export function toJson_VinylCacheSpecPodAffinity(obj: VinylCacheSpecPodAffinity 
     'nodeAffinity': toJson_VinylCacheSpecPodAffinityNodeAffinity(obj.nodeAffinity),
     'podAffinity': toJson_VinylCacheSpecPodAffinityPodAffinity(obj.podAffinity),
     'podAntiAffinity': toJson_VinylCacheSpecPodAffinityPodAntiAffinity(obj.podAntiAffinity),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * EnvVar represents an environment variable present in a Container.
+ *
+ * @schema VinylCacheSpecPodEnv
+ */
+export interface VinylCacheSpecPodEnv {
+  /**
+   * Name of the environment variable.
+   * May consist of any printable ASCII characters except '='.
+   *
+   * @schema VinylCacheSpecPodEnv#name
+   */
+  readonly name: string;
+
+  /**
+   * Variable references $(VAR_NAME) are expanded
+   * using the previously defined environment variables in the container and
+   * any service environment variables. If a variable cannot be resolved,
+   * the reference in the input string will be unchanged. Double $$ are reduced
+   * to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e.
+   * "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)".
+   * Escaped references will never be expanded, regardless of whether the variable
+   * exists or not.
+   * Defaults to "".
+   *
+   * @default .
+   * @schema VinylCacheSpecPodEnv#value
+   */
+  readonly value?: string;
+
+  /**
+   * Source for the environment variable's value. Cannot be used if value is not empty.
+   *
+   * @schema VinylCacheSpecPodEnv#valueFrom
+   */
+  readonly valueFrom?: VinylCacheSpecPodEnvValueFrom;
+}
+
+/**
+ * Converts an object of type 'VinylCacheSpecPodEnv' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheSpecPodEnv(obj: VinylCacheSpecPodEnv | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'name': obj.name,
+    'value': obj.value,
+    'valueFrom': toJson_VinylCacheSpecPodEnvValueFrom(obj.valueFrom),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -1989,7 +2306,7 @@ export interface VinylCacheSpecPodVolumes {
    * A failure to resolve or pull the image during pod startup will block containers from starting and may add significant latency. Failures will be retried using normal volume backoff and will be reported on the pod reason and message.
    * The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field.
    * The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images.
-   * The volume will be mounted read-only (ro) and non-executable files (noexec).
+   * The volume will be mounted read-only (ro).
    * Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath) before 1.33.
    * The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type.
    *
@@ -2043,8 +2360,7 @@ export interface VinylCacheSpecPodVolumes {
   /**
    * portworxVolume represents a portworx volume attached and mounted on kubelets host machine.
    * Deprecated: PortworxVolume is deprecated. All operations for the in-tree portworxVolume type
-   * are redirected to the pxd.portworx.com CSI driver when the CSIMigrationPortworx feature-gate
-   * is on.
+   * are redirected to the pxd.portworx.com CSI driver.
    *
    * @schema VinylCacheSpecPodVolumes#portworxVolume
    */
@@ -2262,6 +2578,106 @@ export enum VinylCacheSpecStorageType {
   /** file */
   FILE = "file",
 }
+
+/**
+ * otlp configures the OTLP trace exporter. endpoint is required when
+ * tracing is enabled.
+ *
+ * @schema VinylCacheSpecTracingOtlp
+ */
+export interface VinylCacheSpecTracingOtlp {
+  /**
+   * endpoint is the collector's host:port (no scheme).
+   *
+   * @schema VinylCacheSpecTracingOtlp#endpoint
+   */
+  readonly endpoint?: string;
+
+  /**
+   * insecure disables TLS for the OTLP connection.
+   *
+   * @schema VinylCacheSpecTracingOtlp#insecure
+   */
+  readonly insecure?: boolean;
+
+  /**
+   * protocol selects the OTLP transport. Defaults to grpc.
+   *
+   * @default grpc.
+   * @schema VinylCacheSpecTracingOtlp#protocol
+   */
+  readonly protocol?: VinylCacheSpecTracingOtlpProtocol;
+}
+
+/**
+ * Converts an object of type 'VinylCacheSpecTracingOtlp' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheSpecTracingOtlp(obj: VinylCacheSpecTracingOtlp | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'endpoint': obj.endpoint,
+    'insecure': obj.insecure,
+    'protocol': obj.protocol,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * resources are the tracer container's resource requirements.
+ *
+ * @schema VinylCacheSpecTracingResources
+ */
+export interface VinylCacheSpecTracingResources {
+  /**
+   * Claims lists the names of resources, defined in spec.resourceClaims,
+   * that are used by this container.
+   *
+   * This field depends on the
+   * DynamicResourceAllocation feature gate.
+   *
+   * This field is immutable. It can only be set for containers.
+   *
+   * @schema VinylCacheSpecTracingResources#claims
+   */
+  readonly claims?: VinylCacheSpecTracingResourcesClaims[];
+
+  /**
+   * Limits describes the maximum amount of compute resources allowed.
+   * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+   *
+   * @schema VinylCacheSpecTracingResources#limits
+   */
+  readonly limits?: { [key: string]: VinylCacheSpecTracingResourcesLimits };
+
+  /**
+   * Requests describes the minimum amount of compute resources required.
+   * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+   * otherwise to an implementation-defined value. Requests cannot exceed Limits.
+   * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+   *
+   * @schema VinylCacheSpecTracingResources#requests
+   */
+  readonly requests?: { [key: string]: VinylCacheSpecTracingResourcesRequests };
+}
+
+/**
+ * Converts an object of type 'VinylCacheSpecTracingResources' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheSpecTracingResources(obj: VinylCacheSpecTracingResources | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'claims': obj.claims?.map(y => toJson_VinylCacheSpecTracingResourcesClaims(y)),
+    'limits': ((obj.limits) === undefined) ? undefined : (Object.entries(obj.limits).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    'requests': ((obj.requests) === undefined) ? undefined : (Object.entries(obj.requests).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
 
 /**
  * snippets provides VCL code injected into each generated subroutine.
@@ -2718,8 +3134,11 @@ export function toJson_VinylCacheSpecBackendsDirectorHash(obj: VinylCacheSpecBac
  */
 export interface VinylCacheSpecBackendsDirectorShard {
   /**
-   * by determines what value is hashed for shard selection. "HASH" uses the Varnish
-   * hash (default); "URL" uses the request URL.
+   * by determines what value the cluster-peer shard director hashes to pick a
+   * backend, at the point in vcl_recv where cluster routing runs. "URL" (default)
+   * hashes the request URL. "HASH" is not offered: it would hash Varnish's
+   * req.hash, which is only populated by vcl_hash, and vcl_recv's cluster routing
+   * never reaches vcl_hash — so HASH cannot work at this call site.
    *
    * @schema VinylCacheSpecBackendsDirectorShard#by
    */
@@ -2807,14 +3226,15 @@ export enum VinylCacheSpecClusterPeerRoutingType {
 }
 
 /**
- * by determines what value is hashed for shard selection. "HASH" uses the Varnish
- * hash (default); "URL" uses the request URL.
+ * by determines what value the cluster-peer shard director hashes to pick a
+ * backend, at the point in vcl_recv where cluster routing runs. "URL" (default)
+ * hashes the request URL. "HASH" is not offered: it would hash Varnish's
+ * req.hash, which is only populated by vcl_hash, and vcl_recv's cluster routing
+ * never reaches vcl_hash — so HASH cannot work at this call site.
  *
  * @schema VinylCacheSpecDirectorShardBy
  */
 export enum VinylCacheSpecDirectorShardBy {
-  /** HASH */
-  HASH = "HASH",
   /** URL */
   URL = "URL",
 }
@@ -2835,9 +3255,9 @@ export enum VinylCacheSpecDirectorShardHealthy {
 
 /**
  * image overrides the exporter image. Defaults to
- * ghcr.io/bluedynamics/varnish-exporter:1.6.1.
+ * ghcr.io/bluedynamics/varnish-exporter:1.6.1-varnish9.1.0.
  *
- * @default ghcr.io/bluedynamics/varnish-exporter:1.6.1.
+ * @default ghcr.io/bluedynamics/varnish-exporter:1.6.1-varnish9.1.0.
  * @schema VinylCacheSpecMonitoringExporterImage
  */
 export interface VinylCacheSpecMonitoringExporterImage {
@@ -3063,6 +3483,69 @@ export function toJson_VinylCacheSpecPodAffinityPodAntiAffinity(obj: VinylCacheS
   const result = {
     'preferredDuringSchedulingIgnoredDuringExecution': obj.preferredDuringSchedulingIgnoredDuringExecution?.map(y => toJson_VinylCacheSpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecution(y)),
     'requiredDuringSchedulingIgnoredDuringExecution': obj.requiredDuringSchedulingIgnoredDuringExecution?.map(y => toJson_VinylCacheSpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution(y)),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Source for the environment variable's value. Cannot be used if value is not empty.
+ *
+ * @schema VinylCacheSpecPodEnvValueFrom
+ */
+export interface VinylCacheSpecPodEnvValueFrom {
+  /**
+   * Selects a key of a ConfigMap.
+   *
+   * @schema VinylCacheSpecPodEnvValueFrom#configMapKeyRef
+   */
+  readonly configMapKeyRef?: VinylCacheSpecPodEnvValueFromConfigMapKeyRef;
+
+  /**
+   * Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels['<KEY>']`, `metadata.annotations['<KEY>']`,
+   * spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.
+   *
+   * @schema VinylCacheSpecPodEnvValueFrom#fieldRef
+   */
+  readonly fieldRef?: VinylCacheSpecPodEnvValueFromFieldRef;
+
+  /**
+   * FileKeyRef selects a key of the env file.
+   * Requires the EnvFiles feature gate to be enabled.
+   *
+   * @schema VinylCacheSpecPodEnvValueFrom#fileKeyRef
+   */
+  readonly fileKeyRef?: VinylCacheSpecPodEnvValueFromFileKeyRef;
+
+  /**
+   * Selects a resource of the container: only resources limits and requests
+   * (limits.cpu, limits.memory, limits.ephemeral-storage, requests.cpu, requests.memory and requests.ephemeral-storage) are currently supported.
+   *
+   * @schema VinylCacheSpecPodEnvValueFrom#resourceFieldRef
+   */
+  readonly resourceFieldRef?: VinylCacheSpecPodEnvValueFromResourceFieldRef;
+
+  /**
+   * Selects a key of a secret in the pod's namespace
+   *
+   * @schema VinylCacheSpecPodEnvValueFrom#secretKeyRef
+   */
+  readonly secretKeyRef?: VinylCacheSpecPodEnvValueFromSecretKeyRef;
+}
+
+/**
+ * Converts an object of type 'VinylCacheSpecPodEnvValueFrom' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheSpecPodEnvValueFrom(obj: VinylCacheSpecPodEnvValueFrom | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'configMapKeyRef': toJson_VinylCacheSpecPodEnvValueFromConfigMapKeyRef(obj.configMapKeyRef),
+    'fieldRef': toJson_VinylCacheSpecPodEnvValueFromFieldRef(obj.fieldRef),
+    'fileKeyRef': toJson_VinylCacheSpecPodEnvValueFromFileKeyRef(obj.fileKeyRef),
+    'resourceFieldRef': toJson_VinylCacheSpecPodEnvValueFromResourceFieldRef(obj.resourceFieldRef),
+    'secretKeyRef': toJson_VinylCacheSpecPodEnvValueFromSecretKeyRef(obj.secretKeyRef),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -4086,7 +4569,7 @@ export function toJson_VinylCacheSpecPodVolumesHostPath(obj: VinylCacheSpecPodVo
  * A failure to resolve or pull the image during pod startup will block containers from starting and may add significant latency. Failures will be retried using normal volume backoff and will be reported on the pod reason and message.
  * The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field.
  * The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images.
- * The volume will be mounted read-only (ro) and non-executable files (noexec).
+ * The volume will be mounted read-only (ro).
  * Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath) before 1.33.
  * The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type.
  *
@@ -4386,8 +4869,7 @@ export function toJson_VinylCacheSpecPodVolumesPhotonPersistentDisk(obj: VinylCa
 /**
  * portworxVolume represents a portworx volume attached and mounted on kubelets host machine.
  * Deprecated: PortworxVolume is deprecated. All operations for the in-tree portworxVolume type
- * are redirected to the pxd.portworx.com CSI driver when the CSIMigrationPortworx feature-gate
- * is on.
+ * are redirected to the pxd.portworx.com CSI driver.
  *
  * @schema VinylCacheSpecPodVolumesPortworxVolume
  */
@@ -4965,6 +5447,87 @@ export function toJson_VinylCacheSpecPodVolumesVsphereVolume(obj: VinylCacheSpec
 /* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
 
 /**
+ * protocol selects the OTLP transport. Defaults to grpc.
+ *
+ * @default grpc.
+ * @schema VinylCacheSpecTracingOtlpProtocol
+ */
+export enum VinylCacheSpecTracingOtlpProtocol {
+  /** grpc */
+  GRPC = "grpc",
+  /** http/protobuf */
+  HTTP_FORWARD_SLASH_PROTOBUF = "http/protobuf",
+}
+
+/**
+ * ResourceClaim references one entry in PodSpec.ResourceClaims.
+ *
+ * @schema VinylCacheSpecTracingResourcesClaims
+ */
+export interface VinylCacheSpecTracingResourcesClaims {
+  /**
+   * Name must match the name of one entry in pod.spec.resourceClaims of
+   * the Pod where this field is used. It makes that resource available
+   * inside a container.
+   *
+   * @schema VinylCacheSpecTracingResourcesClaims#name
+   */
+  readonly name: string;
+
+  /**
+   * Request is the name chosen for a request in the referenced claim.
+   * If empty, everything from the claim is made available, otherwise
+   * only the result of this request.
+   *
+   * @schema VinylCacheSpecTracingResourcesClaims#request
+   */
+  readonly request?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheSpecTracingResourcesClaims' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheSpecTracingResourcesClaims(obj: VinylCacheSpecTracingResourcesClaims | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'name': obj.name,
+    'request': obj.request,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * @schema VinylCacheSpecTracingResourcesLimits
+ */
+export class VinylCacheSpecTracingResourcesLimits {
+  public static fromNumber(value: number): VinylCacheSpecTracingResourcesLimits {
+    return new VinylCacheSpecTracingResourcesLimits(value);
+  }
+  public static fromString(value: string): VinylCacheSpecTracingResourcesLimits {
+    return new VinylCacheSpecTracingResourcesLimits(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * @schema VinylCacheSpecTracingResourcesRequests
+ */
+export class VinylCacheSpecTracingResourcesRequests {
+  public static fromNumber(value: number): VinylCacheSpecTracingResourcesRequests {
+    return new VinylCacheSpecTracingResourcesRequests(value);
+  }
+  public static fromString(value: string): VinylCacheSpecTracingResourcesRequests {
+    return new VinylCacheSpecTracingResourcesRequests(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
  * dataSource field can be used to specify either:
  * * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot)
  * * An existing PVC (PersistentVolumeClaim)
@@ -5325,14 +5888,15 @@ export function toJson_VinylCacheSpecVolumeClaimTemplatesStatusModifyVolumeStatu
 /* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
 
 /**
- * by determines what value is hashed for shard selection. "HASH" uses the Varnish
- * hash (default); "URL" uses the request URL.
+ * by determines what value the cluster-peer shard director hashes to pick a
+ * backend, at the point in vcl_recv where cluster routing runs. "URL" (default)
+ * hashes the request URL. "HASH" is not offered: it would hash Varnish's
+ * req.hash, which is only populated by vcl_hash, and vcl_recv's cluster routing
+ * never reaches vcl_hash — so HASH cannot work at this call site.
  *
  * @schema VinylCacheSpecBackendsDirectorShardBy
  */
 export enum VinylCacheSpecBackendsDirectorShardBy {
-  /** HASH */
-  HASH = "HASH",
   /** URL */
   URL = "URL",
 }
@@ -5754,6 +6318,246 @@ export function toJson_VinylCacheSpecPodAffinityPodAntiAffinityRequiredDuringSch
     'namespaceSelector': toJson_VinylCacheSpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector(obj.namespaceSelector),
     'namespaces': obj.namespaces?.map(y => y),
     'topologyKey': obj.topologyKey,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Selects a key of a ConfigMap.
+ *
+ * @schema VinylCacheSpecPodEnvValueFromConfigMapKeyRef
+ */
+export interface VinylCacheSpecPodEnvValueFromConfigMapKeyRef {
+  /**
+   * The key to select.
+   *
+   * @schema VinylCacheSpecPodEnvValueFromConfigMapKeyRef#key
+   */
+  readonly key: string;
+
+  /**
+   * Name of the referent.
+   * This field is effectively required, but due to backwards compatibility is
+   * allowed to be empty. Instances of this type with an empty value here are
+   * almost certainly wrong.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+   *
+   * @schema VinylCacheSpecPodEnvValueFromConfigMapKeyRef#name
+   */
+  readonly name?: string;
+
+  /**
+   * Specify whether the ConfigMap or its key must be defined
+   *
+   * @schema VinylCacheSpecPodEnvValueFromConfigMapKeyRef#optional
+   */
+  readonly optional?: boolean;
+}
+
+/**
+ * Converts an object of type 'VinylCacheSpecPodEnvValueFromConfigMapKeyRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheSpecPodEnvValueFromConfigMapKeyRef(obj: VinylCacheSpecPodEnvValueFromConfigMapKeyRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'name': obj.name,
+    'optional': obj.optional,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels['<KEY>']`, `metadata.annotations['<KEY>']`,
+ * spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.
+ *
+ * @schema VinylCacheSpecPodEnvValueFromFieldRef
+ */
+export interface VinylCacheSpecPodEnvValueFromFieldRef {
+  /**
+   * Version of the schema the FieldPath is written in terms of, defaults to "v1".
+   *
+   * @schema VinylCacheSpecPodEnvValueFromFieldRef#apiVersion
+   */
+  readonly apiVersion?: string;
+
+  /**
+   * Path of the field to select in the specified API version.
+   *
+   * @schema VinylCacheSpecPodEnvValueFromFieldRef#fieldPath
+   */
+  readonly fieldPath: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheSpecPodEnvValueFromFieldRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheSpecPodEnvValueFromFieldRef(obj: VinylCacheSpecPodEnvValueFromFieldRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'apiVersion': obj.apiVersion,
+    'fieldPath': obj.fieldPath,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * FileKeyRef selects a key of the env file.
+ * Requires the EnvFiles feature gate to be enabled.
+ *
+ * @schema VinylCacheSpecPodEnvValueFromFileKeyRef
+ */
+export interface VinylCacheSpecPodEnvValueFromFileKeyRef {
+  /**
+   * The key within the env file. An invalid key will prevent the pod from starting.
+   * The keys defined within a source may consist of any printable ASCII characters except '='.
+   * During Alpha stage of the EnvFiles feature gate, the key size is limited to 128 characters.
+   *
+   * @schema VinylCacheSpecPodEnvValueFromFileKeyRef#key
+   */
+  readonly key: string;
+
+  /**
+   * Specify whether the file or its key must be defined. If the file or key
+   * does not exist, then the env var is not published.
+   * If optional is set to true and the specified key does not exist,
+   * the environment variable will not be set in the Pod's containers.
+   *
+   * If optional is set to false and the specified key does not exist,
+   * an error will be returned during Pod creation.
+   *
+   * @schema VinylCacheSpecPodEnvValueFromFileKeyRef#optional
+   */
+  readonly optional?: boolean;
+
+  /**
+   * The path within the volume from which to select the file.
+   * Must be relative and may not contain the '..' path or start with '..'.
+   *
+   * @schema VinylCacheSpecPodEnvValueFromFileKeyRef#path
+   */
+  readonly path: string;
+
+  /**
+   * The name of the volume mount containing the env file.
+   *
+   * @schema VinylCacheSpecPodEnvValueFromFileKeyRef#volumeName
+   */
+  readonly volumeName: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheSpecPodEnvValueFromFileKeyRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheSpecPodEnvValueFromFileKeyRef(obj: VinylCacheSpecPodEnvValueFromFileKeyRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'optional': obj.optional,
+    'path': obj.path,
+    'volumeName': obj.volumeName,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Selects a resource of the container: only resources limits and requests
+ * (limits.cpu, limits.memory, limits.ephemeral-storage, requests.cpu, requests.memory and requests.ephemeral-storage) are currently supported.
+ *
+ * @schema VinylCacheSpecPodEnvValueFromResourceFieldRef
+ */
+export interface VinylCacheSpecPodEnvValueFromResourceFieldRef {
+  /**
+   * Container name: required for volumes, optional for env vars
+   *
+   * @schema VinylCacheSpecPodEnvValueFromResourceFieldRef#containerName
+   */
+  readonly containerName?: string;
+
+  /**
+   * Specifies the output format of the exposed resources, defaults to "1"
+   *
+   * @schema VinylCacheSpecPodEnvValueFromResourceFieldRef#divisor
+   */
+  readonly divisor?: VinylCacheSpecPodEnvValueFromResourceFieldRefDivisor;
+
+  /**
+   * Required: resource to select
+   *
+   * @schema VinylCacheSpecPodEnvValueFromResourceFieldRef#resource
+   */
+  readonly resource: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheSpecPodEnvValueFromResourceFieldRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheSpecPodEnvValueFromResourceFieldRef(obj: VinylCacheSpecPodEnvValueFromResourceFieldRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'containerName': obj.containerName,
+    'divisor': obj.divisor?.value,
+    'resource': obj.resource,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Selects a key of a secret in the pod's namespace
+ *
+ * @schema VinylCacheSpecPodEnvValueFromSecretKeyRef
+ */
+export interface VinylCacheSpecPodEnvValueFromSecretKeyRef {
+  /**
+   * The key of the secret to select from.  Must be a valid secret key.
+   *
+   * @schema VinylCacheSpecPodEnvValueFromSecretKeyRef#key
+   */
+  readonly key: string;
+
+  /**
+   * Name of the referent.
+   * This field is effectively required, but due to backwards compatibility is
+   * allowed to be empty. Instances of this type with an empty value here are
+   * almost certainly wrong.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+   *
+   * @schema VinylCacheSpecPodEnvValueFromSecretKeyRef#name
+   */
+  readonly name?: string;
+
+  /**
+   * Specify whether the Secret or its key must be defined
+   *
+   * @schema VinylCacheSpecPodEnvValueFromSecretKeyRef#optional
+   */
+  readonly optional?: boolean;
+}
+
+/**
+ * Converts an object of type 'VinylCacheSpecPodEnvValueFromSecretKeyRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheSpecPodEnvValueFromSecretKeyRef(obj: VinylCacheSpecPodEnvValueFromSecretKeyRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'name': obj.name,
+    'optional': obj.optional,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -6890,6 +7694,22 @@ export function toJson_VinylCacheSpecPodAffinityPodAntiAffinityRequiredDuringSch
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
 }
 /* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Specifies the output format of the exposed resources, defaults to "1"
+ *
+ * @schema VinylCacheSpecPodEnvValueFromResourceFieldRefDivisor
+ */
+export class VinylCacheSpecPodEnvValueFromResourceFieldRefDivisor {
+  public static fromNumber(value: number): VinylCacheSpecPodEnvValueFromResourceFieldRefDivisor {
+    return new VinylCacheSpecPodEnvValueFromResourceFieldRefDivisor(value);
+  }
+  public static fromString(value: string): VinylCacheSpecPodEnvValueFromResourceFieldRefDivisor {
+    return new VinylCacheSpecPodEnvValueFromResourceFieldRefDivisor(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
 
 /**
  * Required: Selects a field of the pod: only annotations, labels, name, namespace and uid are supported.
@@ -8948,6 +9768,9777 @@ export class VinylCacheSpecPodVolumesProjectedSourcesDownwardApiItemsResourceFie
   }
   public static fromString(value: string): VinylCacheSpecPodVolumesProjectedSourcesDownwardApiItemsResourceFieldRefDivisor {
     return new VinylCacheSpecPodVolumesProjectedSourcesDownwardApiItemsResourceFieldRefDivisor(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+
+/**
+ * VinylCache is the Schema for the vinylcaches API.
+It describes a complete Varnish cache cluster: replicas, backends, VCL configuration,
+clustering, and cache invalidation strategy.
+ *
+ * @schema VinylCacheV1Alpha1
+ */
+export class VinylCacheV1Alpha1 extends ApiObject {
+  /**
+   * Returns the apiVersion and kind for "VinylCacheV1Alpha1"
+   */
+  public static readonly GVK: GroupVersionKind = {
+    apiVersion: 'vinyl.bluedynamics.eu/v1alpha1',
+    kind: 'VinylCache',
+  }
+
+  /**
+   * Renders a Kubernetes manifest for "VinylCacheV1Alpha1".
+   *
+   * This can be used to inline resource manifests inside other objects (e.g. as templates).
+   *
+   * @param props initialization props
+   */
+  public static manifest(props: VinylCacheV1Alpha1Props = {}): any {
+    return {
+      ...VinylCacheV1Alpha1.GVK,
+      ...toJson_VinylCacheV1Alpha1Props(props),
+    };
+  }
+
+  /**
+   * Defines a "VinylCacheV1Alpha1" API object
+   * @param scope the scope in which to define this object
+   * @param id a scope-local name for the object
+   * @param props initialization props
+   */
+  public constructor(scope: Construct, id: string, props: VinylCacheV1Alpha1Props = {}) {
+    super(scope, id, {
+      ...VinylCacheV1Alpha1.GVK,
+      ...props,
+    });
+  }
+
+  /**
+   * Renders the object to Kubernetes JSON.
+   */
+  public override toJson(): any {
+    const resolved = super.toJson();
+
+    return {
+      ...VinylCacheV1Alpha1.GVK,
+      ...toJson_VinylCacheV1Alpha1Props(resolved),
+    };
+  }
+}
+
+/**
+ * VinylCache is the Schema for the vinylcaches API.
+ * It describes a complete Varnish cache cluster: replicas, backends, VCL configuration,
+ * clustering, and cache invalidation strategy.
+ *
+ * @schema VinylCacheV1Alpha1
+ */
+export interface VinylCacheV1Alpha1Props {
+  /**
+   * @schema VinylCacheV1Alpha1#metadata
+   */
+  readonly metadata?: ApiObjectMetadata;
+
+  /**
+   * spec defines the desired state of the VinylCache cluster.
+   *
+   * @schema VinylCacheV1Alpha1#spec
+   */
+  readonly spec?: VinylCacheV1Alpha1Spec;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1Props' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1Props(obj: VinylCacheV1Alpha1Props | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'metadata': obj.metadata,
+    'spec': toJson_VinylCacheV1Alpha1Spec(obj.spec),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * spec defines the desired state of the VinylCache cluster.
+ *
+ * @schema VinylCacheV1Alpha1Spec
+ */
+export interface VinylCacheV1Alpha1Spec {
+  /**
+   * backends defines the upstream services Varnish will proxy to.
+   * At least one backend is required.
+   *
+   * @schema VinylCacheV1Alpha1Spec#backends
+   */
+  readonly backends: VinylCacheV1Alpha1SpecBackends[];
+
+  /**
+   * cluster configures Varnish clustering between pods.
+   *
+   * @schema VinylCacheV1Alpha1Spec#cluster
+   */
+  readonly cluster?: VinylCacheV1Alpha1SpecCluster;
+
+  /**
+   * debounce configures a grace period before applying endpoint changes to Varnish,
+   * preventing thundering-herd on rapid endpoint churn.
+   *
+   * @schema VinylCacheV1Alpha1Spec#debounce
+   */
+  readonly debounce?: VinylCacheV1Alpha1SpecDebounce;
+
+  /**
+   * director configures how Varnish distributes requests across backend endpoints.
+   *
+   * @schema VinylCacheV1Alpha1Spec#director
+   */
+  readonly director?: VinylCacheV1Alpha1SpecDirector;
+
+  /**
+   * esi configures Edge Side Includes (ESI) processing.
+   *
+   * @schema VinylCacheV1Alpha1Spec#esi
+   */
+  readonly esi?: VinylCacheV1Alpha1SpecEsi;
+
+  /**
+   * image is the container image for the Varnish pods.
+   *
+   * @schema VinylCacheV1Alpha1Spec#image
+   */
+  readonly image: string;
+
+  /**
+   * invalidation configures cache invalidation methods (PURGE, BAN, xkey).
+   *
+   * @schema VinylCacheV1Alpha1Spec#invalidation
+   */
+  readonly invalidation?: VinylCacheV1Alpha1SpecInvalidation;
+
+  /**
+   * monitoring configures Prometheus metrics and alerting rules.
+   *
+   * @schema VinylCacheV1Alpha1Spec#monitoring
+   */
+  readonly monitoring?: VinylCacheV1Alpha1SpecMonitoring;
+
+  /**
+   * pod configures pod-level scheduling and metadata.
+   *
+   * @schema VinylCacheV1Alpha1Spec#pod
+   */
+  readonly pod?: VinylCacheV1Alpha1SpecPod;
+
+  /**
+   * proxyProtocol enables PROXY protocol on a dedicated port for passing client IP.
+   *
+   * @schema VinylCacheV1Alpha1Spec#proxyProtocol
+   */
+  readonly proxyProtocol?: VinylCacheV1Alpha1SpecProxyProtocol;
+
+  /**
+   * replicas is the desired number of Varnish pods in the cluster.
+   *
+   * @schema VinylCacheV1Alpha1Spec#replicas
+   */
+  readonly replicas: number;
+
+  /**
+   * resources sets CPU and memory requests/limits for the Varnish container.
+   *
+   * @schema VinylCacheV1Alpha1Spec#resources
+   */
+  readonly resources?: VinylCacheV1Alpha1SpecResources;
+
+  /**
+   * retry configures retry behaviour when VCL updates fail to apply.
+   *
+   * @schema VinylCacheV1Alpha1Spec#retry
+   */
+  readonly retry?: VinylCacheV1Alpha1SpecRetry;
+
+  /**
+   * service configures the Kubernetes Service created for traffic ingress.
+   *
+   * @schema VinylCacheV1Alpha1Spec#service
+   */
+  readonly service?: VinylCacheV1Alpha1SpecService;
+
+  /**
+   * storage configures one or more Varnish storage backends (malloc or file).
+   * When set, these are the only cache storages. When empty, varnishd
+   * creates its default storage s0 (malloc, 100 MB).
+   *
+   * @schema VinylCacheV1Alpha1Spec#storage
+   */
+  readonly storage?: VinylCacheV1Alpha1SpecStorage[];
+
+  /**
+   * tracing configures the vinyl-tracer sidecar that exports OpenTelemetry
+   * trace spans built from the Varnish Shared memory Log.
+   *
+   * @schema VinylCacheV1Alpha1Spec#tracing
+   */
+  readonly tracing?: VinylCacheV1Alpha1SpecTracing;
+
+  /**
+   * varnishParameters are runtime parameters passed to varnishd via -p flags,
+   * one flag per map entry: the key must be a bare varnishd parameter name
+   * (lowercase letters, digits, and underscores, starting with a letter —
+   * the admission webhook rejects anything else, including padding
+   * whitespace or uppercase) and the value is passed through unchanged,
+   * e.g. {"thread_pool_min": "100"} becomes "-p thread_pool_min=100".
+   * Entries are sorted by key before being rendered as args, so the pod
+   * template does not churn between reconciles.
+   *
+   * ESI processing is NOT controlled through this map — see spec.esi.
+   * varnishd's "feature" parameter is still useful alongside it: if ESI
+   * response bodies don't reliably start with '<', also set
+   * {"feature": "+esi_disable_xml_check"} (a real varnishd feature bit;
+   * see spec.esi's doc comment for why there is no "+esi" equivalent).
+   *
+   * Certain security-sensitive parameters (vcc_allow_inline_c, cc_command)
+   * are blocked by the admission webhook.
+   *
+   * The key shape is also enforced here via CEL, independently of the
+   * admission webhook: the webhook's failurePolicy=fail only protects
+   * against the webhook being down, not against it never having been
+   * installed (e.g. a cluster running these CRDs without the operator's
+   * webhook configuration applied), and varnishParamArgs renders these
+   * keys straight into varnishd's argv.
+   *
+   * @schema VinylCacheV1Alpha1Spec#varnishParameters
+   */
+  readonly varnishParameters?: { [key: string]: string };
+
+  /**
+   * vcl configures VCL generation: snippets injected into generated VCL subroutines,
+   * or a full VCL override.
+   *
+   * @schema VinylCacheV1Alpha1Spec#vcl
+   */
+  readonly vcl?: VinylCacheV1Alpha1SpecVcl;
+
+  /**
+   * volumeClaimTemplates are appended verbatim to the generated StatefulSet's
+   * spec.volumeClaimTemplates. Each template yields one PVC per replica
+   * (named <claim>-<statefulset>-<ord>) that persists across pod restarts
+   * for that replica. Useful for per-replica SSD-backed file storage.
+   * Reference the claim name from spec.pod.volumeMounts; reference the
+   * resulting mountPath from spec.storage[].path.
+   *
+   * @schema VinylCacheV1Alpha1Spec#volumeClaimTemplates
+   */
+  readonly volumeClaimTemplates?: VinylCacheV1Alpha1SpecVolumeClaimTemplates[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1Spec' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1Spec(obj: VinylCacheV1Alpha1Spec | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'backends': obj.backends?.map(y => toJson_VinylCacheV1Alpha1SpecBackends(y)),
+    'cluster': toJson_VinylCacheV1Alpha1SpecCluster(obj.cluster),
+    'debounce': toJson_VinylCacheV1Alpha1SpecDebounce(obj.debounce),
+    'director': toJson_VinylCacheV1Alpha1SpecDirector(obj.director),
+    'esi': toJson_VinylCacheV1Alpha1SpecEsi(obj.esi),
+    'image': obj.image,
+    'invalidation': toJson_VinylCacheV1Alpha1SpecInvalidation(obj.invalidation),
+    'monitoring': toJson_VinylCacheV1Alpha1SpecMonitoring(obj.monitoring),
+    'pod': toJson_VinylCacheV1Alpha1SpecPod(obj.pod),
+    'proxyProtocol': toJson_VinylCacheV1Alpha1SpecProxyProtocol(obj.proxyProtocol),
+    'replicas': obj.replicas,
+    'resources': toJson_VinylCacheV1Alpha1SpecResources(obj.resources),
+    'retry': toJson_VinylCacheV1Alpha1SpecRetry(obj.retry),
+    'service': toJson_VinylCacheV1Alpha1SpecService(obj.service),
+    'storage': obj.storage?.map(y => toJson_VinylCacheV1Alpha1SpecStorage(y)),
+    'tracing': toJson_VinylCacheV1Alpha1SpecTracing(obj.tracing),
+    'varnishParameters': ((obj.varnishParameters) === undefined) ? undefined : (Object.entries(obj.varnishParameters).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    'vcl': toJson_VinylCacheV1Alpha1SpecVcl(obj.vcl),
+    'volumeClaimTemplates': obj.volumeClaimTemplates?.map(y => toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplates(y)),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * BackendSpec describes an upstream Kubernetes service used as a Varnish backend.
+ *
+ * @schema VinylCacheV1Alpha1SpecBackends
+ */
+export interface VinylCacheV1Alpha1SpecBackends {
+  /**
+   * connectionParameters configures backend connection pool timeouts and limits.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackends#connectionParameters
+   */
+  readonly connectionParameters?: VinylCacheV1Alpha1SpecBackendsConnectionParameters;
+
+  /**
+   * director overrides the cluster-wide director for this backend only.
+   * If nil, a shard director with defaults is generated, grouping all resolved
+   * per-pod backends for this serviceRef. Use "round_robin" or "random" if
+   * consistent hashing is undesirable (e.g. stateless backends).
+   *
+   * @schema VinylCacheV1Alpha1SpecBackends#director
+   */
+  readonly director?: VinylCacheV1Alpha1SpecBackendsDirector;
+
+  /**
+   * name is the VCL identifier for this backend. Must match ^[a-zA-Z][a-zA-Z0-9_]*$.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackends#name
+   */
+  readonly name: string;
+
+  /**
+   * port overrides the service port used for this backend.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackends#port
+   */
+  readonly port?: number;
+
+  /**
+   * probe configures the Varnish backend health probe.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackends#probe
+   */
+  readonly probe?: VinylCacheV1Alpha1SpecBackendsProbe;
+
+  /**
+   * retry configures retrying a fetch on another backend of this group
+   * when the backend sent no response. Defaults to one retry for shard,
+   * round_robin and random directors; hash and fallback directors never
+   * retry, since they would pick the same backend again.
+   *
+   * @default one retry for shard,
+   * @schema VinylCacheV1Alpha1SpecBackends#retry
+   */
+  readonly retry?: VinylCacheV1Alpha1SpecBackendsRetry;
+
+  /**
+   * serviceRef references the Kubernetes Service in the same namespace.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackends#serviceRef
+   */
+  readonly serviceRef: VinylCacheV1Alpha1SpecBackendsServiceRef;
+
+  /**
+   * weight is the relative weight for the director. 0 means standby (fallback director).
+   *
+   * @schema VinylCacheV1Alpha1SpecBackends#weight
+   */
+  readonly weight?: number;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecBackends' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecBackends(obj: VinylCacheV1Alpha1SpecBackends | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'connectionParameters': toJson_VinylCacheV1Alpha1SpecBackendsConnectionParameters(obj.connectionParameters),
+    'director': toJson_VinylCacheV1Alpha1SpecBackendsDirector(obj.director),
+    'name': obj.name,
+    'port': obj.port,
+    'probe': toJson_VinylCacheV1Alpha1SpecBackendsProbe(obj.probe),
+    'retry': toJson_VinylCacheV1Alpha1SpecBackendsRetry(obj.retry),
+    'serviceRef': toJson_VinylCacheV1Alpha1SpecBackendsServiceRef(obj.serviceRef),
+    'weight': obj.weight,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * cluster configures Varnish clustering between pods.
+ *
+ * @schema VinylCacheV1Alpha1SpecCluster
+ */
+export interface VinylCacheV1Alpha1SpecCluster {
+  /**
+   * enabled activates inter-pod clustering via a shard director.
+   *
+   * @schema VinylCacheV1Alpha1SpecCluster#enabled
+   */
+  readonly enabled?: boolean;
+
+  /**
+   * peerRouting configures how requests are routed between Varnish peers.
+   *
+   * @schema VinylCacheV1Alpha1SpecCluster#peerRouting
+   */
+  readonly peerRouting?: VinylCacheV1Alpha1SpecClusterPeerRouting;
+
+  /**
+   * retry configures retrying a request on another Varnish peer when the
+   * peer sent no response, e.g. because its pod was OOMKilled. The peer
+   * that receives the retry serves it from its own cache or backend.
+   * Default: one retry.
+   *
+   * @schema VinylCacheV1Alpha1SpecCluster#retry
+   */
+  readonly retry?: VinylCacheV1Alpha1SpecClusterRetry;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecCluster' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecCluster(obj: VinylCacheV1Alpha1SpecCluster | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'enabled': obj.enabled,
+    'peerRouting': toJson_VinylCacheV1Alpha1SpecClusterPeerRouting(obj.peerRouting),
+    'retry': toJson_VinylCacheV1Alpha1SpecClusterRetry(obj.retry),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * debounce configures a grace period before applying endpoint changes to Varnish,
+ * preventing thundering-herd on rapid endpoint churn.
+ *
+ * @schema VinylCacheV1Alpha1SpecDebounce
+ */
+export interface VinylCacheV1Alpha1SpecDebounce {
+  /**
+   * duration is the time to wait after the last endpoint change before pushing a VCL update.
+   * This prevents thundering-herd on rapid endpoint churn. Default: 1s.
+   *
+   * @schema VinylCacheV1Alpha1SpecDebounce#duration
+   */
+  readonly duration?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecDebounce' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecDebounce(obj: VinylCacheV1Alpha1SpecDebounce | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'duration': obj.duration,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * director configures how Varnish distributes requests across backend endpoints.
+ *
+ * @schema VinylCacheV1Alpha1SpecDirector
+ */
+export interface VinylCacheV1Alpha1SpecDirector {
+  /**
+   * hash configures the hash director. Only used when type is "hash".
+   *
+   * @schema VinylCacheV1Alpha1SpecDirector#hash
+   */
+  readonly hash?: VinylCacheV1Alpha1SpecDirectorHash;
+
+  /**
+   * shard configures the shard director (consistent-hash). Only used when type is "shard".
+   *
+   * @schema VinylCacheV1Alpha1SpecDirector#shard
+   */
+  readonly shard?: VinylCacheV1Alpha1SpecDirectorShard;
+
+  /**
+   * type selects the Varnish director algorithm.
+   * "shard" (default) provides consistent hashing; "round_robin", "random", and "hash"
+   * are also supported.
+   *
+   * @schema VinylCacheV1Alpha1SpecDirector#type
+   */
+  readonly type?: VinylCacheV1Alpha1SpecDirectorType;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecDirector' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecDirector(obj: VinylCacheV1Alpha1SpecDirector | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'hash': toJson_VinylCacheV1Alpha1SpecDirectorHash(obj.hash),
+    'shard': toJson_VinylCacheV1Alpha1SpecDirectorShard(obj.shard),
+    'type': obj.type,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * esi configures Edge Side Includes (ESI) processing.
+ *
+ * @schema VinylCacheV1Alpha1SpecEsi
+ */
+export interface VinylCacheV1Alpha1SpecEsi {
+  /**
+   * enabled gates the generated vcl_backend_response block that sets
+   * beresp.do_esi = true whenever a backend response carries
+   * Surrogate-Control: content="ESI/1.0". ESI is core varnishd
+   * functionality, not a VMOD and not something any "-p feature=..."
+   * flag turns on or off — an earlier convention asked for
+   * {"feature": "+esi"} in spec.varnishParameters, but "+esi" is not a
+   * real varnishd feature bit (varnishd -x parameter lists no bare
+   * "esi" token) and passing it crashes varnishd outright ("Unknown
+   * feature bit (+esi)"), atomically rejecting the whole -p feature=...
+   * value even when combined with a real token. This field replaces
+   * that convention as the only way to enable ESI.
+   *
+   * If response bodies don't reliably start with '<' (varnishd's ESI
+   * implementation sniffs the body to decide whether to scan it for
+   * <esi:...> tags), additionally set spec.varnishParameters'
+   * {"feature": "+esi_disable_xml_check"} — that token IS real and
+   * independent of this field.
+   *
+   * @schema VinylCacheV1Alpha1SpecEsi#enabled
+   */
+  readonly enabled?: boolean;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecEsi' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecEsi(obj: VinylCacheV1Alpha1SpecEsi | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'enabled': obj.enabled,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * invalidation configures cache invalidation methods (PURGE, BAN, xkey).
+ *
+ * @schema VinylCacheV1Alpha1SpecInvalidation
+ */
+export interface VinylCacheV1Alpha1SpecInvalidation {
+  /**
+   * ban configures BAN-based cache invalidation.
+   *
+   * @schema VinylCacheV1Alpha1SpecInvalidation#ban
+   */
+  readonly ban?: VinylCacheV1Alpha1SpecInvalidationBan;
+
+  /**
+   * purge configures HTTP PURGE-based cache invalidation.
+   *
+   * @schema VinylCacheV1Alpha1SpecInvalidation#purge
+   */
+  readonly purge?: VinylCacheV1Alpha1SpecInvalidationPurge;
+
+  /**
+   * xkey configures xkey-based surrogate key invalidation (requires vmod_xkey).
+   *
+   * @schema VinylCacheV1Alpha1SpecInvalidation#xkey
+   */
+  readonly xkey?: VinylCacheV1Alpha1SpecInvalidationXkey;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecInvalidation' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecInvalidation(obj: VinylCacheV1Alpha1SpecInvalidation | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'ban': toJson_VinylCacheV1Alpha1SpecInvalidationBan(obj.ban),
+    'purge': toJson_VinylCacheV1Alpha1SpecInvalidationPurge(obj.purge),
+    'xkey': toJson_VinylCacheV1Alpha1SpecInvalidationXkey(obj.xkey),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * monitoring configures Prometheus metrics and alerting rules.
+ *
+ * @schema VinylCacheV1Alpha1SpecMonitoring
+ */
+export interface VinylCacheV1Alpha1SpecMonitoring {
+  /**
+   * enabled activates Prometheus metrics scraping.
+   *
+   * @schema VinylCacheV1Alpha1SpecMonitoring#enabled
+   */
+  readonly enabled?: boolean;
+
+  /**
+   * exporter configures the prometheus_varnish_exporter sidecar that exposes
+   * native varnish_* metrics (cache hit/miss, backend health) from varnishstat.
+   *
+   * @schema VinylCacheV1Alpha1SpecMonitoring#exporter
+   */
+  readonly exporter?: VinylCacheV1Alpha1SpecMonitoringExporter;
+
+  /**
+   * prometheusRules configures PrometheusRule objects for alerting.
+   *
+   * @schema VinylCacheV1Alpha1SpecMonitoring#prometheusRules
+   */
+  readonly prometheusRules?: VinylCacheV1Alpha1SpecMonitoringPrometheusRules;
+
+  /**
+   * serviceMonitor configures a ServiceMonitor for Prometheus Operator scraping.
+   *
+   * @schema VinylCacheV1Alpha1SpecMonitoring#serviceMonitor
+   */
+  readonly serviceMonitor?: VinylCacheV1Alpha1SpecMonitoringServiceMonitor;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecMonitoring' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecMonitoring(obj: VinylCacheV1Alpha1SpecMonitoring | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'enabled': obj.enabled,
+    'exporter': toJson_VinylCacheV1Alpha1SpecMonitoringExporter(obj.exporter),
+    'prometheusRules': toJson_VinylCacheV1Alpha1SpecMonitoringPrometheusRules(obj.prometheusRules),
+    'serviceMonitor': toJson_VinylCacheV1Alpha1SpecMonitoringServiceMonitor(obj.serviceMonitor),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * pod configures pod-level scheduling and metadata.
+ *
+ * @schema VinylCacheV1Alpha1SpecPod
+ */
+export interface VinylCacheV1Alpha1SpecPod {
+  /**
+   * affinity configures pod affinity and anti-affinity scheduling rules.
+   *
+   * @schema VinylCacheV1Alpha1SpecPod#affinity
+   */
+  readonly affinity?: VinylCacheV1Alpha1SpecPodAffinity;
+
+  /**
+   * annotations are added to each Varnish pod.
+   *
+   * @schema VinylCacheV1Alpha1SpecPod#annotations
+   */
+  readonly annotations?: { [key: string]: string };
+
+  /**
+   * env sets environment variables on the varnish container. An entry
+   * whose name matches an operator default replaces that default; all
+   * others are appended. The operator sets MALLOC_CONF to tune varnishd's
+   * jemalloc heap for a container (see the memory sizing how-to); setting
+   * MALLOC_CONF here replaces the whole value, and an empty value restores
+   * jemalloc's own defaults.
+   *
+   * @schema VinylCacheV1Alpha1SpecPod#env
+   */
+  readonly env?: VinylCacheV1Alpha1SpecPodEnv[];
+
+  /**
+   * labels are added to each Varnish pod (merged with operator-managed labels).
+   *
+   * @schema VinylCacheV1Alpha1SpecPod#labels
+   */
+  readonly labels?: { [key: string]: string };
+
+  /**
+   * nodeSelector constrains pods to nodes matching all specified labels.
+   *
+   * @schema VinylCacheV1Alpha1SpecPod#nodeSelector
+   */
+  readonly nodeSelector?: { [key: string]: string };
+
+  /**
+   * priorityClassName is the name of the PriorityClass for Varnish pods.
+   *
+   * @schema VinylCacheV1Alpha1SpecPod#priorityClassName
+   */
+  readonly priorityClassName?: string;
+
+  /**
+   * tolerations allow pods to be scheduled on tainted nodes.
+   *
+   * @schema VinylCacheV1Alpha1SpecPod#tolerations
+   */
+  readonly tolerations?: VinylCacheV1Alpha1SpecPodTolerations[];
+
+  /**
+   * volumeMounts are additional mounts appended to the varnish container.
+   * Each entry must reference a name present in spec.pod.volumes or
+   * spec.volumeClaimTemplates. Reserved mount paths (/run/vinyl,
+   * /etc/varnish/secret, /var/lib/varnish, /tmp, /etc/varnish/default.vcl)
+   * are rejected by the admission webhook.
+   *
+   * @schema VinylCacheV1Alpha1SpecPod#volumeMounts
+   */
+  readonly volumeMounts?: VinylCacheV1Alpha1SpecPodVolumeMounts[];
+
+  /**
+   * volumes are additional pod-level volumes appended to the operator-managed
+   * defaults (agent-token, varnish-secret, varnish-workdir, varnish-tmp,
+   * bootstrap-vcl). Use to back spec.storage[].path with a PVC, an EmptyDir
+   * with sizeLimit, or any VolumeSource supported by Kubernetes. Reserved
+   * names collide with operator-managed volumes and are rejected by the
+   * admission webhook. Volume names must also be unique across volumes and
+   * volumeClaimTemplates.
+   *
+   * @schema VinylCacheV1Alpha1SpecPod#volumes
+   */
+  readonly volumes?: VinylCacheV1Alpha1SpecPodVolumes[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPod' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPod(obj: VinylCacheV1Alpha1SpecPod | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'affinity': toJson_VinylCacheV1Alpha1SpecPodAffinity(obj.affinity),
+    'annotations': ((obj.annotations) === undefined) ? undefined : (Object.entries(obj.annotations).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    'env': obj.env?.map(y => toJson_VinylCacheV1Alpha1SpecPodEnv(y)),
+    'labels': ((obj.labels) === undefined) ? undefined : (Object.entries(obj.labels).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    'nodeSelector': ((obj.nodeSelector) === undefined) ? undefined : (Object.entries(obj.nodeSelector).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    'priorityClassName': obj.priorityClassName,
+    'tolerations': obj.tolerations?.map(y => toJson_VinylCacheV1Alpha1SpecPodTolerations(y)),
+    'volumeMounts': obj.volumeMounts?.map(y => toJson_VinylCacheV1Alpha1SpecPodVolumeMounts(y)),
+    'volumes': obj.volumes?.map(y => toJson_VinylCacheV1Alpha1SpecPodVolumes(y)),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * proxyProtocol enables PROXY protocol on a dedicated port for passing client IP.
+ *
+ * @schema VinylCacheV1Alpha1SpecProxyProtocol
+ */
+export interface VinylCacheV1Alpha1SpecProxyProtocol {
+  /**
+   * enabled activates PROXY protocol support.
+   *
+   * @schema VinylCacheV1Alpha1SpecProxyProtocol#enabled
+   */
+  readonly enabled?: boolean;
+
+  /**
+   * port is the port on which PROXY protocol connections are accepted. Default: 8081.
+   *
+   * @schema VinylCacheV1Alpha1SpecProxyProtocol#port
+   */
+  readonly port?: number;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecProxyProtocol' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecProxyProtocol(obj: VinylCacheV1Alpha1SpecProxyProtocol | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'enabled': obj.enabled,
+    'port': obj.port,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * resources sets CPU and memory requests/limits for the Varnish container.
+ *
+ * @schema VinylCacheV1Alpha1SpecResources
+ */
+export interface VinylCacheV1Alpha1SpecResources {
+  /**
+   * Claims lists the names of resources, defined in spec.resourceClaims,
+   * that are used by this container.
+   *
+   * This field depends on the
+   * DynamicResourceAllocation feature gate.
+   *
+   * This field is immutable. It can only be set for containers.
+   *
+   * @schema VinylCacheV1Alpha1SpecResources#claims
+   */
+  readonly claims?: VinylCacheV1Alpha1SpecResourcesClaims[];
+
+  /**
+   * Limits describes the maximum amount of compute resources allowed.
+   * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+   *
+   * @schema VinylCacheV1Alpha1SpecResources#limits
+   */
+  readonly limits?: { [key: string]: VinylCacheV1Alpha1SpecResourcesLimits };
+
+  /**
+   * Requests describes the minimum amount of compute resources required.
+   * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+   * otherwise to an implementation-defined value. Requests cannot exceed Limits.
+   * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+   *
+   * @schema VinylCacheV1Alpha1SpecResources#requests
+   */
+  readonly requests?: { [key: string]: VinylCacheV1Alpha1SpecResourcesRequests };
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecResources' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecResources(obj: VinylCacheV1Alpha1SpecResources | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'claims': obj.claims?.map(y => toJson_VinylCacheV1Alpha1SpecResourcesClaims(y)),
+    'limits': ((obj.limits) === undefined) ? undefined : (Object.entries(obj.limits).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    'requests': ((obj.requests) === undefined) ? undefined : (Object.entries(obj.requests).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * retry configures retry behaviour when VCL updates fail to apply.
+ *
+ * @schema VinylCacheV1Alpha1SpecRetry
+ */
+export interface VinylCacheV1Alpha1SpecRetry {
+  /**
+   * backoffBase is how long the reconcile loop waits before retrying a failed
+   * VCL push. Default: 30s.
+   *
+   * @schema VinylCacheV1Alpha1SpecRetry#backoffBase
+   */
+  readonly backoffBase?: string;
+
+  /**
+   * backoffMax is the maximum backoff duration (exponential backoff cap). Default: 5m.
+   *
+   * @schema VinylCacheV1Alpha1SpecRetry#backoffMax
+   */
+  readonly backoffMax?: string;
+
+  /**
+   * maxAttempts has no effect.
+   *
+   * Deprecated: VCL pushes are retried by the reconcile loop, which pushes to
+   * every reachable pod that does not already carry the desired VCL. Bounding
+   * the attempts would leave a pod unconverged with no way back, so the field
+   * is inert and scheduled for removal in the next breaking version. It never
+   * had the semantics its name suggests: it bounded attempts per reconcile,
+   * never in total.
+   * See docs/superpowers/specs/2026-08-25-reconcile-starvation-design.md.
+   *
+   * @schema VinylCacheV1Alpha1SpecRetry#maxAttempts
+   */
+  readonly maxAttempts?: number;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecRetry' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecRetry(obj: VinylCacheV1Alpha1SpecRetry | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'backoffBase': obj.backoffBase,
+    'backoffMax': obj.backoffMax,
+    'maxAttempts': obj.maxAttempts,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * service configures the Kubernetes Service created for traffic ingress.
+ *
+ * @schema VinylCacheV1Alpha1SpecService
+ */
+export interface VinylCacheV1Alpha1SpecService {
+  /**
+   * annotations are added to the Service object.
+   *
+   * @schema VinylCacheV1Alpha1SpecService#annotations
+   */
+  readonly annotations?: { [key: string]: string };
+
+  /**
+   * type sets the Kubernetes Service type (ClusterIP, NodePort, LoadBalancer).
+   *
+   * @schema VinylCacheV1Alpha1SpecService#type
+   */
+  readonly type?: VinylCacheV1Alpha1SpecServiceType;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecService' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecService(obj: VinylCacheV1Alpha1SpecService | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'annotations': ((obj.annotations) === undefined) ? undefined : (Object.entries(obj.annotations).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    'type': obj.type,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * StorageSpec configures a Varnish storage backend.
+ *
+ * @schema VinylCacheV1Alpha1SpecStorage
+ */
+export interface VinylCacheV1Alpha1SpecStorage {
+  /**
+   * name is the internal storage identifier used in varnishd -s arguments.
+   * "synth" is reserved: varnishd 9.1 defines a storage of that name.
+   *
+   * @schema VinylCacheV1Alpha1SpecStorage#name
+   */
+  readonly name: string;
+
+  /**
+   * path is the filesystem path for file-type storage.
+   *
+   * @schema VinylCacheV1Alpha1SpecStorage#path
+   */
+  readonly path?: string;
+
+  /**
+   * size is the storage allocation as a Kubernetes resource quantity (e.g. "1Gi").
+   * The operator converts to bytes for varnishd.
+   *
+   * @schema VinylCacheV1Alpha1SpecStorage#size
+   */
+  readonly size?: VinylCacheV1Alpha1SpecStorageSize;
+
+  /**
+   * type is the storage backend type. Only "malloc" and "file" are permitted.
+   * "persistent", "umem", and "default" are rejected by the admission webhook.
+   *
+   * @schema VinylCacheV1Alpha1SpecStorage#type
+   */
+  readonly type: VinylCacheV1Alpha1SpecStorageType;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecStorage' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecStorage(obj: VinylCacheV1Alpha1SpecStorage | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'name': obj.name,
+    'path': obj.path,
+    'size': obj.size?.value,
+    'type': obj.type,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * tracing configures the vinyl-tracer sidecar that exports OpenTelemetry
+ * trace spans built from the Varnish Shared memory Log.
+ *
+ * @schema VinylCacheV1Alpha1SpecTracing
+ */
+export interface VinylCacheV1Alpha1SpecTracing {
+  /**
+   * enabled activates the vinyl-tracer sidecar.
+   *
+   * @schema VinylCacheV1Alpha1SpecTracing#enabled
+   */
+  readonly enabled?: boolean;
+
+  /**
+   * otlp configures the OTLP trace exporter. endpoint is required when
+   * tracing is enabled.
+   *
+   * @schema VinylCacheV1Alpha1SpecTracing#otlp
+   */
+  readonly otlp?: VinylCacheV1Alpha1SpecTracingOtlp;
+
+  /**
+   * resources are the tracer container's resource requirements.
+   *
+   * @schema VinylCacheV1Alpha1SpecTracing#resources
+   */
+  readonly resources?: VinylCacheV1Alpha1SpecTracingResources;
+
+  /**
+   * serviceName is the OTel service.name resource attribute.
+   * Defaults to the VinylCache name.
+   *
+   * @default the VinylCache name.
+   * @schema VinylCacheV1Alpha1SpecTracing#serviceName
+   */
+  readonly serviceName?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecTracing' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecTracing(obj: VinylCacheV1Alpha1SpecTracing | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'enabled': obj.enabled,
+    'otlp': toJson_VinylCacheV1Alpha1SpecTracingOtlp(obj.otlp),
+    'resources': toJson_VinylCacheV1Alpha1SpecTracingResources(obj.resources),
+    'serviceName': obj.serviceName,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * vcl configures VCL generation: snippets injected into generated VCL subroutines,
+ * or a full VCL override.
+ *
+ * @schema VinylCacheV1Alpha1SpecVcl
+ */
+export interface VinylCacheV1Alpha1SpecVcl {
+  /**
+   * fullOverride replaces the entire generated VCL with a custom VCL string.
+   * Use with caution — this disables all structured configuration.
+   *
+   * @schema VinylCacheV1Alpha1SpecVcl#fullOverride
+   */
+  readonly fullOverride?: string;
+
+  /**
+   * snippets provides VCL code injected into each generated subroutine.
+   *
+   * @schema VinylCacheV1Alpha1SpecVcl#snippets
+   */
+  readonly snippets?: VinylCacheV1Alpha1SpecVclSnippets;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecVcl' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecVcl(obj: VinylCacheV1Alpha1SpecVcl | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'fullOverride': obj.fullOverride,
+    'snippets': toJson_VinylCacheV1Alpha1SpecVclSnippets(obj.snippets),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * PersistentVolumeClaim is a user's request for and claim to a persistent volume
+ *
+ * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplates
+ */
+export interface VinylCacheV1Alpha1SpecVolumeClaimTemplates {
+  /**
+   * APIVersion defines the versioned schema of this representation of an object.
+   * Servers should convert recognized schemas to the latest internal value, and
+   * may reject unrecognized values.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplates#apiVersion
+   */
+  readonly apiVersion?: string;
+
+  /**
+   * Kind is a string value representing the REST resource this object represents.
+   * Servers may infer this from the endpoint the client submits requests to.
+   * Cannot be updated.
+   * In CamelCase.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplates#kind
+   */
+  readonly kind?: string;
+
+  /**
+   * Standard object's metadata.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplates#metadata
+   */
+  readonly metadata?: any;
+
+  /**
+   * spec defines the desired characteristics of a volume requested by a pod author.
+   * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplates#spec
+   */
+  readonly spec?: VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpec;
+
+  /**
+   * status represents the current information/status of a persistent volume claim.
+   * Read-only.
+   * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplates#status
+   */
+  readonly status?: VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatus;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecVolumeClaimTemplates' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplates(obj: VinylCacheV1Alpha1SpecVolumeClaimTemplates | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'apiVersion': obj.apiVersion,
+    'kind': obj.kind,
+    'metadata': obj.metadata,
+    'spec': toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpec(obj.spec),
+    'status': toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatus(obj.status),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * connectionParameters configures backend connection pool timeouts and limits.
+ *
+ * @schema VinylCacheV1Alpha1SpecBackendsConnectionParameters
+ */
+export interface VinylCacheV1Alpha1SpecBackendsConnectionParameters {
+  /**
+   * betweenBytesTimeout is the maximum time to wait between bytes of the response body.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsConnectionParameters#betweenBytesTimeout
+   */
+  readonly betweenBytesTimeout?: string;
+
+  /**
+   * connectTimeout is the maximum time to establish a TCP connection to the backend.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsConnectionParameters#connectTimeout
+   */
+  readonly connectTimeout?: string;
+
+  /**
+   * firstByteTimeout is the maximum time to wait for the first byte of the response.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsConnectionParameters#firstByteTimeout
+   */
+  readonly firstByteTimeout?: string;
+
+  /**
+   * idleTimeout is the maximum time an idle connection may be reused. Should be less
+   * than the backend's keep-alive timeout to avoid 503 races.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsConnectionParameters#idleTimeout
+   */
+  readonly idleTimeout?: string;
+
+  /**
+   * maxConnections is the maximum number of concurrent connections to the backend.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsConnectionParameters#maxConnections
+   */
+  readonly maxConnections?: number;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecBackendsConnectionParameters' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecBackendsConnectionParameters(obj: VinylCacheV1Alpha1SpecBackendsConnectionParameters | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'betweenBytesTimeout': obj.betweenBytesTimeout,
+    'connectTimeout': obj.connectTimeout,
+    'firstByteTimeout': obj.firstByteTimeout,
+    'idleTimeout': obj.idleTimeout,
+    'maxConnections': obj.maxConnections,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * director overrides the cluster-wide director for this backend only.
+ * If nil, a shard director with defaults is generated, grouping all resolved
+ * per-pod backends for this serviceRef. Use "round_robin" or "random" if
+ * consistent hashing is undesirable (e.g. stateless backends).
+ *
+ * @schema VinylCacheV1Alpha1SpecBackendsDirector
+ */
+export interface VinylCacheV1Alpha1SpecBackendsDirector {
+  /**
+   * hash configures the hash director. Only used when type is "hash".
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsDirector#hash
+   */
+  readonly hash?: VinylCacheV1Alpha1SpecBackendsDirectorHash;
+
+  /**
+   * shard configures the shard director (consistent-hash). Only used when type is "shard".
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsDirector#shard
+   */
+  readonly shard?: VinylCacheV1Alpha1SpecBackendsDirectorShard;
+
+  /**
+   * type selects the Varnish director algorithm.
+   * "shard" (default) provides consistent hashing; "round_robin", "random", and "hash"
+   * are also supported.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsDirector#type
+   */
+  readonly type?: VinylCacheV1Alpha1SpecBackendsDirectorType;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecBackendsDirector' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecBackendsDirector(obj: VinylCacheV1Alpha1SpecBackendsDirector | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'hash': toJson_VinylCacheV1Alpha1SpecBackendsDirectorHash(obj.hash),
+    'shard': toJson_VinylCacheV1Alpha1SpecBackendsDirectorShard(obj.shard),
+    'type': obj.type,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * probe configures the Varnish backend health probe.
+ *
+ * @schema VinylCacheV1Alpha1SpecBackendsProbe
+ */
+export interface VinylCacheV1Alpha1SpecBackendsProbe {
+  /**
+   * expectedResponse is the expected HTTP response status code. Defaults to 200.
+   *
+   * @default 200.
+   * @schema VinylCacheV1Alpha1SpecBackendsProbe#expectedResponse
+   */
+  readonly expectedResponse?: number;
+
+  /**
+   * interval is how often to probe the backend.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsProbe#interval
+   */
+  readonly interval?: string;
+
+  /**
+   * threshold is the minimum number of successful probes within the window for the backend
+   * to be considered healthy.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsProbe#threshold
+   */
+  readonly threshold?: number;
+
+  /**
+   * timeout is the maximum time to wait for a probe response.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsProbe#timeout
+   */
+  readonly timeout?: string;
+
+  /**
+   * url is the URL to probe. If empty, the backend's root path is used.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsProbe#url
+   */
+  readonly url?: string;
+
+  /**
+   * window is the number of most recent probes to consider for threshold evaluation.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsProbe#window
+   */
+  readonly window?: number;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecBackendsProbe' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecBackendsProbe(obj: VinylCacheV1Alpha1SpecBackendsProbe | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'expectedResponse': obj.expectedResponse,
+    'interval': obj.interval,
+    'threshold': obj.threshold,
+    'timeout': obj.timeout,
+    'url': obj.url,
+    'window': obj.window,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * retry configures retrying a fetch on another backend of this group
+ * when the backend sent no response. Defaults to one retry for shard,
+ * round_robin and random directors; hash and fallback directors never
+ * retry, since they would pick the same backend again.
+ *
+ * @default one retry for shard,
+ * @schema VinylCacheV1Alpha1SpecBackendsRetry
+ */
+export interface VinylCacheV1Alpha1SpecBackendsRetry {
+  /**
+   * maxRetries is the number of retries per fetch. 0 disables retrying.
+   * Default: 1.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsRetry#maxRetries
+   */
+  readonly maxRetries?: number;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecBackendsRetry' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecBackendsRetry(obj: VinylCacheV1Alpha1SpecBackendsRetry | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'maxRetries': obj.maxRetries,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * serviceRef references the Kubernetes Service in the same namespace.
+ *
+ * @schema VinylCacheV1Alpha1SpecBackendsServiceRef
+ */
+export interface VinylCacheV1Alpha1SpecBackendsServiceRef {
+  /**
+   * name is the Kubernetes Service name.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsServiceRef#name
+   */
+  readonly name: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecBackendsServiceRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecBackendsServiceRef(obj: VinylCacheV1Alpha1SpecBackendsServiceRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'name': obj.name,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * peerRouting configures how requests are routed between Varnish peers.
+ *
+ * @schema VinylCacheV1Alpha1SpecClusterPeerRouting
+ */
+export interface VinylCacheV1Alpha1SpecClusterPeerRouting {
+  /**
+   * type is the routing strategy between Varnish pods. Only "shard" is supported.
+   *
+   * @schema VinylCacheV1Alpha1SpecClusterPeerRouting#type
+   */
+  readonly type?: VinylCacheV1Alpha1SpecClusterPeerRoutingType;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecClusterPeerRouting' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecClusterPeerRouting(obj: VinylCacheV1Alpha1SpecClusterPeerRouting | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'type': obj.type,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * retry configures retrying a request on another Varnish peer when the
+ * peer sent no response, e.g. because its pod was OOMKilled. The peer
+ * that receives the retry serves it from its own cache or backend.
+ * Default: one retry.
+ *
+ * @schema VinylCacheV1Alpha1SpecClusterRetry
+ */
+export interface VinylCacheV1Alpha1SpecClusterRetry {
+  /**
+   * maxRetries is the number of retries per fetch. 0 disables retrying.
+   * Default: 1.
+   *
+   * @schema VinylCacheV1Alpha1SpecClusterRetry#maxRetries
+   */
+  readonly maxRetries?: number;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecClusterRetry' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecClusterRetry(obj: VinylCacheV1Alpha1SpecClusterRetry | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'maxRetries': obj.maxRetries,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * hash configures the hash director. Only used when type is "hash".
+ *
+ * @schema VinylCacheV1Alpha1SpecDirectorHash
+ */
+export interface VinylCacheV1Alpha1SpecDirectorHash {
+  /**
+   * header is the request header name used as the hash key.
+   *
+   * @schema VinylCacheV1Alpha1SpecDirectorHash#header
+   */
+  readonly header?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecDirectorHash' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecDirectorHash(obj: VinylCacheV1Alpha1SpecDirectorHash | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'header': obj.header,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * shard configures the shard director (consistent-hash). Only used when type is "shard".
+ *
+ * @schema VinylCacheV1Alpha1SpecDirectorShard
+ */
+export interface VinylCacheV1Alpha1SpecDirectorShard {
+  /**
+   * by determines what value the cluster-peer shard director hashes to pick a
+   * backend, at the point in vcl_recv where cluster routing runs. "URL" (default)
+   * hashes the request URL. "HASH" is not offered: it would hash Varnish's
+   * req.hash, which is only populated by vcl_hash, and vcl_recv's cluster routing
+   * never reaches vcl_hash — so HASH cannot work at this call site.
+   *
+   * @schema VinylCacheV1Alpha1SpecDirectorShard#by
+   */
+  readonly by?: VinylCacheV1Alpha1SpecDirectorShardBy;
+
+  /**
+   * healthy controls which backends the director considers when selecting a shard.
+   * "CHOSEN" (default) only considers the chosen backend healthy; "ALL" requires all
+   * backends to be healthy.
+   *
+   * @schema VinylCacheV1Alpha1SpecDirectorShard#healthy
+   */
+  readonly healthy?: VinylCacheV1Alpha1SpecDirectorShardHealthy;
+
+  /**
+   * rampup is the time after adding a backend before it receives its full share of traffic,
+   * preventing thundering-herd. Default: 30s.
+   *
+   * @schema VinylCacheV1Alpha1SpecDirectorShard#rampup
+   */
+  readonly rampup?: string;
+
+  /**
+   * replicas is the number of Ketama replicas per backend in the hash ring. Default: 67.
+   *
+   * @schema VinylCacheV1Alpha1SpecDirectorShard#replicas
+   */
+  readonly replicas?: number;
+
+  /**
+   * warmup is the proportion of requests (0.0–1.0) sent to the alternative backend
+   * to pre-populate its cache. Default: 0.1. Must be between 0.0 and 1.0.
+   *
+   * @schema VinylCacheV1Alpha1SpecDirectorShard#warmup
+   */
+  readonly warmup?: number;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecDirectorShard' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecDirectorShard(obj: VinylCacheV1Alpha1SpecDirectorShard | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'by': obj.by,
+    'healthy': obj.healthy,
+    'rampup': obj.rampup,
+    'replicas': obj.replicas,
+    'warmup': obj.warmup,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * type selects the Varnish director algorithm.
+ * "shard" (default) provides consistent hashing; "round_robin", "random", and "hash"
+ * are also supported.
+ *
+ * @schema VinylCacheV1Alpha1SpecDirectorType
+ */
+export enum VinylCacheV1Alpha1SpecDirectorType {
+  /** shard */
+  SHARD = "shard",
+  /** round_robin */
+  ROUND_UNDERSCORE_ROBIN = "round_robin",
+  /** random */
+  RANDOM = "random",
+  /** hash */
+  HASH = "hash",
+  /** fallback */
+  FALLBACK = "fallback",
+}
+
+/**
+ * ban configures BAN-based cache invalidation.
+ *
+ * @schema VinylCacheV1Alpha1SpecInvalidationBan
+ */
+export interface VinylCacheV1Alpha1SpecInvalidationBan {
+  /**
+   * allowedSources is a list of CIDR ranges permitted to send BAN requests.
+   *
+   * @schema VinylCacheV1Alpha1SpecInvalidationBan#allowedSources
+   */
+  readonly allowedSources?: string[];
+
+  /**
+   * enabled activates the BAN invalidation handler.
+   *
+   * @schema VinylCacheV1Alpha1SpecInvalidationBan#enabled
+   */
+  readonly enabled?: boolean;
+
+  /**
+   * rateLimitPerMinute limits BAN requests per minute. 0 means no limit.
+   *
+   * @schema VinylCacheV1Alpha1SpecInvalidationBan#rateLimitPerMinute
+   */
+  readonly rateLimitPerMinute?: number;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecInvalidationBan' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecInvalidationBan(obj: VinylCacheV1Alpha1SpecInvalidationBan | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'allowedSources': obj.allowedSources?.map(y => y),
+    'enabled': obj.enabled,
+    'rateLimitPerMinute': obj.rateLimitPerMinute,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * purge configures HTTP PURGE-based cache invalidation.
+ *
+ * @schema VinylCacheV1Alpha1SpecInvalidationPurge
+ */
+export interface VinylCacheV1Alpha1SpecInvalidationPurge {
+  /**
+   * allowedSources is a list of CIDR ranges permitted to send PURGE requests.
+   * If empty, no source restriction is applied.
+   *
+   * @schema VinylCacheV1Alpha1SpecInvalidationPurge#allowedSources
+   */
+  readonly allowedSources?: string[];
+
+  /**
+   * enabled activates the PURGE invalidation handler.
+   *
+   * @schema VinylCacheV1Alpha1SpecInvalidationPurge#enabled
+   */
+  readonly enabled?: boolean;
+
+  /**
+   * hosts are the site hostnames a PURGE through the invalidation proxy
+   * applies to, e.g. ["example.org"]. Varnish keys cached objects by URL
+   * and site host, while a client reaches the proxy through the cache's
+   * invalidation host, so the proxy has to forward the purge with the site
+   * host. A request may name its hosts in an X-Vinyl-Purge-Host header;
+   * without one, the proxy sends one purge per host listed here. Needed for
+   * clients that cannot set headers, such as plone.cachepurging. If both
+   * are absent, the purge matches only objects cached under the
+   * invalidation host itself.
+   *
+   * @schema VinylCacheV1Alpha1SpecInvalidationPurge#hosts
+   */
+  readonly hosts?: string[];
+
+  /**
+   * soft enables soft purges, which mark objects as expired rather than removing them.
+   * This allows Varnish to serve stale content while revalidating.
+   *
+   * @schema VinylCacheV1Alpha1SpecInvalidationPurge#soft
+   */
+  readonly soft?: boolean;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecInvalidationPurge' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecInvalidationPurge(obj: VinylCacheV1Alpha1SpecInvalidationPurge | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'allowedSources': obj.allowedSources?.map(y => y),
+    'enabled': obj.enabled,
+    'hosts': obj.hosts?.map(y => y),
+    'soft': obj.soft,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * xkey configures xkey-based surrogate key invalidation (requires vmod_xkey).
+ *
+ * @schema VinylCacheV1Alpha1SpecInvalidationXkey
+ */
+export interface VinylCacheV1Alpha1SpecInvalidationXkey {
+  /**
+   * allowedSources is a list of CIDR ranges permitted to send xkey invalidation requests.
+   *
+   * @schema VinylCacheV1Alpha1SpecInvalidationXkey#allowedSources
+   */
+  readonly allowedSources?: string[];
+
+  /**
+   * enabled activates xkey-based invalidation. The operator's invalidation
+   * API purges xkey keys hard, removing the tagged objects.
+   *
+   * @schema VinylCacheV1Alpha1SpecInvalidationXkey#enabled
+   */
+  readonly enabled?: boolean;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecInvalidationXkey' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecInvalidationXkey(obj: VinylCacheV1Alpha1SpecInvalidationXkey | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'allowedSources': obj.allowedSources?.map(y => y),
+    'enabled': obj.enabled,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * exporter configures the prometheus_varnish_exporter sidecar that exposes
+ * native varnish_* metrics (cache hit/miss, backend health) from varnishstat.
+ *
+ * @schema VinylCacheV1Alpha1SpecMonitoringExporter
+ */
+export interface VinylCacheV1Alpha1SpecMonitoringExporter {
+  /**
+   * enabled adds a prometheus_varnish_exporter sidecar to each Varnish pod.
+   *
+   * @schema VinylCacheV1Alpha1SpecMonitoringExporter#enabled
+   */
+  readonly enabled?: boolean;
+
+  /**
+   * image overrides the exporter image. Defaults to
+   * ghcr.io/bluedynamics/varnish-exporter:1.6.1-varnish9.1.0.
+   *
+   * @default ghcr.io/bluedynamics/varnish-exporter:1.6.1-varnish9.1.0.
+   * @schema VinylCacheV1Alpha1SpecMonitoringExporter#image
+   */
+  readonly image?: VinylCacheV1Alpha1SpecMonitoringExporterImage;
+
+  /**
+   * port is the container port the exporter listens on. Defaults to 9131.
+   *
+   * @default 9131.
+   * @schema VinylCacheV1Alpha1SpecMonitoringExporter#port
+   */
+  readonly port?: number;
+
+  /**
+   * resources sets the exporter container resource requirements.
+   *
+   * @schema VinylCacheV1Alpha1SpecMonitoringExporter#resources
+   */
+  readonly resources?: VinylCacheV1Alpha1SpecMonitoringExporterResources;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecMonitoringExporter' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecMonitoringExporter(obj: VinylCacheV1Alpha1SpecMonitoringExporter | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'enabled': obj.enabled,
+    'image': toJson_VinylCacheV1Alpha1SpecMonitoringExporterImage(obj.image),
+    'port': obj.port,
+    'resources': toJson_VinylCacheV1Alpha1SpecMonitoringExporterResources(obj.resources),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * prometheusRules configures PrometheusRule objects for alerting.
+ *
+ * @schema VinylCacheV1Alpha1SpecMonitoringPrometheusRules
+ */
+export interface VinylCacheV1Alpha1SpecMonitoringPrometheusRules {
+  /**
+   * enabled creates a PrometheusRule with default alerting rules.
+   *
+   * @schema VinylCacheV1Alpha1SpecMonitoringPrometheusRules#enabled
+   */
+  readonly enabled?: boolean;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecMonitoringPrometheusRules' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecMonitoringPrometheusRules(obj: VinylCacheV1Alpha1SpecMonitoringPrometheusRules | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'enabled': obj.enabled,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * serviceMonitor configures a ServiceMonitor for Prometheus Operator scraping.
+ *
+ * @schema VinylCacheV1Alpha1SpecMonitoringServiceMonitor
+ */
+export interface VinylCacheV1Alpha1SpecMonitoringServiceMonitor {
+  /**
+   * enabled creates a ServiceMonitor targeting the Varnish metrics endpoint.
+   *
+   * @schema VinylCacheV1Alpha1SpecMonitoringServiceMonitor#enabled
+   */
+  readonly enabled?: boolean;
+
+  /**
+   * interval is the scrape interval (e.g. "30s"). Defaults to the Prometheus global interval.
+   *
+   * @default the Prometheus global interval.
+   * @schema VinylCacheV1Alpha1SpecMonitoringServiceMonitor#interval
+   */
+  readonly interval?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecMonitoringServiceMonitor' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecMonitoringServiceMonitor(obj: VinylCacheV1Alpha1SpecMonitoringServiceMonitor | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'enabled': obj.enabled,
+    'interval': obj.interval,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * affinity configures pod affinity and anti-affinity scheduling rules.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinity
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinity {
+  /**
+   * Describes node affinity scheduling rules for the pod.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinity#nodeAffinity
+   */
+  readonly nodeAffinity?: VinylCacheV1Alpha1SpecPodAffinityNodeAffinity;
+
+  /**
+   * Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinity#podAffinity
+   */
+  readonly podAffinity?: VinylCacheV1Alpha1SpecPodAffinityPodAffinity;
+
+  /**
+   * Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinity#podAntiAffinity
+   */
+  readonly podAntiAffinity?: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinity;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinity' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinity(obj: VinylCacheV1Alpha1SpecPodAffinity | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'nodeAffinity': toJson_VinylCacheV1Alpha1SpecPodAffinityNodeAffinity(obj.nodeAffinity),
+    'podAffinity': toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinity(obj.podAffinity),
+    'podAntiAffinity': toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinity(obj.podAntiAffinity),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * EnvVar represents an environment variable present in a Container.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodEnv
+ */
+export interface VinylCacheV1Alpha1SpecPodEnv {
+  /**
+   * Name of the environment variable.
+   * May consist of any printable ASCII characters except '='.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnv#name
+   */
+  readonly name: string;
+
+  /**
+   * Variable references $(VAR_NAME) are expanded
+   * using the previously defined environment variables in the container and
+   * any service environment variables. If a variable cannot be resolved,
+   * the reference in the input string will be unchanged. Double $$ are reduced
+   * to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e.
+   * "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)".
+   * Escaped references will never be expanded, regardless of whether the variable
+   * exists or not.
+   * Defaults to "".
+   *
+   * @default .
+   * @schema VinylCacheV1Alpha1SpecPodEnv#value
+   */
+  readonly value?: string;
+
+  /**
+   * Source for the environment variable's value. Cannot be used if value is not empty.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnv#valueFrom
+   */
+  readonly valueFrom?: VinylCacheV1Alpha1SpecPodEnvValueFrom;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodEnv' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodEnv(obj: VinylCacheV1Alpha1SpecPodEnv | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'name': obj.name,
+    'value': obj.value,
+    'valueFrom': toJson_VinylCacheV1Alpha1SpecPodEnvValueFrom(obj.valueFrom),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * The pod this Toleration is attached to tolerates any taint that matches
+ * the triple <key,value,effect> using the matching operator <operator>.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodTolerations
+ */
+export interface VinylCacheV1Alpha1SpecPodTolerations {
+  /**
+   * Effect indicates the taint effect to match. Empty means match all taint effects.
+   * When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodTolerations#effect
+   */
+  readonly effect?: string;
+
+  /**
+   * Key is the taint key that the toleration applies to. Empty means match all taint keys.
+   * If the key is empty, operator must be Exists; this combination means to match all values and all keys.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodTolerations#key
+   */
+  readonly key?: string;
+
+  /**
+   * Operator represents a key's relationship to the value.
+   * Valid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.
+   * Exists is equivalent to wildcard for value, so that a pod can
+   * tolerate all taints of a particular category.
+   * Lt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).
+   *
+   * @default Equal.
+   * @schema VinylCacheV1Alpha1SpecPodTolerations#operator
+   */
+  readonly operator?: string;
+
+  /**
+   * TolerationSeconds represents the period of time the toleration (which must be
+   * of effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,
+   * it is not set, which means tolerate the taint forever (do not evict). Zero and
+   * negative values will be treated as 0 (evict immediately) by the system.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodTolerations#tolerationSeconds
+   */
+  readonly tolerationSeconds?: number;
+
+  /**
+   * Value is the taint value the toleration matches to.
+   * If the operator is Exists, the value should be empty, otherwise just a regular string.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodTolerations#value
+   */
+  readonly value?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodTolerations' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodTolerations(obj: VinylCacheV1Alpha1SpecPodTolerations | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'effect': obj.effect,
+    'key': obj.key,
+    'operator': obj.operator,
+    'tolerationSeconds': obj.tolerationSeconds,
+    'value': obj.value,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * VolumeMount describes a mounting of a Volume within a container.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumeMounts
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumeMounts {
+  /**
+   * Path within the container at which the volume should be mounted.  Must
+   * not contain ':'.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumeMounts#mountPath
+   */
+  readonly mountPath: string;
+
+  /**
+   * mountPropagation determines how mounts are propagated from the host
+   * to container and the other way around.
+   * When not set, MountPropagationNone is used.
+   * This field is beta in 1.10.
+   * When RecursiveReadOnly is set to IfPossible or to Enabled, MountPropagation must be None or unspecified
+   * (which defaults to None).
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumeMounts#mountPropagation
+   */
+  readonly mountPropagation?: string;
+
+  /**
+   * This must match the Name of a Volume.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumeMounts#name
+   */
+  readonly name: string;
+
+  /**
+   * Mounted read-only if true, read-write otherwise (false or unspecified).
+   * Defaults to false.
+   *
+   * @default false.
+   * @schema VinylCacheV1Alpha1SpecPodVolumeMounts#readOnly
+   */
+  readonly readOnly?: boolean;
+
+  /**
+   * RecursiveReadOnly specifies whether read-only mounts should be handled
+   * recursively.
+   *
+   * If ReadOnly is false, this field has no meaning and must be unspecified.
+   *
+   * If ReadOnly is true, and this field is set to Disabled, the mount is not made
+   * recursively read-only.  If this field is set to IfPossible, the mount is made
+   * recursively read-only, if it is supported by the container runtime.  If this
+   * field is set to Enabled, the mount is made recursively read-only if it is
+   * supported by the container runtime, otherwise the pod will not be started and
+   * an error will be generated to indicate the reason.
+   *
+   * If this field is set to IfPossible or Enabled, MountPropagation must be set to
+   * None (or be unspecified, which defaults to None).
+   *
+   * If this field is not specified, it is treated as an equivalent of Disabled.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumeMounts#recursiveReadOnly
+   */
+  readonly recursiveReadOnly?: string;
+
+  /**
+   * Path within the volume from which the container's volume should be mounted.
+   * Defaults to "" (volume's root).
+   *
+   * @default volume's root).
+   * @schema VinylCacheV1Alpha1SpecPodVolumeMounts#subPath
+   */
+  readonly subPath?: string;
+
+  /**
+   * Expanded path within the volume from which the container's volume should be mounted.
+   * Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment.
+   * Defaults to "" (volume's root).
+   * SubPathExpr and SubPath are mutually exclusive.
+   *
+   * @default volume's root).
+   * @schema VinylCacheV1Alpha1SpecPodVolumeMounts#subPathExpr
+   */
+  readonly subPathExpr?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumeMounts' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumeMounts(obj: VinylCacheV1Alpha1SpecPodVolumeMounts | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'mountPath': obj.mountPath,
+    'mountPropagation': obj.mountPropagation,
+    'name': obj.name,
+    'readOnly': obj.readOnly,
+    'recursiveReadOnly': obj.recursiveReadOnly,
+    'subPath': obj.subPath,
+    'subPathExpr': obj.subPathExpr,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Volume represents a named volume in a pod that may be accessed by any container in the pod.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumes
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumes {
+  /**
+   * awsElasticBlockStore represents an AWS Disk resource that is attached to a
+   * kubelet's host machine and then exposed to the pod.
+   * Deprecated: AWSElasticBlockStore is deprecated. All operations for the in-tree
+   * awsElasticBlockStore type are redirected to the ebs.csi.aws.com CSI driver.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#awsElasticBlockStore
+   */
+  readonly awsElasticBlockStore?: VinylCacheV1Alpha1SpecPodVolumesAwsElasticBlockStore;
+
+  /**
+   * azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod.
+   * Deprecated: AzureDisk is deprecated. All operations for the in-tree azureDisk type
+   * are redirected to the disk.csi.azure.com CSI driver.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#azureDisk
+   */
+  readonly azureDisk?: VinylCacheV1Alpha1SpecPodVolumesAzureDisk;
+
+  /**
+   * azureFile represents an Azure File Service mount on the host and bind mount to the pod.
+   * Deprecated: AzureFile is deprecated. All operations for the in-tree azureFile type
+   * are redirected to the file.csi.azure.com CSI driver.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#azureFile
+   */
+  readonly azureFile?: VinylCacheV1Alpha1SpecPodVolumesAzureFile;
+
+  /**
+   * cephFS represents a Ceph FS mount on the host that shares a pod's lifetime.
+   * Deprecated: CephFS is deprecated and the in-tree cephfs type is no longer supported.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#cephfs
+   */
+  readonly cephfs?: VinylCacheV1Alpha1SpecPodVolumesCephfs;
+
+  /**
+   * cinder represents a cinder volume attached and mounted on kubelets host machine.
+   * Deprecated: Cinder is deprecated. All operations for the in-tree cinder type
+   * are redirected to the cinder.csi.openstack.org CSI driver.
+   * More info: https://examples.k8s.io/mysql-cinder-pd/README.md
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#cinder
+   */
+  readonly cinder?: VinylCacheV1Alpha1SpecPodVolumesCinder;
+
+  /**
+   * configMap represents a configMap that should populate this volume
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#configMap
+   */
+  readonly configMap?: VinylCacheV1Alpha1SpecPodVolumesConfigMap;
+
+  /**
+   * csi (Container Storage Interface) represents ephemeral storage that is handled by certain external CSI drivers.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#csi
+   */
+  readonly csi?: VinylCacheV1Alpha1SpecPodVolumesCsi;
+
+  /**
+   * downwardAPI represents downward API about the pod that should populate this volume
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#downwardAPI
+   */
+  readonly downwardApi?: VinylCacheV1Alpha1SpecPodVolumesDownwardApi;
+
+  /**
+   * emptyDir represents a temporary directory that shares a pod's lifetime.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#emptyDir
+   */
+  readonly emptyDir?: VinylCacheV1Alpha1SpecPodVolumesEmptyDir;
+
+  /**
+   * ephemeral represents a volume that is handled by a cluster storage driver.
+   * The volume's lifecycle is tied to the pod that defines it - it will be created before the pod starts,
+   * and deleted when the pod is removed.
+   *
+   * Use this if:
+   * a) the volume is only needed while the pod runs,
+   * b) features of normal volumes like restoring from snapshot or capacity
+   * tracking are needed,
+   * c) the storage driver is specified through a storage class, and
+   * d) the storage driver supports dynamic volume provisioning through
+   * a PersistentVolumeClaim (see EphemeralVolumeSource for more
+   * information on the connection between this volume type
+   * and PersistentVolumeClaim).
+   *
+   * Use PersistentVolumeClaim or one of the vendor-specific
+   * APIs for volumes that persist for longer than the lifecycle
+   * of an individual pod.
+   *
+   * Use CSI for light-weight local ephemeral volumes if the CSI driver is meant to
+   * be used that way - see the documentation of the driver for
+   * more information.
+   *
+   * A pod can use both types of ephemeral volumes and
+   * persistent volumes at the same time.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#ephemeral
+   */
+  readonly ephemeral?: VinylCacheV1Alpha1SpecPodVolumesEphemeral;
+
+  /**
+   * fc represents a Fibre Channel resource that is attached to a kubelet's host machine and then exposed to the pod.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#fc
+   */
+  readonly fc?: VinylCacheV1Alpha1SpecPodVolumesFc;
+
+  /**
+   * flexVolume represents a generic volume resource that is
+   * provisioned/attached using an exec based plugin.
+   * Deprecated: FlexVolume is deprecated. Consider using a CSIDriver instead.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#flexVolume
+   */
+  readonly flexVolume?: VinylCacheV1Alpha1SpecPodVolumesFlexVolume;
+
+  /**
+   * flocker represents a Flocker volume attached to a kubelet's host machine. This depends on the Flocker control service being running.
+   * Deprecated: Flocker is deprecated and the in-tree flocker type is no longer supported.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#flocker
+   */
+  readonly flocker?: VinylCacheV1Alpha1SpecPodVolumesFlocker;
+
+  /**
+   * gcePersistentDisk represents a GCE Disk resource that is attached to a
+   * kubelet's host machine and then exposed to the pod.
+   * Deprecated: GCEPersistentDisk is deprecated. All operations for the in-tree
+   * gcePersistentDisk type are redirected to the pd.csi.storage.gke.io CSI driver.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#gcePersistentDisk
+   */
+  readonly gcePersistentDisk?: VinylCacheV1Alpha1SpecPodVolumesGcePersistentDisk;
+
+  /**
+   * gitRepo represents a git repository at a particular revision.
+   * Deprecated: GitRepo is deprecated. To provision a container with a git repo, mount an
+   * EmptyDir into an InitContainer that clones the repo using git, then mount the EmptyDir
+   * into the Pod's container.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#gitRepo
+   */
+  readonly gitRepo?: VinylCacheV1Alpha1SpecPodVolumesGitRepo;
+
+  /**
+   * glusterfs represents a Glusterfs mount on the host that shares a pod's lifetime.
+   * Deprecated: Glusterfs is deprecated and the in-tree glusterfs type is no longer supported.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#glusterfs
+   */
+  readonly glusterfs?: VinylCacheV1Alpha1SpecPodVolumesGlusterfs;
+
+  /**
+   * hostPath represents a pre-existing file or directory on the host
+   * machine that is directly exposed to the container. This is generally
+   * used for system agents or other privileged things that are allowed
+   * to see the host machine. Most containers will NOT need this.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#hostPath
+   */
+  readonly hostPath?: VinylCacheV1Alpha1SpecPodVolumesHostPath;
+
+  /**
+   * image represents an OCI object (a container image or artifact) pulled and mounted on the kubelet's host machine.
+   * The volume is resolved at pod startup depending on which PullPolicy value is provided:
+   *
+   * - Always: the kubelet always attempts to pull the reference. Container creation will fail If the pull fails.
+   * - Never: the kubelet never pulls the reference and only uses a local image or artifact. Container creation will fail if the reference isn't present.
+   * - IfNotPresent: the kubelet pulls if the reference isn't already present on disk. Container creation will fail if the reference isn't present and the pull fails.
+   *
+   * The volume gets re-resolved if the pod gets deleted and recreated, which means that new remote content will become available on pod recreation.
+   * A failure to resolve or pull the image during pod startup will block containers from starting and may add significant latency. Failures will be retried using normal volume backoff and will be reported on the pod reason and message.
+   * The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field.
+   * The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images.
+   * The volume will be mounted read-only (ro).
+   * Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath) before 1.33.
+   * The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#image
+   */
+  readonly image?: VinylCacheV1Alpha1SpecPodVolumesImage;
+
+  /**
+   * iscsi represents an ISCSI Disk resource that is attached to a
+   * kubelet's host machine and then exposed to the pod.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes/#iscsi
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#iscsi
+   */
+  readonly iscsi?: VinylCacheV1Alpha1SpecPodVolumesIscsi;
+
+  /**
+   * name of the volume.
+   * Must be a DNS_LABEL and unique within the pod.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#name
+   */
+  readonly name: string;
+
+  /**
+   * nfs represents an NFS mount on the host that shares a pod's lifetime
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#nfs
+   */
+  readonly nfs?: VinylCacheV1Alpha1SpecPodVolumesNfs;
+
+  /**
+   * persistentVolumeClaimVolumeSource represents a reference to a
+   * PersistentVolumeClaim in the same namespace.
+   * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#persistentVolumeClaim
+   */
+  readonly persistentVolumeClaim?: VinylCacheV1Alpha1SpecPodVolumesPersistentVolumeClaim;
+
+  /**
+   * photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine.
+   * Deprecated: PhotonPersistentDisk is deprecated and the in-tree photonPersistentDisk type is no longer supported.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#photonPersistentDisk
+   */
+  readonly photonPersistentDisk?: VinylCacheV1Alpha1SpecPodVolumesPhotonPersistentDisk;
+
+  /**
+   * portworxVolume represents a portworx volume attached and mounted on kubelets host machine.
+   * Deprecated: PortworxVolume is deprecated. All operations for the in-tree portworxVolume type
+   * are redirected to the pxd.portworx.com CSI driver.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#portworxVolume
+   */
+  readonly portworxVolume?: VinylCacheV1Alpha1SpecPodVolumesPortworxVolume;
+
+  /**
+   * projected items for all in one resources secrets, configmaps, and downward API
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#projected
+   */
+  readonly projected?: VinylCacheV1Alpha1SpecPodVolumesProjected;
+
+  /**
+   * quobyte represents a Quobyte mount on the host that shares a pod's lifetime.
+   * Deprecated: Quobyte is deprecated and the in-tree quobyte type is no longer supported.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#quobyte
+   */
+  readonly quobyte?: VinylCacheV1Alpha1SpecPodVolumesQuobyte;
+
+  /**
+   * rbd represents a Rados Block Device mount on the host that shares a pod's lifetime.
+   * Deprecated: RBD is deprecated and the in-tree rbd type is no longer supported.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#rbd
+   */
+  readonly rbd?: VinylCacheV1Alpha1SpecPodVolumesRbd;
+
+  /**
+   * scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes.
+   * Deprecated: ScaleIO is deprecated and the in-tree scaleIO type is no longer supported.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#scaleIO
+   */
+  readonly scaleIo?: VinylCacheV1Alpha1SpecPodVolumesScaleIo;
+
+  /**
+   * secret represents a secret that should populate this volume.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#secret
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#secret
+   */
+  readonly secret?: VinylCacheV1Alpha1SpecPodVolumesSecret;
+
+  /**
+   * storageOS represents a StorageOS volume attached and mounted on Kubernetes nodes.
+   * Deprecated: StorageOS is deprecated and the in-tree storageos type is no longer supported.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#storageos
+   */
+  readonly storageos?: VinylCacheV1Alpha1SpecPodVolumesStorageos;
+
+  /**
+   * vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine.
+   * Deprecated: VsphereVolume is deprecated. All operations for the in-tree vsphereVolume type
+   * are redirected to the csi.vsphere.vmware.com CSI driver.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumes#vsphereVolume
+   */
+  readonly vsphereVolume?: VinylCacheV1Alpha1SpecPodVolumesVsphereVolume;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumes' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumes(obj: VinylCacheV1Alpha1SpecPodVolumes | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'awsElasticBlockStore': toJson_VinylCacheV1Alpha1SpecPodVolumesAwsElasticBlockStore(obj.awsElasticBlockStore),
+    'azureDisk': toJson_VinylCacheV1Alpha1SpecPodVolumesAzureDisk(obj.azureDisk),
+    'azureFile': toJson_VinylCacheV1Alpha1SpecPodVolumesAzureFile(obj.azureFile),
+    'cephfs': toJson_VinylCacheV1Alpha1SpecPodVolumesCephfs(obj.cephfs),
+    'cinder': toJson_VinylCacheV1Alpha1SpecPodVolumesCinder(obj.cinder),
+    'configMap': toJson_VinylCacheV1Alpha1SpecPodVolumesConfigMap(obj.configMap),
+    'csi': toJson_VinylCacheV1Alpha1SpecPodVolumesCsi(obj.csi),
+    'downwardAPI': toJson_VinylCacheV1Alpha1SpecPodVolumesDownwardApi(obj.downwardApi),
+    'emptyDir': toJson_VinylCacheV1Alpha1SpecPodVolumesEmptyDir(obj.emptyDir),
+    'ephemeral': toJson_VinylCacheV1Alpha1SpecPodVolumesEphemeral(obj.ephemeral),
+    'fc': toJson_VinylCacheV1Alpha1SpecPodVolumesFc(obj.fc),
+    'flexVolume': toJson_VinylCacheV1Alpha1SpecPodVolumesFlexVolume(obj.flexVolume),
+    'flocker': toJson_VinylCacheV1Alpha1SpecPodVolumesFlocker(obj.flocker),
+    'gcePersistentDisk': toJson_VinylCacheV1Alpha1SpecPodVolumesGcePersistentDisk(obj.gcePersistentDisk),
+    'gitRepo': toJson_VinylCacheV1Alpha1SpecPodVolumesGitRepo(obj.gitRepo),
+    'glusterfs': toJson_VinylCacheV1Alpha1SpecPodVolumesGlusterfs(obj.glusterfs),
+    'hostPath': toJson_VinylCacheV1Alpha1SpecPodVolumesHostPath(obj.hostPath),
+    'image': toJson_VinylCacheV1Alpha1SpecPodVolumesImage(obj.image),
+    'iscsi': toJson_VinylCacheV1Alpha1SpecPodVolumesIscsi(obj.iscsi),
+    'name': obj.name,
+    'nfs': toJson_VinylCacheV1Alpha1SpecPodVolumesNfs(obj.nfs),
+    'persistentVolumeClaim': toJson_VinylCacheV1Alpha1SpecPodVolumesPersistentVolumeClaim(obj.persistentVolumeClaim),
+    'photonPersistentDisk': toJson_VinylCacheV1Alpha1SpecPodVolumesPhotonPersistentDisk(obj.photonPersistentDisk),
+    'portworxVolume': toJson_VinylCacheV1Alpha1SpecPodVolumesPortworxVolume(obj.portworxVolume),
+    'projected': toJson_VinylCacheV1Alpha1SpecPodVolumesProjected(obj.projected),
+    'quobyte': toJson_VinylCacheV1Alpha1SpecPodVolumesQuobyte(obj.quobyte),
+    'rbd': toJson_VinylCacheV1Alpha1SpecPodVolumesRbd(obj.rbd),
+    'scaleIO': toJson_VinylCacheV1Alpha1SpecPodVolumesScaleIo(obj.scaleIo),
+    'secret': toJson_VinylCacheV1Alpha1SpecPodVolumesSecret(obj.secret),
+    'storageos': toJson_VinylCacheV1Alpha1SpecPodVolumesStorageos(obj.storageos),
+    'vsphereVolume': toJson_VinylCacheV1Alpha1SpecPodVolumesVsphereVolume(obj.vsphereVolume),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * ResourceClaim references one entry in PodSpec.ResourceClaims.
+ *
+ * @schema VinylCacheV1Alpha1SpecResourcesClaims
+ */
+export interface VinylCacheV1Alpha1SpecResourcesClaims {
+  /**
+   * Name must match the name of one entry in pod.spec.resourceClaims of
+   * the Pod where this field is used. It makes that resource available
+   * inside a container.
+   *
+   * @schema VinylCacheV1Alpha1SpecResourcesClaims#name
+   */
+  readonly name: string;
+
+  /**
+   * Request is the name chosen for a request in the referenced claim.
+   * If empty, everything from the claim is made available, otherwise
+   * only the result of this request.
+   *
+   * @schema VinylCacheV1Alpha1SpecResourcesClaims#request
+   */
+  readonly request?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecResourcesClaims' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecResourcesClaims(obj: VinylCacheV1Alpha1SpecResourcesClaims | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'name': obj.name,
+    'request': obj.request,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * @schema VinylCacheV1Alpha1SpecResourcesLimits
+ */
+export class VinylCacheV1Alpha1SpecResourcesLimits {
+  public static fromNumber(value: number): VinylCacheV1Alpha1SpecResourcesLimits {
+    return new VinylCacheV1Alpha1SpecResourcesLimits(value);
+  }
+  public static fromString(value: string): VinylCacheV1Alpha1SpecResourcesLimits {
+    return new VinylCacheV1Alpha1SpecResourcesLimits(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * @schema VinylCacheV1Alpha1SpecResourcesRequests
+ */
+export class VinylCacheV1Alpha1SpecResourcesRequests {
+  public static fromNumber(value: number): VinylCacheV1Alpha1SpecResourcesRequests {
+    return new VinylCacheV1Alpha1SpecResourcesRequests(value);
+  }
+  public static fromString(value: string): VinylCacheV1Alpha1SpecResourcesRequests {
+    return new VinylCacheV1Alpha1SpecResourcesRequests(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * type sets the Kubernetes Service type (ClusterIP, NodePort, LoadBalancer).
+ *
+ * @schema VinylCacheV1Alpha1SpecServiceType
+ */
+export enum VinylCacheV1Alpha1SpecServiceType {
+  /** ClusterIP */
+  CLUSTER_IP = "ClusterIP",
+  /** NodePort */
+  NODE_PORT = "NodePort",
+  /** LoadBalancer */
+  LOAD_BALANCER = "LoadBalancer",
+}
+
+/**
+ * size is the storage allocation as a Kubernetes resource quantity (e.g. "1Gi").
+ * The operator converts to bytes for varnishd.
+ *
+ * @schema VinylCacheV1Alpha1SpecStorageSize
+ */
+export class VinylCacheV1Alpha1SpecStorageSize {
+  public static fromNumber(value: number): VinylCacheV1Alpha1SpecStorageSize {
+    return new VinylCacheV1Alpha1SpecStorageSize(value);
+  }
+  public static fromString(value: string): VinylCacheV1Alpha1SpecStorageSize {
+    return new VinylCacheV1Alpha1SpecStorageSize(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * type is the storage backend type. Only "malloc" and "file" are permitted.
+ * "persistent", "umem", and "default" are rejected by the admission webhook.
+ *
+ * @schema VinylCacheV1Alpha1SpecStorageType
+ */
+export enum VinylCacheV1Alpha1SpecStorageType {
+  /** malloc */
+  MALLOC = "malloc",
+  /** file */
+  FILE = "file",
+}
+
+/**
+ * otlp configures the OTLP trace exporter. endpoint is required when
+ * tracing is enabled.
+ *
+ * @schema VinylCacheV1Alpha1SpecTracingOtlp
+ */
+export interface VinylCacheV1Alpha1SpecTracingOtlp {
+  /**
+   * endpoint is the collector's host:port (no scheme).
+   *
+   * @schema VinylCacheV1Alpha1SpecTracingOtlp#endpoint
+   */
+  readonly endpoint?: string;
+
+  /**
+   * insecure disables TLS for the OTLP connection.
+   *
+   * @schema VinylCacheV1Alpha1SpecTracingOtlp#insecure
+   */
+  readonly insecure?: boolean;
+
+  /**
+   * protocol selects the OTLP transport. Defaults to grpc.
+   *
+   * @default grpc.
+   * @schema VinylCacheV1Alpha1SpecTracingOtlp#protocol
+   */
+  readonly protocol?: VinylCacheV1Alpha1SpecTracingOtlpProtocol;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecTracingOtlp' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecTracingOtlp(obj: VinylCacheV1Alpha1SpecTracingOtlp | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'endpoint': obj.endpoint,
+    'insecure': obj.insecure,
+    'protocol': obj.protocol,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * resources are the tracer container's resource requirements.
+ *
+ * @schema VinylCacheV1Alpha1SpecTracingResources
+ */
+export interface VinylCacheV1Alpha1SpecTracingResources {
+  /**
+   * Claims lists the names of resources, defined in spec.resourceClaims,
+   * that are used by this container.
+   *
+   * This field depends on the
+   * DynamicResourceAllocation feature gate.
+   *
+   * This field is immutable. It can only be set for containers.
+   *
+   * @schema VinylCacheV1Alpha1SpecTracingResources#claims
+   */
+  readonly claims?: VinylCacheV1Alpha1SpecTracingResourcesClaims[];
+
+  /**
+   * Limits describes the maximum amount of compute resources allowed.
+   * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+   *
+   * @schema VinylCacheV1Alpha1SpecTracingResources#limits
+   */
+  readonly limits?: { [key: string]: VinylCacheV1Alpha1SpecTracingResourcesLimits };
+
+  /**
+   * Requests describes the minimum amount of compute resources required.
+   * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+   * otherwise to an implementation-defined value. Requests cannot exceed Limits.
+   * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+   *
+   * @schema VinylCacheV1Alpha1SpecTracingResources#requests
+   */
+  readonly requests?: { [key: string]: VinylCacheV1Alpha1SpecTracingResourcesRequests };
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecTracingResources' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecTracingResources(obj: VinylCacheV1Alpha1SpecTracingResources | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'claims': obj.claims?.map(y => toJson_VinylCacheV1Alpha1SpecTracingResourcesClaims(y)),
+    'limits': ((obj.limits) === undefined) ? undefined : (Object.entries(obj.limits).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    'requests': ((obj.requests) === undefined) ? undefined : (Object.entries(obj.requests).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * snippets provides VCL code injected into each generated subroutine.
+ *
+ * @schema VinylCacheV1Alpha1SpecVclSnippets
+ */
+export interface VinylCacheV1Alpha1SpecVclSnippets {
+  /**
+   * header is inserted at the top of the VCL file, before any subroutines.
+   * Use for import statements and global declarations.
+   *
+   * @schema VinylCacheV1Alpha1SpecVclSnippets#header
+   */
+  readonly header?: string;
+
+  /**
+   * vclBackendError is inserted into vcl_backend_error.
+   *
+   * @schema VinylCacheV1Alpha1SpecVclSnippets#vclBackendError
+   */
+  readonly vclBackendError?: string;
+
+  /**
+   * vclBackendFetch is inserted into vcl_backend_fetch.
+   *
+   * @schema VinylCacheV1Alpha1SpecVclSnippets#vclBackendFetch
+   */
+  readonly vclBackendFetch?: string;
+
+  /**
+   * vclBackendResponse is inserted into vcl_backend_response.
+   *
+   * @schema VinylCacheV1Alpha1SpecVclSnippets#vclBackendResponse
+   */
+  readonly vclBackendResponse?: string;
+
+  /**
+   * vclDeliver is inserted into vcl_deliver.
+   *
+   * @schema VinylCacheV1Alpha1SpecVclSnippets#vclDeliver
+   */
+  readonly vclDeliver?: string;
+
+  /**
+   * vclFini is inserted into vcl_fini.
+   *
+   * @schema VinylCacheV1Alpha1SpecVclSnippets#vclFini
+   */
+  readonly vclFini?: string;
+
+  /**
+   * vclHash is inserted into vcl_hash.
+   *
+   * @schema VinylCacheV1Alpha1SpecVclSnippets#vclHash
+   */
+  readonly vclHash?: string;
+
+  /**
+   * vclHit is inserted into vcl_hit.
+   *
+   * @schema VinylCacheV1Alpha1SpecVclSnippets#vclHit
+   */
+  readonly vclHit?: string;
+
+  /**
+   * vclInit is inserted into the vcl_init subroutine after director initialisation.
+   *
+   * @schema VinylCacheV1Alpha1SpecVclSnippets#vclInit
+   */
+  readonly vclInit?: string;
+
+  /**
+   * vclMiss is inserted into vcl_miss.
+   *
+   * @schema VinylCacheV1Alpha1SpecVclSnippets#vclMiss
+   */
+  readonly vclMiss?: string;
+
+  /**
+   * vclPass is inserted into vcl_pass.
+   *
+   * @schema VinylCacheV1Alpha1SpecVclSnippets#vclPass
+   */
+  readonly vclPass?: string;
+
+  /**
+   * vclPipe is inserted into vcl_pipe.
+   *
+   * @schema VinylCacheV1Alpha1SpecVclSnippets#vclPipe
+   */
+  readonly vclPipe?: string;
+
+  /**
+   * vclPurge is inserted into vcl_purge.
+   *
+   * @schema VinylCacheV1Alpha1SpecVclSnippets#vclPurge
+   */
+  readonly vclPurge?: string;
+
+  /**
+   * vclRecv is inserted into vcl_recv after generated routing logic, before return().
+   *
+   * @schema VinylCacheV1Alpha1SpecVclSnippets#vclRecv
+   */
+  readonly vclRecv?: string;
+
+  /**
+   * vclSynth is inserted into vcl_synth.
+   *
+   * @schema VinylCacheV1Alpha1SpecVclSnippets#vclSynth
+   */
+  readonly vclSynth?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecVclSnippets' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecVclSnippets(obj: VinylCacheV1Alpha1SpecVclSnippets | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'header': obj.header,
+    'vclBackendError': obj.vclBackendError,
+    'vclBackendFetch': obj.vclBackendFetch,
+    'vclBackendResponse': obj.vclBackendResponse,
+    'vclDeliver': obj.vclDeliver,
+    'vclFini': obj.vclFini,
+    'vclHash': obj.vclHash,
+    'vclHit': obj.vclHit,
+    'vclInit': obj.vclInit,
+    'vclMiss': obj.vclMiss,
+    'vclPass': obj.vclPass,
+    'vclPipe': obj.vclPipe,
+    'vclPurge': obj.vclPurge,
+    'vclRecv': obj.vclRecv,
+    'vclSynth': obj.vclSynth,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * spec defines the desired characteristics of a volume requested by a pod author.
+ * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
+ *
+ * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpec
+ */
+export interface VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpec {
+  /**
+   * accessModes contains the desired access modes the volume should have.
+   * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpec#accessModes
+   */
+  readonly accessModes?: string[];
+
+  /**
+   * dataSource field can be used to specify either:
+   * * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot)
+   * * An existing PVC (PersistentVolumeClaim)
+   * If the provisioner or an external controller can support the specified data source,
+   * it will create a new volume based on the contents of the specified data source.
+   * When the AnyVolumeDataSource feature gate is enabled, dataSource contents will be copied to dataSourceRef,
+   * and dataSourceRef contents will be copied to dataSource when dataSourceRef.namespace is not specified.
+   * If the namespace is specified, then dataSourceRef will not be copied to dataSource.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpec#dataSource
+   */
+  readonly dataSource?: VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSource;
+
+  /**
+   * dataSourceRef specifies the object from which to populate the volume with data, if a non-empty
+   * volume is desired. This may be any object from a non-empty API group (non
+   * core object) or a PersistentVolumeClaim object.
+   * When this field is specified, volume binding will only succeed if the type of
+   * the specified object matches some installed volume populator or dynamic
+   * provisioner.
+   * This field will replace the functionality of the dataSource field and as such
+   * if both fields are non-empty, they must have the same value. For backwards
+   * compatibility, when namespace isn't specified in dataSourceRef,
+   * both fields (dataSource and dataSourceRef) will be set to the same
+   * value automatically if one of them is empty and the other is non-empty.
+   * When namespace is specified in dataSourceRef,
+   * dataSource isn't set to the same value and must be empty.
+   * There are three important differences between dataSource and dataSourceRef:
+   * * While dataSource only allows two specific types of objects, dataSourceRef
+   * allows any non-core object, as well as PersistentVolumeClaim objects.
+   * * While dataSource ignores disallowed values (dropping them), dataSourceRef
+   * preserves all values, and generates an error if a disallowed value is
+   * specified.
+   * * While dataSource only allows local objects, dataSourceRef allows objects
+   * in any namespaces.
+   * (Beta) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
+   * (Alpha) Using the namespace field of dataSourceRef requires the CrossNamespaceVolumeDataSource feature gate to be enabled.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpec#dataSourceRef
+   */
+  readonly dataSourceRef?: VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSourceRef;
+
+  /**
+   * resources represents the minimum resources the volume should have.
+   * Users are allowed to specify resource requirements
+   * that are lower than previous value but must still be higher than capacity recorded in the
+   * status field of the claim.
+   * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpec#resources
+   */
+  readonly resources?: VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResources;
+
+  /**
+   * selector is a label query over volumes to consider for binding.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpec#selector
+   */
+  readonly selector?: VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecSelector;
+
+  /**
+   * storageClassName is the name of the StorageClass required by the claim.
+   * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpec#storageClassName
+   */
+  readonly storageClassName?: string;
+
+  /**
+   * volumeAttributesClassName may be used to set the VolumeAttributesClass used by this claim.
+   * If specified, the CSI driver will create or update the volume with the attributes defined
+   * in the corresponding VolumeAttributesClass. This has a different purpose than storageClassName,
+   * it can be changed after the claim is created. An empty string or nil value indicates that no
+   * VolumeAttributesClass will be applied to the claim. If the claim enters an Infeasible error state,
+   * this field can be reset to its previous value (including nil) to cancel the modification.
+   * If the resource referred to by volumeAttributesClass does not exist, this PersistentVolumeClaim will be
+   * set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource
+   * exists.
+   * More info: https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpec#volumeAttributesClassName
+   */
+  readonly volumeAttributesClassName?: string;
+
+  /**
+   * volumeMode defines what type of volume is required by the claim.
+   * Value of Filesystem is implied when not included in claim spec.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpec#volumeMode
+   */
+  readonly volumeMode?: string;
+
+  /**
+   * volumeName is the binding reference to the PersistentVolume backing this claim.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpec#volumeName
+   */
+  readonly volumeName?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpec' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpec(obj: VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpec | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'accessModes': obj.accessModes?.map(y => y),
+    'dataSource': toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSource(obj.dataSource),
+    'dataSourceRef': toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSourceRef(obj.dataSourceRef),
+    'resources': toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResources(obj.resources),
+    'selector': toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecSelector(obj.selector),
+    'storageClassName': obj.storageClassName,
+    'volumeAttributesClassName': obj.volumeAttributesClassName,
+    'volumeMode': obj.volumeMode,
+    'volumeName': obj.volumeName,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * status represents the current information/status of a persistent volume claim.
+ * Read-only.
+ * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
+ *
+ * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatus
+ */
+export interface VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatus {
+  /**
+   * accessModes contains the actual access modes the volume backing the PVC has.
+   * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatus#accessModes
+   */
+  readonly accessModes?: string[];
+
+  /**
+   * allocatedResourceStatuses stores status of resource being resized for the given PVC.
+   * Key names follow standard Kubernetes label syntax. Valid values are either:
+   * * Un-prefixed keys:
+   * - storage - the capacity of the volume.
+   * * Custom resources must use implementation-defined prefixed names such as "example.com/my-custom-resource"
+   * Apart from above values - keys that are unprefixed or have kubernetes.io prefix are considered
+   * reserved and hence may not be used.
+   *
+   * ClaimResourceStatus can be in any of following states:
+   * - ControllerResizeInProgress:
+   * State set when resize controller starts resizing the volume in control-plane.
+   * - ControllerResizeFailed:
+   * State set when resize has failed in resize controller with a terminal error.
+   * - NodeResizePending:
+   * State set when resize controller has finished resizing the volume but further resizing of
+   * volume is needed on the node.
+   * - NodeResizeInProgress:
+   * State set when kubelet starts resizing the volume.
+   * - NodeResizeFailed:
+   * State set when resizing has failed in kubelet with a terminal error. Transient errors don't set
+   * NodeResizeFailed.
+   * For example: if expanding a PVC for more capacity - this field can be one of the following states:
+   * - pvc.status.allocatedResourceStatus['storage'] = "ControllerResizeInProgress"
+   * - pvc.status.allocatedResourceStatus['storage'] = "ControllerResizeFailed"
+   * - pvc.status.allocatedResourceStatus['storage'] = "NodeResizePending"
+   * - pvc.status.allocatedResourceStatus['storage'] = "NodeResizeInProgress"
+   * - pvc.status.allocatedResourceStatus['storage'] = "NodeResizeFailed"
+   * When this field is not set, it means that no resize operation is in progress for the given PVC.
+   *
+   * A controller that receives PVC update with previously unknown resourceName or ClaimResourceStatus
+   * should ignore the update for the purpose it was designed. For example - a controller that
+   * only is responsible for resizing capacity of the volume, should ignore PVC updates that change other valid
+   * resources associated with PVC.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatus#allocatedResourceStatuses
+   */
+  readonly allocatedResourceStatuses?: { [key: string]: string };
+
+  /**
+   * allocatedResources tracks the resources allocated to a PVC including its capacity.
+   * Key names follow standard Kubernetes label syntax. Valid values are either:
+   * * Un-prefixed keys:
+   * - storage - the capacity of the volume.
+   * * Custom resources must use implementation-defined prefixed names such as "example.com/my-custom-resource"
+   * Apart from above values - keys that are unprefixed or have kubernetes.io prefix are considered
+   * reserved and hence may not be used.
+   *
+   * Capacity reported here may be larger than the actual capacity when a volume expansion operation
+   * is requested.
+   * For storage quota, the larger value from allocatedResources and PVC.spec.resources is used.
+   * If allocatedResources is not set, PVC.spec.resources alone is used for quota calculation.
+   * If a volume expansion capacity request is lowered, allocatedResources is only
+   * lowered if there are no expansion operations in progress and if the actual volume capacity
+   * is equal or lower than the requested capacity.
+   *
+   * A controller that receives PVC update with previously unknown resourceName
+   * should ignore the update for the purpose it was designed. For example - a controller that
+   * only is responsible for resizing capacity of the volume, should ignore PVC updates that change other valid
+   * resources associated with PVC.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatus#allocatedResources
+   */
+  readonly allocatedResources?: { [key: string]: VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusAllocatedResources };
+
+  /**
+   * capacity represents the actual resources of the underlying volume.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatus#capacity
+   */
+  readonly capacity?: { [key: string]: VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusCapacity };
+
+  /**
+   * conditions is the current Condition of persistent volume claim. If underlying persistent volume is being
+   * resized then the Condition will be set to 'Resizing'.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatus#conditions
+   */
+  readonly conditions?: VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusConditions[];
+
+  /**
+   * currentVolumeAttributesClassName is the current name of the VolumeAttributesClass the PVC is using.
+   * When unset, there is no VolumeAttributeClass applied to this PersistentVolumeClaim
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatus#currentVolumeAttributesClassName
+   */
+  readonly currentVolumeAttributesClassName?: string;
+
+  /**
+   * ModifyVolumeStatus represents the status object of ControllerModifyVolume operation.
+   * When this is unset, there is no ModifyVolume operation being attempted.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatus#modifyVolumeStatus
+   */
+  readonly modifyVolumeStatus?: VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusModifyVolumeStatus;
+
+  /**
+   * phase represents the current phase of PersistentVolumeClaim.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatus#phase
+   */
+  readonly phase?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatus' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatus(obj: VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatus | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'accessModes': obj.accessModes?.map(y => y),
+    'allocatedResourceStatuses': ((obj.allocatedResourceStatuses) === undefined) ? undefined : (Object.entries(obj.allocatedResourceStatuses).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    'allocatedResources': ((obj.allocatedResources) === undefined) ? undefined : (Object.entries(obj.allocatedResources).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    'capacity': ((obj.capacity) === undefined) ? undefined : (Object.entries(obj.capacity).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    'conditions': obj.conditions?.map(y => toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusConditions(y)),
+    'currentVolumeAttributesClassName': obj.currentVolumeAttributesClassName,
+    'modifyVolumeStatus': toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusModifyVolumeStatus(obj.modifyVolumeStatus),
+    'phase': obj.phase,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * hash configures the hash director. Only used when type is "hash".
+ *
+ * @schema VinylCacheV1Alpha1SpecBackendsDirectorHash
+ */
+export interface VinylCacheV1Alpha1SpecBackendsDirectorHash {
+  /**
+   * header is the request header name used as the hash key.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsDirectorHash#header
+   */
+  readonly header?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecBackendsDirectorHash' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecBackendsDirectorHash(obj: VinylCacheV1Alpha1SpecBackendsDirectorHash | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'header': obj.header,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * shard configures the shard director (consistent-hash). Only used when type is "shard".
+ *
+ * @schema VinylCacheV1Alpha1SpecBackendsDirectorShard
+ */
+export interface VinylCacheV1Alpha1SpecBackendsDirectorShard {
+  /**
+   * by determines what value the cluster-peer shard director hashes to pick a
+   * backend, at the point in vcl_recv where cluster routing runs. "URL" (default)
+   * hashes the request URL. "HASH" is not offered: it would hash Varnish's
+   * req.hash, which is only populated by vcl_hash, and vcl_recv's cluster routing
+   * never reaches vcl_hash — so HASH cannot work at this call site.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsDirectorShard#by
+   */
+  readonly by?: VinylCacheV1Alpha1SpecBackendsDirectorShardBy;
+
+  /**
+   * healthy controls which backends the director considers when selecting a shard.
+   * "CHOSEN" (default) only considers the chosen backend healthy; "ALL" requires all
+   * backends to be healthy.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsDirectorShard#healthy
+   */
+  readonly healthy?: VinylCacheV1Alpha1SpecBackendsDirectorShardHealthy;
+
+  /**
+   * rampup is the time after adding a backend before it receives its full share of traffic,
+   * preventing thundering-herd. Default: 30s.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsDirectorShard#rampup
+   */
+  readonly rampup?: string;
+
+  /**
+   * replicas is the number of Ketama replicas per backend in the hash ring. Default: 67.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsDirectorShard#replicas
+   */
+  readonly replicas?: number;
+
+  /**
+   * warmup is the proportion of requests (0.0–1.0) sent to the alternative backend
+   * to pre-populate its cache. Default: 0.1. Must be between 0.0 and 1.0.
+   *
+   * @schema VinylCacheV1Alpha1SpecBackendsDirectorShard#warmup
+   */
+  readonly warmup?: number;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecBackendsDirectorShard' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecBackendsDirectorShard(obj: VinylCacheV1Alpha1SpecBackendsDirectorShard | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'by': obj.by,
+    'healthy': obj.healthy,
+    'rampup': obj.rampup,
+    'replicas': obj.replicas,
+    'warmup': obj.warmup,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * type selects the Varnish director algorithm.
+ * "shard" (default) provides consistent hashing; "round_robin", "random", and "hash"
+ * are also supported.
+ *
+ * @schema VinylCacheV1Alpha1SpecBackendsDirectorType
+ */
+export enum VinylCacheV1Alpha1SpecBackendsDirectorType {
+  /** shard */
+  SHARD = "shard",
+  /** round_robin */
+  ROUND_UNDERSCORE_ROBIN = "round_robin",
+  /** random */
+  RANDOM = "random",
+  /** hash */
+  HASH = "hash",
+  /** fallback */
+  FALLBACK = "fallback",
+}
+
+/**
+ * type is the routing strategy between Varnish pods. Only "shard" is supported.
+ *
+ * @schema VinylCacheV1Alpha1SpecClusterPeerRoutingType
+ */
+export enum VinylCacheV1Alpha1SpecClusterPeerRoutingType {
+  /** shard */
+  SHARD = "shard",
+}
+
+/**
+ * by determines what value the cluster-peer shard director hashes to pick a
+ * backend, at the point in vcl_recv where cluster routing runs. "URL" (default)
+ * hashes the request URL. "HASH" is not offered: it would hash Varnish's
+ * req.hash, which is only populated by vcl_hash, and vcl_recv's cluster routing
+ * never reaches vcl_hash — so HASH cannot work at this call site.
+ *
+ * @schema VinylCacheV1Alpha1SpecDirectorShardBy
+ */
+export enum VinylCacheV1Alpha1SpecDirectorShardBy {
+  /** URL */
+  URL = "URL",
+}
+
+/**
+ * healthy controls which backends the director considers when selecting a shard.
+ * "CHOSEN" (default) only considers the chosen backend healthy; "ALL" requires all
+ * backends to be healthy.
+ *
+ * @schema VinylCacheV1Alpha1SpecDirectorShardHealthy
+ */
+export enum VinylCacheV1Alpha1SpecDirectorShardHealthy {
+  /** CHOSEN */
+  CHOSEN = "CHOSEN",
+  /** ALL */
+  ALL = "ALL",
+}
+
+/**
+ * image overrides the exporter image. Defaults to
+ * ghcr.io/bluedynamics/varnish-exporter:1.6.1-varnish9.1.0.
+ *
+ * @default ghcr.io/bluedynamics/varnish-exporter:1.6.1-varnish9.1.0.
+ * @schema VinylCacheV1Alpha1SpecMonitoringExporterImage
+ */
+export interface VinylCacheV1Alpha1SpecMonitoringExporterImage {
+  /**
+   * @schema VinylCacheV1Alpha1SpecMonitoringExporterImage#repository
+   */
+  readonly repository?: string;
+
+  /**
+   * @schema VinylCacheV1Alpha1SpecMonitoringExporterImage#tag
+   */
+  readonly tag?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecMonitoringExporterImage' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecMonitoringExporterImage(obj: VinylCacheV1Alpha1SpecMonitoringExporterImage | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'repository': obj.repository,
+    'tag': obj.tag,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * resources sets the exporter container resource requirements.
+ *
+ * @schema VinylCacheV1Alpha1SpecMonitoringExporterResources
+ */
+export interface VinylCacheV1Alpha1SpecMonitoringExporterResources {
+  /**
+   * Claims lists the names of resources, defined in spec.resourceClaims,
+   * that are used by this container.
+   *
+   * This field depends on the
+   * DynamicResourceAllocation feature gate.
+   *
+   * This field is immutable. It can only be set for containers.
+   *
+   * @schema VinylCacheV1Alpha1SpecMonitoringExporterResources#claims
+   */
+  readonly claims?: VinylCacheV1Alpha1SpecMonitoringExporterResourcesClaims[];
+
+  /**
+   * Limits describes the maximum amount of compute resources allowed.
+   * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+   *
+   * @schema VinylCacheV1Alpha1SpecMonitoringExporterResources#limits
+   */
+  readonly limits?: { [key: string]: VinylCacheV1Alpha1SpecMonitoringExporterResourcesLimits };
+
+  /**
+   * Requests describes the minimum amount of compute resources required.
+   * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+   * otherwise to an implementation-defined value. Requests cannot exceed Limits.
+   * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+   *
+   * @schema VinylCacheV1Alpha1SpecMonitoringExporterResources#requests
+   */
+  readonly requests?: { [key: string]: VinylCacheV1Alpha1SpecMonitoringExporterResourcesRequests };
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecMonitoringExporterResources' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecMonitoringExporterResources(obj: VinylCacheV1Alpha1SpecMonitoringExporterResources | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'claims': obj.claims?.map(y => toJson_VinylCacheV1Alpha1SpecMonitoringExporterResourcesClaims(y)),
+    'limits': ((obj.limits) === undefined) ? undefined : (Object.entries(obj.limits).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    'requests': ((obj.requests) === undefined) ? undefined : (Object.entries(obj.requests).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Describes node affinity scheduling rules for the pod.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinity
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityNodeAffinity {
+  /**
+   * The scheduler will prefer to schedule pods to nodes that satisfy
+   * the affinity expressions specified by this field, but it may choose
+   * a node that violates one or more of the expressions. The node that is
+   * most preferred is the one with the greatest sum of weights, i.e.
+   * for each node that meets all of the scheduling requirements (resource
+   * request, requiredDuringScheduling affinity expressions, etc.),
+   * compute a sum by iterating through the elements of this field and adding
+   * "weight" to the sum if the node matches the corresponding matchExpressions; the
+   * node(s) with the highest sum are the most preferred.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinity#preferredDuringSchedulingIgnoredDuringExecution
+   */
+  readonly preferredDuringSchedulingIgnoredDuringExecution?: VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecution[];
+
+  /**
+   * If the affinity requirements specified by this field are not met at
+   * scheduling time, the pod will not be scheduled onto the node.
+   * If the affinity requirements specified by this field cease to be met
+   * at some point during pod execution (e.g. due to an update), the system
+   * may or may not try to eventually evict the pod from its node.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinity#requiredDuringSchedulingIgnoredDuringExecution
+   */
+  readonly requiredDuringSchedulingIgnoredDuringExecution?: VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecution;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityNodeAffinity' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityNodeAffinity(obj: VinylCacheV1Alpha1SpecPodAffinityNodeAffinity | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'preferredDuringSchedulingIgnoredDuringExecution': obj.preferredDuringSchedulingIgnoredDuringExecution?.map(y => toJson_VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecution(y)),
+    'requiredDuringSchedulingIgnoredDuringExecution': toJson_VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecution(obj.requiredDuringSchedulingIgnoredDuringExecution),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinity
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAffinity {
+  /**
+   * The scheduler will prefer to schedule pods to nodes that satisfy
+   * the affinity expressions specified by this field, but it may choose
+   * a node that violates one or more of the expressions. The node that is
+   * most preferred is the one with the greatest sum of weights, i.e.
+   * for each node that meets all of the scheduling requirements (resource
+   * request, requiredDuringScheduling affinity expressions, etc.),
+   * compute a sum by iterating through the elements of this field and adding
+   * "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
+   * node(s) with the highest sum are the most preferred.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinity#preferredDuringSchedulingIgnoredDuringExecution
+   */
+  readonly preferredDuringSchedulingIgnoredDuringExecution?: VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecution[];
+
+  /**
+   * If the affinity requirements specified by this field are not met at
+   * scheduling time, the pod will not be scheduled onto the node.
+   * If the affinity requirements specified by this field cease to be met
+   * at some point during pod execution (e.g. due to a pod label update), the
+   * system may or may not try to eventually evict the pod from its node.
+   * When there are multiple elements, the lists of nodes corresponding to each
+   * podAffinityTerm are intersected, i.e. all terms must be satisfied.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinity#requiredDuringSchedulingIgnoredDuringExecution
+   */
+  readonly requiredDuringSchedulingIgnoredDuringExecution?: VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAffinity' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinity(obj: VinylCacheV1Alpha1SpecPodAffinityPodAffinity | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'preferredDuringSchedulingIgnoredDuringExecution': obj.preferredDuringSchedulingIgnoredDuringExecution?.map(y => toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecution(y)),
+    'requiredDuringSchedulingIgnoredDuringExecution': obj.requiredDuringSchedulingIgnoredDuringExecution?.map(y => toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution(y)),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinity
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinity {
+  /**
+   * The scheduler will prefer to schedule pods to nodes that satisfy
+   * the anti-affinity expressions specified by this field, but it may choose
+   * a node that violates one or more of the expressions. The node that is
+   * most preferred is the one with the greatest sum of weights, i.e.
+   * for each node that meets all of the scheduling requirements (resource
+   * request, requiredDuringScheduling anti-affinity expressions, etc.),
+   * compute a sum by iterating through the elements of this field and subtracting
+   * "weight" from the sum if the node has pods which matches the corresponding podAffinityTerm; the
+   * node(s) with the highest sum are the most preferred.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinity#preferredDuringSchedulingIgnoredDuringExecution
+   */
+  readonly preferredDuringSchedulingIgnoredDuringExecution?: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecution[];
+
+  /**
+   * If the anti-affinity requirements specified by this field are not met at
+   * scheduling time, the pod will not be scheduled onto the node.
+   * If the anti-affinity requirements specified by this field cease to be met
+   * at some point during pod execution (e.g. due to a pod label update), the
+   * system may or may not try to eventually evict the pod from its node.
+   * When there are multiple elements, the lists of nodes corresponding to each
+   * podAffinityTerm are intersected, i.e. all terms must be satisfied.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinity#requiredDuringSchedulingIgnoredDuringExecution
+   */
+  readonly requiredDuringSchedulingIgnoredDuringExecution?: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinity' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinity(obj: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinity | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'preferredDuringSchedulingIgnoredDuringExecution': obj.preferredDuringSchedulingIgnoredDuringExecution?.map(y => toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecution(y)),
+    'requiredDuringSchedulingIgnoredDuringExecution': obj.requiredDuringSchedulingIgnoredDuringExecution?.map(y => toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution(y)),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Source for the environment variable's value. Cannot be used if value is not empty.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodEnvValueFrom
+ */
+export interface VinylCacheV1Alpha1SpecPodEnvValueFrom {
+  /**
+   * Selects a key of a ConfigMap.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnvValueFrom#configMapKeyRef
+   */
+  readonly configMapKeyRef?: VinylCacheV1Alpha1SpecPodEnvValueFromConfigMapKeyRef;
+
+  /**
+   * Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels['<KEY>']`, `metadata.annotations['<KEY>']`,
+   * spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnvValueFrom#fieldRef
+   */
+  readonly fieldRef?: VinylCacheV1Alpha1SpecPodEnvValueFromFieldRef;
+
+  /**
+   * FileKeyRef selects a key of the env file.
+   * Requires the EnvFiles feature gate to be enabled.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnvValueFrom#fileKeyRef
+   */
+  readonly fileKeyRef?: VinylCacheV1Alpha1SpecPodEnvValueFromFileKeyRef;
+
+  /**
+   * Selects a resource of the container: only resources limits and requests
+   * (limits.cpu, limits.memory, limits.ephemeral-storage, requests.cpu, requests.memory and requests.ephemeral-storage) are currently supported.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnvValueFrom#resourceFieldRef
+   */
+  readonly resourceFieldRef?: VinylCacheV1Alpha1SpecPodEnvValueFromResourceFieldRef;
+
+  /**
+   * Selects a key of a secret in the pod's namespace
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnvValueFrom#secretKeyRef
+   */
+  readonly secretKeyRef?: VinylCacheV1Alpha1SpecPodEnvValueFromSecretKeyRef;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodEnvValueFrom' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodEnvValueFrom(obj: VinylCacheV1Alpha1SpecPodEnvValueFrom | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'configMapKeyRef': toJson_VinylCacheV1Alpha1SpecPodEnvValueFromConfigMapKeyRef(obj.configMapKeyRef),
+    'fieldRef': toJson_VinylCacheV1Alpha1SpecPodEnvValueFromFieldRef(obj.fieldRef),
+    'fileKeyRef': toJson_VinylCacheV1Alpha1SpecPodEnvValueFromFileKeyRef(obj.fileKeyRef),
+    'resourceFieldRef': toJson_VinylCacheV1Alpha1SpecPodEnvValueFromResourceFieldRef(obj.resourceFieldRef),
+    'secretKeyRef': toJson_VinylCacheV1Alpha1SpecPodEnvValueFromSecretKeyRef(obj.secretKeyRef),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * awsElasticBlockStore represents an AWS Disk resource that is attached to a
+ * kubelet's host machine and then exposed to the pod.
+ * Deprecated: AWSElasticBlockStore is deprecated. All operations for the in-tree
+ * awsElasticBlockStore type are redirected to the ebs.csi.aws.com CSI driver.
+ * More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesAwsElasticBlockStore
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesAwsElasticBlockStore {
+  /**
+   * fsType is the filesystem type of the volume that you want to mount.
+   * Tip: Ensure that the filesystem type is supported by the host operating system.
+   * Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesAwsElasticBlockStore#fsType
+   */
+  readonly fsType?: string;
+
+  /**
+   * partition is the partition in the volume that you want to mount.
+   * If omitted, the default is to mount by volume name.
+   * Examples: For volume /dev/sda1, you specify the partition as "1".
+   * Similarly, the volume partition for /dev/sda is "0" (or you can leave the property empty).
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesAwsElasticBlockStore#partition
+   */
+  readonly partition?: number;
+
+  /**
+   * readOnly value true will force the readOnly setting in VolumeMounts.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesAwsElasticBlockStore#readOnly
+   */
+  readonly readOnly?: boolean;
+
+  /**
+   * volumeID is unique ID of the persistent disk resource in AWS (Amazon EBS volume).
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesAwsElasticBlockStore#volumeID
+   */
+  readonly volumeId: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesAwsElasticBlockStore' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesAwsElasticBlockStore(obj: VinylCacheV1Alpha1SpecPodVolumesAwsElasticBlockStore | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'fsType': obj.fsType,
+    'partition': obj.partition,
+    'readOnly': obj.readOnly,
+    'volumeID': obj.volumeId,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * azureDisk represents an Azure Data Disk mount on the host and bind mount to the pod.
+ * Deprecated: AzureDisk is deprecated. All operations for the in-tree azureDisk type
+ * are redirected to the disk.csi.azure.com CSI driver.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesAzureDisk
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesAzureDisk {
+  /**
+   * cachingMode is the Host Caching mode: None, Read Only, Read Write.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesAzureDisk#cachingMode
+   */
+  readonly cachingMode?: string;
+
+  /**
+   * diskName is the Name of the data disk in the blob storage
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesAzureDisk#diskName
+   */
+  readonly diskName: string;
+
+  /**
+   * diskURI is the URI of data disk in the blob storage
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesAzureDisk#diskURI
+   */
+  readonly diskUri: string;
+
+  /**
+   * fsType is Filesystem type to mount.
+   * Must be a filesystem type supported by the host operating system.
+   * Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesAzureDisk#fsType
+   */
+  readonly fsType?: string;
+
+  /**
+   * kind expected values are Shared: multiple blob disks per storage account  Dedicated: single blob disk per storage account  Managed: azure managed data disk (only in managed availability set). defaults to shared
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesAzureDisk#kind
+   */
+  readonly kind?: string;
+
+  /**
+   * readOnly Defaults to false (read/write). ReadOnly here will force
+   * the ReadOnly setting in VolumeMounts.
+   *
+   * @default false (read/write). ReadOnly here will force
+   * @schema VinylCacheV1Alpha1SpecPodVolumesAzureDisk#readOnly
+   */
+  readonly readOnly?: boolean;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesAzureDisk' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesAzureDisk(obj: VinylCacheV1Alpha1SpecPodVolumesAzureDisk | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'cachingMode': obj.cachingMode,
+    'diskName': obj.diskName,
+    'diskURI': obj.diskUri,
+    'fsType': obj.fsType,
+    'kind': obj.kind,
+    'readOnly': obj.readOnly,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * azureFile represents an Azure File Service mount on the host and bind mount to the pod.
+ * Deprecated: AzureFile is deprecated. All operations for the in-tree azureFile type
+ * are redirected to the file.csi.azure.com CSI driver.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesAzureFile
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesAzureFile {
+  /**
+   * readOnly defaults to false (read/write). ReadOnly here will force
+   * the ReadOnly setting in VolumeMounts.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesAzureFile#readOnly
+   */
+  readonly readOnly?: boolean;
+
+  /**
+   * secretName is the  name of secret that contains Azure Storage Account Name and Key
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesAzureFile#secretName
+   */
+  readonly secretName: string;
+
+  /**
+   * shareName is the azure share Name
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesAzureFile#shareName
+   */
+  readonly shareName: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesAzureFile' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesAzureFile(obj: VinylCacheV1Alpha1SpecPodVolumesAzureFile | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'readOnly': obj.readOnly,
+    'secretName': obj.secretName,
+    'shareName': obj.shareName,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * cephFS represents a Ceph FS mount on the host that shares a pod's lifetime.
+ * Deprecated: CephFS is deprecated and the in-tree cephfs type is no longer supported.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesCephfs
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesCephfs {
+  /**
+   * monitors is Required: Monitors is a collection of Ceph monitors
+   * More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesCephfs#monitors
+   */
+  readonly monitors: string[];
+
+  /**
+   * path is Optional: Used as the mounted root, rather than the full Ceph tree, default is /
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesCephfs#path
+   */
+  readonly path?: string;
+
+  /**
+   * readOnly is Optional: Defaults to false (read/write). ReadOnly here will force
+   * the ReadOnly setting in VolumeMounts.
+   * More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
+   *
+   * @default false (read/write). ReadOnly here will force
+   * @schema VinylCacheV1Alpha1SpecPodVolumesCephfs#readOnly
+   */
+  readonly readOnly?: boolean;
+
+  /**
+   * secretFile is Optional: SecretFile is the path to key ring for User, default is /etc/ceph/user.secret
+   * More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesCephfs#secretFile
+   */
+  readonly secretFile?: string;
+
+  /**
+   * secretRef is Optional: SecretRef is reference to the authentication secret for User, default is empty.
+   * More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesCephfs#secretRef
+   */
+  readonly secretRef?: VinylCacheV1Alpha1SpecPodVolumesCephfsSecretRef;
+
+  /**
+   * user is optional: User is the rados user name, default is admin
+   * More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesCephfs#user
+   */
+  readonly user?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesCephfs' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesCephfs(obj: VinylCacheV1Alpha1SpecPodVolumesCephfs | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'monitors': obj.monitors?.map(y => y),
+    'path': obj.path,
+    'readOnly': obj.readOnly,
+    'secretFile': obj.secretFile,
+    'secretRef': toJson_VinylCacheV1Alpha1SpecPodVolumesCephfsSecretRef(obj.secretRef),
+    'user': obj.user,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * cinder represents a cinder volume attached and mounted on kubelets host machine.
+ * Deprecated: Cinder is deprecated. All operations for the in-tree cinder type
+ * are redirected to the cinder.csi.openstack.org CSI driver.
+ * More info: https://examples.k8s.io/mysql-cinder-pd/README.md
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesCinder
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesCinder {
+  /**
+   * fsType is the filesystem type to mount.
+   * Must be a filesystem type supported by the host operating system.
+   * Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
+   * More info: https://examples.k8s.io/mysql-cinder-pd/README.md
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesCinder#fsType
+   */
+  readonly fsType?: string;
+
+  /**
+   * readOnly defaults to false (read/write). ReadOnly here will force
+   * the ReadOnly setting in VolumeMounts.
+   * More info: https://examples.k8s.io/mysql-cinder-pd/README.md
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesCinder#readOnly
+   */
+  readonly readOnly?: boolean;
+
+  /**
+   * secretRef is optional: points to a secret object containing parameters used to connect
+   * to OpenStack.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesCinder#secretRef
+   */
+  readonly secretRef?: VinylCacheV1Alpha1SpecPodVolumesCinderSecretRef;
+
+  /**
+   * volumeID used to identify the volume in cinder.
+   * More info: https://examples.k8s.io/mysql-cinder-pd/README.md
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesCinder#volumeID
+   */
+  readonly volumeId: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesCinder' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesCinder(obj: VinylCacheV1Alpha1SpecPodVolumesCinder | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'fsType': obj.fsType,
+    'readOnly': obj.readOnly,
+    'secretRef': toJson_VinylCacheV1Alpha1SpecPodVolumesCinderSecretRef(obj.secretRef),
+    'volumeID': obj.volumeId,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * configMap represents a configMap that should populate this volume
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesConfigMap
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesConfigMap {
+  /**
+   * defaultMode is optional: mode bits used to set permissions on created files by default.
+   * Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
+   * YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
+   * Defaults to 0644.
+   * Directories within the path are not affected by this setting.
+   * This might be in conflict with other options that affect the file
+   * mode, like fsGroup, and the result can be other mode bits set.
+   *
+   * @default 0644.
+   * @schema VinylCacheV1Alpha1SpecPodVolumesConfigMap#defaultMode
+   */
+  readonly defaultMode?: number;
+
+  /**
+   * items if unspecified, each key-value pair in the Data field of the referenced
+   * ConfigMap will be projected into the volume as a file whose name is the
+   * key and content is the value. If specified, the listed keys will be
+   * projected into the specified paths, and unlisted keys will not be
+   * present. If a key is specified which is not present in the ConfigMap,
+   * the volume setup will error unless it is marked optional. Paths must be
+   * relative and may not contain the '..' path or start with '..'.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesConfigMap#items
+   */
+  readonly items?: VinylCacheV1Alpha1SpecPodVolumesConfigMapItems[];
+
+  /**
+   * Name of the referent.
+   * This field is effectively required, but due to backwards compatibility is
+   * allowed to be empty. Instances of this type with an empty value here are
+   * almost certainly wrong.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesConfigMap#name
+   */
+  readonly name?: string;
+
+  /**
+   * optional specify whether the ConfigMap or its keys must be defined
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesConfigMap#optional
+   */
+  readonly optional?: boolean;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesConfigMap' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesConfigMap(obj: VinylCacheV1Alpha1SpecPodVolumesConfigMap | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'defaultMode': obj.defaultMode,
+    'items': obj.items?.map(y => toJson_VinylCacheV1Alpha1SpecPodVolumesConfigMapItems(y)),
+    'name': obj.name,
+    'optional': obj.optional,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * csi (Container Storage Interface) represents ephemeral storage that is handled by certain external CSI drivers.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesCsi
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesCsi {
+  /**
+   * driver is the name of the CSI driver that handles this volume.
+   * Consult with your admin for the correct name as registered in the cluster.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesCsi#driver
+   */
+  readonly driver: string;
+
+  /**
+   * fsType to mount. Ex. "ext4", "xfs", "ntfs".
+   * If not provided, the empty value is passed to the associated CSI driver
+   * which will determine the default filesystem to apply.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesCsi#fsType
+   */
+  readonly fsType?: string;
+
+  /**
+   * nodePublishSecretRef is a reference to the secret object containing
+   * sensitive information to pass to the CSI driver to complete the CSI
+   * NodePublishVolume and NodeUnpublishVolume calls.
+   * This field is optional, and  may be empty if no secret is required. If the
+   * secret object contains more than one secret, all secret references are passed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesCsi#nodePublishSecretRef
+   */
+  readonly nodePublishSecretRef?: VinylCacheV1Alpha1SpecPodVolumesCsiNodePublishSecretRef;
+
+  /**
+   * readOnly specifies a read-only configuration for the volume.
+   * Defaults to false (read/write).
+   *
+   * @default false (read/write).
+   * @schema VinylCacheV1Alpha1SpecPodVolumesCsi#readOnly
+   */
+  readonly readOnly?: boolean;
+
+  /**
+   * volumeAttributes stores driver-specific properties that are passed to the CSI
+   * driver. Consult your driver's documentation for supported values.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesCsi#volumeAttributes
+   */
+  readonly volumeAttributes?: { [key: string]: string };
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesCsi' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesCsi(obj: VinylCacheV1Alpha1SpecPodVolumesCsi | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'driver': obj.driver,
+    'fsType': obj.fsType,
+    'nodePublishSecretRef': toJson_VinylCacheV1Alpha1SpecPodVolumesCsiNodePublishSecretRef(obj.nodePublishSecretRef),
+    'readOnly': obj.readOnly,
+    'volumeAttributes': ((obj.volumeAttributes) === undefined) ? undefined : (Object.entries(obj.volumeAttributes).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * downwardAPI represents downward API about the pod that should populate this volume
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesDownwardApi
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesDownwardApi {
+  /**
+   * Optional: mode bits to use on created files by default. Must be a
+   * Optional: mode bits used to set permissions on created files by default.
+   * Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
+   * YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
+   * Defaults to 0644.
+   * Directories within the path are not affected by this setting.
+   * This might be in conflict with other options that affect the file
+   * mode, like fsGroup, and the result can be other mode bits set.
+   *
+   * @default 0644.
+   * @schema VinylCacheV1Alpha1SpecPodVolumesDownwardApi#defaultMode
+   */
+  readonly defaultMode?: number;
+
+  /**
+   * Items is a list of downward API volume file
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesDownwardApi#items
+   */
+  readonly items?: VinylCacheV1Alpha1SpecPodVolumesDownwardApiItems[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesDownwardApi' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesDownwardApi(obj: VinylCacheV1Alpha1SpecPodVolumesDownwardApi | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'defaultMode': obj.defaultMode,
+    'items': obj.items?.map(y => toJson_VinylCacheV1Alpha1SpecPodVolumesDownwardApiItems(y)),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * emptyDir represents a temporary directory that shares a pod's lifetime.
+ * More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesEmptyDir
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesEmptyDir {
+  /**
+   * medium represents what type of storage medium should back this directory.
+   * The default is "" which means to use the node's default medium.
+   * Must be an empty string (default) or Memory.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEmptyDir#medium
+   */
+  readonly medium?: string;
+
+  /**
+   * sizeLimit is the total amount of local storage required for this EmptyDir volume.
+   * The size limit is also applicable for memory medium.
+   * The maximum usage on memory medium EmptyDir would be the minimum value between
+   * the SizeLimit specified here and the sum of memory limits of all containers in a pod.
+   * The default is nil which means that the limit is undefined.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEmptyDir#sizeLimit
+   */
+  readonly sizeLimit?: VinylCacheV1Alpha1SpecPodVolumesEmptyDirSizeLimit;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesEmptyDir' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesEmptyDir(obj: VinylCacheV1Alpha1SpecPodVolumesEmptyDir | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'medium': obj.medium,
+    'sizeLimit': obj.sizeLimit?.value,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * ephemeral represents a volume that is handled by a cluster storage driver.
+ * The volume's lifecycle is tied to the pod that defines it - it will be created before the pod starts,
+ * and deleted when the pod is removed.
+ *
+ * Use this if:
+ * a) the volume is only needed while the pod runs,
+ * b) features of normal volumes like restoring from snapshot or capacity
+ * tracking are needed,
+ * c) the storage driver is specified through a storage class, and
+ * d) the storage driver supports dynamic volume provisioning through
+ * a PersistentVolumeClaim (see EphemeralVolumeSource for more
+ * information on the connection between this volume type
+ * and PersistentVolumeClaim).
+ *
+ * Use PersistentVolumeClaim or one of the vendor-specific
+ * APIs for volumes that persist for longer than the lifecycle
+ * of an individual pod.
+ *
+ * Use CSI for light-weight local ephemeral volumes if the CSI driver is meant to
+ * be used that way - see the documentation of the driver for
+ * more information.
+ *
+ * A pod can use both types of ephemeral volumes and
+ * persistent volumes at the same time.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeral
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesEphemeral {
+  /**
+   * Will be used to create a stand-alone PVC to provision the volume.
+   * The pod in which this EphemeralVolumeSource is embedded will be the
+   * owner of the PVC, i.e. the PVC will be deleted together with the
+   * pod.  The name of the PVC will be `<pod name>-<volume name>` where
+   * `<volume name>` is the name from the `PodSpec.Volumes` array
+   * entry. Pod validation will reject the pod if the concatenated name
+   * is not valid for a PVC (for example, too long).
+   *
+   * An existing PVC with that name that is not owned by the pod
+   * will *not* be used for the pod to avoid using an unrelated
+   * volume by mistake. Starting the pod is then blocked until
+   * the unrelated PVC is removed. If such a pre-created PVC is
+   * meant to be used by the pod, the PVC has to updated with an
+   * owner reference to the pod once the pod exists. Normally
+   * this should not be necessary, but it may be useful when
+   * manually reconstructing a broken cluster.
+   *
+   * This field is read-only and no changes will be made by Kubernetes
+   * to the PVC after it has been created.
+   *
+   * Required, must not be nil.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeral#volumeClaimTemplate
+   */
+  readonly volumeClaimTemplate?: VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplate;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesEphemeral' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesEphemeral(obj: VinylCacheV1Alpha1SpecPodVolumesEphemeral | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'volumeClaimTemplate': toJson_VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplate(obj.volumeClaimTemplate),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * fc represents a Fibre Channel resource that is attached to a kubelet's host machine and then exposed to the pod.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesFc
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesFc {
+  /**
+   * fsType is the filesystem type to mount.
+   * Must be a filesystem type supported by the host operating system.
+   * Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesFc#fsType
+   */
+  readonly fsType?: string;
+
+  /**
+   * lun is Optional: FC target lun number
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesFc#lun
+   */
+  readonly lun?: number;
+
+  /**
+   * readOnly is Optional: Defaults to false (read/write). ReadOnly here will force
+   * the ReadOnly setting in VolumeMounts.
+   *
+   * @default false (read/write). ReadOnly here will force
+   * @schema VinylCacheV1Alpha1SpecPodVolumesFc#readOnly
+   */
+  readonly readOnly?: boolean;
+
+  /**
+   * targetWWNs is Optional: FC target worldwide names (WWNs)
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesFc#targetWWNs
+   */
+  readonly targetWwNs?: string[];
+
+  /**
+   * wwids Optional: FC volume world wide identifiers (wwids)
+   * Either wwids or combination of targetWWNs and lun must be set, but not both simultaneously.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesFc#wwids
+   */
+  readonly wwids?: string[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesFc' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesFc(obj: VinylCacheV1Alpha1SpecPodVolumesFc | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'fsType': obj.fsType,
+    'lun': obj.lun,
+    'readOnly': obj.readOnly,
+    'targetWWNs': obj.targetWwNs?.map(y => y),
+    'wwids': obj.wwids?.map(y => y),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * flexVolume represents a generic volume resource that is
+ * provisioned/attached using an exec based plugin.
+ * Deprecated: FlexVolume is deprecated. Consider using a CSIDriver instead.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesFlexVolume
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesFlexVolume {
+  /**
+   * driver is the name of the driver to use for this volume.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesFlexVolume#driver
+   */
+  readonly driver: string;
+
+  /**
+   * fsType is the filesystem type to mount.
+   * Must be a filesystem type supported by the host operating system.
+   * Ex. "ext4", "xfs", "ntfs". The default filesystem depends on FlexVolume script.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesFlexVolume#fsType
+   */
+  readonly fsType?: string;
+
+  /**
+   * options is Optional: this field holds extra command options if any.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesFlexVolume#options
+   */
+  readonly options?: { [key: string]: string };
+
+  /**
+   * readOnly is Optional: defaults to false (read/write). ReadOnly here will force
+   * the ReadOnly setting in VolumeMounts.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesFlexVolume#readOnly
+   */
+  readonly readOnly?: boolean;
+
+  /**
+   * secretRef is Optional: secretRef is reference to the secret object containing
+   * sensitive information to pass to the plugin scripts. This may be
+   * empty if no secret object is specified. If the secret object
+   * contains more than one secret, all secrets are passed to the plugin
+   * scripts.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesFlexVolume#secretRef
+   */
+  readonly secretRef?: VinylCacheV1Alpha1SpecPodVolumesFlexVolumeSecretRef;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesFlexVolume' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesFlexVolume(obj: VinylCacheV1Alpha1SpecPodVolumesFlexVolume | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'driver': obj.driver,
+    'fsType': obj.fsType,
+    'options': ((obj.options) === undefined) ? undefined : (Object.entries(obj.options).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    'readOnly': obj.readOnly,
+    'secretRef': toJson_VinylCacheV1Alpha1SpecPodVolumesFlexVolumeSecretRef(obj.secretRef),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * flocker represents a Flocker volume attached to a kubelet's host machine. This depends on the Flocker control service being running.
+ * Deprecated: Flocker is deprecated and the in-tree flocker type is no longer supported.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesFlocker
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesFlocker {
+  /**
+   * datasetName is Name of the dataset stored as metadata -> name on the dataset for Flocker
+   * should be considered as deprecated
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesFlocker#datasetName
+   */
+  readonly datasetName?: string;
+
+  /**
+   * datasetUUID is the UUID of the dataset. This is unique identifier of a Flocker dataset
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesFlocker#datasetUUID
+   */
+  readonly datasetUuid?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesFlocker' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesFlocker(obj: VinylCacheV1Alpha1SpecPodVolumesFlocker | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'datasetName': obj.datasetName,
+    'datasetUUID': obj.datasetUuid,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * gcePersistentDisk represents a GCE Disk resource that is attached to a
+ * kubelet's host machine and then exposed to the pod.
+ * Deprecated: GCEPersistentDisk is deprecated. All operations for the in-tree
+ * gcePersistentDisk type are redirected to the pd.csi.storage.gke.io CSI driver.
+ * More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesGcePersistentDisk
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesGcePersistentDisk {
+  /**
+   * fsType is filesystem type of the volume that you want to mount.
+   * Tip: Ensure that the filesystem type is supported by the host operating system.
+   * Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesGcePersistentDisk#fsType
+   */
+  readonly fsType?: string;
+
+  /**
+   * partition is the partition in the volume that you want to mount.
+   * If omitted, the default is to mount by volume name.
+   * Examples: For volume /dev/sda1, you specify the partition as "1".
+   * Similarly, the volume partition for /dev/sda is "0" (or you can leave the property empty).
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesGcePersistentDisk#partition
+   */
+  readonly partition?: number;
+
+  /**
+   * pdName is unique name of the PD resource in GCE. Used to identify the disk in GCE.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesGcePersistentDisk#pdName
+   */
+  readonly pdName: string;
+
+  /**
+   * readOnly here will force the ReadOnly setting in VolumeMounts.
+   * Defaults to false.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
+   *
+   * @default false.
+   * @schema VinylCacheV1Alpha1SpecPodVolumesGcePersistentDisk#readOnly
+   */
+  readonly readOnly?: boolean;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesGcePersistentDisk' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesGcePersistentDisk(obj: VinylCacheV1Alpha1SpecPodVolumesGcePersistentDisk | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'fsType': obj.fsType,
+    'partition': obj.partition,
+    'pdName': obj.pdName,
+    'readOnly': obj.readOnly,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * gitRepo represents a git repository at a particular revision.
+ * Deprecated: GitRepo is deprecated. To provision a container with a git repo, mount an
+ * EmptyDir into an InitContainer that clones the repo using git, then mount the EmptyDir
+ * into the Pod's container.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesGitRepo
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesGitRepo {
+  /**
+   * directory is the target directory name.
+   * Must not contain or start with '..'.  If '.' is supplied, the volume directory will be the
+   * git repository.  Otherwise, if specified, the volume will contain the git repository in
+   * the subdirectory with the given name.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesGitRepo#directory
+   */
+  readonly directory?: string;
+
+  /**
+   * repository is the URL
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesGitRepo#repository
+   */
+  readonly repository: string;
+
+  /**
+   * revision is the commit hash for the specified revision.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesGitRepo#revision
+   */
+  readonly revision?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesGitRepo' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesGitRepo(obj: VinylCacheV1Alpha1SpecPodVolumesGitRepo | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'directory': obj.directory,
+    'repository': obj.repository,
+    'revision': obj.revision,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * glusterfs represents a Glusterfs mount on the host that shares a pod's lifetime.
+ * Deprecated: Glusterfs is deprecated and the in-tree glusterfs type is no longer supported.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesGlusterfs
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesGlusterfs {
+  /**
+   * endpoints is the endpoint name that details Glusterfs topology.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesGlusterfs#endpoints
+   */
+  readonly endpoints: string;
+
+  /**
+   * path is the Glusterfs volume path.
+   * More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesGlusterfs#path
+   */
+  readonly path: string;
+
+  /**
+   * readOnly here will force the Glusterfs volume to be mounted with read-only permissions.
+   * Defaults to false.
+   * More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
+   *
+   * @default false.
+   * @schema VinylCacheV1Alpha1SpecPodVolumesGlusterfs#readOnly
+   */
+  readonly readOnly?: boolean;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesGlusterfs' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesGlusterfs(obj: VinylCacheV1Alpha1SpecPodVolumesGlusterfs | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'endpoints': obj.endpoints,
+    'path': obj.path,
+    'readOnly': obj.readOnly,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * hostPath represents a pre-existing file or directory on the host
+ * machine that is directly exposed to the container. This is generally
+ * used for system agents or other privileged things that are allowed
+ * to see the host machine. Most containers will NOT need this.
+ * More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesHostPath
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesHostPath {
+  /**
+   * path of the directory on the host.
+   * If the path is a symlink, it will follow the link to the real path.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesHostPath#path
+   */
+  readonly path: string;
+
+  /**
+   * type for HostPath Volume
+   * Defaults to ""
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath
+   *
+   * @default More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath
+   * @schema VinylCacheV1Alpha1SpecPodVolumesHostPath#type
+   */
+  readonly type?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesHostPath' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesHostPath(obj: VinylCacheV1Alpha1SpecPodVolumesHostPath | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'path': obj.path,
+    'type': obj.type,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * image represents an OCI object (a container image or artifact) pulled and mounted on the kubelet's host machine.
+ * The volume is resolved at pod startup depending on which PullPolicy value is provided:
+ *
+ * - Always: the kubelet always attempts to pull the reference. Container creation will fail If the pull fails.
+ * - Never: the kubelet never pulls the reference and only uses a local image or artifact. Container creation will fail if the reference isn't present.
+ * - IfNotPresent: the kubelet pulls if the reference isn't already present on disk. Container creation will fail if the reference isn't present and the pull fails.
+ *
+ * The volume gets re-resolved if the pod gets deleted and recreated, which means that new remote content will become available on pod recreation.
+ * A failure to resolve or pull the image during pod startup will block containers from starting and may add significant latency. Failures will be retried using normal volume backoff and will be reported on the pod reason and message.
+ * The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field.
+ * The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images.
+ * The volume will be mounted read-only (ro).
+ * Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath) before 1.33.
+ * The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesImage
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesImage {
+  /**
+   * Policy for pulling OCI objects. Possible values are:
+   * Always: the kubelet always attempts to pull the reference. Container creation will fail If the pull fails.
+   * Never: the kubelet never pulls the reference and only uses a local image or artifact. Container creation will fail if the reference isn't present.
+   * IfNotPresent: the kubelet pulls if the reference isn't already present on disk. Container creation will fail if the reference isn't present and the pull fails.
+   * Defaults to Always if :latest tag is specified, or IfNotPresent otherwise.
+   *
+   * @default Always if :latest tag is specified, or IfNotPresent otherwise.
+   * @schema VinylCacheV1Alpha1SpecPodVolumesImage#pullPolicy
+   */
+  readonly pullPolicy?: string;
+
+  /**
+   * Required: Image or artifact reference to be used.
+   * Behaves in the same way as pod.spec.containers[*].image.
+   * Pull secrets will be assembled in the same way as for the container image by looking up node credentials, SA image pull secrets, and pod spec image pull secrets.
+   * More info: https://kubernetes.io/docs/concepts/containers/images
+   * This field is optional to allow higher level config management to default or override
+   * container images in workload controllers like Deployments and StatefulSets.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesImage#reference
+   */
+  readonly reference?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesImage' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesImage(obj: VinylCacheV1Alpha1SpecPodVolumesImage | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'pullPolicy': obj.pullPolicy,
+    'reference': obj.reference,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * iscsi represents an ISCSI Disk resource that is attached to a
+ * kubelet's host machine and then exposed to the pod.
+ * More info: https://kubernetes.io/docs/concepts/storage/volumes/#iscsi
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesIscsi
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesIscsi {
+  /**
+   * chapAuthDiscovery defines whether support iSCSI Discovery CHAP authentication
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesIscsi#chapAuthDiscovery
+   */
+  readonly chapAuthDiscovery?: boolean;
+
+  /**
+   * chapAuthSession defines whether support iSCSI Session CHAP authentication
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesIscsi#chapAuthSession
+   */
+  readonly chapAuthSession?: boolean;
+
+  /**
+   * fsType is the filesystem type of the volume that you want to mount.
+   * Tip: Ensure that the filesystem type is supported by the host operating system.
+   * Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#iscsi
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesIscsi#fsType
+   */
+  readonly fsType?: string;
+
+  /**
+   * initiatorName is the custom iSCSI Initiator Name.
+   * If initiatorName is specified with iscsiInterface simultaneously, new iSCSI interface
+   * <target portal>:<volume name> will be created for the connection.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesIscsi#initiatorName
+   */
+  readonly initiatorName?: string;
+
+  /**
+   * iqn is the target iSCSI Qualified Name.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesIscsi#iqn
+   */
+  readonly iqn: string;
+
+  /**
+   * iscsiInterface is the interface Name that uses an iSCSI transport.
+   * Defaults to 'default' (tcp).
+   *
+   * @default default' (tcp).
+   * @schema VinylCacheV1Alpha1SpecPodVolumesIscsi#iscsiInterface
+   */
+  readonly iscsiInterface?: string;
+
+  /**
+   * lun represents iSCSI Target Lun number.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesIscsi#lun
+   */
+  readonly lun: number;
+
+  /**
+   * portals is the iSCSI Target Portal List. The portal is either an IP or ip_addr:port if the port
+   * is other than default (typically TCP ports 860 and 3260).
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesIscsi#portals
+   */
+  readonly portals?: string[];
+
+  /**
+   * readOnly here will force the ReadOnly setting in VolumeMounts.
+   * Defaults to false.
+   *
+   * @default false.
+   * @schema VinylCacheV1Alpha1SpecPodVolumesIscsi#readOnly
+   */
+  readonly readOnly?: boolean;
+
+  /**
+   * secretRef is the CHAP Secret for iSCSI target and initiator authentication
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesIscsi#secretRef
+   */
+  readonly secretRef?: VinylCacheV1Alpha1SpecPodVolumesIscsiSecretRef;
+
+  /**
+   * targetPortal is iSCSI Target Portal. The Portal is either an IP or ip_addr:port if the port
+   * is other than default (typically TCP ports 860 and 3260).
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesIscsi#targetPortal
+   */
+  readonly targetPortal: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesIscsi' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesIscsi(obj: VinylCacheV1Alpha1SpecPodVolumesIscsi | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'chapAuthDiscovery': obj.chapAuthDiscovery,
+    'chapAuthSession': obj.chapAuthSession,
+    'fsType': obj.fsType,
+    'initiatorName': obj.initiatorName,
+    'iqn': obj.iqn,
+    'iscsiInterface': obj.iscsiInterface,
+    'lun': obj.lun,
+    'portals': obj.portals?.map(y => y),
+    'readOnly': obj.readOnly,
+    'secretRef': toJson_VinylCacheV1Alpha1SpecPodVolumesIscsiSecretRef(obj.secretRef),
+    'targetPortal': obj.targetPortal,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * nfs represents an NFS mount on the host that shares a pod's lifetime
+ * More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesNfs
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesNfs {
+  /**
+   * path that is exported by the NFS server.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesNfs#path
+   */
+  readonly path: string;
+
+  /**
+   * readOnly here will force the NFS export to be mounted with read-only permissions.
+   * Defaults to false.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
+   *
+   * @default false.
+   * @schema VinylCacheV1Alpha1SpecPodVolumesNfs#readOnly
+   */
+  readonly readOnly?: boolean;
+
+  /**
+   * server is the hostname or IP address of the NFS server.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesNfs#server
+   */
+  readonly server: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesNfs' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesNfs(obj: VinylCacheV1Alpha1SpecPodVolumesNfs | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'path': obj.path,
+    'readOnly': obj.readOnly,
+    'server': obj.server,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * persistentVolumeClaimVolumeSource represents a reference to a
+ * PersistentVolumeClaim in the same namespace.
+ * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesPersistentVolumeClaim
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesPersistentVolumeClaim {
+  /**
+   * claimName is the name of a PersistentVolumeClaim in the same namespace as the pod using this volume.
+   * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesPersistentVolumeClaim#claimName
+   */
+  readonly claimName: string;
+
+  /**
+   * readOnly Will force the ReadOnly setting in VolumeMounts.
+   * Default false.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesPersistentVolumeClaim#readOnly
+   */
+  readonly readOnly?: boolean;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesPersistentVolumeClaim' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesPersistentVolumeClaim(obj: VinylCacheV1Alpha1SpecPodVolumesPersistentVolumeClaim | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'claimName': obj.claimName,
+    'readOnly': obj.readOnly,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * photonPersistentDisk represents a PhotonController persistent disk attached and mounted on kubelets host machine.
+ * Deprecated: PhotonPersistentDisk is deprecated and the in-tree photonPersistentDisk type is no longer supported.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesPhotonPersistentDisk
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesPhotonPersistentDisk {
+  /**
+   * fsType is the filesystem type to mount.
+   * Must be a filesystem type supported by the host operating system.
+   * Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesPhotonPersistentDisk#fsType
+   */
+  readonly fsType?: string;
+
+  /**
+   * pdID is the ID that identifies Photon Controller persistent disk
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesPhotonPersistentDisk#pdID
+   */
+  readonly pdId: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesPhotonPersistentDisk' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesPhotonPersistentDisk(obj: VinylCacheV1Alpha1SpecPodVolumesPhotonPersistentDisk | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'fsType': obj.fsType,
+    'pdID': obj.pdId,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * portworxVolume represents a portworx volume attached and mounted on kubelets host machine.
+ * Deprecated: PortworxVolume is deprecated. All operations for the in-tree portworxVolume type
+ * are redirected to the pxd.portworx.com CSI driver.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesPortworxVolume
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesPortworxVolume {
+  /**
+   * fSType represents the filesystem type to mount
+   * Must be a filesystem type supported by the host operating system.
+   * Ex. "ext4", "xfs". Implicitly inferred to be "ext4" if unspecified.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesPortworxVolume#fsType
+   */
+  readonly fsType?: string;
+
+  /**
+   * readOnly defaults to false (read/write). ReadOnly here will force
+   * the ReadOnly setting in VolumeMounts.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesPortworxVolume#readOnly
+   */
+  readonly readOnly?: boolean;
+
+  /**
+   * volumeID uniquely identifies a Portworx volume
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesPortworxVolume#volumeID
+   */
+  readonly volumeId: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesPortworxVolume' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesPortworxVolume(obj: VinylCacheV1Alpha1SpecPodVolumesPortworxVolume | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'fsType': obj.fsType,
+    'readOnly': obj.readOnly,
+    'volumeID': obj.volumeId,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * projected items for all in one resources secrets, configmaps, and downward API
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesProjected
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesProjected {
+  /**
+   * defaultMode are the mode bits used to set permissions on created files by default.
+   * Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
+   * YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
+   * Directories within the path are not affected by this setting.
+   * This might be in conflict with other options that affect the file
+   * mode, like fsGroup, and the result can be other mode bits set.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjected#defaultMode
+   */
+  readonly defaultMode?: number;
+
+  /**
+   * sources is the list of volume projections. Each entry in this list
+   * handles one source.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjected#sources
+   */
+  readonly sources?: VinylCacheV1Alpha1SpecPodVolumesProjectedSources[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesProjected' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesProjected(obj: VinylCacheV1Alpha1SpecPodVolumesProjected | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'defaultMode': obj.defaultMode,
+    'sources': obj.sources?.map(y => toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSources(y)),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * quobyte represents a Quobyte mount on the host that shares a pod's lifetime.
+ * Deprecated: Quobyte is deprecated and the in-tree quobyte type is no longer supported.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesQuobyte
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesQuobyte {
+  /**
+   * group to map volume access to
+   * Default is no group
+   *
+   * @default no group
+   * @schema VinylCacheV1Alpha1SpecPodVolumesQuobyte#group
+   */
+  readonly group?: string;
+
+  /**
+   * readOnly here will force the Quobyte volume to be mounted with read-only permissions.
+   * Defaults to false.
+   *
+   * @default false.
+   * @schema VinylCacheV1Alpha1SpecPodVolumesQuobyte#readOnly
+   */
+  readonly readOnly?: boolean;
+
+  /**
+   * registry represents a single or multiple Quobyte Registry services
+   * specified as a string as host:port pair (multiple entries are separated with commas)
+   * which acts as the central registry for volumes
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesQuobyte#registry
+   */
+  readonly registry: string;
+
+  /**
+   * tenant owning the given Quobyte volume in the Backend
+   * Used with dynamically provisioned Quobyte volumes, value is set by the plugin
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesQuobyte#tenant
+   */
+  readonly tenant?: string;
+
+  /**
+   * user to map volume access to
+   * Defaults to serivceaccount user
+   *
+   * @default serivceaccount user
+   * @schema VinylCacheV1Alpha1SpecPodVolumesQuobyte#user
+   */
+  readonly user?: string;
+
+  /**
+   * volume is a string that references an already created Quobyte volume by name.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesQuobyte#volume
+   */
+  readonly volume: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesQuobyte' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesQuobyte(obj: VinylCacheV1Alpha1SpecPodVolumesQuobyte | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'group': obj.group,
+    'readOnly': obj.readOnly,
+    'registry': obj.registry,
+    'tenant': obj.tenant,
+    'user': obj.user,
+    'volume': obj.volume,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * rbd represents a Rados Block Device mount on the host that shares a pod's lifetime.
+ * Deprecated: RBD is deprecated and the in-tree rbd type is no longer supported.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesRbd
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesRbd {
+  /**
+   * fsType is the filesystem type of the volume that you want to mount.
+   * Tip: Ensure that the filesystem type is supported by the host operating system.
+   * Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#rbd
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesRbd#fsType
+   */
+  readonly fsType?: string;
+
+  /**
+   * image is the rados image name.
+   * More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesRbd#image
+   */
+  readonly image: string;
+
+  /**
+   * keyring is the path to key ring for RBDUser.
+   * Default is /etc/ceph/keyring.
+   * More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
+   *
+   * @default etc/ceph/keyring.
+   * @schema VinylCacheV1Alpha1SpecPodVolumesRbd#keyring
+   */
+  readonly keyring?: string;
+
+  /**
+   * monitors is a collection of Ceph monitors.
+   * More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesRbd#monitors
+   */
+  readonly monitors: string[];
+
+  /**
+   * pool is the rados pool name.
+   * Default is rbd.
+   * More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
+   *
+   * @default rbd.
+   * @schema VinylCacheV1Alpha1SpecPodVolumesRbd#pool
+   */
+  readonly pool?: string;
+
+  /**
+   * readOnly here will force the ReadOnly setting in VolumeMounts.
+   * Defaults to false.
+   * More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
+   *
+   * @default false.
+   * @schema VinylCacheV1Alpha1SpecPodVolumesRbd#readOnly
+   */
+  readonly readOnly?: boolean;
+
+  /**
+   * secretRef is name of the authentication secret for RBDUser. If provided
+   * overrides keyring.
+   * Default is nil.
+   * More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
+   *
+   * @default nil.
+   * @schema VinylCacheV1Alpha1SpecPodVolumesRbd#secretRef
+   */
+  readonly secretRef?: VinylCacheV1Alpha1SpecPodVolumesRbdSecretRef;
+
+  /**
+   * user is the rados user name.
+   * Default is admin.
+   * More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
+   *
+   * @default admin.
+   * @schema VinylCacheV1Alpha1SpecPodVolumesRbd#user
+   */
+  readonly user?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesRbd' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesRbd(obj: VinylCacheV1Alpha1SpecPodVolumesRbd | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'fsType': obj.fsType,
+    'image': obj.image,
+    'keyring': obj.keyring,
+    'monitors': obj.monitors?.map(y => y),
+    'pool': obj.pool,
+    'readOnly': obj.readOnly,
+    'secretRef': toJson_VinylCacheV1Alpha1SpecPodVolumesRbdSecretRef(obj.secretRef),
+    'user': obj.user,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * scaleIO represents a ScaleIO persistent volume attached and mounted on Kubernetes nodes.
+ * Deprecated: ScaleIO is deprecated and the in-tree scaleIO type is no longer supported.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesScaleIo
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesScaleIo {
+  /**
+   * fsType is the filesystem type to mount.
+   * Must be a filesystem type supported by the host operating system.
+   * Ex. "ext4", "xfs", "ntfs".
+   * Default is "xfs".
+   *
+   * @default xfs".
+   * @schema VinylCacheV1Alpha1SpecPodVolumesScaleIo#fsType
+   */
+  readonly fsType?: string;
+
+  /**
+   * gateway is the host address of the ScaleIO API Gateway.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesScaleIo#gateway
+   */
+  readonly gateway: string;
+
+  /**
+   * protectionDomain is the name of the ScaleIO Protection Domain for the configured storage.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesScaleIo#protectionDomain
+   */
+  readonly protectionDomain?: string;
+
+  /**
+   * readOnly Defaults to false (read/write). ReadOnly here will force
+   * the ReadOnly setting in VolumeMounts.
+   *
+   * @default false (read/write). ReadOnly here will force
+   * @schema VinylCacheV1Alpha1SpecPodVolumesScaleIo#readOnly
+   */
+  readonly readOnly?: boolean;
+
+  /**
+   * secretRef references to the secret for ScaleIO user and other
+   * sensitive information. If this is not provided, Login operation will fail.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesScaleIo#secretRef
+   */
+  readonly secretRef: VinylCacheV1Alpha1SpecPodVolumesScaleIoSecretRef;
+
+  /**
+   * sslEnabled Flag enable/disable SSL communication with Gateway, default false
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesScaleIo#sslEnabled
+   */
+  readonly sslEnabled?: boolean;
+
+  /**
+   * storageMode indicates whether the storage for a volume should be ThickProvisioned or ThinProvisioned.
+   * Default is ThinProvisioned.
+   *
+   * @default ThinProvisioned.
+   * @schema VinylCacheV1Alpha1SpecPodVolumesScaleIo#storageMode
+   */
+  readonly storageMode?: string;
+
+  /**
+   * storagePool is the ScaleIO Storage Pool associated with the protection domain.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesScaleIo#storagePool
+   */
+  readonly storagePool?: string;
+
+  /**
+   * system is the name of the storage system as configured in ScaleIO.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesScaleIo#system
+   */
+  readonly system: string;
+
+  /**
+   * volumeName is the name of a volume already created in the ScaleIO system
+   * that is associated with this volume source.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesScaleIo#volumeName
+   */
+  readonly volumeName?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesScaleIo' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesScaleIo(obj: VinylCacheV1Alpha1SpecPodVolumesScaleIo | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'fsType': obj.fsType,
+    'gateway': obj.gateway,
+    'protectionDomain': obj.protectionDomain,
+    'readOnly': obj.readOnly,
+    'secretRef': toJson_VinylCacheV1Alpha1SpecPodVolumesScaleIoSecretRef(obj.secretRef),
+    'sslEnabled': obj.sslEnabled,
+    'storageMode': obj.storageMode,
+    'storagePool': obj.storagePool,
+    'system': obj.system,
+    'volumeName': obj.volumeName,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * secret represents a secret that should populate this volume.
+ * More info: https://kubernetes.io/docs/concepts/storage/volumes#secret
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesSecret
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesSecret {
+  /**
+   * defaultMode is Optional: mode bits used to set permissions on created files by default.
+   * Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
+   * YAML accepts both octal and decimal values, JSON requires decimal values
+   * for mode bits. Defaults to 0644.
+   * Directories within the path are not affected by this setting.
+   * This might be in conflict with other options that affect the file
+   * mode, like fsGroup, and the result can be other mode bits set.
+   *
+   * @default 0644.
+   * @schema VinylCacheV1Alpha1SpecPodVolumesSecret#defaultMode
+   */
+  readonly defaultMode?: number;
+
+  /**
+   * items If unspecified, each key-value pair in the Data field of the referenced
+   * Secret will be projected into the volume as a file whose name is the
+   * key and content is the value. If specified, the listed keys will be
+   * projected into the specified paths, and unlisted keys will not be
+   * present. If a key is specified which is not present in the Secret,
+   * the volume setup will error unless it is marked optional. Paths must be
+   * relative and may not contain the '..' path or start with '..'.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesSecret#items
+   */
+  readonly items?: VinylCacheV1Alpha1SpecPodVolumesSecretItems[];
+
+  /**
+   * optional field specify whether the Secret or its keys must be defined
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesSecret#optional
+   */
+  readonly optional?: boolean;
+
+  /**
+   * secretName is the name of the secret in the pod's namespace to use.
+   * More info: https://kubernetes.io/docs/concepts/storage/volumes#secret
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesSecret#secretName
+   */
+  readonly secretName?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesSecret' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesSecret(obj: VinylCacheV1Alpha1SpecPodVolumesSecret | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'defaultMode': obj.defaultMode,
+    'items': obj.items?.map(y => toJson_VinylCacheV1Alpha1SpecPodVolumesSecretItems(y)),
+    'optional': obj.optional,
+    'secretName': obj.secretName,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * storageOS represents a StorageOS volume attached and mounted on Kubernetes nodes.
+ * Deprecated: StorageOS is deprecated and the in-tree storageos type is no longer supported.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesStorageos
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesStorageos {
+  /**
+   * fsType is the filesystem type to mount.
+   * Must be a filesystem type supported by the host operating system.
+   * Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesStorageos#fsType
+   */
+  readonly fsType?: string;
+
+  /**
+   * readOnly defaults to false (read/write). ReadOnly here will force
+   * the ReadOnly setting in VolumeMounts.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesStorageos#readOnly
+   */
+  readonly readOnly?: boolean;
+
+  /**
+   * secretRef specifies the secret to use for obtaining the StorageOS API
+   * credentials.  If not specified, default values will be attempted.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesStorageos#secretRef
+   */
+  readonly secretRef?: VinylCacheV1Alpha1SpecPodVolumesStorageosSecretRef;
+
+  /**
+   * volumeName is the human-readable name of the StorageOS volume.  Volume
+   * names are only unique within a namespace.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesStorageos#volumeName
+   */
+  readonly volumeName?: string;
+
+  /**
+   * volumeNamespace specifies the scope of the volume within StorageOS.  If no
+   * namespace is specified then the Pod's namespace will be used.  This allows the
+   * Kubernetes name scoping to be mirrored within StorageOS for tighter integration.
+   * Set VolumeName to any name to override the default behaviour.
+   * Set to "default" if you are not using namespaces within StorageOS.
+   * Namespaces that do not pre-exist within StorageOS will be created.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesStorageos#volumeNamespace
+   */
+  readonly volumeNamespace?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesStorageos' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesStorageos(obj: VinylCacheV1Alpha1SpecPodVolumesStorageos | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'fsType': obj.fsType,
+    'readOnly': obj.readOnly,
+    'secretRef': toJson_VinylCacheV1Alpha1SpecPodVolumesStorageosSecretRef(obj.secretRef),
+    'volumeName': obj.volumeName,
+    'volumeNamespace': obj.volumeNamespace,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * vsphereVolume represents a vSphere volume attached and mounted on kubelets host machine.
+ * Deprecated: VsphereVolume is deprecated. All operations for the in-tree vsphereVolume type
+ * are redirected to the csi.vsphere.vmware.com CSI driver.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesVsphereVolume
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesVsphereVolume {
+  /**
+   * fsType is filesystem type to mount.
+   * Must be a filesystem type supported by the host operating system.
+   * Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesVsphereVolume#fsType
+   */
+  readonly fsType?: string;
+
+  /**
+   * storagePolicyID is the storage Policy Based Management (SPBM) profile ID associated with the StoragePolicyName.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesVsphereVolume#storagePolicyID
+   */
+  readonly storagePolicyId?: string;
+
+  /**
+   * storagePolicyName is the storage Policy Based Management (SPBM) profile name.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesVsphereVolume#storagePolicyName
+   */
+  readonly storagePolicyName?: string;
+
+  /**
+   * volumePath is the path that identifies vSphere volume vmdk
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesVsphereVolume#volumePath
+   */
+  readonly volumePath: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesVsphereVolume' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesVsphereVolume(obj: VinylCacheV1Alpha1SpecPodVolumesVsphereVolume | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'fsType': obj.fsType,
+    'storagePolicyID': obj.storagePolicyId,
+    'storagePolicyName': obj.storagePolicyName,
+    'volumePath': obj.volumePath,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * protocol selects the OTLP transport. Defaults to grpc.
+ *
+ * @default grpc.
+ * @schema VinylCacheV1Alpha1SpecTracingOtlpProtocol
+ */
+export enum VinylCacheV1Alpha1SpecTracingOtlpProtocol {
+  /** grpc */
+  GRPC = "grpc",
+  /** http/protobuf */
+  HTTP_FORWARD_SLASH_PROTOBUF = "http/protobuf",
+}
+
+/**
+ * ResourceClaim references one entry in PodSpec.ResourceClaims.
+ *
+ * @schema VinylCacheV1Alpha1SpecTracingResourcesClaims
+ */
+export interface VinylCacheV1Alpha1SpecTracingResourcesClaims {
+  /**
+   * Name must match the name of one entry in pod.spec.resourceClaims of
+   * the Pod where this field is used. It makes that resource available
+   * inside a container.
+   *
+   * @schema VinylCacheV1Alpha1SpecTracingResourcesClaims#name
+   */
+  readonly name: string;
+
+  /**
+   * Request is the name chosen for a request in the referenced claim.
+   * If empty, everything from the claim is made available, otherwise
+   * only the result of this request.
+   *
+   * @schema VinylCacheV1Alpha1SpecTracingResourcesClaims#request
+   */
+  readonly request?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecTracingResourcesClaims' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecTracingResourcesClaims(obj: VinylCacheV1Alpha1SpecTracingResourcesClaims | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'name': obj.name,
+    'request': obj.request,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * @schema VinylCacheV1Alpha1SpecTracingResourcesLimits
+ */
+export class VinylCacheV1Alpha1SpecTracingResourcesLimits {
+  public static fromNumber(value: number): VinylCacheV1Alpha1SpecTracingResourcesLimits {
+    return new VinylCacheV1Alpha1SpecTracingResourcesLimits(value);
+  }
+  public static fromString(value: string): VinylCacheV1Alpha1SpecTracingResourcesLimits {
+    return new VinylCacheV1Alpha1SpecTracingResourcesLimits(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * @schema VinylCacheV1Alpha1SpecTracingResourcesRequests
+ */
+export class VinylCacheV1Alpha1SpecTracingResourcesRequests {
+  public static fromNumber(value: number): VinylCacheV1Alpha1SpecTracingResourcesRequests {
+    return new VinylCacheV1Alpha1SpecTracingResourcesRequests(value);
+  }
+  public static fromString(value: string): VinylCacheV1Alpha1SpecTracingResourcesRequests {
+    return new VinylCacheV1Alpha1SpecTracingResourcesRequests(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * dataSource field can be used to specify either:
+ * * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot)
+ * * An existing PVC (PersistentVolumeClaim)
+ * If the provisioner or an external controller can support the specified data source,
+ * it will create a new volume based on the contents of the specified data source.
+ * When the AnyVolumeDataSource feature gate is enabled, dataSource contents will be copied to dataSourceRef,
+ * and dataSourceRef contents will be copied to dataSource when dataSourceRef.namespace is not specified.
+ * If the namespace is specified, then dataSourceRef will not be copied to dataSource.
+ *
+ * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSource
+ */
+export interface VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSource {
+  /**
+   * APIGroup is the group for the resource being referenced.
+   * If APIGroup is not specified, the specified Kind must be in the core API group.
+   * For any other third-party types, APIGroup is required.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSource#apiGroup
+   */
+  readonly apiGroup?: string;
+
+  /**
+   * Kind is the type of resource being referenced
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSource#kind
+   */
+  readonly kind: string;
+
+  /**
+   * Name is the name of resource being referenced
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSource#name
+   */
+  readonly name: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSource' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSource(obj: VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSource | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'apiGroup': obj.apiGroup,
+    'kind': obj.kind,
+    'name': obj.name,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * dataSourceRef specifies the object from which to populate the volume with data, if a non-empty
+ * volume is desired. This may be any object from a non-empty API group (non
+ * core object) or a PersistentVolumeClaim object.
+ * When this field is specified, volume binding will only succeed if the type of
+ * the specified object matches some installed volume populator or dynamic
+ * provisioner.
+ * This field will replace the functionality of the dataSource field and as such
+ * if both fields are non-empty, they must have the same value. For backwards
+ * compatibility, when namespace isn't specified in dataSourceRef,
+ * both fields (dataSource and dataSourceRef) will be set to the same
+ * value automatically if one of them is empty and the other is non-empty.
+ * When namespace is specified in dataSourceRef,
+ * dataSource isn't set to the same value and must be empty.
+ * There are three important differences between dataSource and dataSourceRef:
+ * * While dataSource only allows two specific types of objects, dataSourceRef
+ * allows any non-core object, as well as PersistentVolumeClaim objects.
+ * * While dataSource ignores disallowed values (dropping them), dataSourceRef
+ * preserves all values, and generates an error if a disallowed value is
+ * specified.
+ * * While dataSource only allows local objects, dataSourceRef allows objects
+ * in any namespaces.
+ * (Beta) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
+ * (Alpha) Using the namespace field of dataSourceRef requires the CrossNamespaceVolumeDataSource feature gate to be enabled.
+ *
+ * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSourceRef
+ */
+export interface VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSourceRef {
+  /**
+   * APIGroup is the group for the resource being referenced.
+   * If APIGroup is not specified, the specified Kind must be in the core API group.
+   * For any other third-party types, APIGroup is required.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSourceRef#apiGroup
+   */
+  readonly apiGroup?: string;
+
+  /**
+   * Kind is the type of resource being referenced
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSourceRef#kind
+   */
+  readonly kind: string;
+
+  /**
+   * Name is the name of resource being referenced
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSourceRef#name
+   */
+  readonly name: string;
+
+  /**
+   * Namespace is the namespace of resource being referenced
+   * Note that when a namespace is specified, a gateway.networking.k8s.io/ReferenceGrant object is required in the referent namespace to allow that namespace's owner to accept the reference. See the ReferenceGrant documentation for details.
+   * (Alpha) This field requires the CrossNamespaceVolumeDataSource feature gate to be enabled.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSourceRef#namespace
+   */
+  readonly namespace?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSourceRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSourceRef(obj: VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecDataSourceRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'apiGroup': obj.apiGroup,
+    'kind': obj.kind,
+    'name': obj.name,
+    'namespace': obj.namespace,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * resources represents the minimum resources the volume should have.
+ * Users are allowed to specify resource requirements
+ * that are lower than previous value but must still be higher than capacity recorded in the
+ * status field of the claim.
+ * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
+ *
+ * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResources
+ */
+export interface VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResources {
+  /**
+   * Limits describes the maximum amount of compute resources allowed.
+   * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResources#limits
+   */
+  readonly limits?: { [key: string]: VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResourcesLimits };
+
+  /**
+   * Requests describes the minimum amount of compute resources required.
+   * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+   * otherwise to an implementation-defined value. Requests cannot exceed Limits.
+   * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResources#requests
+   */
+  readonly requests?: { [key: string]: VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResourcesRequests };
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResources' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResources(obj: VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResources | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'limits': ((obj.limits) === undefined) ? undefined : (Object.entries(obj.limits).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    'requests': ((obj.requests) === undefined) ? undefined : (Object.entries(obj.requests).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * selector is a label query over volumes to consider for binding.
+ *
+ * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecSelector
+ */
+export interface VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecSelector {
+  /**
+   * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecSelector#matchExpressions
+   */
+  readonly matchExpressions?: VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecSelectorMatchExpressions[];
+
+  /**
+   * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+   * map is equivalent to an element of matchExpressions, whose key field is "key", the
+   * operator is "In", and the values array contains only "value". The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecSelector#matchLabels
+   */
+  readonly matchLabels?: { [key: string]: string };
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecSelector' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecSelector(obj: VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecSelector | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'matchExpressions': obj.matchExpressions?.map(y => toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecSelectorMatchExpressions(y)),
+    'matchLabels': ((obj.matchLabels) === undefined) ? undefined : (Object.entries(obj.matchLabels).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusAllocatedResources
+ */
+export class VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusAllocatedResources {
+  public static fromNumber(value: number): VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusAllocatedResources {
+    return new VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusAllocatedResources(value);
+  }
+  public static fromString(value: string): VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusAllocatedResources {
+    return new VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusAllocatedResources(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusCapacity
+ */
+export class VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusCapacity {
+  public static fromNumber(value: number): VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusCapacity {
+    return new VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusCapacity(value);
+  }
+  public static fromString(value: string): VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusCapacity {
+    return new VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusCapacity(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * PersistentVolumeClaimCondition contains details about state of pvc
+ *
+ * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusConditions
+ */
+export interface VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusConditions {
+  /**
+   * lastProbeTime is the time we probed the condition.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusConditions#lastProbeTime
+   */
+  readonly lastProbeTime?: Date;
+
+  /**
+   * lastTransitionTime is the time the condition transitioned from one status to another.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusConditions#lastTransitionTime
+   */
+  readonly lastTransitionTime?: Date;
+
+  /**
+   * message is the human-readable message indicating details about last transition.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusConditions#message
+   */
+  readonly message?: string;
+
+  /**
+   * reason is a unique, this should be a short, machine understandable string that gives the reason
+   * for condition's last transition. If it reports "Resizing" that means the underlying
+   * persistent volume is being resized.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusConditions#reason
+   */
+  readonly reason?: string;
+
+  /**
+   * Status is the status of the condition.
+   * Can be True, False, Unknown.
+   * More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=state%20of%20pvc-,conditions.status,-(string)%2C%20required
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusConditions#status
+   */
+  readonly status: string;
+
+  /**
+   * Type is the type of the condition.
+   * More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=set%20to%20%27ResizeStarted%27.-,PersistentVolumeClaimCondition,-contains%20details%20about
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusConditions#type
+   */
+  readonly type: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusConditions' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusConditions(obj: VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusConditions | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'lastProbeTime': obj.lastProbeTime?.toISOString(),
+    'lastTransitionTime': obj.lastTransitionTime?.toISOString(),
+    'message': obj.message,
+    'reason': obj.reason,
+    'status': obj.status,
+    'type': obj.type,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * ModifyVolumeStatus represents the status object of ControllerModifyVolume operation.
+ * When this is unset, there is no ModifyVolume operation being attempted.
+ *
+ * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusModifyVolumeStatus
+ */
+export interface VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusModifyVolumeStatus {
+  /**
+   * status is the status of the ControllerModifyVolume operation. It can be in any of following states:
+   * - Pending
+   * Pending indicates that the PersistentVolumeClaim cannot be modified due to unmet requirements, such as
+   * the specified VolumeAttributesClass not existing.
+   * - InProgress
+   * InProgress indicates that the volume is being modified.
+   * - Infeasible
+   * Infeasible indicates that the request has been rejected as invalid by the CSI driver. To
+   * resolve the error, a valid VolumeAttributesClass needs to be specified.
+   * Note: New statuses can be added in the future. Consumers should check for unknown statuses and fail appropriately.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusModifyVolumeStatus#status
+   */
+  readonly status: string;
+
+  /**
+   * targetVolumeAttributesClassName is the name of the VolumeAttributesClass the PVC currently being reconciled
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusModifyVolumeStatus#targetVolumeAttributesClassName
+   */
+  readonly targetVolumeAttributesClassName?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusModifyVolumeStatus' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusModifyVolumeStatus(obj: VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatusModifyVolumeStatus | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'status': obj.status,
+    'targetVolumeAttributesClassName': obj.targetVolumeAttributesClassName,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * by determines what value the cluster-peer shard director hashes to pick a
+ * backend, at the point in vcl_recv where cluster routing runs. "URL" (default)
+ * hashes the request URL. "HASH" is not offered: it would hash Varnish's
+ * req.hash, which is only populated by vcl_hash, and vcl_recv's cluster routing
+ * never reaches vcl_hash — so HASH cannot work at this call site.
+ *
+ * @schema VinylCacheV1Alpha1SpecBackendsDirectorShardBy
+ */
+export enum VinylCacheV1Alpha1SpecBackendsDirectorShardBy {
+  /** URL */
+  URL = "URL",
+}
+
+/**
+ * healthy controls which backends the director considers when selecting a shard.
+ * "CHOSEN" (default) only considers the chosen backend healthy; "ALL" requires all
+ * backends to be healthy.
+ *
+ * @schema VinylCacheV1Alpha1SpecBackendsDirectorShardHealthy
+ */
+export enum VinylCacheV1Alpha1SpecBackendsDirectorShardHealthy {
+  /** CHOSEN */
+  CHOSEN = "CHOSEN",
+  /** ALL */
+  ALL = "ALL",
+}
+
+/**
+ * ResourceClaim references one entry in PodSpec.ResourceClaims.
+ *
+ * @schema VinylCacheV1Alpha1SpecMonitoringExporterResourcesClaims
+ */
+export interface VinylCacheV1Alpha1SpecMonitoringExporterResourcesClaims {
+  /**
+   * Name must match the name of one entry in pod.spec.resourceClaims of
+   * the Pod where this field is used. It makes that resource available
+   * inside a container.
+   *
+   * @schema VinylCacheV1Alpha1SpecMonitoringExporterResourcesClaims#name
+   */
+  readonly name: string;
+
+  /**
+   * Request is the name chosen for a request in the referenced claim.
+   * If empty, everything from the claim is made available, otherwise
+   * only the result of this request.
+   *
+   * @schema VinylCacheV1Alpha1SpecMonitoringExporterResourcesClaims#request
+   */
+  readonly request?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecMonitoringExporterResourcesClaims' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecMonitoringExporterResourcesClaims(obj: VinylCacheV1Alpha1SpecMonitoringExporterResourcesClaims | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'name': obj.name,
+    'request': obj.request,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * @schema VinylCacheV1Alpha1SpecMonitoringExporterResourcesLimits
+ */
+export class VinylCacheV1Alpha1SpecMonitoringExporterResourcesLimits {
+  public static fromNumber(value: number): VinylCacheV1Alpha1SpecMonitoringExporterResourcesLimits {
+    return new VinylCacheV1Alpha1SpecMonitoringExporterResourcesLimits(value);
+  }
+  public static fromString(value: string): VinylCacheV1Alpha1SpecMonitoringExporterResourcesLimits {
+    return new VinylCacheV1Alpha1SpecMonitoringExporterResourcesLimits(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * @schema VinylCacheV1Alpha1SpecMonitoringExporterResourcesRequests
+ */
+export class VinylCacheV1Alpha1SpecMonitoringExporterResourcesRequests {
+  public static fromNumber(value: number): VinylCacheV1Alpha1SpecMonitoringExporterResourcesRequests {
+    return new VinylCacheV1Alpha1SpecMonitoringExporterResourcesRequests(value);
+  }
+  public static fromString(value: string): VinylCacheV1Alpha1SpecMonitoringExporterResourcesRequests {
+    return new VinylCacheV1Alpha1SpecMonitoringExporterResourcesRequests(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * An empty preferred scheduling term matches all objects with implicit weight 0
+ * (i.e. it's a no-op). A null preferred scheduling term matches no objects (i.e. is also a no-op).
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecution
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecution {
+  /**
+   * A node selector term, associated with the corresponding weight.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecution#preference
+   */
+  readonly preference: VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreference;
+
+  /**
+   * Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecution#weight
+   */
+  readonly weight: number;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecution' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecution(obj: VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecution | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'preference': toJson_VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreference(obj.preference),
+    'weight': obj.weight,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * If the affinity requirements specified by this field are not met at
+ * scheduling time, the pod will not be scheduled onto the node.
+ * If the affinity requirements specified by this field cease to be met
+ * at some point during pod execution (e.g. due to an update), the system
+ * may or may not try to eventually evict the pod from its node.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecution
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecution {
+  /**
+   * Required. A list of node selector terms. The terms are ORed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecution#nodeSelectorTerms
+   */
+  readonly nodeSelectorTerms: VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTerms[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecution' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecution(obj: VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecution | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'nodeSelectorTerms': obj.nodeSelectorTerms?.map(y => toJson_VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTerms(y)),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecution
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecution {
+  /**
+   * Required. A pod affinity term, associated with the corresponding weight.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecution#podAffinityTerm
+   */
+  readonly podAffinityTerm: VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm;
+
+  /**
+   * weight associated with matching the corresponding podAffinityTerm,
+   * in the range 1-100.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecution#weight
+   */
+  readonly weight: number;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecution' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecution(obj: VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecution | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'podAffinityTerm': toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm(obj.podAffinityTerm),
+    'weight': obj.weight,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Defines a set of pods (namely those matching the labelSelector
+ * relative to the given namespace(s)) that this pod should be
+ * co-located (affinity) or not co-located (anti-affinity) with,
+ * where co-located is defined as running on a node whose value of
+ * the label with key <topologyKey> matches that of any node on which
+ * a pod of the set of pods is running
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution {
+  /**
+   * A label query over a set of resources, in this case pods.
+   * If it's null, this PodAffinityTerm matches with no Pods.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution#labelSelector
+   */
+  readonly labelSelector?: VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector;
+
+  /**
+   * MatchLabelKeys is a set of pod label keys to select which pods will
+   * be taken into consideration. The keys are used to lookup values from the
+   * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+   * to select the group of existing pods which pods will be taken into consideration
+   * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+   * pod labels will be ignored. The default value is empty.
+   * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+   * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution#matchLabelKeys
+   */
+  readonly matchLabelKeys?: string[];
+
+  /**
+   * MismatchLabelKeys is a set of pod label keys to select which pods will
+   * be taken into consideration. The keys are used to lookup values from the
+   * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+   * to select the group of existing pods which pods will be taken into consideration
+   * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+   * pod labels will be ignored. The default value is empty.
+   * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+   * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution#mismatchLabelKeys
+   */
+  readonly mismatchLabelKeys?: string[];
+
+  /**
+   * A label query over the set of namespaces that the term applies to.
+   * The term is applied to the union of the namespaces selected by this field
+   * and the ones listed in the namespaces field.
+   * null selector and null or empty namespaces list means "this pod's namespace".
+   * An empty selector ({}) matches all namespaces.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution#namespaceSelector
+   */
+  readonly namespaceSelector?: VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector;
+
+  /**
+   * namespaces specifies a static list of namespace names that the term applies to.
+   * The term is applied to the union of the namespaces listed in this field
+   * and the ones selected by namespaceSelector.
+   * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution#namespaces
+   */
+  readonly namespaces?: string[];
+
+  /**
+   * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+   * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+   * whose value of the label with key topologyKey matches that of any node on which any of the
+   * selected pods is running.
+   * Empty topologyKey is not allowed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution#topologyKey
+   */
+  readonly topologyKey: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution(obj: VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'labelSelector': toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector(obj.labelSelector),
+    'matchLabelKeys': obj.matchLabelKeys?.map(y => y),
+    'mismatchLabelKeys': obj.mismatchLabelKeys?.map(y => y),
+    'namespaceSelector': toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector(obj.namespaceSelector),
+    'namespaces': obj.namespaces?.map(y => y),
+    'topologyKey': obj.topologyKey,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecution
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecution {
+  /**
+   * Required. A pod affinity term, associated with the corresponding weight.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecution#podAffinityTerm
+   */
+  readonly podAffinityTerm: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm;
+
+  /**
+   * weight associated with matching the corresponding podAffinityTerm,
+   * in the range 1-100.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecution#weight
+   */
+  readonly weight: number;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecution' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecution(obj: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecution | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'podAffinityTerm': toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm(obj.podAffinityTerm),
+    'weight': obj.weight,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Defines a set of pods (namely those matching the labelSelector
+ * relative to the given namespace(s)) that this pod should be
+ * co-located (affinity) or not co-located (anti-affinity) with,
+ * where co-located is defined as running on a node whose value of
+ * the label with key <topologyKey> matches that of any node on which
+ * a pod of the set of pods is running
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution {
+  /**
+   * A label query over a set of resources, in this case pods.
+   * If it's null, this PodAffinityTerm matches with no Pods.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution#labelSelector
+   */
+  readonly labelSelector?: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector;
+
+  /**
+   * MatchLabelKeys is a set of pod label keys to select which pods will
+   * be taken into consideration. The keys are used to lookup values from the
+   * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+   * to select the group of existing pods which pods will be taken into consideration
+   * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+   * pod labels will be ignored. The default value is empty.
+   * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+   * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution#matchLabelKeys
+   */
+  readonly matchLabelKeys?: string[];
+
+  /**
+   * MismatchLabelKeys is a set of pod label keys to select which pods will
+   * be taken into consideration. The keys are used to lookup values from the
+   * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+   * to select the group of existing pods which pods will be taken into consideration
+   * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+   * pod labels will be ignored. The default value is empty.
+   * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+   * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution#mismatchLabelKeys
+   */
+  readonly mismatchLabelKeys?: string[];
+
+  /**
+   * A label query over the set of namespaces that the term applies to.
+   * The term is applied to the union of the namespaces selected by this field
+   * and the ones listed in the namespaces field.
+   * null selector and null or empty namespaces list means "this pod's namespace".
+   * An empty selector ({}) matches all namespaces.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution#namespaceSelector
+   */
+  readonly namespaceSelector?: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector;
+
+  /**
+   * namespaces specifies a static list of namespace names that the term applies to.
+   * The term is applied to the union of the namespaces listed in this field
+   * and the ones selected by namespaceSelector.
+   * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution#namespaces
+   */
+  readonly namespaces?: string[];
+
+  /**
+   * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+   * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+   * whose value of the label with key topologyKey matches that of any node on which any of the
+   * selected pods is running.
+   * Empty topologyKey is not allowed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution#topologyKey
+   */
+  readonly topologyKey: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution(obj: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'labelSelector': toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector(obj.labelSelector),
+    'matchLabelKeys': obj.matchLabelKeys?.map(y => y),
+    'mismatchLabelKeys': obj.mismatchLabelKeys?.map(y => y),
+    'namespaceSelector': toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector(obj.namespaceSelector),
+    'namespaces': obj.namespaces?.map(y => y),
+    'topologyKey': obj.topologyKey,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Selects a key of a ConfigMap.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodEnvValueFromConfigMapKeyRef
+ */
+export interface VinylCacheV1Alpha1SpecPodEnvValueFromConfigMapKeyRef {
+  /**
+   * The key to select.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnvValueFromConfigMapKeyRef#key
+   */
+  readonly key: string;
+
+  /**
+   * Name of the referent.
+   * This field is effectively required, but due to backwards compatibility is
+   * allowed to be empty. Instances of this type with an empty value here are
+   * almost certainly wrong.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnvValueFromConfigMapKeyRef#name
+   */
+  readonly name?: string;
+
+  /**
+   * Specify whether the ConfigMap or its key must be defined
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnvValueFromConfigMapKeyRef#optional
+   */
+  readonly optional?: boolean;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodEnvValueFromConfigMapKeyRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodEnvValueFromConfigMapKeyRef(obj: VinylCacheV1Alpha1SpecPodEnvValueFromConfigMapKeyRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'name': obj.name,
+    'optional': obj.optional,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels['<KEY>']`, `metadata.annotations['<KEY>']`,
+ * spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodEnvValueFromFieldRef
+ */
+export interface VinylCacheV1Alpha1SpecPodEnvValueFromFieldRef {
+  /**
+   * Version of the schema the FieldPath is written in terms of, defaults to "v1".
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnvValueFromFieldRef#apiVersion
+   */
+  readonly apiVersion?: string;
+
+  /**
+   * Path of the field to select in the specified API version.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnvValueFromFieldRef#fieldPath
+   */
+  readonly fieldPath: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodEnvValueFromFieldRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodEnvValueFromFieldRef(obj: VinylCacheV1Alpha1SpecPodEnvValueFromFieldRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'apiVersion': obj.apiVersion,
+    'fieldPath': obj.fieldPath,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * FileKeyRef selects a key of the env file.
+ * Requires the EnvFiles feature gate to be enabled.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodEnvValueFromFileKeyRef
+ */
+export interface VinylCacheV1Alpha1SpecPodEnvValueFromFileKeyRef {
+  /**
+   * The key within the env file. An invalid key will prevent the pod from starting.
+   * The keys defined within a source may consist of any printable ASCII characters except '='.
+   * During Alpha stage of the EnvFiles feature gate, the key size is limited to 128 characters.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnvValueFromFileKeyRef#key
+   */
+  readonly key: string;
+
+  /**
+   * Specify whether the file or its key must be defined. If the file or key
+   * does not exist, then the env var is not published.
+   * If optional is set to true and the specified key does not exist,
+   * the environment variable will not be set in the Pod's containers.
+   *
+   * If optional is set to false and the specified key does not exist,
+   * an error will be returned during Pod creation.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnvValueFromFileKeyRef#optional
+   */
+  readonly optional?: boolean;
+
+  /**
+   * The path within the volume from which to select the file.
+   * Must be relative and may not contain the '..' path or start with '..'.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnvValueFromFileKeyRef#path
+   */
+  readonly path: string;
+
+  /**
+   * The name of the volume mount containing the env file.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnvValueFromFileKeyRef#volumeName
+   */
+  readonly volumeName: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodEnvValueFromFileKeyRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodEnvValueFromFileKeyRef(obj: VinylCacheV1Alpha1SpecPodEnvValueFromFileKeyRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'optional': obj.optional,
+    'path': obj.path,
+    'volumeName': obj.volumeName,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Selects a resource of the container: only resources limits and requests
+ * (limits.cpu, limits.memory, limits.ephemeral-storage, requests.cpu, requests.memory and requests.ephemeral-storage) are currently supported.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodEnvValueFromResourceFieldRef
+ */
+export interface VinylCacheV1Alpha1SpecPodEnvValueFromResourceFieldRef {
+  /**
+   * Container name: required for volumes, optional for env vars
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnvValueFromResourceFieldRef#containerName
+   */
+  readonly containerName?: string;
+
+  /**
+   * Specifies the output format of the exposed resources, defaults to "1"
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnvValueFromResourceFieldRef#divisor
+   */
+  readonly divisor?: VinylCacheV1Alpha1SpecPodEnvValueFromResourceFieldRefDivisor;
+
+  /**
+   * Required: resource to select
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnvValueFromResourceFieldRef#resource
+   */
+  readonly resource: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodEnvValueFromResourceFieldRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodEnvValueFromResourceFieldRef(obj: VinylCacheV1Alpha1SpecPodEnvValueFromResourceFieldRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'containerName': obj.containerName,
+    'divisor': obj.divisor?.value,
+    'resource': obj.resource,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Selects a key of a secret in the pod's namespace
+ *
+ * @schema VinylCacheV1Alpha1SpecPodEnvValueFromSecretKeyRef
+ */
+export interface VinylCacheV1Alpha1SpecPodEnvValueFromSecretKeyRef {
+  /**
+   * The key of the secret to select from.  Must be a valid secret key.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnvValueFromSecretKeyRef#key
+   */
+  readonly key: string;
+
+  /**
+   * Name of the referent.
+   * This field is effectively required, but due to backwards compatibility is
+   * allowed to be empty. Instances of this type with an empty value here are
+   * almost certainly wrong.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnvValueFromSecretKeyRef#name
+   */
+  readonly name?: string;
+
+  /**
+   * Specify whether the Secret or its key must be defined
+   *
+   * @schema VinylCacheV1Alpha1SpecPodEnvValueFromSecretKeyRef#optional
+   */
+  readonly optional?: boolean;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodEnvValueFromSecretKeyRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodEnvValueFromSecretKeyRef(obj: VinylCacheV1Alpha1SpecPodEnvValueFromSecretKeyRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'name': obj.name,
+    'optional': obj.optional,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * secretRef is Optional: SecretRef is reference to the authentication secret for User, default is empty.
+ * More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesCephfsSecretRef
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesCephfsSecretRef {
+  /**
+   * Name of the referent.
+   * This field is effectively required, but due to backwards compatibility is
+   * allowed to be empty. Instances of this type with an empty value here are
+   * almost certainly wrong.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesCephfsSecretRef#name
+   */
+  readonly name?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesCephfsSecretRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesCephfsSecretRef(obj: VinylCacheV1Alpha1SpecPodVolumesCephfsSecretRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'name': obj.name,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * secretRef is optional: points to a secret object containing parameters used to connect
+ * to OpenStack.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesCinderSecretRef
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesCinderSecretRef {
+  /**
+   * Name of the referent.
+   * This field is effectively required, but due to backwards compatibility is
+   * allowed to be empty. Instances of this type with an empty value here are
+   * almost certainly wrong.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesCinderSecretRef#name
+   */
+  readonly name?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesCinderSecretRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesCinderSecretRef(obj: VinylCacheV1Alpha1SpecPodVolumesCinderSecretRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'name': obj.name,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Maps a string key to a path within a volume.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesConfigMapItems
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesConfigMapItems {
+  /**
+   * key is the key to project.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesConfigMapItems#key
+   */
+  readonly key: string;
+
+  /**
+   * mode is Optional: mode bits used to set permissions on this file.
+   * Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
+   * YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
+   * If not specified, the volume defaultMode will be used.
+   * This might be in conflict with other options that affect the file
+   * mode, like fsGroup, and the result can be other mode bits set.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesConfigMapItems#mode
+   */
+  readonly mode?: number;
+
+  /**
+   * path is the relative path of the file to map the key to.
+   * May not be an absolute path.
+   * May not contain the path element '..'.
+   * May not start with the string '..'.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesConfigMapItems#path
+   */
+  readonly path: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesConfigMapItems' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesConfigMapItems(obj: VinylCacheV1Alpha1SpecPodVolumesConfigMapItems | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'mode': obj.mode,
+    'path': obj.path,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * nodePublishSecretRef is a reference to the secret object containing
+ * sensitive information to pass to the CSI driver to complete the CSI
+ * NodePublishVolume and NodeUnpublishVolume calls.
+ * This field is optional, and  may be empty if no secret is required. If the
+ * secret object contains more than one secret, all secret references are passed.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesCsiNodePublishSecretRef
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesCsiNodePublishSecretRef {
+  /**
+   * Name of the referent.
+   * This field is effectively required, but due to backwards compatibility is
+   * allowed to be empty. Instances of this type with an empty value here are
+   * almost certainly wrong.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesCsiNodePublishSecretRef#name
+   */
+  readonly name?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesCsiNodePublishSecretRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesCsiNodePublishSecretRef(obj: VinylCacheV1Alpha1SpecPodVolumesCsiNodePublishSecretRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'name': obj.name,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * DownwardAPIVolumeFile represents information to create the file containing the pod field
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesDownwardApiItems
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesDownwardApiItems {
+  /**
+   * Required: Selects a field of the pod: only annotations, labels, name, namespace and uid are supported.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesDownwardApiItems#fieldRef
+   */
+  readonly fieldRef?: VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsFieldRef;
+
+  /**
+   * Optional: mode bits used to set permissions on this file, must be an octal value
+   * between 0000 and 0777 or a decimal value between 0 and 511.
+   * YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
+   * If not specified, the volume defaultMode will be used.
+   * This might be in conflict with other options that affect the file
+   * mode, like fsGroup, and the result can be other mode bits set.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesDownwardApiItems#mode
+   */
+  readonly mode?: number;
+
+  /**
+   * Required: Path is  the relative path name of the file to be created. Must not be absolute or contain the '..' path. Must be utf-8 encoded. The first item of the relative path must not start with '..'
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesDownwardApiItems#path
+   */
+  readonly path: string;
+
+  /**
+   * Selects a resource of the container: only resources limits and requests
+   * (limits.cpu, limits.memory, requests.cpu and requests.memory) are currently supported.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesDownwardApiItems#resourceFieldRef
+   */
+  readonly resourceFieldRef?: VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsResourceFieldRef;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesDownwardApiItems' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesDownwardApiItems(obj: VinylCacheV1Alpha1SpecPodVolumesDownwardApiItems | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'fieldRef': toJson_VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsFieldRef(obj.fieldRef),
+    'mode': obj.mode,
+    'path': obj.path,
+    'resourceFieldRef': toJson_VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsResourceFieldRef(obj.resourceFieldRef),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * sizeLimit is the total amount of local storage required for this EmptyDir volume.
+ * The size limit is also applicable for memory medium.
+ * The maximum usage on memory medium EmptyDir would be the minimum value between
+ * the SizeLimit specified here and the sum of memory limits of all containers in a pod.
+ * The default is nil which means that the limit is undefined.
+ * More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesEmptyDirSizeLimit
+ */
+export class VinylCacheV1Alpha1SpecPodVolumesEmptyDirSizeLimit {
+  public static fromNumber(value: number): VinylCacheV1Alpha1SpecPodVolumesEmptyDirSizeLimit {
+    return new VinylCacheV1Alpha1SpecPodVolumesEmptyDirSizeLimit(value);
+  }
+  public static fromString(value: string): VinylCacheV1Alpha1SpecPodVolumesEmptyDirSizeLimit {
+    return new VinylCacheV1Alpha1SpecPodVolumesEmptyDirSizeLimit(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * Will be used to create a stand-alone PVC to provision the volume.
+ * The pod in which this EphemeralVolumeSource is embedded will be the
+ * owner of the PVC, i.e. the PVC will be deleted together with the
+ * pod.  The name of the PVC will be `<pod name>-<volume name>` where
+ * `<volume name>` is the name from the `PodSpec.Volumes` array
+ * entry. Pod validation will reject the pod if the concatenated name
+ * is not valid for a PVC (for example, too long).
+ *
+ * An existing PVC with that name that is not owned by the pod
+ * will *not* be used for the pod to avoid using an unrelated
+ * volume by mistake. Starting the pod is then blocked until
+ * the unrelated PVC is removed. If such a pre-created PVC is
+ * meant to be used by the pod, the PVC has to updated with an
+ * owner reference to the pod once the pod exists. Normally
+ * this should not be necessary, but it may be useful when
+ * manually reconstructing a broken cluster.
+ *
+ * This field is read-only and no changes will be made by Kubernetes
+ * to the PVC after it has been created.
+ *
+ * Required, must not be nil.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplate
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplate {
+  /**
+   * May contain labels and annotations that will be copied into the PVC
+   * when creating it. No other fields are allowed and will be rejected during
+   * validation.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplate#metadata
+   */
+  readonly metadata?: any;
+
+  /**
+   * The specification for the PersistentVolumeClaim. The entire content is
+   * copied unchanged into the PVC that gets created from this
+   * template. The same fields as in a PersistentVolumeClaim
+   * are also valid here.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplate#spec
+   */
+  readonly spec: VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpec;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplate' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplate(obj: VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplate | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'metadata': obj.metadata,
+    'spec': toJson_VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpec(obj.spec),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * secretRef is Optional: secretRef is reference to the secret object containing
+ * sensitive information to pass to the plugin scripts. This may be
+ * empty if no secret object is specified. If the secret object
+ * contains more than one secret, all secrets are passed to the plugin
+ * scripts.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesFlexVolumeSecretRef
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesFlexVolumeSecretRef {
+  /**
+   * Name of the referent.
+   * This field is effectively required, but due to backwards compatibility is
+   * allowed to be empty. Instances of this type with an empty value here are
+   * almost certainly wrong.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesFlexVolumeSecretRef#name
+   */
+  readonly name?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesFlexVolumeSecretRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesFlexVolumeSecretRef(obj: VinylCacheV1Alpha1SpecPodVolumesFlexVolumeSecretRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'name': obj.name,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * secretRef is the CHAP Secret for iSCSI target and initiator authentication
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesIscsiSecretRef
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesIscsiSecretRef {
+  /**
+   * Name of the referent.
+   * This field is effectively required, but due to backwards compatibility is
+   * allowed to be empty. Instances of this type with an empty value here are
+   * almost certainly wrong.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesIscsiSecretRef#name
+   */
+  readonly name?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesIscsiSecretRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesIscsiSecretRef(obj: VinylCacheV1Alpha1SpecPodVolumesIscsiSecretRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'name': obj.name,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Projection that may be projected along with other supported volume types.
+ * Exactly one of these fields must be set.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSources
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesProjectedSources {
+  /**
+   * ClusterTrustBundle allows a pod to access the `.spec.trustBundle` field
+   * of ClusterTrustBundle objects in an auto-updating file.
+   *
+   * Alpha, gated by the ClusterTrustBundleProjection feature gate.
+   *
+   * ClusterTrustBundle objects can either be selected by name, or by the
+   * combination of signer name and a label selector.
+   *
+   * Kubelet performs aggressive normalization of the PEM contents written
+   * into the pod filesystem.  Esoteric PEM features such as inter-block
+   * comments and block headers are stripped.  Certificates are deduplicated.
+   * The ordering of certificates within the file is arbitrary, and Kubelet
+   * may change the order over time.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSources#clusterTrustBundle
+   */
+  readonly clusterTrustBundle?: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundle;
+
+  /**
+   * configMap information about the configMap data to project
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSources#configMap
+   */
+  readonly configMap?: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesConfigMap;
+
+  /**
+   * downwardAPI information about the downwardAPI data to project
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSources#downwardAPI
+   */
+  readonly downwardApi?: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApi;
+
+  /**
+   * Projects an auto-rotating credential bundle (private key and certificate
+   * chain) that the pod can use either as a TLS client or server.
+   *
+   * Kubelet generates a private key and uses it to send a
+   * PodCertificateRequest to the named signer.  Once the signer approves the
+   * request and issues a certificate chain, Kubelet writes the key and
+   * certificate chain to the pod filesystem.  The pod does not start until
+   * certificates have been issued for each podCertificate projected volume
+   * source in its spec.
+   *
+   * Kubelet will begin trying to rotate the certificate at the time indicated
+   * by the signer using the PodCertificateRequest.Status.BeginRefreshAt
+   * timestamp.
+   *
+   * Kubelet can write a single file, indicated by the credentialBundlePath
+   * field, or separate files, indicated by the keyPath and
+   * certificateChainPath fields.
+   *
+   * The credential bundle is a single file in PEM format.  The first PEM
+   * entry is the private key (in PKCS#8 format), and the remaining PEM
+   * entries are the certificate chain issued by the signer (typically,
+   * signers will return their certificate chain in leaf-to-root order).
+   *
+   * Prefer using the credential bundle format, since your application code
+   * can read it atomically.  If you use keyPath and certificateChainPath,
+   * your application must make two separate file reads. If these coincide
+   * with a certificate rotation, it is possible that the private key and leaf
+   * certificate you read may not correspond to each other.  Your application
+   * will need to check for this condition, and re-read until they are
+   * consistent.
+   *
+   * The named signer controls chooses the format of the certificate it
+   * issues; consult the signer implementation's documentation to learn how to
+   * use the certificates it issues.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSources#podCertificate
+   */
+  readonly podCertificate?: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesPodCertificate;
+
+  /**
+   * secret information about the secret data to project
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSources#secret
+   */
+  readonly secret?: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesSecret;
+
+  /**
+   * serviceAccountToken is information about the serviceAccountToken data to project
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSources#serviceAccountToken
+   */
+  readonly serviceAccountToken?: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesServiceAccountToken;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesProjectedSources' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSources(obj: VinylCacheV1Alpha1SpecPodVolumesProjectedSources | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'clusterTrustBundle': toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundle(obj.clusterTrustBundle),
+    'configMap': toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesConfigMap(obj.configMap),
+    'downwardAPI': toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApi(obj.downwardApi),
+    'podCertificate': toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesPodCertificate(obj.podCertificate),
+    'secret': toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesSecret(obj.secret),
+    'serviceAccountToken': toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesServiceAccountToken(obj.serviceAccountToken),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * secretRef is name of the authentication secret for RBDUser. If provided
+ * overrides keyring.
+ * Default is nil.
+ * More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
+ *
+ * @default nil.
+ * @schema VinylCacheV1Alpha1SpecPodVolumesRbdSecretRef
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesRbdSecretRef {
+  /**
+   * Name of the referent.
+   * This field is effectively required, but due to backwards compatibility is
+   * allowed to be empty. Instances of this type with an empty value here are
+   * almost certainly wrong.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesRbdSecretRef#name
+   */
+  readonly name?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesRbdSecretRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesRbdSecretRef(obj: VinylCacheV1Alpha1SpecPodVolumesRbdSecretRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'name': obj.name,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * secretRef references to the secret for ScaleIO user and other
+ * sensitive information. If this is not provided, Login operation will fail.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesScaleIoSecretRef
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesScaleIoSecretRef {
+  /**
+   * Name of the referent.
+   * This field is effectively required, but due to backwards compatibility is
+   * allowed to be empty. Instances of this type with an empty value here are
+   * almost certainly wrong.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesScaleIoSecretRef#name
+   */
+  readonly name?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesScaleIoSecretRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesScaleIoSecretRef(obj: VinylCacheV1Alpha1SpecPodVolumesScaleIoSecretRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'name': obj.name,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Maps a string key to a path within a volume.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesSecretItems
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesSecretItems {
+  /**
+   * key is the key to project.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesSecretItems#key
+   */
+  readonly key: string;
+
+  /**
+   * mode is Optional: mode bits used to set permissions on this file.
+   * Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
+   * YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
+   * If not specified, the volume defaultMode will be used.
+   * This might be in conflict with other options that affect the file
+   * mode, like fsGroup, and the result can be other mode bits set.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesSecretItems#mode
+   */
+  readonly mode?: number;
+
+  /**
+   * path is the relative path of the file to map the key to.
+   * May not be an absolute path.
+   * May not contain the path element '..'.
+   * May not start with the string '..'.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesSecretItems#path
+   */
+  readonly path: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesSecretItems' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesSecretItems(obj: VinylCacheV1Alpha1SpecPodVolumesSecretItems | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'mode': obj.mode,
+    'path': obj.path,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * secretRef specifies the secret to use for obtaining the StorageOS API
+ * credentials.  If not specified, default values will be attempted.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesStorageosSecretRef
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesStorageosSecretRef {
+  /**
+   * Name of the referent.
+   * This field is effectively required, but due to backwards compatibility is
+   * allowed to be empty. Instances of this type with an empty value here are
+   * almost certainly wrong.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesStorageosSecretRef#name
+   */
+  readonly name?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesStorageosSecretRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesStorageosSecretRef(obj: VinylCacheV1Alpha1SpecPodVolumesStorageosSecretRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'name': obj.name,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResourcesLimits
+ */
+export class VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResourcesLimits {
+  public static fromNumber(value: number): VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResourcesLimits {
+    return new VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResourcesLimits(value);
+  }
+  public static fromString(value: string): VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResourcesLimits {
+    return new VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResourcesLimits(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResourcesRequests
+ */
+export class VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResourcesRequests {
+  public static fromNumber(value: number): VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResourcesRequests {
+    return new VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResourcesRequests(value);
+  }
+  public static fromString(value: string): VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResourcesRequests {
+    return new VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecResourcesRequests(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * A label selector requirement is a selector that contains values, a key, and an operator that
+ * relates the key and values.
+ *
+ * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecSelectorMatchExpressions
+ */
+export interface VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecSelectorMatchExpressions {
+  /**
+   * key is the label key that the selector applies to.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecSelectorMatchExpressions#key
+   */
+  readonly key: string;
+
+  /**
+   * operator represents a key's relationship to a set of values.
+   * Valid operators are In, NotIn, Exists and DoesNotExist.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecSelectorMatchExpressions#operator
+   */
+  readonly operator: string;
+
+  /**
+   * values is an array of string values. If the operator is In or NotIn,
+   * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+   * the values array must be empty. This array is replaced during a strategic
+   * merge patch.
+   *
+   * @schema VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecSelectorMatchExpressions#values
+   */
+  readonly values?: string[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecSelectorMatchExpressions' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecSelectorMatchExpressions(obj: VinylCacheV1Alpha1SpecVolumeClaimTemplatesSpecSelectorMatchExpressions | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'operator': obj.operator,
+    'values': obj.values?.map(y => y),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A node selector term, associated with the corresponding weight.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreference
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreference {
+  /**
+   * A list of node selector requirements by node's labels.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreference#matchExpressions
+   */
+  readonly matchExpressions?: VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressions[];
+
+  /**
+   * A list of node selector requirements by node's fields.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreference#matchFields
+   */
+  readonly matchFields?: VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFields[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreference' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreference(obj: VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreference | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'matchExpressions': obj.matchExpressions?.map(y => toJson_VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressions(y)),
+    'matchFields': obj.matchFields?.map(y => toJson_VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFields(y)),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A null or empty node selector term matches no objects. The requirements of
+ * them are ANDed.
+ * The TopologySelectorTerm type implements a subset of the NodeSelectorTerm.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTerms
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTerms {
+  /**
+   * A list of node selector requirements by node's labels.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTerms#matchExpressions
+   */
+  readonly matchExpressions?: VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressions[];
+
+  /**
+   * A list of node selector requirements by node's fields.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTerms#matchFields
+   */
+  readonly matchFields?: VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFields[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTerms' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTerms(obj: VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTerms | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'matchExpressions': obj.matchExpressions?.map(y => toJson_VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressions(y)),
+    'matchFields': obj.matchFields?.map(y => toJson_VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFields(y)),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Required. A pod affinity term, associated with the corresponding weight.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm {
+  /**
+   * A label query over a set of resources, in this case pods.
+   * If it's null, this PodAffinityTerm matches with no Pods.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm#labelSelector
+   */
+  readonly labelSelector?: VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector;
+
+  /**
+   * MatchLabelKeys is a set of pod label keys to select which pods will
+   * be taken into consideration. The keys are used to lookup values from the
+   * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+   * to select the group of existing pods which pods will be taken into consideration
+   * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+   * pod labels will be ignored. The default value is empty.
+   * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+   * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm#matchLabelKeys
+   */
+  readonly matchLabelKeys?: string[];
+
+  /**
+   * MismatchLabelKeys is a set of pod label keys to select which pods will
+   * be taken into consideration. The keys are used to lookup values from the
+   * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+   * to select the group of existing pods which pods will be taken into consideration
+   * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+   * pod labels will be ignored. The default value is empty.
+   * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+   * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm#mismatchLabelKeys
+   */
+  readonly mismatchLabelKeys?: string[];
+
+  /**
+   * A label query over the set of namespaces that the term applies to.
+   * The term is applied to the union of the namespaces selected by this field
+   * and the ones listed in the namespaces field.
+   * null selector and null or empty namespaces list means "this pod's namespace".
+   * An empty selector ({}) matches all namespaces.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm#namespaceSelector
+   */
+  readonly namespaceSelector?: VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector;
+
+  /**
+   * namespaces specifies a static list of namespace names that the term applies to.
+   * The term is applied to the union of the namespaces listed in this field
+   * and the ones selected by namespaceSelector.
+   * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm#namespaces
+   */
+  readonly namespaces?: string[];
+
+  /**
+   * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+   * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+   * whose value of the label with key topologyKey matches that of any node on which any of the
+   * selected pods is running.
+   * Empty topologyKey is not allowed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm#topologyKey
+   */
+  readonly topologyKey: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm(obj: VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'labelSelector': toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector(obj.labelSelector),
+    'matchLabelKeys': obj.matchLabelKeys?.map(y => y),
+    'mismatchLabelKeys': obj.mismatchLabelKeys?.map(y => y),
+    'namespaceSelector': toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector(obj.namespaceSelector),
+    'namespaces': obj.namespaces?.map(y => y),
+    'topologyKey': obj.topologyKey,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A label query over a set of resources, in this case pods.
+ * If it's null, this PodAffinityTerm matches with no Pods.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector {
+  /**
+   * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector#matchExpressions
+   */
+  readonly matchExpressions?: VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions[];
+
+  /**
+   * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+   * map is equivalent to an element of matchExpressions, whose key field is "key", the
+   * operator is "In", and the values array contains only "value". The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector#matchLabels
+   */
+  readonly matchLabels?: { [key: string]: string };
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector(obj: VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'matchExpressions': obj.matchExpressions?.map(y => toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions(y)),
+    'matchLabels': ((obj.matchLabels) === undefined) ? undefined : (Object.entries(obj.matchLabels).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A label query over the set of namespaces that the term applies to.
+ * The term is applied to the union of the namespaces selected by this field
+ * and the ones listed in the namespaces field.
+ * null selector and null or empty namespaces list means "this pod's namespace".
+ * An empty selector ({}) matches all namespaces.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector {
+  /**
+   * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector#matchExpressions
+   */
+  readonly matchExpressions?: VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions[];
+
+  /**
+   * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+   * map is equivalent to an element of matchExpressions, whose key field is "key", the
+   * operator is "In", and the values array contains only "value". The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector#matchLabels
+   */
+  readonly matchLabels?: { [key: string]: string };
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector(obj: VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'matchExpressions': obj.matchExpressions?.map(y => toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions(y)),
+    'matchLabels': ((obj.matchLabels) === undefined) ? undefined : (Object.entries(obj.matchLabels).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Required. A pod affinity term, associated with the corresponding weight.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm {
+  /**
+   * A label query over a set of resources, in this case pods.
+   * If it's null, this PodAffinityTerm matches with no Pods.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm#labelSelector
+   */
+  readonly labelSelector?: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector;
+
+  /**
+   * MatchLabelKeys is a set of pod label keys to select which pods will
+   * be taken into consideration. The keys are used to lookup values from the
+   * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+   * to select the group of existing pods which pods will be taken into consideration
+   * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+   * pod labels will be ignored. The default value is empty.
+   * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+   * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm#matchLabelKeys
+   */
+  readonly matchLabelKeys?: string[];
+
+  /**
+   * MismatchLabelKeys is a set of pod label keys to select which pods will
+   * be taken into consideration. The keys are used to lookup values from the
+   * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+   * to select the group of existing pods which pods will be taken into consideration
+   * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+   * pod labels will be ignored. The default value is empty.
+   * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+   * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm#mismatchLabelKeys
+   */
+  readonly mismatchLabelKeys?: string[];
+
+  /**
+   * A label query over the set of namespaces that the term applies to.
+   * The term is applied to the union of the namespaces selected by this field
+   * and the ones listed in the namespaces field.
+   * null selector and null or empty namespaces list means "this pod's namespace".
+   * An empty selector ({}) matches all namespaces.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm#namespaceSelector
+   */
+  readonly namespaceSelector?: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector;
+
+  /**
+   * namespaces specifies a static list of namespace names that the term applies to.
+   * The term is applied to the union of the namespaces listed in this field
+   * and the ones selected by namespaceSelector.
+   * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm#namespaces
+   */
+  readonly namespaces?: string[];
+
+  /**
+   * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+   * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+   * whose value of the label with key topologyKey matches that of any node on which any of the
+   * selected pods is running.
+   * Empty topologyKey is not allowed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm#topologyKey
+   */
+  readonly topologyKey: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm(obj: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'labelSelector': toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector(obj.labelSelector),
+    'matchLabelKeys': obj.matchLabelKeys?.map(y => y),
+    'mismatchLabelKeys': obj.mismatchLabelKeys?.map(y => y),
+    'namespaceSelector': toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector(obj.namespaceSelector),
+    'namespaces': obj.namespaces?.map(y => y),
+    'topologyKey': obj.topologyKey,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A label query over a set of resources, in this case pods.
+ * If it's null, this PodAffinityTerm matches with no Pods.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector {
+  /**
+   * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector#matchExpressions
+   */
+  readonly matchExpressions?: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions[];
+
+  /**
+   * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+   * map is equivalent to an element of matchExpressions, whose key field is "key", the
+   * operator is "In", and the values array contains only "value". The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector#matchLabels
+   */
+  readonly matchLabels?: { [key: string]: string };
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector(obj: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'matchExpressions': obj.matchExpressions?.map(y => toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions(y)),
+    'matchLabels': ((obj.matchLabels) === undefined) ? undefined : (Object.entries(obj.matchLabels).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A label query over the set of namespaces that the term applies to.
+ * The term is applied to the union of the namespaces selected by this field
+ * and the ones listed in the namespaces field.
+ * null selector and null or empty namespaces list means "this pod's namespace".
+ * An empty selector ({}) matches all namespaces.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector {
+  /**
+   * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector#matchExpressions
+   */
+  readonly matchExpressions?: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions[];
+
+  /**
+   * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+   * map is equivalent to an element of matchExpressions, whose key field is "key", the
+   * operator is "In", and the values array contains only "value". The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector#matchLabels
+   */
+  readonly matchLabels?: { [key: string]: string };
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector(obj: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'matchExpressions': obj.matchExpressions?.map(y => toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions(y)),
+    'matchLabels': ((obj.matchLabels) === undefined) ? undefined : (Object.entries(obj.matchLabels).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Specifies the output format of the exposed resources, defaults to "1"
+ *
+ * @schema VinylCacheV1Alpha1SpecPodEnvValueFromResourceFieldRefDivisor
+ */
+export class VinylCacheV1Alpha1SpecPodEnvValueFromResourceFieldRefDivisor {
+  public static fromNumber(value: number): VinylCacheV1Alpha1SpecPodEnvValueFromResourceFieldRefDivisor {
+    return new VinylCacheV1Alpha1SpecPodEnvValueFromResourceFieldRefDivisor(value);
+  }
+  public static fromString(value: string): VinylCacheV1Alpha1SpecPodEnvValueFromResourceFieldRefDivisor {
+    return new VinylCacheV1Alpha1SpecPodEnvValueFromResourceFieldRefDivisor(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * Required: Selects a field of the pod: only annotations, labels, name, namespace and uid are supported.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsFieldRef
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsFieldRef {
+  /**
+   * Version of the schema the FieldPath is written in terms of, defaults to "v1".
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsFieldRef#apiVersion
+   */
+  readonly apiVersion?: string;
+
+  /**
+   * Path of the field to select in the specified API version.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsFieldRef#fieldPath
+   */
+  readonly fieldPath: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsFieldRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsFieldRef(obj: VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsFieldRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'apiVersion': obj.apiVersion,
+    'fieldPath': obj.fieldPath,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Selects a resource of the container: only resources limits and requests
+ * (limits.cpu, limits.memory, requests.cpu and requests.memory) are currently supported.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsResourceFieldRef
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsResourceFieldRef {
+  /**
+   * Container name: required for volumes, optional for env vars
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsResourceFieldRef#containerName
+   */
+  readonly containerName?: string;
+
+  /**
+   * Specifies the output format of the exposed resources, defaults to "1"
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsResourceFieldRef#divisor
+   */
+  readonly divisor?: VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsResourceFieldRefDivisor;
+
+  /**
+   * Required: resource to select
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsResourceFieldRef#resource
+   */
+  readonly resource: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsResourceFieldRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsResourceFieldRef(obj: VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsResourceFieldRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'containerName': obj.containerName,
+    'divisor': obj.divisor?.value,
+    'resource': obj.resource,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * The specification for the PersistentVolumeClaim. The entire content is
+ * copied unchanged into the PVC that gets created from this
+ * template. The same fields as in a PersistentVolumeClaim
+ * are also valid here.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpec
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpec {
+  /**
+   * accessModes contains the desired access modes the volume should have.
+   * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpec#accessModes
+   */
+  readonly accessModes?: string[];
+
+  /**
+   * dataSource field can be used to specify either:
+   * * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot)
+   * * An existing PVC (PersistentVolumeClaim)
+   * If the provisioner or an external controller can support the specified data source,
+   * it will create a new volume based on the contents of the specified data source.
+   * When the AnyVolumeDataSource feature gate is enabled, dataSource contents will be copied to dataSourceRef,
+   * and dataSourceRef contents will be copied to dataSource when dataSourceRef.namespace is not specified.
+   * If the namespace is specified, then dataSourceRef will not be copied to dataSource.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpec#dataSource
+   */
+  readonly dataSource?: VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSource;
+
+  /**
+   * dataSourceRef specifies the object from which to populate the volume with data, if a non-empty
+   * volume is desired. This may be any object from a non-empty API group (non
+   * core object) or a PersistentVolumeClaim object.
+   * When this field is specified, volume binding will only succeed if the type of
+   * the specified object matches some installed volume populator or dynamic
+   * provisioner.
+   * This field will replace the functionality of the dataSource field and as such
+   * if both fields are non-empty, they must have the same value. For backwards
+   * compatibility, when namespace isn't specified in dataSourceRef,
+   * both fields (dataSource and dataSourceRef) will be set to the same
+   * value automatically if one of them is empty and the other is non-empty.
+   * When namespace is specified in dataSourceRef,
+   * dataSource isn't set to the same value and must be empty.
+   * There are three important differences between dataSource and dataSourceRef:
+   * * While dataSource only allows two specific types of objects, dataSourceRef
+   * allows any non-core object, as well as PersistentVolumeClaim objects.
+   * * While dataSource ignores disallowed values (dropping them), dataSourceRef
+   * preserves all values, and generates an error if a disallowed value is
+   * specified.
+   * * While dataSource only allows local objects, dataSourceRef allows objects
+   * in any namespaces.
+   * (Beta) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
+   * (Alpha) Using the namespace field of dataSourceRef requires the CrossNamespaceVolumeDataSource feature gate to be enabled.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpec#dataSourceRef
+   */
+  readonly dataSourceRef?: VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSourceRef;
+
+  /**
+   * resources represents the minimum resources the volume should have.
+   * Users are allowed to specify resource requirements
+   * that are lower than previous value but must still be higher than capacity recorded in the
+   * status field of the claim.
+   * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpec#resources
+   */
+  readonly resources?: VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResources;
+
+  /**
+   * selector is a label query over volumes to consider for binding.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpec#selector
+   */
+  readonly selector?: VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecSelector;
+
+  /**
+   * storageClassName is the name of the StorageClass required by the claim.
+   * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpec#storageClassName
+   */
+  readonly storageClassName?: string;
+
+  /**
+   * volumeAttributesClassName may be used to set the VolumeAttributesClass used by this claim.
+   * If specified, the CSI driver will create or update the volume with the attributes defined
+   * in the corresponding VolumeAttributesClass. This has a different purpose than storageClassName,
+   * it can be changed after the claim is created. An empty string or nil value indicates that no
+   * VolumeAttributesClass will be applied to the claim. If the claim enters an Infeasible error state,
+   * this field can be reset to its previous value (including nil) to cancel the modification.
+   * If the resource referred to by volumeAttributesClass does not exist, this PersistentVolumeClaim will be
+   * set to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource
+   * exists.
+   * More info: https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpec#volumeAttributesClassName
+   */
+  readonly volumeAttributesClassName?: string;
+
+  /**
+   * volumeMode defines what type of volume is required by the claim.
+   * Value of Filesystem is implied when not included in claim spec.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpec#volumeMode
+   */
+  readonly volumeMode?: string;
+
+  /**
+   * volumeName is the binding reference to the PersistentVolume backing this claim.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpec#volumeName
+   */
+  readonly volumeName?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpec' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpec(obj: VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpec | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'accessModes': obj.accessModes?.map(y => y),
+    'dataSource': toJson_VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSource(obj.dataSource),
+    'dataSourceRef': toJson_VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSourceRef(obj.dataSourceRef),
+    'resources': toJson_VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResources(obj.resources),
+    'selector': toJson_VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecSelector(obj.selector),
+    'storageClassName': obj.storageClassName,
+    'volumeAttributesClassName': obj.volumeAttributesClassName,
+    'volumeMode': obj.volumeMode,
+    'volumeName': obj.volumeName,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * ClusterTrustBundle allows a pod to access the `.spec.trustBundle` field
+ * of ClusterTrustBundle objects in an auto-updating file.
+ *
+ * Alpha, gated by the ClusterTrustBundleProjection feature gate.
+ *
+ * ClusterTrustBundle objects can either be selected by name, or by the
+ * combination of signer name and a label selector.
+ *
+ * Kubelet performs aggressive normalization of the PEM contents written
+ * into the pod filesystem.  Esoteric PEM features such as inter-block
+ * comments and block headers are stripped.  Certificates are deduplicated.
+ * The ordering of certificates within the file is arbitrary, and Kubelet
+ * may change the order over time.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundle
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundle {
+  /**
+   * Select all ClusterTrustBundles that match this label selector.  Only has
+   * effect if signerName is set.  Mutually-exclusive with name.  If unset,
+   * interpreted as "match nothing".  If set but empty, interpreted as "match
+   * everything".
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundle#labelSelector
+   */
+  readonly labelSelector?: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundleLabelSelector;
+
+  /**
+   * Select a single ClusterTrustBundle by object name.  Mutually-exclusive
+   * with signerName and labelSelector.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundle#name
+   */
+  readonly name?: string;
+
+  /**
+   * If true, don't block pod startup if the referenced ClusterTrustBundle(s)
+   * aren't available.  If using name, then the named ClusterTrustBundle is
+   * allowed not to exist.  If using signerName, then the combination of
+   * signerName and labelSelector is allowed to match zero
+   * ClusterTrustBundles.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundle#optional
+   */
+  readonly optional?: boolean;
+
+  /**
+   * Relative path from the volume root to write the bundle.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundle#path
+   */
+  readonly path: string;
+
+  /**
+   * Select all ClusterTrustBundles that match this signer name.
+   * Mutually-exclusive with name.  The contents of all selected
+   * ClusterTrustBundles will be unified and deduplicated.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundle#signerName
+   */
+  readonly signerName?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundle' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundle(obj: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundle | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'labelSelector': toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundleLabelSelector(obj.labelSelector),
+    'name': obj.name,
+    'optional': obj.optional,
+    'path': obj.path,
+    'signerName': obj.signerName,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * configMap information about the configMap data to project
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesConfigMap
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesConfigMap {
+  /**
+   * items if unspecified, each key-value pair in the Data field of the referenced
+   * ConfigMap will be projected into the volume as a file whose name is the
+   * key and content is the value. If specified, the listed keys will be
+   * projected into the specified paths, and unlisted keys will not be
+   * present. If a key is specified which is not present in the ConfigMap,
+   * the volume setup will error unless it is marked optional. Paths must be
+   * relative and may not contain the '..' path or start with '..'.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesConfigMap#items
+   */
+  readonly items?: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesConfigMapItems[];
+
+  /**
+   * Name of the referent.
+   * This field is effectively required, but due to backwards compatibility is
+   * allowed to be empty. Instances of this type with an empty value here are
+   * almost certainly wrong.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesConfigMap#name
+   */
+  readonly name?: string;
+
+  /**
+   * optional specify whether the ConfigMap or its keys must be defined
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesConfigMap#optional
+   */
+  readonly optional?: boolean;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesConfigMap' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesConfigMap(obj: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesConfigMap | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'items': obj.items?.map(y => toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesConfigMapItems(y)),
+    'name': obj.name,
+    'optional': obj.optional,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * downwardAPI information about the downwardAPI data to project
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApi
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApi {
+  /**
+   * Items is a list of DownwardAPIVolume file
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApi#items
+   */
+  readonly items?: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItems[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApi' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApi(obj: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApi | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'items': obj.items?.map(y => toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItems(y)),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Projects an auto-rotating credential bundle (private key and certificate
+ * chain) that the pod can use either as a TLS client or server.
+ *
+ * Kubelet generates a private key and uses it to send a
+ * PodCertificateRequest to the named signer.  Once the signer approves the
+ * request and issues a certificate chain, Kubelet writes the key and
+ * certificate chain to the pod filesystem.  The pod does not start until
+ * certificates have been issued for each podCertificate projected volume
+ * source in its spec.
+ *
+ * Kubelet will begin trying to rotate the certificate at the time indicated
+ * by the signer using the PodCertificateRequest.Status.BeginRefreshAt
+ * timestamp.
+ *
+ * Kubelet can write a single file, indicated by the credentialBundlePath
+ * field, or separate files, indicated by the keyPath and
+ * certificateChainPath fields.
+ *
+ * The credential bundle is a single file in PEM format.  The first PEM
+ * entry is the private key (in PKCS#8 format), and the remaining PEM
+ * entries are the certificate chain issued by the signer (typically,
+ * signers will return their certificate chain in leaf-to-root order).
+ *
+ * Prefer using the credential bundle format, since your application code
+ * can read it atomically.  If you use keyPath and certificateChainPath,
+ * your application must make two separate file reads. If these coincide
+ * with a certificate rotation, it is possible that the private key and leaf
+ * certificate you read may not correspond to each other.  Your application
+ * will need to check for this condition, and re-read until they are
+ * consistent.
+ *
+ * The named signer controls chooses the format of the certificate it
+ * issues; consult the signer implementation's documentation to learn how to
+ * use the certificates it issues.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesPodCertificate
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesPodCertificate {
+  /**
+   * Write the certificate chain at this path in the projected volume.
+   *
+   * Most applications should use credentialBundlePath.  When using keyPath
+   * and certificateChainPath, your application needs to check that the key
+   * and leaf certificate are consistent, because it is possible to read the
+   * files mid-rotation.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesPodCertificate#certificateChainPath
+   */
+  readonly certificateChainPath?: string;
+
+  /**
+   * Write the credential bundle at this path in the projected volume.
+   *
+   * The credential bundle is a single file that contains multiple PEM blocks.
+   * The first PEM block is a PRIVATE KEY block, containing a PKCS#8 private
+   * key.
+   *
+   * The remaining blocks are CERTIFICATE blocks, containing the issued
+   * certificate chain from the signer (leaf and any intermediates).
+   *
+   * Using credentialBundlePath lets your Pod's application code make a single
+   * atomic read that retrieves a consistent key and certificate chain.  If you
+   * project them to separate files, your application code will need to
+   * additionally check that the leaf certificate was issued to the key.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesPodCertificate#credentialBundlePath
+   */
+  readonly credentialBundlePath?: string;
+
+  /**
+   * Write the key at this path in the projected volume.
+   *
+   * Most applications should use credentialBundlePath.  When using keyPath
+   * and certificateChainPath, your application needs to check that the key
+   * and leaf certificate are consistent, because it is possible to read the
+   * files mid-rotation.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesPodCertificate#keyPath
+   */
+  readonly keyPath?: string;
+
+  /**
+   * The type of keypair Kubelet will generate for the pod.
+   *
+   * Valid values are "RSA3072", "RSA4096", "ECDSAP256", "ECDSAP384",
+   * "ECDSAP521", and "ED25519".
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesPodCertificate#keyType
+   */
+  readonly keyType: string;
+
+  /**
+   * maxExpirationSeconds is the maximum lifetime permitted for the
+   * certificate.
+   *
+   * Kubelet copies this value verbatim into the PodCertificateRequests it
+   * generates for this projection.
+   *
+   * If omitted, kube-apiserver will set it to 86400(24 hours). kube-apiserver
+   * will reject values shorter than 3600 (1 hour).  The maximum allowable
+   * value is 7862400 (91 days).
+   *
+   * The signer implementation is then free to issue a certificate with any
+   * lifetime *shorter* than MaxExpirationSeconds, but no shorter than 3600
+   * seconds (1 hour).  This constraint is enforced by kube-apiserver.
+   * `kubernetes.io` signers will never issue certificates with a lifetime
+   * longer than 24 hours.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesPodCertificate#maxExpirationSeconds
+   */
+  readonly maxExpirationSeconds?: number;
+
+  /**
+   * Kubelet's generated CSRs will be addressed to this signer.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesPodCertificate#signerName
+   */
+  readonly signerName: string;
+
+  /**
+   * userAnnotations allow pod authors to pass additional information to
+   * the signer implementation.  Kubernetes does not restrict or validate this
+   * metadata in any way.
+   *
+   * These values are copied verbatim into the `spec.unverifiedUserAnnotations` field of
+   * the PodCertificateRequest objects that Kubelet creates.
+   *
+   * Entries are subject to the same validation as object metadata annotations,
+   * with the addition that all keys must be domain-prefixed. No restrictions
+   * are placed on values, except an overall size limitation on the entire field.
+   *
+   * Signers should document the keys and values they support. Signers should
+   * deny requests that contain keys they do not recognize.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesPodCertificate#userAnnotations
+   */
+  readonly userAnnotations?: { [key: string]: string };
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesPodCertificate' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesPodCertificate(obj: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesPodCertificate | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'certificateChainPath': obj.certificateChainPath,
+    'credentialBundlePath': obj.credentialBundlePath,
+    'keyPath': obj.keyPath,
+    'keyType': obj.keyType,
+    'maxExpirationSeconds': obj.maxExpirationSeconds,
+    'signerName': obj.signerName,
+    'userAnnotations': ((obj.userAnnotations) === undefined) ? undefined : (Object.entries(obj.userAnnotations).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * secret information about the secret data to project
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesSecret
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesSecret {
+  /**
+   * items if unspecified, each key-value pair in the Data field of the referenced
+   * Secret will be projected into the volume as a file whose name is the
+   * key and content is the value. If specified, the listed keys will be
+   * projected into the specified paths, and unlisted keys will not be
+   * present. If a key is specified which is not present in the Secret,
+   * the volume setup will error unless it is marked optional. Paths must be
+   * relative and may not contain the '..' path or start with '..'.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesSecret#items
+   */
+  readonly items?: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesSecretItems[];
+
+  /**
+   * Name of the referent.
+   * This field is effectively required, but due to backwards compatibility is
+   * allowed to be empty. Instances of this type with an empty value here are
+   * almost certainly wrong.
+   * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesSecret#name
+   */
+  readonly name?: string;
+
+  /**
+   * optional field specify whether the Secret or its key must be defined
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesSecret#optional
+   */
+  readonly optional?: boolean;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesSecret' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesSecret(obj: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesSecret | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'items': obj.items?.map(y => toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesSecretItems(y)),
+    'name': obj.name,
+    'optional': obj.optional,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * serviceAccountToken is information about the serviceAccountToken data to project
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesServiceAccountToken
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesServiceAccountToken {
+  /**
+   * audience is the intended audience of the token. A recipient of a token
+   * must identify itself with an identifier specified in the audience of the
+   * token, and otherwise should reject the token. The audience defaults to the
+   * identifier of the apiserver.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesServiceAccountToken#audience
+   */
+  readonly audience?: string;
+
+  /**
+   * expirationSeconds is the requested duration of validity of the service
+   * account token. As the token approaches expiration, the kubelet volume
+   * plugin will proactively rotate the service account token. The kubelet will
+   * start trying to rotate the token if the token is older than 80 percent of
+   * its time to live or if the token is older than 24 hours.Defaults to 1 hour
+   * and must be at least 10 minutes.
+   *
+   * @default 1 hour
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesServiceAccountToken#expirationSeconds
+   */
+  readonly expirationSeconds?: number;
+
+  /**
+   * path is the path relative to the mount point of the file to project the
+   * token into.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesServiceAccountToken#path
+   */
+  readonly path: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesServiceAccountToken' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesServiceAccountToken(obj: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesServiceAccountToken | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'audience': obj.audience,
+    'expirationSeconds': obj.expirationSeconds,
+    'path': obj.path,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A node selector requirement is a selector that contains values, a key, and an operator
+ * that relates the key and values.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressions
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressions {
+  /**
+   * The label key that the selector applies to.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressions#key
+   */
+  readonly key: string;
+
+  /**
+   * Represents a key's relationship to a set of values.
+   * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressions#operator
+   */
+  readonly operator: string;
+
+  /**
+   * An array of string values. If the operator is In or NotIn,
+   * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+   * the values array must be empty. If the operator is Gt or Lt, the values
+   * array must have a single element, which will be interpreted as an integer.
+   * This array is replaced during a strategic merge patch.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressions#values
+   */
+  readonly values?: string[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressions' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressions(obj: VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressions | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'operator': obj.operator,
+    'values': obj.values?.map(y => y),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A node selector requirement is a selector that contains values, a key, and an operator
+ * that relates the key and values.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFields
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFields {
+  /**
+   * The label key that the selector applies to.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFields#key
+   */
+  readonly key: string;
+
+  /**
+   * Represents a key's relationship to a set of values.
+   * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFields#operator
+   */
+  readonly operator: string;
+
+  /**
+   * An array of string values. If the operator is In or NotIn,
+   * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+   * the values array must be empty. If the operator is Gt or Lt, the values
+   * array must have a single element, which will be interpreted as an integer.
+   * This array is replaced during a strategic merge patch.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFields#values
+   */
+  readonly values?: string[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFields' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFields(obj: VinylCacheV1Alpha1SpecPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFields | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'operator': obj.operator,
+    'values': obj.values?.map(y => y),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A node selector requirement is a selector that contains values, a key, and an operator
+ * that relates the key and values.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressions
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressions {
+  /**
+   * The label key that the selector applies to.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressions#key
+   */
+  readonly key: string;
+
+  /**
+   * Represents a key's relationship to a set of values.
+   * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressions#operator
+   */
+  readonly operator: string;
+
+  /**
+   * An array of string values. If the operator is In or NotIn,
+   * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+   * the values array must be empty. If the operator is Gt or Lt, the values
+   * array must have a single element, which will be interpreted as an integer.
+   * This array is replaced during a strategic merge patch.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressions#values
+   */
+  readonly values?: string[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressions' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressions(obj: VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressions | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'operator': obj.operator,
+    'values': obj.values?.map(y => y),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A node selector requirement is a selector that contains values, a key, and an operator
+ * that relates the key and values.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFields
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFields {
+  /**
+   * The label key that the selector applies to.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFields#key
+   */
+  readonly key: string;
+
+  /**
+   * Represents a key's relationship to a set of values.
+   * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFields#operator
+   */
+  readonly operator: string;
+
+  /**
+   * An array of string values. If the operator is In or NotIn,
+   * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+   * the values array must be empty. If the operator is Gt or Lt, the values
+   * array must have a single element, which will be interpreted as an integer.
+   * This array is replaced during a strategic merge patch.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFields#values
+   */
+  readonly values?: string[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFields' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFields(obj: VinylCacheV1Alpha1SpecPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFields | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'operator': obj.operator,
+    'values': obj.values?.map(y => y),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A label query over a set of resources, in this case pods.
+ * If it's null, this PodAffinityTerm matches with no Pods.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector {
+  /**
+   * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector#matchExpressions
+   */
+  readonly matchExpressions?: VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions[];
+
+  /**
+   * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+   * map is equivalent to an element of matchExpressions, whose key field is "key", the
+   * operator is "In", and the values array contains only "value". The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector#matchLabels
+   */
+  readonly matchLabels?: { [key: string]: string };
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector(obj: VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'matchExpressions': obj.matchExpressions?.map(y => toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions(y)),
+    'matchLabels': ((obj.matchLabels) === undefined) ? undefined : (Object.entries(obj.matchLabels).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A label query over the set of namespaces that the term applies to.
+ * The term is applied to the union of the namespaces selected by this field
+ * and the ones listed in the namespaces field.
+ * null selector and null or empty namespaces list means "this pod's namespace".
+ * An empty selector ({}) matches all namespaces.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector {
+  /**
+   * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector#matchExpressions
+   */
+  readonly matchExpressions?: VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions[];
+
+  /**
+   * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+   * map is equivalent to an element of matchExpressions, whose key field is "key", the
+   * operator is "In", and the values array contains only "value". The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector#matchLabels
+   */
+  readonly matchLabels?: { [key: string]: string };
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector(obj: VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'matchExpressions': obj.matchExpressions?.map(y => toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions(y)),
+    'matchLabels': ((obj.matchLabels) === undefined) ? undefined : (Object.entries(obj.matchLabels).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A label selector requirement is a selector that contains values, a key, and an operator that
+ * relates the key and values.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions {
+  /**
+   * key is the label key that the selector applies to.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions#key
+   */
+  readonly key: string;
+
+  /**
+   * operator represents a key's relationship to a set of values.
+   * Valid operators are In, NotIn, Exists and DoesNotExist.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions#operator
+   */
+  readonly operator: string;
+
+  /**
+   * values is an array of string values. If the operator is In or NotIn,
+   * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+   * the values array must be empty. This array is replaced during a strategic
+   * merge patch.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions#values
+   */
+  readonly values?: string[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions(obj: VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'operator': obj.operator,
+    'values': obj.values?.map(y => y),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A label selector requirement is a selector that contains values, a key, and an operator that
+ * relates the key and values.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions {
+  /**
+   * key is the label key that the selector applies to.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions#key
+   */
+  readonly key: string;
+
+  /**
+   * operator represents a key's relationship to a set of values.
+   * Valid operators are In, NotIn, Exists and DoesNotExist.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions#operator
+   */
+  readonly operator: string;
+
+  /**
+   * values is an array of string values. If the operator is In or NotIn,
+   * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+   * the values array must be empty. This array is replaced during a strategic
+   * merge patch.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions#values
+   */
+  readonly values?: string[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions(obj: VinylCacheV1Alpha1SpecPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'operator': obj.operator,
+    'values': obj.values?.map(y => y),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A label query over a set of resources, in this case pods.
+ * If it's null, this PodAffinityTerm matches with no Pods.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector {
+  /**
+   * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector#matchExpressions
+   */
+  readonly matchExpressions?: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions[];
+
+  /**
+   * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+   * map is equivalent to an element of matchExpressions, whose key field is "key", the
+   * operator is "In", and the values array contains only "value". The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector#matchLabels
+   */
+  readonly matchLabels?: { [key: string]: string };
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector(obj: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'matchExpressions': obj.matchExpressions?.map(y => toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions(y)),
+    'matchLabels': ((obj.matchLabels) === undefined) ? undefined : (Object.entries(obj.matchLabels).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A label query over the set of namespaces that the term applies to.
+ * The term is applied to the union of the namespaces selected by this field
+ * and the ones listed in the namespaces field.
+ * null selector and null or empty namespaces list means "this pod's namespace".
+ * An empty selector ({}) matches all namespaces.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector {
+  /**
+   * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector#matchExpressions
+   */
+  readonly matchExpressions?: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions[];
+
+  /**
+   * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+   * map is equivalent to an element of matchExpressions, whose key field is "key", the
+   * operator is "In", and the values array contains only "value". The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector#matchLabels
+   */
+  readonly matchLabels?: { [key: string]: string };
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector(obj: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'matchExpressions': obj.matchExpressions?.map(y => toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions(y)),
+    'matchLabels': ((obj.matchLabels) === undefined) ? undefined : (Object.entries(obj.matchLabels).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A label selector requirement is a selector that contains values, a key, and an operator that
+ * relates the key and values.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions {
+  /**
+   * key is the label key that the selector applies to.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions#key
+   */
+  readonly key: string;
+
+  /**
+   * operator represents a key's relationship to a set of values.
+   * Valid operators are In, NotIn, Exists and DoesNotExist.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions#operator
+   */
+  readonly operator: string;
+
+  /**
+   * values is an array of string values. If the operator is In or NotIn,
+   * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+   * the values array must be empty. This array is replaced during a strategic
+   * merge patch.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions#values
+   */
+  readonly values?: string[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions(obj: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'operator': obj.operator,
+    'values': obj.values?.map(y => y),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A label selector requirement is a selector that contains values, a key, and an operator that
+ * relates the key and values.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions {
+  /**
+   * key is the label key that the selector applies to.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions#key
+   */
+  readonly key: string;
+
+  /**
+   * operator represents a key's relationship to a set of values.
+   * Valid operators are In, NotIn, Exists and DoesNotExist.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions#operator
+   */
+  readonly operator: string;
+
+  /**
+   * values is an array of string values. If the operator is In or NotIn,
+   * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+   * the values array must be empty. This array is replaced during a strategic
+   * merge patch.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions#values
+   */
+  readonly values?: string[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions(obj: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'operator': obj.operator,
+    'values': obj.values?.map(y => y),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Specifies the output format of the exposed resources, defaults to "1"
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsResourceFieldRefDivisor
+ */
+export class VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsResourceFieldRefDivisor {
+  public static fromNumber(value: number): VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsResourceFieldRefDivisor {
+    return new VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsResourceFieldRefDivisor(value);
+  }
+  public static fromString(value: string): VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsResourceFieldRefDivisor {
+    return new VinylCacheV1Alpha1SpecPodVolumesDownwardApiItemsResourceFieldRefDivisor(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * dataSource field can be used to specify either:
+ * * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot)
+ * * An existing PVC (PersistentVolumeClaim)
+ * If the provisioner or an external controller can support the specified data source,
+ * it will create a new volume based on the contents of the specified data source.
+ * When the AnyVolumeDataSource feature gate is enabled, dataSource contents will be copied to dataSourceRef,
+ * and dataSourceRef contents will be copied to dataSource when dataSourceRef.namespace is not specified.
+ * If the namespace is specified, then dataSourceRef will not be copied to dataSource.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSource
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSource {
+  /**
+   * APIGroup is the group for the resource being referenced.
+   * If APIGroup is not specified, the specified Kind must be in the core API group.
+   * For any other third-party types, APIGroup is required.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSource#apiGroup
+   */
+  readonly apiGroup?: string;
+
+  /**
+   * Kind is the type of resource being referenced
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSource#kind
+   */
+  readonly kind: string;
+
+  /**
+   * Name is the name of resource being referenced
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSource#name
+   */
+  readonly name: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSource' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSource(obj: VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSource | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'apiGroup': obj.apiGroup,
+    'kind': obj.kind,
+    'name': obj.name,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * dataSourceRef specifies the object from which to populate the volume with data, if a non-empty
+ * volume is desired. This may be any object from a non-empty API group (non
+ * core object) or a PersistentVolumeClaim object.
+ * When this field is specified, volume binding will only succeed if the type of
+ * the specified object matches some installed volume populator or dynamic
+ * provisioner.
+ * This field will replace the functionality of the dataSource field and as such
+ * if both fields are non-empty, they must have the same value. For backwards
+ * compatibility, when namespace isn't specified in dataSourceRef,
+ * both fields (dataSource and dataSourceRef) will be set to the same
+ * value automatically if one of them is empty and the other is non-empty.
+ * When namespace is specified in dataSourceRef,
+ * dataSource isn't set to the same value and must be empty.
+ * There are three important differences between dataSource and dataSourceRef:
+ * * While dataSource only allows two specific types of objects, dataSourceRef
+ * allows any non-core object, as well as PersistentVolumeClaim objects.
+ * * While dataSource ignores disallowed values (dropping them), dataSourceRef
+ * preserves all values, and generates an error if a disallowed value is
+ * specified.
+ * * While dataSource only allows local objects, dataSourceRef allows objects
+ * in any namespaces.
+ * (Beta) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
+ * (Alpha) Using the namespace field of dataSourceRef requires the CrossNamespaceVolumeDataSource feature gate to be enabled.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSourceRef
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSourceRef {
+  /**
+   * APIGroup is the group for the resource being referenced.
+   * If APIGroup is not specified, the specified Kind must be in the core API group.
+   * For any other third-party types, APIGroup is required.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSourceRef#apiGroup
+   */
+  readonly apiGroup?: string;
+
+  /**
+   * Kind is the type of resource being referenced
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSourceRef#kind
+   */
+  readonly kind: string;
+
+  /**
+   * Name is the name of resource being referenced
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSourceRef#name
+   */
+  readonly name: string;
+
+  /**
+   * Namespace is the namespace of resource being referenced
+   * Note that when a namespace is specified, a gateway.networking.k8s.io/ReferenceGrant object is required in the referent namespace to allow that namespace's owner to accept the reference. See the ReferenceGrant documentation for details.
+   * (Alpha) This field requires the CrossNamespaceVolumeDataSource feature gate to be enabled.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSourceRef#namespace
+   */
+  readonly namespace?: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSourceRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSourceRef(obj: VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecDataSourceRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'apiGroup': obj.apiGroup,
+    'kind': obj.kind,
+    'name': obj.name,
+    'namespace': obj.namespace,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * resources represents the minimum resources the volume should have.
+ * Users are allowed to specify resource requirements
+ * that are lower than previous value but must still be higher than capacity recorded in the
+ * status field of the claim.
+ * More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResources
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResources {
+  /**
+   * Limits describes the maximum amount of compute resources allowed.
+   * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResources#limits
+   */
+  readonly limits?: { [key: string]: VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResourcesLimits };
+
+  /**
+   * Requests describes the minimum amount of compute resources required.
+   * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+   * otherwise to an implementation-defined value. Requests cannot exceed Limits.
+   * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResources#requests
+   */
+  readonly requests?: { [key: string]: VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResourcesRequests };
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResources' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResources(obj: VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResources | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'limits': ((obj.limits) === undefined) ? undefined : (Object.entries(obj.limits).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+    'requests': ((obj.requests) === undefined) ? undefined : (Object.entries(obj.requests).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * selector is a label query over volumes to consider for binding.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecSelector
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecSelector {
+  /**
+   * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecSelector#matchExpressions
+   */
+  readonly matchExpressions?: VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecSelectorMatchExpressions[];
+
+  /**
+   * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+   * map is equivalent to an element of matchExpressions, whose key field is "key", the
+   * operator is "In", and the values array contains only "value". The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecSelector#matchLabels
+   */
+  readonly matchLabels?: { [key: string]: string };
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecSelector' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecSelector(obj: VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecSelector | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'matchExpressions': obj.matchExpressions?.map(y => toJson_VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecSelectorMatchExpressions(y)),
+    'matchLabels': ((obj.matchLabels) === undefined) ? undefined : (Object.entries(obj.matchLabels).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Select all ClusterTrustBundles that match this label selector.  Only has
+ * effect if signerName is set.  Mutually-exclusive with name.  If unset,
+ * interpreted as "match nothing".  If set but empty, interpreted as "match
+ * everything".
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundleLabelSelector
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundleLabelSelector {
+  /**
+   * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundleLabelSelector#matchExpressions
+   */
+  readonly matchExpressions?: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundleLabelSelectorMatchExpressions[];
+
+  /**
+   * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+   * map is equivalent to an element of matchExpressions, whose key field is "key", the
+   * operator is "In", and the values array contains only "value". The requirements are ANDed.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundleLabelSelector#matchLabels
+   */
+  readonly matchLabels?: { [key: string]: string };
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundleLabelSelector' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundleLabelSelector(obj: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundleLabelSelector | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'matchExpressions': obj.matchExpressions?.map(y => toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundleLabelSelectorMatchExpressions(y)),
+    'matchLabels': ((obj.matchLabels) === undefined) ? undefined : (Object.entries(obj.matchLabels).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Maps a string key to a path within a volume.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesConfigMapItems
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesConfigMapItems {
+  /**
+   * key is the key to project.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesConfigMapItems#key
+   */
+  readonly key: string;
+
+  /**
+   * mode is Optional: mode bits used to set permissions on this file.
+   * Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
+   * YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
+   * If not specified, the volume defaultMode will be used.
+   * This might be in conflict with other options that affect the file
+   * mode, like fsGroup, and the result can be other mode bits set.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesConfigMapItems#mode
+   */
+  readonly mode?: number;
+
+  /**
+   * path is the relative path of the file to map the key to.
+   * May not be an absolute path.
+   * May not contain the path element '..'.
+   * May not start with the string '..'.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesConfigMapItems#path
+   */
+  readonly path: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesConfigMapItems' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesConfigMapItems(obj: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesConfigMapItems | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'mode': obj.mode,
+    'path': obj.path,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * DownwardAPIVolumeFile represents information to create the file containing the pod field
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItems
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItems {
+  /**
+   * Required: Selects a field of the pod: only annotations, labels, name, namespace and uid are supported.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItems#fieldRef
+   */
+  readonly fieldRef?: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsFieldRef;
+
+  /**
+   * Optional: mode bits used to set permissions on this file, must be an octal value
+   * between 0000 and 0777 or a decimal value between 0 and 511.
+   * YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
+   * If not specified, the volume defaultMode will be used.
+   * This might be in conflict with other options that affect the file
+   * mode, like fsGroup, and the result can be other mode bits set.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItems#mode
+   */
+  readonly mode?: number;
+
+  /**
+   * Required: Path is  the relative path name of the file to be created. Must not be absolute or contain the '..' path. Must be utf-8 encoded. The first item of the relative path must not start with '..'
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItems#path
+   */
+  readonly path: string;
+
+  /**
+   * Selects a resource of the container: only resources limits and requests
+   * (limits.cpu, limits.memory, requests.cpu and requests.memory) are currently supported.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItems#resourceFieldRef
+   */
+  readonly resourceFieldRef?: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsResourceFieldRef;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItems' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItems(obj: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItems | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'fieldRef': toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsFieldRef(obj.fieldRef),
+    'mode': obj.mode,
+    'path': obj.path,
+    'resourceFieldRef': toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsResourceFieldRef(obj.resourceFieldRef),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Maps a string key to a path within a volume.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesSecretItems
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesSecretItems {
+  /**
+   * key is the key to project.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesSecretItems#key
+   */
+  readonly key: string;
+
+  /**
+   * mode is Optional: mode bits used to set permissions on this file.
+   * Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
+   * YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
+   * If not specified, the volume defaultMode will be used.
+   * This might be in conflict with other options that affect the file
+   * mode, like fsGroup, and the result can be other mode bits set.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesSecretItems#mode
+   */
+  readonly mode?: number;
+
+  /**
+   * path is the relative path of the file to map the key to.
+   * May not be an absolute path.
+   * May not contain the path element '..'.
+   * May not start with the string '..'.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesSecretItems#path
+   */
+  readonly path: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesSecretItems' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesSecretItems(obj: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesSecretItems | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'mode': obj.mode,
+    'path': obj.path,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A label selector requirement is a selector that contains values, a key, and an operator that
+ * relates the key and values.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions {
+  /**
+   * key is the label key that the selector applies to.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions#key
+   */
+  readonly key: string;
+
+  /**
+   * operator represents a key's relationship to a set of values.
+   * Valid operators are In, NotIn, Exists and DoesNotExist.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions#operator
+   */
+  readonly operator: string;
+
+  /**
+   * values is an array of string values. If the operator is In or NotIn,
+   * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+   * the values array must be empty. This array is replaced during a strategic
+   * merge patch.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions#values
+   */
+  readonly values?: string[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions(obj: VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'operator': obj.operator,
+    'values': obj.values?.map(y => y),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A label selector requirement is a selector that contains values, a key, and an operator that
+ * relates the key and values.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions {
+  /**
+   * key is the label key that the selector applies to.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions#key
+   */
+  readonly key: string;
+
+  /**
+   * operator represents a key's relationship to a set of values.
+   * Valid operators are In, NotIn, Exists and DoesNotExist.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions#operator
+   */
+  readonly operator: string;
+
+  /**
+   * values is an array of string values. If the operator is In or NotIn,
+   * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+   * the values array must be empty. This array is replaced during a strategic
+   * merge patch.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions#values
+   */
+  readonly values?: string[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions(obj: VinylCacheV1Alpha1SpecPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'operator': obj.operator,
+    'values': obj.values?.map(y => y),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A label selector requirement is a selector that contains values, a key, and an operator that
+ * relates the key and values.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions {
+  /**
+   * key is the label key that the selector applies to.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions#key
+   */
+  readonly key: string;
+
+  /**
+   * operator represents a key's relationship to a set of values.
+   * Valid operators are In, NotIn, Exists and DoesNotExist.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions#operator
+   */
+  readonly operator: string;
+
+  /**
+   * values is an array of string values. If the operator is In or NotIn,
+   * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+   * the values array must be empty. This array is replaced during a strategic
+   * merge patch.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions#values
+   */
+  readonly values?: string[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions(obj: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'operator': obj.operator,
+    'values': obj.values?.map(y => y),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A label selector requirement is a selector that contains values, a key, and an operator that
+ * relates the key and values.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions
+ */
+export interface VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions {
+  /**
+   * key is the label key that the selector applies to.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions#key
+   */
+  readonly key: string;
+
+  /**
+   * operator represents a key's relationship to a set of values.
+   * Valid operators are In, NotIn, Exists and DoesNotExist.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions#operator
+   */
+  readonly operator: string;
+
+  /**
+   * values is an array of string values. If the operator is In or NotIn,
+   * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+   * the values array must be empty. This array is replaced during a strategic
+   * merge patch.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions#values
+   */
+  readonly values?: string[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions(obj: VinylCacheV1Alpha1SpecPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'operator': obj.operator,
+    'values': obj.values?.map(y => y),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResourcesLimits
+ */
+export class VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResourcesLimits {
+  public static fromNumber(value: number): VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResourcesLimits {
+    return new VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResourcesLimits(value);
+  }
+  public static fromString(value: string): VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResourcesLimits {
+    return new VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResourcesLimits(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResourcesRequests
+ */
+export class VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResourcesRequests {
+  public static fromNumber(value: number): VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResourcesRequests {
+    return new VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResourcesRequests(value);
+  }
+  public static fromString(value: string): VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResourcesRequests {
+    return new VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecResourcesRequests(value);
+  }
+  private constructor(public readonly value: number | string) {
+  }
+}
+
+/**
+ * A label selector requirement is a selector that contains values, a key, and an operator that
+ * relates the key and values.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecSelectorMatchExpressions
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecSelectorMatchExpressions {
+  /**
+   * key is the label key that the selector applies to.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecSelectorMatchExpressions#key
+   */
+  readonly key: string;
+
+  /**
+   * operator represents a key's relationship to a set of values.
+   * Valid operators are In, NotIn, Exists and DoesNotExist.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecSelectorMatchExpressions#operator
+   */
+  readonly operator: string;
+
+  /**
+   * values is an array of string values. If the operator is In or NotIn,
+   * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+   * the values array must be empty. This array is replaced during a strategic
+   * merge patch.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecSelectorMatchExpressions#values
+   */
+  readonly values?: string[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecSelectorMatchExpressions' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecSelectorMatchExpressions(obj: VinylCacheV1Alpha1SpecPodVolumesEphemeralVolumeClaimTemplateSpecSelectorMatchExpressions | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'operator': obj.operator,
+    'values': obj.values?.map(y => y),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * A label selector requirement is a selector that contains values, a key, and an operator that
+ * relates the key and values.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundleLabelSelectorMatchExpressions
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundleLabelSelectorMatchExpressions {
+  /**
+   * key is the label key that the selector applies to.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundleLabelSelectorMatchExpressions#key
+   */
+  readonly key: string;
+
+  /**
+   * operator represents a key's relationship to a set of values.
+   * Valid operators are In, NotIn, Exists and DoesNotExist.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundleLabelSelectorMatchExpressions#operator
+   */
+  readonly operator: string;
+
+  /**
+   * values is an array of string values. If the operator is In or NotIn,
+   * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+   * the values array must be empty. This array is replaced during a strategic
+   * merge patch.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundleLabelSelectorMatchExpressions#values
+   */
+  readonly values?: string[];
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundleLabelSelectorMatchExpressions' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundleLabelSelectorMatchExpressions(obj: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesClusterTrustBundleLabelSelectorMatchExpressions | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'key': obj.key,
+    'operator': obj.operator,
+    'values': obj.values?.map(y => y),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Required: Selects a field of the pod: only annotations, labels, name, namespace and uid are supported.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsFieldRef
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsFieldRef {
+  /**
+   * Version of the schema the FieldPath is written in terms of, defaults to "v1".
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsFieldRef#apiVersion
+   */
+  readonly apiVersion?: string;
+
+  /**
+   * Path of the field to select in the specified API version.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsFieldRef#fieldPath
+   */
+  readonly fieldPath: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsFieldRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsFieldRef(obj: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsFieldRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'apiVersion': obj.apiVersion,
+    'fieldPath': obj.fieldPath,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Selects a resource of the container: only resources limits and requests
+ * (limits.cpu, limits.memory, requests.cpu and requests.memory) are currently supported.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsResourceFieldRef
+ */
+export interface VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsResourceFieldRef {
+  /**
+   * Container name: required for volumes, optional for env vars
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsResourceFieldRef#containerName
+   */
+  readonly containerName?: string;
+
+  /**
+   * Specifies the output format of the exposed resources, defaults to "1"
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsResourceFieldRef#divisor
+   */
+  readonly divisor?: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsResourceFieldRefDivisor;
+
+  /**
+   * Required: resource to select
+   *
+   * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsResourceFieldRef#resource
+   */
+  readonly resource: string;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsResourceFieldRef' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsResourceFieldRef(obj: VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsResourceFieldRef | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'containerName': obj.containerName,
+    'divisor': obj.divisor?.value,
+    'resource': obj.resource,
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * Specifies the output format of the exposed resources, defaults to "1"
+ *
+ * @schema VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsResourceFieldRefDivisor
+ */
+export class VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsResourceFieldRefDivisor {
+  public static fromNumber(value: number): VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsResourceFieldRefDivisor {
+    return new VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsResourceFieldRefDivisor(value);
+  }
+  public static fromString(value: string): VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsResourceFieldRefDivisor {
+    return new VinylCacheV1Alpha1SpecPodVolumesProjectedSourcesDownwardApiItemsResourceFieldRefDivisor(value);
   }
   private constructor(public readonly value: number | string) {
   }
