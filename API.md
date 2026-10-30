@@ -2181,6 +2181,8 @@ const ploneVinylCacheOptions: PloneVinylCacheOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.limitMemory">limitMemory</a></code> | <code>string</code> | Memory limit for Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.monitoring">monitoring</a></code> | <code>boolean</code> | Enable Prometheus monitoring. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.nodeSelector">nodeSelector</a></code> | <code>{[ key: string ]: string}</code> | Node selector labels for the Varnish pods. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.ploneBackendProbe">ploneBackendProbe</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheBackendProbe">VinylCacheBackendProbe</a></code> | Probe settings for the auto-generated Plone backend, merged field by field over the defaults, e.g. `{ timeout: '5s' }` for slow warm-up queries. `threshold` must not exceed `window`, and `window` must be 64 or less. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.ploneFrontendProbe">ploneFrontendProbe</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.VinylCacheBackendProbe">VinylCacheBackendProbe</a></code> | Probe settings for the auto-generated Plone frontend (Volto variant only), merged field by field over the defaults, see `ploneBackendProbe`. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.purgeHosts">purgeHosts</a></code> | <code>string[]</code> | Public site hostnames a PURGE through the invalidation proxy applies to, e.g. `['example.org', 'www.example.org']` (`spec.invalidation.purge.hosts`). |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.replicas">replicas</a></code> | <code>number</code> | Number of Varnish pod replicas. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.requestCpu">requestCpu</a></code> | <code>string</code> | CPU request for Varnish pods. |
@@ -2367,6 +2369,32 @@ public readonly nodeSelector: {[ key: string ]: string};
 Node selector labels for the Varnish pods.
 
 Constrains pods to nodes matching all specified labels.
+
+---
+
+##### `ploneBackendProbe`<sup>Optional</sup> <a name="ploneBackendProbe" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.ploneBackendProbe"></a>
+
+```typescript
+public readonly ploneBackendProbe: VinylCacheBackendProbe;
+```
+
+- *Type:* <a href="#@bluedynamics/cdk8s-plone.VinylCacheBackendProbe">VinylCacheBackendProbe</a>
+- *Default:* { url: '/ok', interval: '5s', timeout: '2s', window: 10, threshold: 8 }
+
+Probe settings for the auto-generated Plone backend, merged field by field over the defaults, e.g. `{ timeout: '5s' }` for slow warm-up queries. `threshold` must not exceed `window`, and `window` must be 64 or less.
+
+---
+
+##### `ploneFrontendProbe`<sup>Optional</sup> <a name="ploneFrontendProbe" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.ploneFrontendProbe"></a>
+
+```typescript
+public readonly ploneFrontendProbe: VinylCacheBackendProbe;
+```
+
+- *Type:* <a href="#@bluedynamics/cdk8s-plone.VinylCacheBackendProbe">VinylCacheBackendProbe</a>
+- *Default:* { url: '/', interval: '5s', timeout: '2s', window: 10, threshold: 8 }
+
+Probe settings for the auto-generated Plone frontend (Volto variant only), merged field by field over the defaults, see `ploneBackendProbe`.
 
 ---
 

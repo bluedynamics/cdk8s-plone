@@ -3,6 +3,8 @@ import * as path from 'path';
 import { Construct } from 'constructs';
 import {
   VinylCache,
+  VinylCacheSpecBackends,
+  VinylCacheSpecBackendsProbe,
   VinylCacheSpecDirectorShardBy,
   VinylCacheSpecDirectorShardHealthy,
   VinylCacheSpecDirectorType,
@@ -229,6 +231,21 @@ export interface PloneVinylCacheOptions {
    * @default - no extra backends
    */
   readonly extraBackends?: VinylCacheBackend[];
+
+  /**
+   * Probe settings for the auto-generated Plone backend, merged field by field
+   * over the defaults, e.g. `{ timeout: '5s' }` for slow warm-up queries.
+   * `threshold` must not exceed `window`, and `window` must be 64 or less.
+   * @default - { url: '/ok', interval: '5s', timeout: '2s', window: 10, threshold: 8 }
+   */
+  readonly ploneBackendProbe?: VinylCacheBackendProbe;
+
+  /**
+   * Probe settings for the auto-generated Plone frontend (Volto variant only),
+   * merged field by field over the defaults, see `ploneBackendProbe`.
+   * @default - { url: '/', interval: '5s', timeout: '2s', window: 10, threshold: 8 }
+   */
+  readonly ploneFrontendProbe?: VinylCacheBackendProbe;
 
   /**
    * Number of Varnish pod replicas.
@@ -494,6 +511,34 @@ export interface PloneVinylCacheOptions {
 }
 
 /**
+ * Merges a probe override field by field over the construct defaults and
+ * checks the limits varnishd enforces when it compiles the VCL. cloud-vinyl
+ * does not check them, so a bad probe would leave the cache unsynced.
+ */
+function toProbe(name: string, defaults: VinylCacheBackendProbe, override: VinylCacheBackendProbe | undefined): VinylCacheSpecBackendsProbe {
+  const probe = {
+    url: override?.url ?? defaults.url ?? '/',
+    interval: override?.interval ?? '5s',
+    timeout: override?.timeout ?? '2s',
+    window: override?.window ?? 10,
+    threshold: override?.threshold ?? 8,
+    expectedResponse: override?.expectedResponse,
+  };
+  for (const field of ['window', 'threshold'] as const) {
+    if (!Number.isInteger(probe[field]) || probe[field] < 1) {
+      throw new Error(`${name}.${field} must be a positive integer, got ${probe[field]}`);
+    }
+  }
+  if (probe.window > 64) {
+    throw new Error(`${name}.window must be 64 or less (varnishd limit), got ${probe.window}`);
+  }
+  if (probe.threshold > probe.window) {
+    throw new Error(`${name}.threshold (${probe.threshold}) cannot be greater than window (${probe.window}), varnishd would reject the VCL`);
+  }
+  return probe;
+}
+
+/**
  * Builds a cpu/memory map from the values that are set, or undefined if none is.
  */
 function quantities<T>(cpu: string | undefined, memory: string | undefined, from: (value: string) => T): { [key: string]: T } | undefined {
@@ -611,30 +656,12 @@ export class PloneVinylCache extends Construct {
       fs.readFileSync(path.join(__dirname, 'config', 'plone-vinyl-backend-response.vcl'), 'utf8');
 
     // Build backends from Plone services
-    const backends: Array<{
-      name: string;
-      serviceRef: { name: string };
-      port: number;
-      probe?: {
-        url: string;
-        interval: string;
-        timeout: string;
-        window: number;
-        threshold: number;
-      };
-      weight?: number;
-    }> = [
+    const backends: VinylCacheSpecBackends[] = [
       {
         name: 'plone_backend',
         serviceRef: { name: options.plone.backendServiceName },
         port: 8080,
-        probe: {
-          url: '/ok',
-          interval: '5s',
-          timeout: '2s',
-          window: 10,
-          threshold: 8,
-        },
+        probe: toProbe('ploneBackendProbe', { url: '/ok' }, options.ploneBackendProbe),
       },
     ];
 
@@ -643,13 +670,7 @@ export class PloneVinylCache extends Construct {
         name: 'plone_frontend',
         serviceRef: { name: options.plone.frontendServiceName },
         port: 3000,
-        probe: {
-          url: '/',
-          interval: '5s',
-          timeout: '2s',
-          window: 10,
-          threshold: 8,
-        },
+        probe: toProbe('ploneFrontendProbe', { url: '/' }, options.ploneFrontendProbe),
       });
     }
 
@@ -659,13 +680,8 @@ export class PloneVinylCache extends Construct {
           name: eb.name,
           serviceRef: { name: eb.serviceName },
           port: eb.port,
-          probe: eb.probe ? {
-            url: eb.probe.url ?? '/',
-            interval: eb.probe.interval ?? '5s',
-            timeout: eb.probe.timeout ?? '2s',
-            window: eb.probe.window ?? 10,
-            threshold: eb.probe.threshold ?? 8,
-          } : undefined,
+          probe: eb.probe ? toProbe(`extraBackends[${eb.name}].probe`, { url: '/' }, eb.probe) : undefined,
+          weight: eb.weight,
         });
       }
     }
