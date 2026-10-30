@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { Names } from 'cdk8s';
 import { Construct } from 'constructs';
 import {
   VinylCache,
@@ -420,7 +419,8 @@ export interface PloneVinylCacheOptions {
  *   plone: plone,
  *   replicas: 2,
  * });
- * // Use cache.vinylCacheServiceName for IngressRoute
+ * // Use cache.vinylCacheServiceName for IngressRoute,
+ * // cache.invalidationUrl for plone.cachepurging
  */
 export class PloneVinylCache extends Construct {
   /**
@@ -428,6 +428,9 @@ export class PloneVinylCache extends Construct {
    * Use this to reference the cache service from ingress or other constructs.
    */
   public readonly vinylCacheServiceName: string;
+
+  private readonly namespace?: string;
+  private readonly invalidationEnabled: boolean;
 
   constructor(scope: Construct, id: string, options: PloneVinylCacheOptions) {
     super(scope, id);
@@ -612,6 +615,33 @@ export class PloneVinylCache extends Construct {
     });
 
     // The operator creates a service with the same name as the VinylCache resource
-    this.vinylCacheServiceName = Names.toLabelValue(vinylCache);
+    this.vinylCacheServiceName = vinylCache.name;
+    this.namespace = vinylCache.metadata.namespace;
+    this.invalidationEnabled = invalidation;
+  }
+
+  /**
+   * URL of the cloud-vinyl invalidation proxy for this cache, e.g. for the
+   * purge proxy setting of `plone.cachepurging`.
+   *
+   * Has the form `http://<cache>-invalidation.<namespace>:8090`, the same
+   * address the operator reports in `status.invalidationURL`. The proxy serves
+   * all namespaces and routes by `Host`, so the bare Service name is rejected.
+   *
+   * Throws if the chart has no namespace, because the URL cannot be built
+   * without one, or if `invalidation` is disabled.
+   */
+  public get invalidationUrl(): string {
+    if (!this.invalidationEnabled) {
+      throw new Error(`${this.node.path}: invalidationUrl is not available, invalidation is disabled`);
+    }
+    if (!this.namespace) {
+      throw new Error(
+        `${this.node.path}: invalidationUrl needs a namespace. `
+        + 'The invalidation proxy routes by "<cache>-invalidation.<namespace>"; '
+        + 'set `namespace` on the Chart.',
+      );
+    }
+    return `http://${this.vinylCacheServiceName}-invalidation.${this.namespace}:8090`;
   }
 }

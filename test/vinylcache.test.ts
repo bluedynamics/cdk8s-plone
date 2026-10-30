@@ -383,3 +383,61 @@ test('cluster and varnishParameters are omitted by default', () => {
   expect(vc.spec.cluster).toBeUndefined();
   expect(vc.spec.varnishParameters).toBeUndefined();
 });
+
+function synthVinylCache(chart: Chart): any {
+  return Testing.synth(chart).find((m: any) => m.kind === 'VinylCache');
+}
+
+test('vinylCacheServiceName matches the VinylCache name, also for mixed-case ids', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'MyChart');
+
+  // WHEN
+  const plone = new Plone(chart, 'plone');
+  const cache = new PloneVinylCache(chart, 'Cache', { plone });
+
+  // THEN
+  expect(cache.vinylCacheServiceName).toBe(synthVinylCache(chart).metadata.name);
+  expect(cache.vinylCacheServiceName).toBe(cache.vinylCacheServiceName.toLowerCase());
+});
+
+test('invalidationUrl names the namespaced invalidation host', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone', { namespace: 'site' });
+
+  // WHEN
+  const plone = new Plone(chart, 'plone');
+  const cache = new PloneVinylCache(chart, 'cache', { plone });
+
+  // THEN
+  const name = synthVinylCache(chart).metadata.name;
+  expect(cache.invalidationUrl).toBe(`http://${name}-invalidation.site:8090`);
+});
+
+test('invalidationUrl throws without a namespace', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  const plone = new Plone(chart, 'plone');
+  const cache = new PloneVinylCache(chart, 'cache', { plone });
+
+  // THEN
+  expect(() => cache.invalidationUrl).toThrow(/needs a namespace/);
+});
+
+test('invalidationUrl throws when invalidation is disabled', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone', { namespace: 'site' });
+
+  // WHEN
+  const plone = new Plone(chart, 'plone');
+  const cache = new PloneVinylCache(chart, 'cache', { plone, invalidation: false });
+
+  // THEN
+  expect(() => cache.invalidationUrl).toThrow(/invalidation is disabled/);
+});
