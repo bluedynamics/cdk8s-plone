@@ -157,7 +157,8 @@ export interface VinylCacheToleration {
  * Creates a VinylCache custom resource that the cloud-vinyl operator
  * reconciles into a Varnish Cache cluster with agent-based VCL delivery.
  *
- * Requires the cloud-vinyl operator to be installed in the cluster.
+ * Requires cloud-vinyl 1.0.0-rc.2 or later in the cluster
+ * (`vinyl.bluedynamics.eu/v1`).
  */
 export interface PloneVinylCacheOptions {
   /**
@@ -252,10 +253,10 @@ export interface PloneVinylCacheOptions {
 
   /**
    * Shard director: what value is hashed for shard selection.
-   * "HASH" uses the Varnish hash (default); "URL" uses the request URL.
+   * Only "URL" (the request URL) is supported. cloud-vinyl 1.0 removed "HASH":
+   * the cluster routing runs in vcl_recv, before Varnish computes the hash.
    * Only applied when director is "shard".
-   * Requires cloud-vinyl operator >= 0.4.2.
-   * @default - operator default ("HASH")
+   * @default - operator default ("URL")
    */
   readonly shardBy?: string;
 
@@ -264,7 +265,6 @@ export interface PloneVinylCacheOptions {
    * "CHOSEN" (default) only considers the chosen backend healthy; "ALL" requires all
    * backends to be healthy.
    * Only applied when director is "shard".
-   * Requires cloud-vinyl operator >= 0.4.2.
    * @default - operator default ("CHOSEN")
    */
   readonly shardHealthy?: string;
@@ -305,6 +305,19 @@ export interface PloneVinylCacheOptions {
   readonly invalidation?: boolean;
 
   /**
+   * Public site hostnames a PURGE through the invalidation proxy applies to,
+   * e.g. `['example.org', 'www.example.org']` (`spec.invalidation.purge.hosts`).
+   *
+   * Varnish keys cached pages by URL and site host, while clients reach the
+   * proxy through `invalidationUrl`. For a purge without an
+   * `X-Vinyl-Purge-Host` header, the proxy sends one purge per listed host.
+   * Clients that cannot set headers, such as `plone.cachepurging`, need this,
+   * or their purges match nothing. At most 16 lowercase hostnames.
+   * @default - none, purges apply only to the host the client sends
+   */
+  readonly purgeHosts?: string[];
+
+  /**
    * Enable Prometheus monitoring. When true this turns on operator metrics,
    * a ServiceMonitor, and the prometheus_varnish_exporter sidecar (required
    * for cache hit-ratio and backend-health metrics).
@@ -314,7 +327,8 @@ export interface PloneVinylCacheOptions {
 
   /**
    * Container image for the Varnish pods.
-   * @default 'varnish:7.6'
+   * cloud-vinyl 1.0 is tested with the docker-library `varnish` 9.1 image.
+   * @default 'varnish:9.1.0'
    */
   readonly image?: string;
 
@@ -438,6 +452,25 @@ export class PloneVinylCache extends Construct {
     const replicas = options.replicas ?? 2;
     const invalidation = options.invalidation ?? true;
     const monitoring = options.monitoring ?? false;
+    const purgeHosts = options.purgeHosts;
+    if (purgeHosts !== undefined) {
+      if (!invalidation) {
+        throw new Error('purgeHosts needs invalidation enabled');
+      }
+      // Same constraints as the CRD, so mistakes fail at synth time.
+      if (purgeHosts.length > 16) {
+        throw new Error(`purgeHosts accepts at most 16 hosts, got ${purgeHosts.length}`);
+      }
+      const hostPattern = /^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$/;
+      for (const host of purgeHosts) {
+        if (!hostPattern.test(host) || host.length > 253) {
+          throw new Error(`purgeHosts entry "${host}" is not a lowercase hostname`);
+        }
+      }
+      if (new Set(purgeHosts).size !== purgeHosts.length) {
+        throw new Error('purgeHosts must not contain duplicates');
+      }
+    }
 
     // Resolve director type enum
     const directorStr = options.director ?? 'shard';
@@ -467,8 +500,12 @@ export class PloneVinylCache extends Construct {
     if (directorType === VinylCacheSpecDirectorType.SHARD &&
         (options.shardBy || options.shardHealthy || options.shardRampup || options.shardReplicas !== undefined)) {
       let shardBy: VinylCacheSpecDirectorShardBy | undefined;
-      if (options.shardBy === 'URL') shardBy = VinylCacheSpecDirectorShardBy.URL;
-      else if (options.shardBy === 'HASH') shardBy = VinylCacheSpecDirectorShardBy.HASH;
+      if (options.shardBy === 'URL') {shardBy = VinylCacheSpecDirectorShardBy.URL;} else if (options.shardBy !== undefined) {
+        throw new Error(
+          `shardBy must be "URL", got "${options.shardBy}". `
+          + 'cloud-vinyl 1.0 removed "HASH": the cluster routing runs before Varnish computes the hash.',
+        );
+      }
 
       let shardHealthy: VinylCacheSpecDirectorShardHealthy | undefined;
       if (options.shardHealthy === 'ALL') shardHealthy = VinylCacheSpecDirectorShardHealthy.ALL;
@@ -558,7 +595,7 @@ export class PloneVinylCache extends Construct {
     const vinylCache = new VinylCache(this, 'vinylcache', {
       spec: {
         replicas,
-        image: options.image ?? 'varnish:7.6',
+        image: options.image ?? 'varnish:9.1.0',
         backends,
         director: { type: directorType, shard: shardSpec },
         storage,
@@ -593,7 +630,7 @@ export class PloneVinylCache extends Construct {
           },
         },
         invalidation: invalidation ? {
-          purge: { enabled: true },
+          purge: { enabled: true, hosts: purgeHosts },
           ban: { enabled: true },
           xkey: { enabled: true },
         } : undefined,
@@ -627,6 +664,9 @@ export class PloneVinylCache extends Construct {
    * Has the form `http://<cache>-invalidation.<namespace>:8090`, the same
    * address the operator reports in `status.invalidationURL`. The proxy serves
    * all namespaces and routes by `Host`, so the bare Service name is rejected.
+   *
+   * Purges from clients that cannot set an `X-Vinyl-Purge-Host` header, such
+   * as `plone.cachepurging`, only match cached pages if `purgeHosts` is set.
    *
    * Throws if the chart has no namespace, because the URL cannot be built
    * without one, or if `invalidation` is disabled.

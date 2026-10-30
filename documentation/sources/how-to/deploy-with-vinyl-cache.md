@@ -19,7 +19,9 @@ myst:
 
 ## Prerequisites
 
-- The **cloud-vinyl operator** must be installed in your cluster
+- The **cloud-vinyl operator 1.0.0-rc.2 or later** must be installed in your cluster.
+  `PloneVinylCache` renders `vinyl.bluedynamics.eu/v1`, which earlier releases do not serve.
+  Apply the CRD server-side, as described in the cloud-vinyl release notes.
 - A working Plone deployment using `cdk8s-plone`
 - `@bluedynamics/cdk8s-plone` version with VinylCache support
 
@@ -134,28 +136,36 @@ new PloneVinylCache(chart, 'cache', {
 });
 ```
 
+(vinyl-cache-invalidation)=
+
 ### Cache invalidation
 
 Invalidation is enabled by default (PURGE, BAN, xkey). Configure `plone.cachepurging` to point to the VinylCache invalidation proxy endpoint.
 
 The proxy serves the caches of all namespaces and routes by `Host`, so the address must include the namespace.
-Give the chart a namespace and read the address from `invalidationUrl`:
+Give the chart a namespace, list the public hostnames of the site in `purgeHosts`, and read the address from `invalidationUrl`:
 
 ```typescript
 const chart = new Chart(app, 'site', { namespace: 'plone' });
-const cache = new PloneVinylCache(chart, 'cache', { plone });
+const cache = new PloneVinylCache(chart, 'cache', {
+  plone,
+  purgeHosts: ['example.org', 'www.example.org'],
+});
 // http://<cache>-invalidation.plone:8090
 console.log(cache.invalidationUrl);
 ```
+
+Varnish keys a cached page by its URL and its site host.
+`plone.cachepurging` cannot tell the proxy the site host, so the proxy sends one purge per entry in `purgeHosts`.
+Without `purgeHosts`, its purges succeed but remove nothing, and pages only change after their TTL.
+To check that purges work, watch `vinyl_objects_purged_total`.
 
 Enter this value as a caching proxy in the `plone.cachepurging` settings.
 Do not build the address from `vinylCacheServiceName` yourself: the proxy rejects the bare `<cache>-invalidation` name with `404 unknown cache`, and `plone.cachepurging` does not log failed purges.
 `invalidationUrl` throws if the chart has no namespace or if `invalidation` is disabled.
 
-:::{note}
-BAN-based invalidation requires **cloud-vinyl operator ≥ 0.4.2**. Earlier versions accept the spec but do not emit the BAN ACL / handler.
-Starting with 0.4.2 the operator's own pod IP is automatically added to the PURGE ACL, so purges from the operator itself work without additional configuration.
-:::
+cloud-vinyl handles PURGE, BAN, and xkey requests in its own VCL with its own access lists.
+A custom `vclRecvSnippet` only runs for `GET` and `HEAD` requests and must not handle them.
 
 To disable invalidation:
 
@@ -168,13 +178,13 @@ new PloneVinylCache(chart, 'cache', {
 
 ### Shard director tuning
 
-For shard-based load distribution (the default), you can fine-tune the consistent-hash behavior. These options require **cloud-vinyl ≥ 0.4.2** to be honored by the generated VCL.
+For shard-based load distribution (the default), you can fine-tune the consistent-hash behavior.
 
 ```typescript
 new PloneVinylCache(chart, 'cache', {
   plone: plone,
   director: 'shard',
-  shardBy: 'URL',        // hash the request URL instead of Varnish's hash
+  shardBy: 'URL',        // the only supported value; cloud-vinyl 1.0 removed 'HASH'
   shardHealthy: 'ALL',   // require all backends healthy (vs. only "CHOSEN")
   shardRampup: '45s',    // warm-up window for newly added backends
   shardReplicas: 128,    // Ketama replicas per backend
@@ -182,6 +192,22 @@ new PloneVinylCache(chart, 'cache', {
 ```
 
 Shard options are ignored for non-shard directors (`round_robin`, `random`, `hash`).
+
+## Upgrading from cloud-vinyl 0.x
+
+This `cdk8s-plone` release targets cloud-vinyl 1.0.
+
+1. Upgrade the operator and its CRD to 1.0.0-rc.2 or later first, following the cloud-vinyl release notes.
+   The new manifests use `vinyl.bluedynamics.eu/v1`, which older operators reject.
+2. Set `purgeHosts` if you use `plone.cachepurging`, see {ref}`vinyl-cache-invalidation`.
+3. Review the manifest diff:
+   - `apiVersion` changes from `v1alpha1` to `v1`.
+   - The default image changes from `varnish:7.6` to `varnish:9.1.0`, the image cloud-vinyl 1.0 is tested with.
+     Set `image` to keep another one.
+   - The default `vclRecv` snippet no longer contains PURGE and BAN handling.
+     Since cloud-vinyl 0.7.0 it did not compile, so caches with the default snippet never became ready.
+4. Replace `shardBy: 'HASH'` with `'URL'` or drop it.
+   cloud-vinyl 1.0 removed `HASH`, and `PloneVinylCache` rejects it.
 
 ## Migrating from PloneHttpcache
 

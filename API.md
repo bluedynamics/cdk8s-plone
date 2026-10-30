@@ -620,6 +620,9 @@ Has the form `http://<cache>-invalidation.<namespace>:8090`, the same
 address the operator reports in `status.invalidationURL`. The proxy serves
 all namespaces and routes by `Host`, so the bare Service name is rejected.
 
+Purges from clients that cannot set an `X-Vinyl-Purge-Host` header, such
+as `plone.cachepurging`, only match cached pages if `purgeHosts` is set.
+
 Throws if the chart has no namespace, because the URL cannot be built
 without one, or if `invalidation` is disabled.
 
@@ -2091,7 +2094,8 @@ Configuration options for PloneVinylCache (cloud-vinyl operator).
 Creates a VinylCache custom resource that the cloud-vinyl operator
 reconciles into a Varnish Cache cluster with agent-based VCL delivery.
 
-Requires the cloud-vinyl operator to be installed in the cluster.
+Requires cloud-vinyl 1.0.0-rc.2 or later in the cluster
+(`vinyl.bluedynamics.eu/v1`).
 
 #### Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.Initializer"></a>
 
@@ -2115,6 +2119,7 @@ const ploneVinylCacheOptions: PloneVinylCacheOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.limitMemory">limitMemory</a></code> | <code>string</code> | Memory limit for Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.monitoring">monitoring</a></code> | <code>boolean</code> | Enable Prometheus monitoring. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.nodeSelector">nodeSelector</a></code> | <code>{[ key: string ]: string}</code> | Node selector labels for the Varnish pods. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.purgeHosts">purgeHosts</a></code> | <code>string[]</code> | Public site hostnames a PURGE through the invalidation proxy applies to, e.g. `['example.org', 'www.example.org']` (`spec.invalidation.purge.hosts`). |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.replicas">replicas</a></code> | <code>number</code> | Number of Varnish pod replicas. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.requestCpu">requestCpu</a></code> | <code>string</code> | CPU request for Varnish pods. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.requestMemory">requestMemory</a></code> | <code>string</code> | Memory request for Varnish pods. |
@@ -2210,9 +2215,11 @@ public readonly image: string;
 ```
 
 - *Type:* string
-- *Default:* 'varnish:7.6'
+- *Default:* 'varnish:9.1.0'
 
 Container image for the Varnish pods.
+
+cloud-vinyl 1.0 is tested with the docker-library `varnish` 9.1 image.
 
 ---
 
@@ -2287,6 +2294,25 @@ Constrains pods to nodes matching all specified labels.
 
 ---
 
+##### `purgeHosts`<sup>Optional</sup> <a name="purgeHosts" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.purgeHosts"></a>
+
+```typescript
+public readonly purgeHosts: string[];
+```
+
+- *Type:* string[]
+- *Default:* none, purges apply only to the host the client sends
+
+Public site hostnames a PURGE through the invalidation proxy applies to, e.g. `['example.org', 'www.example.org']` (`spec.invalidation.purge.hosts`).
+
+Varnish keys cached pages by URL and site host, while clients reach the
+proxy through `invalidationUrl`. For a purge without an
+`X-Vinyl-Purge-Host` header, the proxy sends one purge per listed host.
+Clients that cannot set headers, such as `plone.cachepurging`, need this,
+or their purges match nothing. At most 16 lowercase hostnames.
+
+---
+
 ##### `replicas`<sup>Optional</sup> <a name="replicas" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.replicas"></a>
 
 ```typescript
@@ -2333,13 +2359,13 @@ public readonly shardBy: string;
 ```
 
 - *Type:* string
-- *Default:* operator default ("HASH")
+- *Default:* operator default ("URL")
 
 Shard director: what value is hashed for shard selection.
 
-"HASH" uses the Varnish hash (default); "URL" uses the request URL.
+Only "URL" (the request URL) is supported. cloud-vinyl 1.0 removed "HASH":
+the cluster routing runs in vcl_recv, before Varnish computes the hash.
 Only applied when director is "shard".
-Requires cloud-vinyl operator >= 0.4.2.
 
 ---
 
@@ -2357,7 +2383,6 @@ Shard director: which backends the director considers when selecting a shard.
 "CHOSEN" (default) only considers the chosen backend healthy; "ALL" requires all
 backends to be healthy.
 Only applied when director is "shard".
-Requires cloud-vinyl operator >= 0.4.2.
 
 ---
 

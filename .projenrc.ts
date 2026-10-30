@@ -62,9 +62,11 @@ project.addTask('import:servicemonitor', {
   exec: 'cdk8s import https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml --language typescript --output src/imports/',
 });
 
+// Pinned to a release, so the import matches the operator users install.
+const cloudVinylVersion = 'v1.0.0-rc.2';
 project.addTask('import:vinylcache', {
-  description: 'Import cloud-vinyl VinylCache CRD',
-  exec: 'cdk8s import https://raw.githubusercontent.com/bluedynamics/cloud-vinyl/main/config/crd/bases/vinyl.bluedynamics.eu_vinylcaches.yaml --language typescript --output src/imports/',
+  description: `Import cloud-vinyl VinylCache CRD (${cloudVinylVersion})`,
+  exec: `cdk8s import https://raw.githubusercontent.com/bluedynamics/cloud-vinyl/${cloudVinylVersion}/config/crd/bases/vinyl.bluedynamics.eu_vinylcaches.yaml --language typescript --output src/imports/`,
 });
 
 // // Fix upgrade workflow permissions for PR job
