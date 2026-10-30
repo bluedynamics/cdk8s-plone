@@ -1,6 +1,8 @@
+import { ApiObject } from 'cdk8s';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Construct } from 'constructs';
 import * as k8s from './imports/k8s';
+import { PloneKubeService } from './kube';
 
 /**
  * Configuration for the generated Kubernetes Service spec.
@@ -142,6 +144,11 @@ export class PloneService extends Construct {
    */
   public labels: { [name: string]: string };
 
+  /**
+   * The Kubernetes Service, for JSON patches as an escape hatch.
+   */
+  public readonly service: ApiObject;
+
   constructor(scope: Construct, id: string, options: PloneServiceOptions) {
     super(scope, id);
 
@@ -184,8 +191,8 @@ export class PloneService extends Construct {
       },
       spec: spec,
     };
-    const service = new k8s.KubeService(this, 'service', serviceOpts);
-    this.name = service.name;
+    this.service = new PloneKubeService(this, 'service', serviceOpts);
+    this.name = this.service.name;
     this.labels = service_labels;
   }
 }

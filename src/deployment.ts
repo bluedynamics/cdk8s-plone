@@ -1,8 +1,9 @@
 // import { log } from 'console';
-import { Names } from 'cdk8s';
+import { ApiObject, Names } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-30';
 import { Construct } from 'constructs';
 import * as k8s from './imports/k8s';
+import { PloneKubeDeployment } from './kube';
 import { PlonePDB, PlonePDBOptions } from './pdb';
 
 /**
@@ -105,13 +106,6 @@ export interface PloneDeploymentOptions {
   readonly podAnnotations?: { [name: string]: string };
 
   /**
-   * Additional container specification overrides.
-   * Advanced use only - merges with generated container spec.
-   * @default - undefined
-   */
-  readonly ploneContainer?: k8s.Container;
-
-  /**
    * Sidecar containers to run alongside the main container.
    * @example [{ name: 'log-forwarder', image: 'fluentd:latest' }]
    * @default []
@@ -198,6 +192,10 @@ function validateSeconds(name: string, value: number | undefined): void {
  * and an optional PodDisruptionBudget.
  */
 export class PloneDeployment extends Construct {
+  /**
+   * The Kubernetes Deployment, for JSON patches as an escape hatch.
+   */
+  public readonly deployment: ApiObject;
 
   constructor(scope: Construct, id: string, options: PloneDeploymentOptions) {
     super(scope, id);
@@ -294,7 +292,7 @@ export class PloneDeployment extends Construct {
       },
     };
 
-    new k8s.KubeDeployment(this, 'deployment', deploymentOptions);
+    this.deployment = new PloneKubeDeployment(this, 'deployment', deploymentOptions);
 
     if (options.pdb ?? false) {
       const pdbOptions = options.pdb ?? {};

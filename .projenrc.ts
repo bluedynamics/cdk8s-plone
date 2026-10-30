@@ -19,6 +19,7 @@ const project = new cdk.JsiiProject({
     kplus,
   ],
   peerDeps: [
+    'cdk8s',
     constructs,
     kplus,
   ],
