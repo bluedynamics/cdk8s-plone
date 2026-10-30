@@ -271,3 +271,21 @@ test('frontend escape hatches are undefined for Blicca', () => {
   expect(plone.frontendDeployment).toBeUndefined();
   expect(plone.frontendService).toBeUndefined();
 });
+
+test('rollingUpdate is plumbed through to backend and frontend', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new Plone(chart, 'plone', {
+    backend: { rollingUpdate: { maxUnavailable: 0, maxSurge: '50%' } },
+    frontend: { rollingUpdate: { maxSurge: 1 } },
+  });
+
+  // THEN
+  expect(synthKind(chart, 'Deployment', 'plone-backend-deployment').spec.strategy.rollingUpdate)
+    .toEqual({ maxUnavailable: 0, maxSurge: '50%' });
+  expect(synthKind(chart, 'Deployment', 'plone-frontend-deployment').spec.strategy.rollingUpdate)
+    .toEqual({ maxSurge: 1 });
+});

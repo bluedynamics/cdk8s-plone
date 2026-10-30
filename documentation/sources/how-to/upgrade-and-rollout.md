@@ -38,8 +38,18 @@ cdk8s synth
 kubectl apply -f dist/
 ```
 
-Kubernetes replaces the pods with the default RollingUpdate strategy.
-With two or more replicas and a PodDisruptionBudget, the old pods drain only as new pods become ready.
+Kubernetes replaces the pods with the RollingUpdate strategy.
+By default it removes up to a quarter of the old pods before new ones are ready.
+Plone takes a while to become ready, so the site runs with less capacity during the rollout.
+To keep full capacity, start new pods first and remove old ones only when replacements are ready:
+
+```typescript
+backend: {
+  rollingUpdate: { maxUnavailable: 0, maxSurge: '50%' },
+}
+```
+
+The cluster needs room for the extra pods while the rollout runs.
 
 ```{important}
 Upgrading to a new Plone major or minor version may require a Plone site upgrade step that `cdk8s-plone` does not perform.

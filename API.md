@@ -811,6 +811,7 @@ const ploneBaseOptions: PloneBaseOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.replicas">replicas</a></code> | <code>number</code> | Number of pod replicas to run. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.requestCpu">requestCpu</a></code> | <code>string</code> | CPU request for the container. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.requestMemory">requestMemory</a></code> | <code>string</code> | Memory request for the container. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.rollingUpdate">rollingUpdate</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.PloneRollingUpdate">PloneRollingUpdate</a></code> | Rolling update settings for the Deployment (`spec.strategy.rollingUpdate`). For rollouts without a capacity dip use `{ maxUnavailable: 0, maxSurge: '50%' }`: Plone needs time to become ready, and the default lets a quarter of the pods go away first. Not to be confused with the top-level `maxUnavailable` and `minAvailable`, which configure the PodDisruptionBudget. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.securityContext">securityContext</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.PloneSecurityContext">PloneSecurityContext</a></code> | Security context for the container. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.service">service</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.PloneServiceSpec">PloneServiceSpec</a></code> | Service configuration: type, trafficDistribution, sessionAffinity, annotations/labels, and a raw `overrides` escape hatch for any other ServiceSpec field. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.serviceAnnotations">serviceAnnotations</a></code> | <code>{[ key: string ]: string}</code> | Annotations to add to the Service metadata. |
@@ -1267,6 +1268,19 @@ Memory request for the container.
 '256Mi' or '512Mi'
 ```
 
+
+##### `rollingUpdate`<sup>Optional</sup> <a name="rollingUpdate" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.rollingUpdate"></a>
+
+```typescript
+public readonly rollingUpdate: PloneRollingUpdate;
+```
+
+- *Type:* <a href="#@bluedynamics/cdk8s-plone.PloneRollingUpdate">PloneRollingUpdate</a>
+- *Default:* Kubernetes default ('25%' surge, '25%' unavailable)
+
+Rolling update settings for the Deployment (`spec.strategy.rollingUpdate`). For rollouts without a capacity dip use `{ maxUnavailable: 0, maxSurge: '50%' }`: Plone needs time to become ready, and the default lets a quarter of the pods go away first. Not to be confused with the top-level `maxUnavailable` and `minAvailable`, which configure the PodDisruptionBudget.
+
+---
 
 ##### `securityContext`<sup>Optional</sup> <a name="securityContext" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.securityContext"></a>
 
@@ -1780,6 +1794,53 @@ public readonly version: string;
 Version string for labeling the deployment.
 
 This is used in Kubernetes labels and doesn't affect the actual image versions.
+
+---
+
+### PloneRollingUpdate <a name="PloneRollingUpdate" id="@bluedynamics/cdk8s-plone.PloneRollingUpdate"></a>
+
+Rolling update settings for a Deployment (`spec.strategy.rollingUpdate`).
+
+#### Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.PloneRollingUpdate.Initializer"></a>
+
+```typescript
+import { PloneRollingUpdate } from '@bluedynamics/cdk8s-plone'
+
+const ploneRollingUpdate: PloneRollingUpdate = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneRollingUpdate.property.maxSurge">maxSurge</a></code> | <code>string \| number</code> | Maximum number of pods created above the desired replica count during an update, as an absolute number (e.g. 1) or a percentage (e.g. '50%'). |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneRollingUpdate.property.maxUnavailable">maxUnavailable</a></code> | <code>string \| number</code> | Maximum number of pods that can be unavailable during an update, as an absolute number (e.g. 0) or a percentage (e.g. '25%'). Not to be confused with the PodDisruptionBudget's `maxUnavailable`. |
+
+---
+
+##### `maxSurge`<sup>Optional</sup> <a name="maxSurge" id="@bluedynamics/cdk8s-plone.PloneRollingUpdate.property.maxSurge"></a>
+
+```typescript
+public readonly maxSurge: string | number;
+```
+
+- *Type:* string | number
+- *Default:* Kubernetes default ('25%')
+
+Maximum number of pods created above the desired replica count during an update, as an absolute number (e.g. 1) or a percentage (e.g. '50%').
+
+---
+
+##### `maxUnavailable`<sup>Optional</sup> <a name="maxUnavailable" id="@bluedynamics/cdk8s-plone.PloneRollingUpdate.property.maxUnavailable"></a>
+
+```typescript
+public readonly maxUnavailable: string | number;
+```
+
+- *Type:* string | number
+- *Default:* Kubernetes default ('25%')
+
+Maximum number of pods that can be unavailable during an update, as an absolute number (e.g. 0) or a percentage (e.g. '25%'). Not to be confused with the PodDisruptionBudget's `maxUnavailable`.
 
 ---
 
