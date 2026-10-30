@@ -138,6 +138,8 @@ It requires Kubernetes 1.30 or later.
 
 Configure the generated Kubernetes `Service` through the grouped `service` option.
 Curated fields cover the common cases; `service.overrides` is an escape hatch for any other `ServiceSpec` field and has the highest precedence.
+Write overrides in their manifest form, for example `clusterIP` or `targetPort: 8080`.
+Each top-level key replaces the field as a whole.
 
 ```typescript
 backend: {

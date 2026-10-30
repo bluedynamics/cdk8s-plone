@@ -37,3 +37,21 @@ export class PloneKubeService extends k8s.KubeService {
     return JsonPatch.apply(super.toJson(), ...this.rawPatches);
   }
 }
+
+/**
+ * Converts a value for a raw JSON patch: cdk8s value objects such as
+ * IntOrString and Quantity (from these imports or from cdk8s-plus) become
+ * their plain value, recursively. Plain values pass through unchanged.
+ */
+export function toManifestValue(value: any): any {
+  if (Array.isArray(value)) {
+    return value.map(toManifestValue);
+  }
+  if (value !== null && typeof value === 'object') {
+    if (Object.getPrototypeOf(value) !== Object.prototype && 'value' in value) {
+      return value.value;
+    }
+    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, toManifestValue(v)]));
+  }
+  return value;
+}

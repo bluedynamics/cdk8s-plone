@@ -1,4 +1,6 @@
-import { Chart, Testing } from 'cdk8s';
+import { Chart, JsonPatch, Testing } from 'cdk8s';
+import * as kplus from 'cdk8s-plus-30';
+import * as k8s from '../src/imports/k8s';
 import { PloneService } from '../src/service';
 
 function synthService(props: any) {
@@ -84,4 +86,53 @@ test('legacy options.annotations still merge with spec.annotations', () => {
     spec: { annotations: { b: '2' } },
   });
   expect(manifest.metadata.annotations).toEqual({ a: '1', b: '2' });
+});
+
+test('overrides keep plain IntOrString values', () => {
+  const svc = synthService({
+    targetPort: 8080,
+    spec: { overrides: { ports: [{ name: 'http', port: 80, targetPort: 8080 }] } },
+  });
+  expect(svc.spec.ports).toEqual([{ name: 'http', port: 80, targetPort: 8080 }]);
+});
+
+test('overrides unwrap IntOrString objects from both imports', () => {
+  const svc = synthService({
+    targetPort: 8080,
+    spec: {
+      overrides: {
+        ports: [
+          { name: 'a', port: 80, targetPort: k8s.IntOrString.fromNumber(8080) },
+          { name: 'b', port: 81, targetPort: kplus.k8s.IntOrString.fromString('http') },
+        ],
+      },
+    },
+  });
+  expect(svc.spec.ports).toEqual([
+    { name: 'a', port: 80, targetPort: 8080 },
+    { name: 'b', port: 81, targetPort: 'http' },
+  ]);
+});
+
+test.each([
+  [{ clusterIp: 'None' }, { clusterIP: 'None' }],
+  [{ clusterIP: 'None' }, { clusterIP: 'None' }],
+  [{ loadBalancerIp: '10.0.0.1' }, { loadBalancerIP: '10.0.0.1' }],
+  [
+    { sessionAffinityConfig: { clientIp: { timeoutSeconds: 600 } } },
+    { sessionAffinityConfig: { clientIP: { timeoutSeconds: 600 } } },
+  ],
+])('overrides accept TypeScript and manifest spellings %j', (overrides, expected) => {
+  const svc = synthService({ targetPort: 8080, spec: { overrides } });
+  expect(svc.spec).toMatchObject(expected);
+  expect(svc.spec.clusterIp).toBeUndefined();
+  expect(svc.spec.loadBalancerIp).toBeUndefined();
+});
+
+test('patches on the service win over overrides', () => {
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const service = new PloneService(chart, 'test', { targetPort: 8080, spec: { overrides: { type: 'NodePort' } } });
+  service.service.addJsonPatch(JsonPatch.replace('/spec/type', 'LoadBalancer'));
+  expect(Testing.synth(chart)[0].spec.type).toBe('LoadBalancer');
 });

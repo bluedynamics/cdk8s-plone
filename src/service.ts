@@ -1,8 +1,8 @@
-import { ApiObject } from 'cdk8s';
+import { ApiObject, JsonPatch } from 'cdk8s';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Construct } from 'constructs';
 import * as k8s from './imports/k8s';
-import { PloneKubeService } from './kube';
+import { PloneKubeService, toManifestValue } from './kube';
 
 /**
  * Configuration for the generated Kubernetes Service spec.
@@ -74,11 +74,15 @@ export interface PloneServiceSpec {
   readonly labels?: { [name: string]: string };
 
   /**
-   * Raw ServiceSpec overrides as a free-form map (e.g. `{ ipFamilyPolicy:
-   * 'PreferDualStack' }`). Highest precedence — merged on top of all curated
-   * fields and the construct-managed base. Use for any ServiceSpec field not
-   * covered above. Keys and values are passed through to the Service spec
-   * verbatim and are not validated by this construct.
+   * Raw ServiceSpec overrides as a free-form map in manifest form (e.g.
+   * `{ ipFamilyPolicy: 'PreferDualStack' }`). Highest precedence: each
+   * top-level key replaces the field on top of all curated fields and the
+   * construct-managed base. Use for any ServiceSpec field not covered above.
+   * Keys and values are written to the Service spec verbatim and are not
+   * validated by this construct. cdk8s value objects such as
+   * `IntOrString.fromNumber(8080)` are unwrapped, and the TypeScript spellings
+   * `clusterIp`, `loadBalancerIp` and `sessionAffinityConfig.clientIp` are
+   * accepted for `clusterIP`, `loadBalancerIP` and `clientIP`.
    * @default - none
    */
   readonly overrides?: { [key: string]: any };
@@ -180,8 +184,6 @@ export class PloneService extends Construct {
       publishNotReadyAddresses: userSpec.publishNotReadyAddresses,
       loadBalancerClass: userSpec.loadBalancerClass,
       loadBalancerSourceRanges: userSpec.loadBalancerSourceRanges,
-      // overrides win over everything, including ports/selector
-      ...userSpec.overrides ?? {},
     };
 
     const serviceOpts: k8s.KubeServiceProps = {
@@ -194,5 +196,31 @@ export class PloneService extends Construct {
     this.service = new PloneKubeService(this, 'service', serviceOpts);
     this.name = this.service.name;
     this.labels = service_labels;
+
+    // Overrides win over everything, including ports/selector. They are
+    // patched onto the converted spec: spread into k8s.ServiceSpec, the
+    // generated toJson functions would drop plain IntOrString values and
+    // unknown keys (#227).
+    for (const [key, raw] of Object.entries(userSpec.overrides ?? {})) {
+      if (raw === undefined) {
+        continue;
+      }
+      let value = toManifestValue(raw);
+      if (key === 'sessionAffinityConfig' && value?.clientIp !== undefined) {
+        const { clientIp, ...rest } = value;
+        value = { clientIP: clientIp, ...rest };
+      }
+      this.service.addJsonPatch(JsonPatch.add(`/spec/${LEGACY_SPEC_KEYS[key] ?? key}`, value));
+    }
   }
 }
+
+/**
+ * ServiceSpec keys whose TypeScript spelling in the generated imports differs
+ * from the manifest. Overrides used to go through the typed conversion, so
+ * the TypeScript spelling keeps working.
+ */
+const LEGACY_SPEC_KEYS: { [key: string]: string } = {
+  clusterIp: 'clusterIP',
+  loadBalancerIp: 'loadBalancerIP',
+};
