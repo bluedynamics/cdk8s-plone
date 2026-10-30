@@ -159,6 +159,30 @@ backend: {
 The top-level `serviceAnnotations` option is deprecated. Use `service.annotations` instead.
 ```
 
+### Escape hatch
+
+For fields without a dedicated option, patch the generated objects with [JSON Patch](https://cdk8s.io/docs/latest/basics/escape-hatches).
+`Plone` exposes `backendDeployment`, `backendService`, `frontendDeployment`, and `frontendService`.
+The frontend properties are `undefined` for the Blicca variant.
+
+```typescript
+import { JsonPatch } from 'cdk8s';
+
+const plone = new Plone(chart, 'plone');
+plone.backendDeployment.addJsonPatch(
+  JsonPatch.add('/spec/strategy', {
+    type: 'RollingUpdate',
+    rollingUpdate: { maxUnavailable: 0, maxSurge: '50%' },
+  }),
+  JsonPatch.add('/spec/template/spec/containers/0/args', ['--debug']),
+);
+```
+
+- Patches apply to the final manifest, so you write values in their manifest form, such as `'50%'` or `cpu: '2'`.
+- The Plone container is always `containers/0`.
+- Patches are not validated.
+  Prefer a dedicated option where one exists.
+
 ### Environment variables
 
 Pass environment variables with the cdk8s-plus `Env` API, including values sourced from a `Secret`.

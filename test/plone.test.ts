@@ -1,4 +1,4 @@
-import { Chart, Testing } from 'cdk8s';
+import { ApiObject, Chart, JsonPatch, Testing } from 'cdk8s';
 import { Plone, PloneVariant } from '../src/plone';
 
 
@@ -197,4 +197,77 @@ test('shutdown timing is plumbed through to backend and frontend', () => {
   const frontend = podSpec('plone-frontend');
   expect(frontend.containers[0].lifecycle).toBeUndefined();
   expect(frontend.terminationGracePeriodSeconds).toBeUndefined();
+});
+
+function synthKind(chart: Chart, kind: string, name: string): any {
+  return Testing.synth(chart).find(
+    (m: any) => m.kind === kind && m.metadata.labels['app.kubernetes.io/name'] === name,
+  );
+}
+
+test('escape hatch patches keep plain IntOrString and Quantity values', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const plone = new Plone(chart, 'plone');
+
+  // WHEN
+  plone.backendDeployment.addJsonPatch(
+    JsonPatch.add('/spec/strategy', { type: 'RollingUpdate', rollingUpdate: { maxUnavailable: 0, maxSurge: '50%' } }),
+    JsonPatch.add('/spec/template/spec/containers/0/resources/limits/cpu', '2'),
+    JsonPatch.add('/spec/template/spec/containers/0/startupProbe', { httpGet: { path: '/', port: 8080 } }),
+  );
+  plone.backendService.addJsonPatch(JsonPatch.replace('/spec/ports/0/targetPort', 'http'));
+
+  // THEN
+  const deployment = synthKind(chart, 'Deployment', 'plone-backend-deployment');
+  expect(deployment.spec.strategy).toEqual({ type: 'RollingUpdate', rollingUpdate: { maxUnavailable: 0, maxSurge: '50%' } });
+  const container = deployment.spec.template.spec.containers[0];
+  expect(container.resources.limits).toEqual({ cpu: '2', memory: '512Mi' });
+  expect(container.startupProbe).toEqual({ httpGet: { path: '/', port: 8080 } });
+  expect(synthKind(chart, 'Service', 'plone-backend-service').spec.ports[0].targetPort).toBe('http');
+});
+
+test('escape hatch patches can remove generated fields', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const plone = new Plone(chart, 'plone');
+
+  // WHEN
+  plone.frontendDeployment!.addJsonPatch(JsonPatch.remove('/spec/template/spec/containers/0/lifecycle'));
+
+  // THEN
+  const container = synthKind(chart, 'Deployment', 'plone-frontend-deployment').spec.template.spec.containers[0];
+  expect(container.lifecycle).toBeUndefined();
+});
+
+test('ApiObject.of reaches the same escape hatch', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const plone = new Plone(chart, 'plone');
+
+  // WHEN
+  ApiObject.of(plone.backendDeployment).addJsonPatch(
+    JsonPatch.add('/spec/template/spec/containers/0/args', ['--debug']),
+  );
+
+  // THEN
+  const container = synthKind(chart, 'Deployment', 'plone-backend-deployment').spec.template.spec.containers[0];
+  expect(container.args).toEqual(['--debug']);
+});
+
+test('frontend escape hatches are undefined for Blicca', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  const plone = new Plone(chart, 'plone', { variant: PloneVariant.BLICCA });
+
+  // THEN
+  expect(plone.backendDeployment).toBeDefined();
+  expect(plone.frontendDeployment).toBeUndefined();
+  expect(plone.frontendService).toBeUndefined();
 });

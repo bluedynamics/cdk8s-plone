@@ -148,9 +148,13 @@ Any object.
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.backendDeployment">backendDeployment</a></code> | <code>cdk8s.ApiObject</code> | The backend Deployment, as an escape hatch for fields without a dedicated option. |
+| <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.backendService">backendService</a></code> | <code>cdk8s.ApiObject</code> | The backend Service, as an escape hatch, see `backendDeployment`. |
 | <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.backendServiceName">backendServiceName</a></code> | <code>string</code> | Name of the backend Kubernetes service. |
 | <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.siteId">siteId</a></code> | <code>string</code> | The Plone site ID in ZODB. |
 | <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.variant">variant</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.PloneVariant">PloneVariant</a></code> | The deployment variant being used (VOLTO or BLICCA). |
+| <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.frontendDeployment">frontendDeployment</a></code> | <code>cdk8s.ApiObject</code> | The frontend Deployment, as an escape hatch, see `backendDeployment`. |
+| <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.frontendService">frontendService</a></code> | <code>cdk8s.ApiObject</code> | The frontend Service, as an escape hatch, see `backendDeployment`. |
 | <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.frontendServiceName">frontendServiceName</a></code> | <code>string</code> | Name of the frontend Kubernetes service. |
 
 ---
@@ -164,6 +168,34 @@ public readonly node: Node;
 - *Type:* constructs.Node
 
 The tree node.
+
+---
+
+##### `backendDeployment`<sup>Required</sup> <a name="backendDeployment" id="@bluedynamics/cdk8s-plone.Plone.property.backendDeployment"></a>
+
+```typescript
+public readonly backendDeployment: ApiObject;
+```
+
+- *Type:* cdk8s.ApiObject
+
+The backend Deployment, as an escape hatch for fields without a dedicated option.
+
+JSON patches apply to the final manifest, so plain values are kept:
+`plone.backendDeployment.addJsonPatch(JsonPatch.add('/spec/template/spec/containers/0/args', ['--debug']))`.
+The Plone container is always `containers/0`.
+
+---
+
+##### `backendService`<sup>Required</sup> <a name="backendService" id="@bluedynamics/cdk8s-plone.Plone.property.backendService"></a>
+
+```typescript
+public readonly backendService: ApiObject;
+```
+
+- *Type:* cdk8s.ApiObject
+
+The backend Service, as an escape hatch, see `backendDeployment`.
 
 ---
 
@@ -202,6 +234,34 @@ public readonly variant: PloneVariant;
 - *Type:* <a href="#@bluedynamics/cdk8s-plone.PloneVariant">PloneVariant</a>
 
 The deployment variant being used (VOLTO or BLICCA).
+
+---
+
+##### `frontendDeployment`<sup>Optional</sup> <a name="frontendDeployment" id="@bluedynamics/cdk8s-plone.Plone.property.frontendDeployment"></a>
+
+```typescript
+public readonly frontendDeployment: ApiObject;
+```
+
+- *Type:* cdk8s.ApiObject
+
+The frontend Deployment, as an escape hatch, see `backendDeployment`.
+
+Only set when variant is VOLTO, otherwise undefined.
+
+---
+
+##### `frontendService`<sup>Optional</sup> <a name="frontendService" id="@bluedynamics/cdk8s-plone.Plone.property.frontendService"></a>
+
+```typescript
+public readonly frontendService: ApiObject;
+```
+
+- *Type:* cdk8s.ApiObject
+
+The frontend Service, as an escape hatch, see `backendDeployment`.
+
+Only set when variant is VOLTO, otherwise undefined.
 
 ---
 
@@ -407,7 +467,8 @@ const cache = new PloneVinylCache(chart, 'cache', {
   plone: plone,
   replicas: 2,
 });
-// Use cache.vinylCacheServiceName for IngressRoute
+// Use cache.vinylCacheServiceName for IngressRoute,
+// cache.invalidationUrl for plone.cachepurging
 ```
 
 
@@ -528,6 +589,7 @@ Any object.
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCache.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCache.property.invalidationUrl">invalidationUrl</a></code> | <code>string</code> | URL of the cloud-vinyl invalidation proxy for this cache, e.g. for the purge proxy setting of `plone.cachepurging`. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCache.property.vinylCacheServiceName">vinylCacheServiceName</a></code> | <code>string</code> | Name of the VinylCache service created by the operator. |
 
 ---
@@ -541,6 +603,25 @@ public readonly node: Node;
 - *Type:* constructs.Node
 
 The tree node.
+
+---
+
+##### `invalidationUrl`<sup>Required</sup> <a name="invalidationUrl" id="@bluedynamics/cdk8s-plone.PloneVinylCache.property.invalidationUrl"></a>
+
+```typescript
+public readonly invalidationUrl: string;
+```
+
+- *Type:* string
+
+URL of the cloud-vinyl invalidation proxy for this cache, e.g. for the purge proxy setting of `plone.cachepurging`.
+
+Has the form `http://<cache>-invalidation.<namespace>:8090`, the same
+address the operator reports in `status.invalidationURL`. The proxy serves
+all namespaces and routes by `Host`, so the bare Service name is rejected.
+
+Throws if the chart has no namespace, because the URL cannot be built
+without one, or if `invalidation` is disabled.
 
 ---
 
