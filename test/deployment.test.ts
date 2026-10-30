@@ -231,3 +231,57 @@ test.each([
   // THEN
   expect(() => new PloneDeployment(chart, 'test', { port: 8080, ...timing })).toThrow(message);
 });
+
+test('no strategy is rendered without rollingUpdate', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new PloneDeployment(chart, 'test', { port: 8080 });
+
+  // THEN
+  expect(synthDeployment(chart).spec.strategy).toBeUndefined();
+});
+
+test('rollingUpdate renders the strategy with numbers and percentages', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new PloneDeployment(chart, 'test', { port: 8080, rollingUpdate: { maxUnavailable: 0, maxSurge: '50%' } });
+
+  // THEN
+  expect(synthDeployment(chart).spec.strategy).toEqual({
+    type: 'RollingUpdate',
+    rollingUpdate: { maxUnavailable: 0, maxSurge: '50%' },
+  });
+});
+
+test('rollingUpdate with one field leaves the other to Kubernetes', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new PloneDeployment(chart, 'test', { port: 8080, rollingUpdate: { maxSurge: 1 } });
+
+  // THEN
+  expect(synthDeployment(chart).spec.strategy).toEqual({ type: 'RollingUpdate', rollingUpdate: { maxSurge: 1 } });
+});
+
+test.each([
+  [{ maxSurge: 0, maxUnavailable: '0%' }, /cannot both be 0/],
+  [{ maxSurge: -1 }, /rollingUpdate.maxSurge must be a non-negative integer or a percentage/],
+  [{ maxSurge: 1.5 }, /rollingUpdate.maxSurge must be/],
+  [{ maxUnavailable: '25' }, /rollingUpdate.maxUnavailable must be/],
+  [{ maxUnavailable: '150%' }, /cannot exceed 100%/],
+])('rejects invalid rollingUpdate %j', (rollingUpdate, message) => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // THEN
+  expect(() => new PloneDeployment(chart, 'test', { port: 8080, rollingUpdate })).toThrow(message);
+});

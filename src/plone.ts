@@ -1,7 +1,7 @@
 import { ApiObject, Names } from 'cdk8s';
 import * as kplus from 'cdk8s-plus-30';
 import { Construct } from 'constructs';
-import { PloneDeployment, PloneDeploymentOptions } from './deployment';
+import { PloneDeployment, PloneDeploymentOptions, PloneRollingUpdate } from './deployment';
 import { IntOrString } from './imports/k8s';
 import * as k8s from './imports/k8s';
 import { ServiceMonitor, ServiceMonitorSpecEndpointsTargetPort } from './imports/monitoring.coreos.com';
@@ -316,6 +316,16 @@ export interface PloneBaseOptions {
    * @default - `preStopDelaySeconds` + 30, which keeps the Kubernetes default of 30 seconds for the shutdown itself
    */
   readonly terminationGracePeriodSeconds?: number;
+
+  /**
+   * Rolling update settings for the Deployment (`spec.strategy.rollingUpdate`).
+   * For rollouts without a capacity dip use `{ maxUnavailable: 0, maxSurge: '50%' }`:
+   * Plone needs time to become ready, and the default lets a quarter of the
+   * pods go away first. Not to be confused with the top-level `maxUnavailable`
+   * and `minAvailable`, which configure the PodDisruptionBudget.
+   * @default - Kubernetes default ('25%' surge, '25%' unavailable)
+   */
+  readonly rollingUpdate?: PloneRollingUpdate;
 }
 /**
  * Plone deployment variants.
@@ -504,6 +514,7 @@ export class Plone extends Construct {
       securityContext: backend.securityContext as k8s.SecurityContext,
       preStopDelaySeconds: backend.preStopDelaySeconds,
       terminationGracePeriodSeconds: backend.terminationGracePeriodSeconds,
+      rollingUpdate: backend.rollingUpdate,
     };
 
     // Probing
@@ -604,6 +615,7 @@ export class Plone extends Construct {
         securityContext: frontend.securityContext as k8s.SecurityContext,
         preStopDelaySeconds: frontend.preStopDelaySeconds,
         terminationGracePeriodSeconds: frontend.terminationGracePeriodSeconds,
+        rollingUpdate: frontend.rollingUpdate,
       };
 
       // Probing

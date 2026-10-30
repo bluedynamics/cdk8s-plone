@@ -98,6 +98,17 @@ backend: {
 }
 ```
 
+`rollingUpdate` controls how a Deployment replaces its pods during an update (`spec.strategy.rollingUpdate`).
+It is independent of the top-level `maxUnavailable` and `minAvailable`, which configure the PodDisruptionBudget.
+Both fields take an absolute number or a percentage string.
+Without the option, Kubernetes uses 25% for both.
+
+```typescript
+backend: {
+  rollingUpdate: { maxUnavailable: 0, maxSurge: '50%' }, // no capacity dip during rollouts
+}
+```
+
 ### Probes
 
 Readiness probes are enabled by default; liveness probes are **disabled** by default.

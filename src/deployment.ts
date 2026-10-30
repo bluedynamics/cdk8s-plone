@@ -31,6 +31,26 @@ export interface PloneImageOptions {
 }
 
 /**
+ * Rolling update settings for a Deployment (`spec.strategy.rollingUpdate`).
+ */
+export interface PloneRollingUpdate {
+  /**
+   * Maximum number of pods created above the desired replica count during
+   * an update, as an absolute number (e.g. 1) or a percentage (e.g. '50%').
+   * @default - Kubernetes default ('25%')
+   */
+  readonly maxSurge?: number | string;
+
+  /**
+   * Maximum number of pods that can be unavailable during an update, as an
+   * absolute number (e.g. 0) or a percentage (e.g. '25%'). Not to be confused
+   * with the PodDisruptionBudget's `maxUnavailable`.
+   * @default - Kubernetes default ('25%')
+   */
+  readonly maxUnavailable?: number | string;
+}
+
+/**
  * Configuration options for PloneDeployment.
  */
 export interface PloneDeploymentOptions {
@@ -165,6 +185,12 @@ export interface PloneDeploymentOptions {
    * @default - `preStopDelaySeconds` + 30, which keeps the Kubernetes default of 30 seconds for the shutdown itself
    */
   readonly terminationGracePeriodSeconds?: number;
+
+  /**
+   * Rolling update settings, see `PloneRollingUpdate`.
+   * @default - Kubernetes default strategy
+   */
+  readonly rollingUpdate?: PloneRollingUpdate;
 }
 
 /**
@@ -177,6 +203,46 @@ const DEFAULT_PRE_STOP_DELAY_SECONDS = 15;
  * of `terminationGracePeriodSeconds`.
  */
 const DEFAULT_SHUTDOWN_SECONDS = 30;
+
+function isZero(value: number | string | undefined): boolean {
+  return value === 0 || value === '0%';
+}
+
+function toIntOrString(name: string, value: number | string | undefined): k8s.IntOrString | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (typeof value === 'number') {
+    if (!Number.isInteger(value) || value < 0) {
+      throw new Error(`rollingUpdate.${name} must be a non-negative integer or a percentage like '25%', got ${value}`);
+    }
+    return k8s.IntOrString.fromNumber(value);
+  }
+  if (!/^\d+%$/.test(value)) {
+    throw new Error(`rollingUpdate.${name} must be a non-negative integer or a percentage like '25%', got '${value}'`);
+  }
+  return k8s.IntOrString.fromString(value);
+}
+
+function toStrategy(rollingUpdate: PloneRollingUpdate | undefined): k8s.DeploymentStrategy | undefined {
+  if (rollingUpdate === undefined) {
+    return undefined;
+  }
+  const { maxSurge, maxUnavailable } = rollingUpdate;
+  if (isZero(maxSurge) && isZero(maxUnavailable)) {
+    throw new Error('rollingUpdate.maxSurge and rollingUpdate.maxUnavailable cannot both be 0');
+  }
+  if (typeof maxUnavailable === 'string' && parseInt(maxUnavailable, 10) > 100) {
+    throw new Error(`rollingUpdate.maxUnavailable cannot exceed 100%, got '${maxUnavailable}'`);
+  }
+  return {
+    type: 'RollingUpdate',
+    rollingUpdate: {
+      maxSurge: toIntOrString('maxSurge', maxSurge),
+      maxUnavailable: toIntOrString('maxUnavailable', maxUnavailable),
+    },
+  };
+}
 
 function validateSeconds(name: string, value: number | undefined): void {
   if (value !== undefined && (!Number.isInteger(value) || value < 0)) {
@@ -271,6 +337,7 @@ export class PloneDeployment extends Construct {
       },
       spec: {
         replicas,
+        strategy: toStrategy(options.rollingUpdate),
         selector: {
           matchLabels: label,
         },
