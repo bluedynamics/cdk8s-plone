@@ -10,6 +10,9 @@ const project = new cdk.JsiiProject({
   defaultReleaseBranch: 'main',
   jsiiVersion: '~5.9.11',
   name: '@bluedynamics/cdk8s-plone',
+  // Short-lived tokens from the bluedynamics-projen GitHub App (secrets
+  // PROJEN_APP_ID, PROJEN_APP_PRIVATE_KEY) instead of a yearly PAT.
+  projenCredentials: github.GithubCredentials.fromApp(),
   projenrcTs: true,
   repositoryUrl: 'https://github.com/bluedynamics/cdk8s-plone.git',
   description: 'Provides a CMS Plone Backend and Frontend for Kubernetes with cdk8s',
