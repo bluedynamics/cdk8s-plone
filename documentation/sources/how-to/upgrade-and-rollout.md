@@ -112,6 +112,27 @@ git diff dist/
 
 Read the [changelog](https://github.com/bluedynamics/cdk8s-plone/releases) for renamed or deprecated options, then apply the reviewed manifests.
 
+(upgrade-pod-labels)=
+
+### Roll out the pod labels before 0.3
+
+Starting with 0.2.5, every backend and frontend pod carries the labels `app.kubernetes.io/instance` and `cdk8s-plone.bluedynamics.eu/group`.
+Adding them replaces all pods once, in an ordinary rolling update.
+
+Release 0.3 switches the Service and the PodDisruptionBudget to select on these labels.
+Roll out a release from 0.2.5 on before you upgrade to 0.3, and wait until it has finished.
+Before you apply 0.3, check that no pod lacks the labels.
+The following command must print nothing:
+
+```shell
+kubectl get pods -n <namespace> -l 'app.kubernetes.io/managed-by=cdk8s-plone,!app.kubernetes.io/instance'
+```
+
+```{warning}
+If you skip this step, all pods that predate the labels leave the Service when 0.3 is applied.
+The site is unreachable until the first new pod is ready.
+```
+
 ## See also
 
 - {doc}`/how-to/scale-and-high-availability` — replicas and PodDisruptionBudget for zero-downtime rollouts.
