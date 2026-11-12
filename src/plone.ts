@@ -326,7 +326,49 @@ export interface PloneBaseOptions {
    * @default - Kubernetes default ('25%' surge, '25%' unavailable)
    */
   readonly rollingUpdate?: PloneRollingUpdate;
+
+  /**
+   * Additional Deployments whose pods run with different settings and join
+   * this role's Service and PodDisruptionBudget, see `PloneGroup`.
+   * Their replicas add to `replicas`.
+   * @default - no groups
+   */
+  readonly groups?: PloneGroup[];
 }
+/**
+ * A group of pods that runs with different settings behind the same Service
+ * as the main Deployment of its role, e.g. an allocator experiment or a canary.
+ * Everything not set here is inherited from the role's options.
+ */
+export interface PloneGroup {
+  /**
+   * Name of the group, a lowercase DNS label. Pods carry it in the label
+   * `cdk8s-plone.bluedynamics.eu/group`. `default` is reserved for the main
+   * Deployment. Renaming a group creates a new Deployment; cdk8s does not
+   * delete the old one.
+   */
+  readonly name: string;
+
+  /**
+   * Number of pods in the group, in addition to the role's `replicas`.
+   * @default 1
+   */
+  readonly replicas?: number;
+
+  /**
+   * Environment for the group's pods, merged over the role's environment:
+   * variables with the same name are replaced, sources are appended.
+   * @default - the role's environment
+   */
+  readonly environment?: kplus.Env;
+
+  /**
+   * Container image for the group's pods.
+   * @default - the role's image
+   */
+  readonly image?: string;
+}
+
 /**
  * Pod label naming the group a Plone pod belongs to. Pods of the main
  * Deployment of a role are in the group `default`.
@@ -468,6 +510,18 @@ export class Plone extends Construct {
   public readonly frontendService: ApiObject | undefined;
 
   /**
+   * The backend group Deployments by group name, as an escape hatch, see
+   * `backendDeployment`. Empty without backend groups.
+   */
+  public readonly backendGroupDeployments: { [name: string]: ApiObject };
+
+  /**
+   * The frontend group Deployments by group name, as an escape hatch, see
+   * `backendDeployment`. Empty without frontend groups or for the Blicca variant.
+   */
+  public readonly frontendGroupDeployments: { [name: string]: ApiObject };
+
+  /**
    * The deployment variant being used (VOLTO or BLICCA).
    */
   public readonly variant: PloneVariant;
@@ -485,209 +539,152 @@ export class Plone extends Construct {
     this.siteId = options.siteId ?? 'Plone';
     this.variant = options.variant ?? PloneVariant.VOLTO;
 
-    // Pod labels shared by all pods of one role of this construct. The
-    // Service and PodDisruptionBudget will select on them once backend
-    // groups (#243) add further Deployments behind the same Service.
+    this.frontendGroupDeployments = {};
     const instance = Names.toLabelValue(this);
 
     // ------------------------------------------------------------------------
     // Backend
     const backend = options.backend ?? {};
-    const backendLabels = {
-      'app.kubernetes.io/name': 'plone-backend',
-      'app.kubernetes.io/instance': instance,
-      'app.kubernetes.io/component': 'backend',
-      'app.kubernetes.io/version': options.version ?? 'undefined',
-      [GROUP_LABEL]: 'default',
-    };
     const backendPort = 8080;
-
-    // Options
-    var backendOptions: PloneDeploymentOptions = {
-      labels: backendLabels,
-      image: {
-        image: backend.image ?? 'plone/plone-backend:latest',
-        imagePullSecrets: options.imagePullSecrets ?? [],
-        imagePullPolicy: backend.imagePullPolicy ?? 'IfNotPresent',
-      },
-      replicas: backend.replicas,
-      limitCpu: backend.limitCpu ?? '500m',
-      limitMemory: backend.limitMemory ?? '512Mi',
-      requestCpu: backend.requestCpu ?? '200m',
-      requestMemory: backend.requestMemory ?? '256Mi',
-      pdb: {
-        maxUnavailable: backend.maxUnavailable ?? undefined,
-        minAvailable: backend.minAvailable ?? undefined,
-      },
+    const backendRole = this.addRole({
+      role: 'backend',
+      options: backend,
+      instance,
+      version: options.version,
+      imagePullSecrets: options.imagePullSecrets,
       port: backendPort,
+      image: backend.image ?? 'plone/plone-backend:latest',
+      limitMemory: '512Mi',
       environment: backend.environment,
-      annotations: backend.annotations,
-      podAnnotations: backend.podAnnotations,
-      nodeSelector: backend.nodeSelector,
-      securityContext: backend.securityContext as k8s.SecurityContext,
-      preStopDelaySeconds: backend.preStopDelaySeconds,
-      terminationGracePeriodSeconds: backend.terminationGracePeriodSeconds,
-      rollingUpdate: backend.rollingUpdate,
-    };
-
-    // Probing
-    const backendActionHttpGet: k8s.HttpGetAction = {
-      path: '/',
-      port: IntOrString.fromNumber(backendPort),
-    };
-    if (backend.livenessEnabled ?? false) {
-      backendOptions.livenessProbe = {
-        httpGet: backendActionHttpGet,
-        initialDelaySeconds: backend.livenessInitialDelaySeconds ?? 30,
-        timeoutSeconds: backend.livenessTimeoutSeconds ?? 5,
-        periodSeconds: backend.livenessPeriodSeconds ?? 10,
-        successThreshold: backend.livenessSuccessThreshold ?? 1,
-        failureThreshold: backend.livenessFailureThreshold ?? 3,
-      };
-    }
-    if (backend.readinessEnabled ?? true) {
-      backendOptions.readinessProbe = {
-        httpGet: backendActionHttpGet,
-        initialDelaySeconds: backend.readinessInitialDelaySeconds ?? 10,
-        timeoutSeconds: backend.readinessTimeoutSeconds ?? 15,
-        periodSeconds: backend.readinessPeriodSeconds ?? 10,
-        successThreshold: backend.readinessSuccessThreshold ?? 1,
-        failureThreshold: backend.readinessFailureThreshold ?? 3,
-      };
-    }
-    // Deployment
-    var backendDeployment = new PloneDeployment(this, 'backend', backendOptions);
-
-    // Service
-    const backendService = new PloneService(backendDeployment, 'service', {
-      labels: {
-        'app.kubernetes.io/name': 'plone-backend-service',
-        'app.kubernetes.io/component': 'service',
-      },
-      targetPort: backendPort,
-      selectorLabel: { app: Names.toLabelValue(backendDeployment) },
-      portName: 'backend-http',
-      spec: {
-        ...backend.service,
-        annotations: { ...backend.serviceAnnotations, ...backend.service?.annotations },
-      },
     });
-    this.backendServiceName = backendService.name;
-    this.backendDeployment = backendDeployment.deployment;
-    this.backendService = backendService.service;
-
-    // ServiceMonitor for backend
-    if (backend.servicemonitor) {
-      this.createServiceMonitor(backendService, 'backend', {
-        port: backend.metricsPort ?? 'backend-http',
-        path: backend.metricsPath ?? '/metrics',
-      });
-    }
+    this.backendServiceName = backendRole.service.name;
+    this.backendDeployment = backendRole.deployment.deployment;
+    this.backendService = backendRole.service.service;
+    this.backendGroupDeployments = backendRole.groups;
 
     // ------------------------------------------------------------------------
     // Frontend
     if (this.variant == PloneVariant.VOLTO) {
       const frontend = options.frontend ?? {};
-      const frontendPort = 3000;
-      const frontendLabels = {
-        'app.kubernetes.io/name': 'plone-frontend',
-        'app.kubernetes.io/instance': instance,
-        'app.kubernetes.io/component': 'frontend',
-        'app.kubernetes.io/version': options.version ?? 'undefined',
-        [GROUP_LABEL]: 'default',
-      };
 
       // Environment for RAZZLE
       var frontendEnvironment = frontend.environment ?? new kplus.Env([], {});
       if (frontendEnvironment.variables.RAZZLE_INTERNAL_API_PATH === undefined) {
         // connect with backend service
-        frontendEnvironment?.addVariable('RAZZLE_INTERNAL_API_PATH', kplus.EnvValue.fromValue(`http://${backendService.name}:${backendPort}/${this.siteId}`));
+        frontendEnvironment?.addVariable('RAZZLE_INTERNAL_API_PATH', kplus.EnvValue.fromValue(`http://${backendRole.service.name}:${backendPort}/${this.siteId}`));
       }
 
-      // Options
-      var frontendOptions: PloneDeploymentOptions = {
-        labels: frontendLabels,
-        image: {
-          image: frontend.image ?? 'plone/plone-frontend:latest',
-          imagePullSecrets: options.imagePullSecrets ?? [],
-          imagePullPolicy: frontend.imagePullPolicy ?? 'IfNotPresent',
-        },
-        replicas: frontend.replicas,
-        limitCpu: frontend.limitCpu ?? '500m',
-        limitMemory: frontend.limitMemory ?? '1Gi',
-        requestCpu: frontend.requestCpu ?? '200m',
-        requestMemory: frontend.requestMemory ?? '256Mi',
-
-        pdb: {
-          maxUnavailable: frontend.maxUnavailable ?? undefined,
-          minAvailable: frontend.minAvailable ?? undefined,
-        },
-        port: frontendPort,
+      const frontendRole = this.addRole({
+        role: 'frontend',
+        options: frontend,
+        instance,
+        version: options.version,
+        imagePullSecrets: options.imagePullSecrets,
+        port: 3000,
+        image: frontend.image ?? 'plone/plone-frontend:latest',
+        limitMemory: '1Gi',
         environment: frontendEnvironment,
-        annotations: frontend.annotations,
-        podAnnotations: frontend.podAnnotations,
-        nodeSelector: frontend.nodeSelector,
-        securityContext: frontend.securityContext as k8s.SecurityContext,
-        preStopDelaySeconds: frontend.preStopDelaySeconds,
-        terminationGracePeriodSeconds: frontend.terminationGracePeriodSeconds,
-        rollingUpdate: frontend.rollingUpdate,
-      };
-
-      // Probing
-      const frontendActionHttpGet: k8s.HttpGetAction = {
-        path: '/',
-        port: IntOrString.fromNumber(frontendPort),
-      };
-      if (frontend.livenessEnabled ?? false) {
-        frontendOptions.livenessProbe = {
-          httpGet: frontendActionHttpGet,
-          initialDelaySeconds: frontend.livenessInitialDelaySeconds ?? 30,
-          timeoutSeconds: frontend.livenessTimeoutSeconds ?? 5,
-          periodSeconds: frontend.livenessPeriodSeconds ?? 10,
-          successThreshold: frontend.livenessSuccessThreshold ?? 1,
-          failureThreshold: frontend.livenessFailureThreshold ?? 3,
-        };
-      }
-      if (frontend.readinessEnabled ?? true) {
-        frontendOptions.readinessProbe = {
-          httpGet: frontendActionHttpGet,
-          initialDelaySeconds: frontend.readinessInitialDelaySeconds ?? 10,
-          timeoutSeconds: frontend.readinessTimeoutSeconds ?? 15,
-          periodSeconds: frontend.readinessPeriodSeconds ?? 10,
-          successThreshold: frontend.readinessSuccessThreshold ?? 1,
-          failureThreshold: frontend.readinessFailureThreshold ?? 3,
-        };
-      }
-
-      // Deployment
-      const frontendDeployment = new PloneDeployment(this, 'frontend', frontendOptions);
-
-      // Service
-      const frontendService = new PloneService(frontendDeployment, 'service', {
-        labels: {
-          'app.kubernetes.io/name': 'plone-frontend-service',
-          'app.kubernetes.io/component': 'service',
-        },
-        targetPort: frontendPort,
-        selectorLabel: { app: Names.toLabelValue(frontendDeployment) },
-        portName: 'frontend-http',
-        spec: {
-          ...frontend.service,
-          annotations: { ...frontend.serviceAnnotations, ...frontend.service?.annotations },
-        },
       });
-      this.frontendServiceName = frontendService.name;
-      this.frontendDeployment = frontendDeployment.deployment;
-      this.frontendService = frontendService.service;
-
-      // ServiceMonitor for frontend
-      if (frontend.servicemonitor) {
-        this.createServiceMonitor(frontendService, 'frontend', {
-          port: frontend.metricsPort ?? 'frontend-http',
-          path: frontend.metricsPath ?? '/metrics',
-        });
-      }
+      this.frontendServiceName = frontendRole.service.name;
+      this.frontendDeployment = frontendRole.deployment.deployment;
+      this.frontendService = frontendRole.service.service;
+      this.frontendGroupDeployments = frontendRole.groups;
     }
+  }
+
+  /**
+   * Creates the Deployment, Service, optional ServiceMonitor and group
+   * Deployments of one role (backend or frontend).
+   *
+   * Every pod of the role carries `app.kubernetes.io/name` and
+   * `app.kubernetes.io/instance`; the Service and PodDisruptionBudget select on
+   * them, so group pods join both. Each Deployment keeps its own `app`
+   * selector, so no Deployment selector overlaps another.
+   */
+  private addRole(config: RoleConfig): { deployment: PloneDeployment; service: PloneService; groups: { [name: string]: ApiObject } } {
+    const { role, options: o, port } = config;
+    const groups = o.groups ?? [];
+    validateGroups(role, groups);
+
+    const roleLabels = {
+      'app.kubernetes.io/name': `plone-${role}`,
+      'app.kubernetes.io/instance': config.instance,
+    };
+    const deploymentOptions: PloneDeploymentOptions = {
+      labels: {
+        'app.kubernetes.io/name': `plone-${role}`,
+        'app.kubernetes.io/instance': config.instance,
+        'app.kubernetes.io/component': role,
+        'app.kubernetes.io/version': config.version ?? 'undefined',
+        [GROUP_LABEL]: 'default',
+      },
+      image: {
+        image: config.image,
+        imagePullSecrets: config.imagePullSecrets ?? [],
+        imagePullPolicy: o.imagePullPolicy ?? 'IfNotPresent',
+      },
+      replicas: o.replicas,
+      limitCpu: o.limitCpu ?? '500m',
+      limitMemory: o.limitMemory ?? config.limitMemory,
+      requestCpu: o.requestCpu ?? '200m',
+      requestMemory: o.requestMemory ?? '256Mi',
+      pdb: {
+        maxUnavailable: o.maxUnavailable ?? undefined,
+        minAvailable: o.minAvailable ?? undefined,
+      },
+      pdbSelector: roleLabels,
+      pdbReplicas: (o.replicas ?? DEFAULT_REPLICAS) + groups.reduce((sum, g) => sum + (g.replicas ?? 1), 0),
+      port,
+      environment: config.environment,
+      annotations: o.annotations,
+      podAnnotations: o.podAnnotations,
+      nodeSelector: o.nodeSelector,
+      securityContext: o.securityContext as k8s.SecurityContext,
+      preStopDelaySeconds: o.preStopDelaySeconds,
+      terminationGracePeriodSeconds: o.terminationGracePeriodSeconds,
+      rollingUpdate: o.rollingUpdate,
+      ...probes(o, port),
+    };
+
+    const deployment = new PloneDeployment(this, role, deploymentOptions);
+    const service = new PloneService(deployment, 'service', {
+      labels: {
+        'app.kubernetes.io/name': `plone-${role}-service`,
+        'app.kubernetes.io/component': 'service',
+      },
+      targetPort: port,
+      selectorLabel: roleLabels,
+      portName: `${role}-http`,
+      spec: {
+        ...o.service,
+        annotations: { ...o.serviceAnnotations, ...o.service?.annotations },
+      },
+    });
+
+    if (o.servicemonitor) {
+      this.createServiceMonitor(service, role, {
+        port: o.metricsPort ?? `${role}-http`,
+        path: o.metricsPath ?? '/metrics',
+      });
+    }
+
+    const groupDeployments: { [name: string]: ApiObject } = {};
+    for (const group of groups) {
+      const groupDeployment = new PloneDeployment(this, `${role}-group-${group.name}`, {
+        ...deploymentOptions,
+        labels: { ...deploymentOptions.labels, [GROUP_LABEL]: group.name },
+        replicas: group.replicas ?? 1,
+        image: { ...deploymentOptions.image, image: group.image ?? config.image },
+        environment: mergeEnv(config.environment, group.environment),
+        // the role's PDB covers the group pods
+        pdb: undefined,
+        pdbSelector: undefined,
+        pdbReplicas: undefined,
+      });
+      groupDeployments[group.name] = groupDeployment.deployment;
+    }
+
+    return { deployment, service, groups: groupDeployments };
   }
 
   /**
@@ -720,6 +717,7 @@ export class Plone extends Construct {
             'app.kubernetes.io/name': service.labels['app.kubernetes.io/name'],
           },
         },
+        podTargetLabels: [GROUP_LABEL],
         endpoints: [
           {
             ...(portName && { port: portName }),
@@ -731,4 +729,79 @@ export class Plone extends Construct {
       },
     });
   }
+}
+
+/**
+ * Replicas of a Deployment without `replicas`, see `PloneDeployment`.
+ */
+const DEFAULT_REPLICAS = 2;
+
+/**
+ * Per-role settings for `Plone.addRole`.
+ */
+interface RoleConfig {
+  readonly role: 'backend' | 'frontend';
+  readonly options: PloneBaseOptions;
+  readonly instance: string;
+  readonly version?: string;
+  readonly imagePullSecrets?: string[];
+  readonly port: number;
+  readonly image: string;
+  readonly limitMemory: string;
+  readonly environment?: kplus.Env;
+}
+
+function probes(o: PloneBaseOptions, port: number): { livenessProbe?: k8s.Probe; readinessProbe?: k8s.Probe } {
+  const httpGet: k8s.HttpGetAction = { path: '/', port: IntOrString.fromNumber(port) };
+  return {
+    livenessProbe: (o.livenessEnabled ?? false) ? {
+      httpGet,
+      initialDelaySeconds: o.livenessInitialDelaySeconds ?? 30,
+      timeoutSeconds: o.livenessTimeoutSeconds ?? 5,
+      periodSeconds: o.livenessPeriodSeconds ?? 10,
+      successThreshold: o.livenessSuccessThreshold ?? 1,
+      failureThreshold: o.livenessFailureThreshold ?? 3,
+    } : undefined,
+    readinessProbe: (o.readinessEnabled ?? true) ? {
+      httpGet,
+      initialDelaySeconds: o.readinessInitialDelaySeconds ?? 10,
+      timeoutSeconds: o.readinessTimeoutSeconds ?? 15,
+      periodSeconds: o.readinessPeriodSeconds ?? 10,
+      successThreshold: o.readinessSuccessThreshold ?? 1,
+      failureThreshold: o.readinessFailureThreshold ?? 3,
+    } : undefined,
+  };
+}
+
+function validateGroups(role: string, groups: PloneGroup[]): void {
+  const seen = new Set<string>();
+  for (const group of groups) {
+    if (!/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(group.name) || group.name.length > 63) {
+      throw new Error(`${role}.groups: "${group.name}" is not a lowercase DNS label`);
+    }
+    if (group.name === 'default') {
+      throw new Error(`${role}.groups: "default" is reserved for the main Deployment`);
+    }
+    if (seen.has(group.name)) {
+      throw new Error(`${role}.groups: "${group.name}" is used more than once`);
+    }
+    seen.add(group.name);
+    if (group.replicas !== undefined && (!Number.isInteger(group.replicas) || group.replicas < 0)) {
+      throw new Error(`${role}.groups["${group.name}"].replicas must be a non-negative integer, got ${group.replicas}`);
+    }
+  }
+}
+
+/**
+ * Merges a group's environment over the role's: variables by name, the
+ * group wins; sources are appended.
+ */
+function mergeEnv(base: kplus.Env | undefined, override: kplus.Env | undefined): kplus.Env | undefined {
+  if (override === undefined) {
+    return base;
+  }
+  if (base === undefined) {
+    return override;
+  }
+  return new kplus.Env([...base.sources, ...override.sources], { ...base.variables, ...override.variables });
 }

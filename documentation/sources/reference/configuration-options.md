@@ -172,6 +172,46 @@ backend: {
 The top-level `serviceAnnotations` option is deprecated. Use `service.annotations` instead.
 ```
 
+(groups)=
+
+### Groups
+
+`groups` runs part of a role's pods with different settings behind the same Service, for example an allocator experiment or a canary.
+Each group becomes an additional Deployment.
+
+```typescript
+import { Env, EnvValue } from 'cdk8s-plus-30';
+
+backend: {
+  replicas: 4,
+  groups: [
+    {
+      name: 'jemalloc',
+      replicas: 2,
+      environment: new Env([], {
+        LD_PRELOAD: EnvValue.fromValue('/usr/lib/x86_64-linux-gnu/libjemalloc.so.2'),
+      }),
+    },
+  ],
+}
+```
+
+- A group inherits all settings of its role, including probes, resources, scheduling, and the graceful shutdown.
+  It can set `replicas` (default `1`), `environment`, and `image`.
+- `environment` is merged over the role's environment.
+  A variable with the same name replaces the role's value.
+- Group replicas add to the role's `replicas`: the example runs six backend pods.
+- Group pods join the role's Service and PodDisruptionBudget.
+- Every pod carries the label `cdk8s-plone.bluedynamics.eu/group`, with the value `default` for the main Deployment.
+  The ServiceMonitor transfers it to the metrics, where Prometheus names it `cdk8s_plone_bluedynamics_eu_group`.
+- `name` must be a lowercase DNS label and must not be `default`.
+  Renaming a group creates a new Deployment, and the old one stays until you delete it.
+- `groups` works for `frontend` as well.
+
+For other settings per group, patch the group's Deployment through `plone.backendGroupDeployments` or `plone.frontendGroupDeployments`, keyed by group name.
+
+Groups require that the pod labels from 0.2.5 are rolled out before you upgrade, see {ref}`upgrade-pod-labels`.
+
 ### Escape hatch
 
 For fields without a dedicated option, patch the generated objects with [JSON Patch](https://cdk8s.io/docs/latest/basics/escape-hatches).

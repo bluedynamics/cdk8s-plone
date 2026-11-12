@@ -90,7 +90,8 @@ exports[`defaults 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "plone-backend-c8acbe0a",
+          "app.kubernetes.io/instance": "plone-c8bc8820",
+          "app.kubernetes.io/name": "plone-backend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -117,7 +118,8 @@ exports[`defaults 1`] = `
         },
       ],
       "selector": {
-        "app": "plone-backend-c8acbe0a",
+        "app.kubernetes.io/instance": "plone-c8bc8820",
+        "app.kubernetes.io/name": "plone-backend",
       },
     },
   },
@@ -214,7 +216,8 @@ exports[`defaults 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "plone-frontend-c88fef5c",
+          "app.kubernetes.io/instance": "plone-c8bc8820",
+          "app.kubernetes.io/name": "plone-frontend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -241,7 +244,8 @@ exports[`defaults 1`] = `
         },
       ],
       "selector": {
-        "app": "plone-frontend-c88fef5c",
+        "app.kubernetes.io/instance": "plone-c8bc8820",
+        "app.kubernetes.io/name": "plone-frontend",
       },
     },
   },
@@ -649,7 +653,8 @@ exports[`with custom appVersion 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "plone-backend-c8acbe0a",
+          "app.kubernetes.io/instance": "plone-c8bc8820",
+          "app.kubernetes.io/name": "plone-backend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -676,7 +681,8 @@ exports[`with custom appVersion 1`] = `
         },
       ],
       "selector": {
-        "app": "plone-backend-c8acbe0a",
+        "app.kubernetes.io/instance": "plone-c8bc8820",
+        "app.kubernetes.io/name": "plone-backend",
       },
     },
   },
@@ -773,7 +779,8 @@ exports[`with custom appVersion 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "plone-frontend-c88fef5c",
+          "app.kubernetes.io/instance": "plone-c8bc8820",
+          "app.kubernetes.io/name": "plone-frontend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -800,7 +807,8 @@ exports[`with custom appVersion 1`] = `
         },
       ],
       "selector": {
-        "app": "plone-frontend-c88fef5c",
+        "app.kubernetes.io/instance": "plone-c8bc8820",
+        "app.kubernetes.io/name": "plone-frontend",
       },
     },
   },
@@ -1208,7 +1216,8 @@ exports[`with exporter disabled 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "plone-backend-c8acbe0a",
+          "app.kubernetes.io/instance": "plone-c8bc8820",
+          "app.kubernetes.io/name": "plone-backend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -1235,7 +1244,8 @@ exports[`with exporter disabled 1`] = `
         },
       ],
       "selector": {
-        "app": "plone-backend-c8acbe0a",
+        "app.kubernetes.io/instance": "plone-c8bc8820",
+        "app.kubernetes.io/name": "plone-backend",
       },
     },
   },
@@ -1332,7 +1342,8 @@ exports[`with exporter disabled 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "plone-frontend-c88fef5c",
+          "app.kubernetes.io/instance": "plone-c8bc8820",
+          "app.kubernetes.io/name": "plone-frontend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -1359,7 +1370,8 @@ exports[`with exporter disabled 1`] = `
         },
       ],
       "selector": {
-        "app": "plone-frontend-c88fef5c",
+        "app.kubernetes.io/instance": "plone-c8bc8820",
+        "app.kubernetes.io/name": "plone-frontend",
       },
     },
   },
@@ -1722,7 +1734,8 @@ exports[`with extra env vars 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "plone-backend-c8acbe0a",
+          "app.kubernetes.io/instance": "plone-c8bc8820",
+          "app.kubernetes.io/name": "plone-backend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -1749,7 +1762,8 @@ exports[`with extra env vars 1`] = `
         },
       ],
       "selector": {
-        "app": "plone-backend-c8acbe0a",
+        "app.kubernetes.io/instance": "plone-c8bc8820",
+        "app.kubernetes.io/name": "plone-backend",
       },
     },
   },
@@ -1846,7 +1860,8 @@ exports[`with extra env vars 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "plone-frontend-c88fef5c",
+          "app.kubernetes.io/instance": "plone-c8bc8820",
+          "app.kubernetes.io/name": "plone-frontend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -1873,7 +1888,8 @@ exports[`with extra env vars 1`] = `
         },
       ],
       "selector": {
-        "app": "plone-frontend-c88fef5c",
+        "app.kubernetes.io/instance": "plone-c8bc8820",
+        "app.kubernetes.io/name": "plone-frontend",
       },
     },
   },
@@ -2289,7 +2305,8 @@ exports[`with tolerations 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "plone-backend-c8acbe0a",
+          "app.kubernetes.io/instance": "plone-c8bc8820",
+          "app.kubernetes.io/name": "plone-backend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -2316,7 +2333,8 @@ exports[`with tolerations 1`] = `
         },
       ],
       "selector": {
-        "app": "plone-backend-c8acbe0a",
+        "app.kubernetes.io/instance": "plone-c8bc8820",
+        "app.kubernetes.io/name": "plone-backend",
       },
     },
   },
@@ -2413,7 +2431,8 @@ exports[`with tolerations 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "plone-frontend-c88fef5c",
+          "app.kubernetes.io/instance": "plone-c8bc8820",
+          "app.kubernetes.io/name": "plone-frontend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -2440,7 +2459,8 @@ exports[`with tolerations 1`] = `
         },
       ],
       "selector": {
-        "app": "plone-frontend-c88fef5c",
+        "app.kubernetes.io/instance": "plone-c8bc8820",
+        "app.kubernetes.io/name": "plone-frontend",
       },
     },
   },

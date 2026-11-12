@@ -140,6 +140,20 @@ export interface PloneDeploymentOptions {
   readonly pdb?: PlonePDBOptions;
 
   /**
+   * Pod selector of the PodDisruptionBudget, when it covers pods of further
+   * Deployments (groups) besides this one.
+   * @default - this Deployment's own selector
+   */
+  readonly pdbSelector?: { [name: string]: string };
+
+  /**
+   * Number of pods the PodDisruptionBudget covers, for the rule that a PDB is
+   * only created from 2 pods on.
+   * @default - `replicas`
+   */
+  readonly pdbReplicas?: number;
+
+  /**
    * Node selector labels for pod scheduling.
    * @default - no node selector
    */
@@ -366,8 +380,8 @@ export class PloneDeployment extends Construct {
       const pdbExplicit = pdbOptions.minAvailable !== undefined || pdbOptions.maxUnavailable !== undefined;
       // A PDB on a single-replica deployment is always undrainable and guarantees
       // no availability. Only emit one for >=2 replicas, or when explicitly configured.
-      if (replicas >= 2 || pdbExplicit) {
-        new PlonePDB(this, 'pdb', label, pdbOptions);
+      if ((options.pdbReplicas ?? replicas) >= 2 || pdbExplicit) {
+        new PlonePDB(this, 'pdb', options.pdbSelector ?? label, pdbOptions);
       }
     }
   }

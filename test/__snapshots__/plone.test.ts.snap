@@ -90,7 +90,8 @@ exports[`defaults 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "app-plone-backend-c82290e6",
+          "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+          "app.kubernetes.io/name": "plone-backend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -117,7 +118,8 @@ exports[`defaults 1`] = `
         },
       ],
       "selector": {
-        "app": "app-plone-backend-c82290e6",
+        "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+        "app.kubernetes.io/name": "plone-backend",
       },
     },
   },
@@ -214,7 +216,8 @@ exports[`defaults 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "app-plone-frontend-c8d010d1",
+          "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+          "app.kubernetes.io/name": "plone-frontend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -241,7 +244,8 @@ exports[`defaults 1`] = `
         },
       ],
       "selector": {
-        "app": "app-plone-frontend-c8d010d1",
+        "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+        "app.kubernetes.io/name": "plone-frontend",
       },
     },
   },
@@ -338,7 +342,8 @@ exports[`defaults-blicca 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "app-plone-backend-c82290e6",
+          "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+          "app.kubernetes.io/name": "plone-backend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -365,7 +370,8 @@ exports[`defaults-blicca 1`] = `
         },
       ],
       "selector": {
-        "app": "app-plone-backend-c82290e6",
+        "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+        "app.kubernetes.io/name": "plone-backend",
       },
     },
   },
@@ -462,7 +468,8 @@ exports[`defaults-with-pdps 1`] = `
       "maxUnavailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "app-plone_with_pdbs-backend-c885cd24",
+          "app.kubernetes.io/instance": "app-plone_with_pdbs-c8243098",
+          "app.kubernetes.io/name": "plone-backend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -489,7 +496,8 @@ exports[`defaults-with-pdps 1`] = `
         },
       ],
       "selector": {
-        "app": "app-plone_with_pdbs-backend-c885cd24",
+        "app.kubernetes.io/instance": "app-plone_with_pdbs-c8243098",
+        "app.kubernetes.io/name": "plone-backend",
       },
     },
   },
@@ -586,7 +594,8 @@ exports[`defaults-with-pdps 1`] = `
       "minAvailable": 2,
       "selector": {
         "matchLabels": {
-          "app": "app-plone_with_pdbs-frontend-c850bc83",
+          "app.kubernetes.io/instance": "app-plone_with_pdbs-c8243098",
+          "app.kubernetes.io/name": "plone-frontend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -613,7 +622,8 @@ exports[`defaults-with-pdps 1`] = `
         },
       ],
       "selector": {
-        "app": "app-plone_with_pdbs-frontend-c850bc83",
+        "app.kubernetes.io/instance": "app-plone_with_pdbs-c8243098",
+        "app.kubernetes.io/name": "plone-frontend",
       },
     },
   },
@@ -713,7 +723,8 @@ exports[`with nodeSelector for region affinity 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "app-plone-backend-c82290e6",
+          "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+          "app.kubernetes.io/name": "plone-backend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -740,7 +751,8 @@ exports[`with nodeSelector for region affinity 1`] = `
         },
       ],
       "selector": {
-        "app": "app-plone-backend-c82290e6",
+        "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+        "app.kubernetes.io/name": "plone-backend",
       },
     },
   },
@@ -840,7 +852,8 @@ exports[`with nodeSelector for region affinity 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "app-plone-frontend-c8d010d1",
+          "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+          "app.kubernetes.io/name": "plone-frontend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -867,7 +880,8 @@ exports[`with nodeSelector for region affinity 1`] = `
         },
       ],
       "selector": {
-        "app": "app-plone-frontend-c8d010d1",
+        "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+        "app.kubernetes.io/name": "plone-frontend",
       },
     },
   },
@@ -971,7 +985,8 @@ exports[`with securityContext for capabilities 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "app-plone-backend-c82290e6",
+          "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+          "app.kubernetes.io/name": "plone-backend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -998,7 +1013,8 @@ exports[`with securityContext for capabilities 1`] = `
         },
       ],
       "selector": {
-        "app": "app-plone-backend-c82290e6",
+        "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+        "app.kubernetes.io/name": "plone-backend",
       },
     },
   },
@@ -1095,7 +1111,8 @@ exports[`with securityContext for capabilities 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "app-plone-frontend-c8d010d1",
+          "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+          "app.kubernetes.io/name": "plone-frontend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -1122,7 +1139,8 @@ exports[`with securityContext for capabilities 1`] = `
         },
       ],
       "selector": {
-        "app": "app-plone-frontend-c8d010d1",
+        "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+        "app.kubernetes.io/name": "plone-frontend",
       },
     },
   },
@@ -1219,7 +1237,8 @@ exports[`with-backend-servicemonitor 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "app-plone-backend-c82290e6",
+          "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+          "app.kubernetes.io/name": "plone-backend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -1246,7 +1265,8 @@ exports[`with-backend-servicemonitor 1`] = `
         },
       ],
       "selector": {
-        "app": "app-plone-backend-c82290e6",
+        "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+        "app.kubernetes.io/name": "plone-backend",
       },
     },
   },
@@ -1267,6 +1287,9 @@ exports[`with-backend-servicemonitor 1`] = `
           "path": "/metrics",
           "port": "backend-http",
         },
+      ],
+      "podTargetLabels": [
+        "cdk8s-plone.bluedynamics.eu/group",
       ],
       "selector": {
         "matchLabels": {
@@ -1368,7 +1391,8 @@ exports[`with-both-servicemonitors 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "app-plone-backend-c82290e6",
+          "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+          "app.kubernetes.io/name": "plone-backend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -1395,7 +1419,8 @@ exports[`with-both-servicemonitors 1`] = `
         },
       ],
       "selector": {
-        "app": "app-plone-backend-c82290e6",
+        "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+        "app.kubernetes.io/name": "plone-backend",
       },
     },
   },
@@ -1416,6 +1441,9 @@ exports[`with-both-servicemonitors 1`] = `
           "path": "/backend/metrics",
           "port": "backend-http",
         },
+      ],
+      "podTargetLabels": [
+        "cdk8s-plone.bluedynamics.eu/group",
       ],
       "selector": {
         "matchLabels": {
@@ -1517,7 +1545,8 @@ exports[`with-both-servicemonitors 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "app-plone-frontend-c8d010d1",
+          "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+          "app.kubernetes.io/name": "plone-frontend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -1544,7 +1573,8 @@ exports[`with-both-servicemonitors 1`] = `
         },
       ],
       "selector": {
-        "app": "app-plone-frontend-c8d010d1",
+        "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+        "app.kubernetes.io/name": "plone-frontend",
       },
     },
   },
@@ -1565,6 +1595,9 @@ exports[`with-both-servicemonitors 1`] = `
           "path": "/frontend/metrics",
           "port": "frontend-http",
         },
+      ],
+      "podTargetLabels": [
+        "cdk8s-plone.bluedynamics.eu/group",
       ],
       "selector": {
         "matchLabels": {
@@ -1666,7 +1699,8 @@ exports[`with-frontend-servicemonitor 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "app-plone-backend-c82290e6",
+          "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+          "app.kubernetes.io/name": "plone-backend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -1693,7 +1727,8 @@ exports[`with-frontend-servicemonitor 1`] = `
         },
       ],
       "selector": {
-        "app": "app-plone-backend-c82290e6",
+        "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+        "app.kubernetes.io/name": "plone-backend",
       },
     },
   },
@@ -1790,7 +1825,8 @@ exports[`with-frontend-servicemonitor 1`] = `
       "minAvailable": 1,
       "selector": {
         "matchLabels": {
-          "app": "app-plone-frontend-c8d010d1",
+          "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+          "app.kubernetes.io/name": "plone-frontend",
         },
       },
       "unhealthyPodEvictionPolicy": "AlwaysAllow",
@@ -1817,7 +1853,8 @@ exports[`with-frontend-servicemonitor 1`] = `
         },
       ],
       "selector": {
-        "app": "app-plone-frontend-c8d010d1",
+        "app.kubernetes.io/instance": "app-plone-c8ae63d2",
+        "app.kubernetes.io/name": "plone-frontend",
       },
     },
   },
@@ -1838,6 +1875,9 @@ exports[`with-frontend-servicemonitor 1`] = `
           "path": "/api/metrics",
           "targetPort": 9090,
         },
+      ],
+      "podTargetLabels": [
+        "cdk8s-plone.bluedynamics.eu/group",
       ],
       "selector": {
         "matchLabels": {
