@@ -328,6 +328,12 @@ export interface PloneBaseOptions {
   readonly rollingUpdate?: PloneRollingUpdate;
 }
 /**
+ * Pod label naming the group a Plone pod belongs to. Pods of the main
+ * Deployment of a role are in the group `default`.
+ */
+const GROUP_LABEL = 'cdk8s-plone.bluedynamics.eu/group';
+
+/**
  * Plone deployment variants.
  */
 export enum PloneVariant {
@@ -479,13 +485,20 @@ export class Plone extends Construct {
     this.siteId = options.siteId ?? 'Plone';
     this.variant = options.variant ?? PloneVariant.VOLTO;
 
+    // Pod labels shared by all pods of one role of this construct. The
+    // Service and PodDisruptionBudget will select on them once backend
+    // groups (#243) add further Deployments behind the same Service.
+    const instance = Names.toLabelValue(this);
+
     // ------------------------------------------------------------------------
     // Backend
     const backend = options.backend ?? {};
     const backendLabels = {
       'app.kubernetes.io/name': 'plone-backend',
+      'app.kubernetes.io/instance': instance,
       'app.kubernetes.io/component': 'backend',
       'app.kubernetes.io/version': options.version ?? 'undefined',
+      [GROUP_LABEL]: 'default',
     };
     const backendPort = 8080;
 
@@ -578,8 +591,10 @@ export class Plone extends Construct {
       const frontendPort = 3000;
       const frontendLabels = {
         'app.kubernetes.io/name': 'plone-frontend',
+        'app.kubernetes.io/instance': instance,
         'app.kubernetes.io/component': 'frontend',
         'app.kubernetes.io/version': options.version ?? 'undefined',
+        [GROUP_LABEL]: 'default',
       };
 
       // Environment for RAZZLE

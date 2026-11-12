@@ -24,10 +24,12 @@ exports[`defaults 1`] = `
           "labels": {
             "app": "plone-backend-c8acbe0a",
             "app.kubernetes.io/component": "backend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-backend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -141,10 +143,12 @@ exports[`defaults 1`] = `
           "labels": {
             "app": "plone-frontend-c88fef5c",
             "app.kubernetes.io/component": "frontend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-frontend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -382,10 +386,12 @@ exports[`with blicca variant (no frontend) 1`] = `
           "labels": {
             "app": "plone-backend-c8acbe0a",
             "app.kubernetes.io/component": "backend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-backend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -604,10 +610,12 @@ exports[`with custom VCL snippets 1`] = `
           "labels": {
             "app": "plone-backend-c8acbe0a",
             "app.kubernetes.io/component": "backend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-backend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -721,10 +729,12 @@ exports[`with custom VCL snippets 1`] = `
           "labels": {
             "app": "plone-frontend-c88fef5c",
             "app.kubernetes.io/component": "frontend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-frontend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -919,10 +929,12 @@ exports[`with custom replicas and resources 1`] = `
           "labels": {
             "app": "plone-backend-c8acbe0a",
             "app.kubernetes.io/component": "backend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-backend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -1036,10 +1048,12 @@ exports[`with custom replicas and resources 1`] = `
           "labels": {
             "app": "plone-frontend-c88fef5c",
             "app.kubernetes.io/component": "frontend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-frontend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -1277,10 +1291,12 @@ exports[`with extraBackends 1`] = `
           "labels": {
             "app": "plone-backend-c8acbe0a",
             "app.kubernetes.io/component": "backend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-backend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -1394,10 +1410,12 @@ exports[`with extraBackends 1`] = `
           "labels": {
             "app": "plone-frontend-c88fef5c",
             "app.kubernetes.io/component": "frontend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-frontend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -1649,10 +1667,12 @@ exports[`with full shard tuning (healthy, rampup, replicas) 1`] = `
           "labels": {
             "app": "plone-backend-c8acbe0a",
             "app.kubernetes.io/component": "backend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-backend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -1766,10 +1786,12 @@ exports[`with full shard tuning (healthy, rampup, replicas) 1`] = `
           "labels": {
             "app": "plone-frontend-c88fef5c",
             "app.kubernetes.io/component": "frontend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-frontend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -2013,10 +2035,12 @@ exports[`with invalidation disabled 1`] = `
           "labels": {
             "app": "plone-backend-c8acbe0a",
             "app.kubernetes.io/component": "backend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-backend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -2130,10 +2154,12 @@ exports[`with invalidation disabled 1`] = `
           "labels": {
             "app": "plone-frontend-c88fef5c",
             "app.kubernetes.io/component": "frontend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-frontend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -2360,10 +2386,12 @@ exports[`with monitoring enabled 1`] = `
           "labels": {
             "app": "plone-backend-c8acbe0a",
             "app.kubernetes.io/component": "backend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-backend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -2477,10 +2505,12 @@ exports[`with monitoring enabled 1`] = `
           "labels": {
             "app": "plone-frontend-c88fef5c",
             "app.kubernetes.io/component": "frontend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-frontend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -2727,10 +2757,12 @@ exports[`with nodeSelector 1`] = `
           "labels": {
             "app": "plone-backend-c8acbe0a",
             "app.kubernetes.io/component": "backend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-backend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -2844,10 +2876,12 @@ exports[`with nodeSelector 1`] = `
           "labels": {
             "app": "plone-frontend-c88fef5c",
             "app.kubernetes.io/component": "frontend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-frontend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -3091,10 +3125,12 @@ exports[`with nodeSelector and tolerations 1`] = `
           "labels": {
             "app": "plone-backend-c8acbe0a",
             "app.kubernetes.io/component": "backend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-backend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -3208,10 +3244,12 @@ exports[`with nodeSelector and tolerations 1`] = `
           "labels": {
             "app": "plone-frontend-c88fef5c",
             "app.kubernetes.io/component": "frontend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-frontend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -3462,10 +3500,12 @@ exports[`with shard director 1`] = `
           "labels": {
             "app": "plone-backend-c8acbe0a",
             "app.kubernetes.io/component": "backend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-backend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -3579,10 +3619,12 @@ exports[`with shard director 1`] = `
           "labels": {
             "app": "plone-frontend-c88fef5c",
             "app.kubernetes.io/component": "frontend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-frontend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -3820,10 +3862,12 @@ exports[`with shard director and shardBy URL 1`] = `
           "labels": {
             "app": "plone-backend-c8acbe0a",
             "app.kubernetes.io/component": "backend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-backend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -3937,10 +3981,12 @@ exports[`with shard director and shardBy URL 1`] = `
           "labels": {
             "app": "plone-frontend-c88fef5c",
             "app.kubernetes.io/component": "frontend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-frontend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -4181,10 +4227,12 @@ exports[`with storage file + malloc 1`] = `
           "labels": {
             "app": "plone-backend-c8acbe0a",
             "app.kubernetes.io/component": "backend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-backend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -4298,10 +4346,12 @@ exports[`with storage file + malloc 1`] = `
           "labels": {
             "app": "plone-frontend-c88fef5c",
             "app.kubernetes.io/component": "frontend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-frontend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -4552,10 +4602,12 @@ exports[`with storage malloc 1`] = `
           "labels": {
             "app": "plone-backend-c8acbe0a",
             "app.kubernetes.io/component": "backend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-backend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -4669,10 +4721,12 @@ exports[`with storage malloc 1`] = `
           "labels": {
             "app": "plone-frontend-c88fef5c",
             "app.kubernetes.io/component": "frontend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-frontend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -4917,10 +4971,12 @@ exports[`with tolerations 1`] = `
           "labels": {
             "app": "plone-backend-c8acbe0a",
             "app.kubernetes.io/component": "backend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-backend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
@@ -5034,10 +5090,12 @@ exports[`with tolerations 1`] = `
           "labels": {
             "app": "plone-frontend-c88fef5c",
             "app.kubernetes.io/component": "frontend",
+            "app.kubernetes.io/instance": "plone-c8bc8820",
             "app.kubernetes.io/managed-by": "cdk8s-plone",
             "app.kubernetes.io/name": "plone-frontend",
             "app.kubernetes.io/part-of": "plone",
             "app.kubernetes.io/version": "undefined",
+            "cdk8s-plone.bluedynamics.eu/group": "default",
           },
         },
         "spec": {
