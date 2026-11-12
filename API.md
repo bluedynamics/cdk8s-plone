@@ -149,8 +149,10 @@ Any object.
 | --- | --- | --- |
 | <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
 | <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.backendDeployment">backendDeployment</a></code> | <code>cdk8s.ApiObject</code> | The backend Deployment, as an escape hatch for fields without a dedicated option. |
+| <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.backendGroupDeployments">backendGroupDeployments</a></code> | <code>{[ key: string ]: cdk8s.ApiObject}</code> | The backend group Deployments by group name, as an escape hatch, see `backendDeployment`. |
 | <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.backendService">backendService</a></code> | <code>cdk8s.ApiObject</code> | The backend Service, as an escape hatch, see `backendDeployment`. |
 | <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.backendServiceName">backendServiceName</a></code> | <code>string</code> | Name of the backend Kubernetes service. |
+| <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.frontendGroupDeployments">frontendGroupDeployments</a></code> | <code>{[ key: string ]: cdk8s.ApiObject}</code> | The frontend group Deployments by group name, as an escape hatch, see `backendDeployment`. |
 | <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.siteId">siteId</a></code> | <code>string</code> | The Plone site ID in ZODB. |
 | <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.variant">variant</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.PloneVariant">PloneVariant</a></code> | The deployment variant being used (VOLTO or BLICCA). |
 | <code><a href="#@bluedynamics/cdk8s-plone.Plone.property.frontendDeployment">frontendDeployment</a></code> | <code>cdk8s.ApiObject</code> | The frontend Deployment, as an escape hatch, see `backendDeployment`. |
@@ -187,6 +189,20 @@ The Plone container is always `containers/0`.
 
 ---
 
+##### `backendGroupDeployments`<sup>Required</sup> <a name="backendGroupDeployments" id="@bluedynamics/cdk8s-plone.Plone.property.backendGroupDeployments"></a>
+
+```typescript
+public readonly backendGroupDeployments: {[ key: string ]: ApiObject};
+```
+
+- *Type:* {[ key: string ]: cdk8s.ApiObject}
+
+The backend group Deployments by group name, as an escape hatch, see `backendDeployment`.
+
+Empty without backend groups.
+
+---
+
 ##### `backendService`<sup>Required</sup> <a name="backendService" id="@bluedynamics/cdk8s-plone.Plone.property.backendService"></a>
 
 ```typescript
@@ -210,6 +226,20 @@ public readonly backendServiceName: string;
 Name of the backend Kubernetes service.
 
 Use this to reference the backend service from other constructs.
+
+---
+
+##### `frontendGroupDeployments`<sup>Required</sup> <a name="frontendGroupDeployments" id="@bluedynamics/cdk8s-plone.Plone.property.frontendGroupDeployments"></a>
+
+```typescript
+public readonly frontendGroupDeployments: {[ key: string ]: ApiObject};
+```
+
+- *Type:* {[ key: string ]: cdk8s.ApiObject}
+
+The frontend group Deployments by group name, as an escape hatch, see `backendDeployment`.
+
+Empty without frontend groups or for the Blicca variant.
 
 ---
 
@@ -785,6 +815,7 @@ const ploneBaseOptions: PloneBaseOptions = { ... }
 | --- | --- | --- |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.annotations">annotations</a></code> | <code>{[ key: string ]: string}</code> | Annotations to add to the Deployment metadata. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.environment">environment</a></code> | <code>cdk8s-plus-30.Env</code> | Environment variables to set in the container. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.groups">groups</a></code> | <code><a href="#@bluedynamics/cdk8s-plone.PloneGroup">PloneGroup</a>[]</code> | Additional Deployments whose pods run with different settings and join this role's Service and PodDisruptionBudget, see `PloneGroup`. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.image">image</a></code> | <code>string</code> | Container image to use for the deployment. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.imagePullPolicy">imagePullPolicy</a></code> | <code>string</code> | Image pull policy for the container. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneBaseOptions.property.limitCpu">limitCpu</a></code> | <code>string</code> | CPU limit for the container. |
@@ -852,6 +883,21 @@ public readonly environment: Env;
 Environment variables to set in the container.
 
 Use cdk8s-plus-30 Env class to define variables and sources.
+
+---
+
+##### `groups`<sup>Optional</sup> <a name="groups" id="@bluedynamics/cdk8s-plone.PloneBaseOptions.property.groups"></a>
+
+```typescript
+public readonly groups: PloneGroup[];
+```
+
+- *Type:* <a href="#@bluedynamics/cdk8s-plone.PloneGroup">PloneGroup</a>[]
+- *Default:* no groups
+
+Additional Deployments whose pods run with different settings and join this role's Service and PodDisruptionBudget, see `PloneGroup`.
+
+Their replicas add to `replicas`.
 
 ---
 
@@ -1426,6 +1472,85 @@ public readonly drop: string[];
 - *Default:* no capabilities dropped
 
 Capabilities to drop (e.g. 'ALL', 'NET_RAW').
+
+---
+
+### PloneGroup <a name="PloneGroup" id="@bluedynamics/cdk8s-plone.PloneGroup"></a>
+
+A group of pods that runs with different settings behind the same Service as the main Deployment of its role, e.g. an allocator experiment or a canary. Everything not set here is inherited from the role's options.
+
+#### Initializer <a name="Initializer" id="@bluedynamics/cdk8s-plone.PloneGroup.Initializer"></a>
+
+```typescript
+import { PloneGroup } from '@bluedynamics/cdk8s-plone'
+
+const ploneGroup: PloneGroup = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneGroup.property.name">name</a></code> | <code>string</code> | Name of the group, a lowercase DNS label. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneGroup.property.environment">environment</a></code> | <code>cdk8s-plus-30.Env</code> | Environment for the group's pods, merged over the role's environment: variables with the same name are replaced, sources are appended. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneGroup.property.image">image</a></code> | <code>string</code> | Container image for the group's pods. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneGroup.property.replicas">replicas</a></code> | <code>number</code> | Number of pods in the group, in addition to the role's `replicas`. |
+
+---
+
+##### `name`<sup>Required</sup> <a name="name" id="@bluedynamics/cdk8s-plone.PloneGroup.property.name"></a>
+
+```typescript
+public readonly name: string;
+```
+
+- *Type:* string
+
+Name of the group, a lowercase DNS label.
+
+Pods carry it in the label
+`cdk8s-plone.bluedynamics.eu/group`. `default` is reserved for the main
+Deployment. Renaming a group creates a new Deployment; cdk8s does not
+delete the old one.
+
+---
+
+##### `environment`<sup>Optional</sup> <a name="environment" id="@bluedynamics/cdk8s-plone.PloneGroup.property.environment"></a>
+
+```typescript
+public readonly environment: Env;
+```
+
+- *Type:* cdk8s-plus-30.Env
+- *Default:* the role's environment
+
+Environment for the group's pods, merged over the role's environment: variables with the same name are replaced, sources are appended.
+
+---
+
+##### `image`<sup>Optional</sup> <a name="image" id="@bluedynamics/cdk8s-plone.PloneGroup.property.image"></a>
+
+```typescript
+public readonly image: string;
+```
+
+- *Type:* string
+- *Default:* the role's image
+
+Container image for the group's pods.
+
+---
+
+##### `replicas`<sup>Optional</sup> <a name="replicas" id="@bluedynamics/cdk8s-plone.PloneGroup.property.replicas"></a>
+
+```typescript
+public readonly replicas: number;
+```
+
+- *Type:* number
+- *Default:* 1
+
+Number of pods in the group, in addition to the role's `replicas`.
 
 ---
 
