@@ -1,4 +1,4 @@
-import { ApiObject, Chart, JsonPatch, Testing } from 'cdk8s';
+import { ApiObject, Chart, JsonPatch, Names, Testing } from 'cdk8s';
 import { Plone, PloneVariant } from '../src/plone';
 
 
@@ -288,4 +288,48 @@ test('rollingUpdate is plumbed through to backend and frontend', () => {
     .toEqual({ maxUnavailable: 0, maxSurge: '50%' });
   expect(synthKind(chart, 'Deployment', 'plone-frontend-deployment').spec.strategy.rollingUpdate)
     .toEqual({ maxSurge: 1 });
+});
+
+test('pods carry instance and group labels; selectors are unchanged', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  const plone = new Plone(chart, 'plone', { backend: { replicas: 2 }, frontend: { replicas: 2 } });
+
+  // THEN
+  const manifests = Testing.synth(chart);
+  for (const role of ['plone-backend', 'plone-frontend']) {
+    const deployment = synthKind(chart, 'Deployment', `${role}-deployment`);
+    const podLabels = deployment.spec.template.metadata.labels;
+    expect(podLabels['app.kubernetes.io/instance']).toBe(Names.toLabelValue(plone));
+    expect(podLabels['cdk8s-plone.bluedynamics.eu/group']).toBe('default');
+    // Release A only adds labels: Deployment, Service and PDB keep selecting on `app`.
+    const selector = deployment.spec.selector.matchLabels;
+    expect(Object.keys(selector)).toEqual(['app']);
+    const service = synthKind(chart, 'Service', `${role}-service`);
+    expect(service.spec.selector).toEqual(selector);
+  }
+  const pdbs = manifests.filter((m: any) => m.kind === 'PodDisruptionBudget');
+  expect(pdbs).toHaveLength(2);
+  for (const pdb of pdbs) {
+    expect(Object.keys(pdb.spec.selector.matchLabels)).toEqual(['app']);
+  }
+});
+
+test('instance label differs between two Plone constructs', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+
+  // WHEN
+  new Plone(chart, 'site-a', { variant: PloneVariant.BLICCA });
+  new Plone(chart, 'site-b', { variant: PloneVariant.BLICCA });
+
+  // THEN
+  const instances = Testing.synth(chart)
+    .filter((m: any) => m.kind === 'Deployment')
+    .map((d: any) => d.spec.template.metadata.labels['app.kubernetes.io/instance']);
+  expect(new Set(instances).size).toBe(2);
 });
