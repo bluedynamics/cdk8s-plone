@@ -4,6 +4,8 @@
 
 ### Plone <a name="Plone" id="@bluedynamics/cdk8s-plone.Plone"></a>
 
+- *Implements:* constructs.IConstruct, constructs.IDependable
+
 Plone construct for deploying Plone CMS to Kubernetes.
 
 This construct creates all necessary Kubernetes resources for running Plone:
@@ -312,6 +314,8 @@ Only set when variant is VOLTO, otherwise undefined.
 
 ### PloneHttpcache <a name="PloneHttpcache" id="@bluedynamics/cdk8s-plone.PloneHttpcache"></a>
 
+- *Implements:* constructs.IConstruct, constructs.IDependable
+
 PloneHttpcache construct for deploying Varnish HTTP caching layer.
 
 Uses the mittwald/kube-httpcache Helm chart to deploy Varnish as a
@@ -480,6 +484,8 @@ Use this to reference the cache service from ingress or other constructs.
 
 
 ### PloneVinylCache <a name="PloneVinylCache" id="@bluedynamics/cdk8s-plone.PloneVinylCache"></a>
+
+- *Implements:* constructs.IConstruct, constructs.IDependable
 
 PloneVinylCache construct for deploying Varnish Cache via cloud-vinyl operator.
 
