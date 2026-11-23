@@ -245,6 +245,9 @@
         {
           "spawn": "package-all",
           "condition": "node -e \"if (process.env.CI) process.exit(1)\""
+        },
+        {
+          "spawn": "test:packed"
         }
       ]
     },
@@ -294,6 +297,9 @@
       "steps": [
         {
           "spawn": "docgen"
+        },
+        {
+          "exec": "mkdir -p lib/config && cp src/config/*.vcl lib/config/"
         }
       ]
     },
@@ -348,6 +354,15 @@
         },
         {
           "spawn": "eslint"
+        }
+      ]
+    },
+    "test:packed": {
+      "name": "test:packed",
+      "description": "Smoke test against the packed npm module",
+      "steps": [
+        {
+          "exec": "node test/packed/smoke.js"
         }
       ]
     },
