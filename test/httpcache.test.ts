@@ -19,6 +19,21 @@ test('defaults', () => {
   expect(Testing.synth(chart)).toMatchSnapshot();
 });
 
+test('default VCL renders through the chart', () => {
+  // GIVEN
+  const app = Testing.app();
+  const chart = new Chart(app, 'plone');
+  const plone = new Plone(chart, 'plone');
+
+  // WHEN: no varnishVcl and no varnishVclFile, so src/config/varnish.tpl.vcl
+  // goes through the chart's `indent 4` into a YAML block scalar (#251).
+  new PloneHttpcache(chart, 'test', { plone: plone });
+
+  // THEN
+  const configMap = Testing.synth(chart).find(o => o.kind === 'ConfigMap');
+  expect(configMap?.data['default.vcl.tmpl']).toMatch(/^vcl 4\.0;\n/);
+});
+
 test('with exporter disabled', () => {
   // GIVEN
   const app = Testing.app();
