@@ -19,8 +19,11 @@ myst:
 
 ## Prerequisites
 
-- The **cloud-vinyl operator 1.0.0-rc.2 or later** must be installed in your cluster.
-  `PloneVinylCache` renders `vinyl.bluedynamics.eu/v1`, which earlier releases do not serve.
+- The **cloud-vinyl operator 1.2.0 or later** must be installed in your cluster.
+  `PloneVinylCache` renders `vinyl.bluedynamics.eu/v1`, which releases before 1.0.0-rc.2 do not serve.
+  Request routing uses `vclRecvRouting`, which needs the CRD of 1.2.0.
+  An older CRD drops the field without an error.
+  Requests are then not routed, see {ref}`vinyl-cache-routing`.
   Apply the CRD server-side, as described in the cloud-vinyl release notes.
 - A working Plone deployment using `cdk8s-plone`
 - `@bluedynamics/cdk8s-plone` version with VinylCache support
@@ -153,6 +156,50 @@ new PloneVinylCache(chart, 'cache', {
 });
 ```
 
+cloud-vinyl runs `vclRecvSnippet` for `GET` and `HEAD` requests only.
+Route requests in `vclRecvRoutingSnippet` instead, see {ref}`vinyl-cache-routing`.
+
+(vinyl-cache-routing)=
+
+### Request routing
+
+For the Volto variant, `PloneVinylCache` routes requests by default:
+
+- `/++api++` and blob URLs (`@@images`, `@@download`, `@@display-file`) go to `plone_backend`.
+  Varnish rewrites their URL for the VirtualHostMonster.
+  The site id comes from `siteId` of the `Plone` construct, the host from the request.
+  The scheme comes from `X-Forwarded-Proto` and defaults to `http`.
+- All other requests go to `plone_frontend`.
+
+The routing runs for every request method except PURGE and BAN.
+Logins, saves, and uploads take the same route as reads.
+The default applies only when you set neither `vclRecvSnippet` nor `vclRecvRoutingSnippet`.
+Blicca deployments get no default routing.
+
+To route differently, pass your own snippet in `vclRecvRoutingSnippet`:
+
+```typescript
+new PloneVinylCache(chart, 'cache', {
+  plone: plone,
+  vclRecvRoutingSnippet: fs.readFileSync('./config/routing.vcl', 'utf8'),
+});
+```
+
+Address a backend through its director as `<name>.backend(by=URL)`, for example `plone_backend.backend(by=URL)`.
+The built-in snippet is `src/config/plone-vinyl-recv-routing-volto.vcl` in the `cdk8s-plone` repository.
+
+If your `vclRecvSnippet` picks the backend or rewrites the URL, move that part to `vclRecvRoutingSnippet`.
+Requests with other methods reach the first backend, `plone_backend`, without your rewrite.
+Leave cache decisions, such as `return (pass)` for authenticated requests, in `vclRecvSnippet`.
+A `return` in `vclRecvRoutingSnippet` applies to writes as well.
+Remove a workaround that repeats the rewrite on `bereq.url` in `vclBackendFetchSnippet`.
+
+```{important}
+`vclRecvRoutingSnippet` needs the CRD of cloud-vinyl 1.2.0 or later.
+An older CRD drops the field without an error.
+Routing that you moved out of `vclRecvSnippet` is then gone for every request method.
+```
+
 (vinyl-cache-invalidation)=
 
 ### Cache invalidation
@@ -182,7 +229,7 @@ Do not build the address from `vinylCacheServiceName` yourself: the proxy reject
 `invalidationUrl` throws if the chart has no namespace or if `invalidation` is disabled.
 
 cloud-vinyl handles PURGE, BAN, and xkey requests in its own VCL with its own access lists.
-A custom `vclRecvSnippet` only runs for `GET` and `HEAD` requests and must not handle them.
+These requests never reach `vclRecvSnippet` or `vclRecvRoutingSnippet`.
 
 To disable invalidation:
 
@@ -233,11 +280,21 @@ new PloneVinylCache(chart, 'cache', {
 
 Shard options are ignored for non-shard directors (`round_robin`, `random`, `hash`).
 
+(vinyl-cache-upgrade-1-2)=
+
+## Upgrading from cloud-vinyl 1.0 or 1.1
+
+1. Upgrade the operator and its CRD to 1.2.0 first, following the [cloud-vinyl upgrade guide](https://bluedynamics.github.io/cloud-vinyl/how-to/upgrade.html#upgrade-1-2-recv-routing).
+   An older CRD drops `vclRecvRouting` without an error.
+2. Review the manifest diff.
+   Volto deployments without a custom `vclRecvSnippet` gain the default routing in `vclRecvRouting`.
+3. If your `vclRecvSnippet` routes requests, move the routing to `vclRecvRoutingSnippet`, see {ref}`vinyl-cache-routing`.
+
 ## Upgrading from cloud-vinyl 0.x
 
-This `cdk8s-plone` release targets cloud-vinyl 1.0.
+This `cdk8s-plone` release targets cloud-vinyl 1.2.
 
-1. Upgrade the operator and its CRD to 1.0.0-rc.2 or later first, following the cloud-vinyl release notes.
+1. Upgrade the operator and its CRD to 1.2.0 or later first, following the cloud-vinyl release notes.
    The new manifests use `vinyl.bluedynamics.eu/v1`, which older operators reject.
 2. Set `purgeHosts` if you use `plone.cachepurging`, see {ref}`vinyl-cache-invalidation`.
 3. Review the manifest diff:
