@@ -2338,7 +2338,8 @@ const ploneVinylCacheOptions: PloneVinylCacheOptions = { ... }
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclPassSnippet">vclPassSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_pass subroutine. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclPipeSnippet">vclPipeSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_pipe subroutine. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclPurgeSnippet">vclPurgeSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_purge subroutine. |
-| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclRecvSnippet">vclRecvSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_recv subroutine. |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclRecvRoutingSnippet">vclRecvRoutingSnippet</a></code> | <code>string</code> | VCL snippet for routing in vcl_recv (`spec.vcl.snippets.vclRecvRouting`). |
+| <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclRecvSnippet">vclRecvSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_recv subroutine. Replaces the default Plone recv snippet. |
 | <code><a href="#@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclSynthSnippet">vclSynthSnippet</a></code> | <code>string</code> | Custom VCL snippet for vcl_synth subroutine. |
 
 ---
@@ -2879,6 +2880,28 @@ Custom VCL snippet for vcl_purge subroutine.
 
 ---
 
+##### `vclRecvRoutingSnippet`<sup>Optional</sup> <a name="vclRecvRoutingSnippet" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclRecvRoutingSnippet"></a>
+
+```typescript
+public readonly vclRecvRoutingSnippet: string;
+```
+
+- *Type:* string
+- *Default:* for the Volto variant without a custom `vclRecvSnippet`: the built-in plone-vinyl-recv-routing-volto.vcl, which sends `/++api++` and blob URLs to `plone_backend` with a VirtualHostMonster rewrite for `plone.siteId` and everything else to `plone_frontend`. Otherwise none.
+
+VCL snippet for routing in vcl_recv (`spec.vcl.snippets.vclRecvRouting`).
+
+cloud-vinyl runs it for every request method except PURGE and BAN, before
+its GET/HEAD check, so set the backend and rewrite URLs here.
+Address a backend through its director as `<name>.backend(by=URL)`,
+e.g. `plone_backend.backend(by=URL)`: backends without their own director
+are shard directors in cloud-vinyl.
+
+Requires the operator and CRD of cloud-vinyl 1.2.0 or later. An older CRD
+drops the field without an error.
+
+---
+
 ##### `vclRecvSnippet`<sup>Optional</sup> <a name="vclRecvSnippet" id="@bluedynamics/cdk8s-plone.PloneVinylCacheOptions.property.vclRecvSnippet"></a>
 
 ```typescript
@@ -2888,9 +2911,11 @@ public readonly vclRecvSnippet: string;
 - *Type:* string
 - *Default:* uses built-in plone-vinyl-recv.vcl
 
-Custom VCL snippet for vcl_recv subroutine.
+Custom VCL snippet for vcl_recv subroutine. Replaces the default Plone recv snippet.
 
-Replaces the default Plone recv snippet.
+cloud-vinyl runs it for GET and HEAD only. Route requests in
+`vclRecvRoutingSnippet` instead, otherwise POST, PUT, PATCH, DELETE and
+OPTIONS go to the first backend without your rewrites.
 
 ---
 

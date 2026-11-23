@@ -1,5 +1,5 @@
 import { Chart, Testing } from 'cdk8s';
-import { Plone } from '../src/plone';
+import { Plone, PloneVariant } from '../src/plone';
 import { PloneVinylCache } from '../src/vinylcache';
 
 test('defaults', () => {
@@ -680,4 +680,62 @@ test.each([
 
   // THEN
   expect(() => new PloneVinylCache(chart, 'cache', { plone, ...opts })).toThrow(message);
+});
+
+describe('vclRecvRouting (#253)', () => {
+  function routing(ploneOpts: any, cacheOpts: any = {}): string | undefined {
+    const chart = new Chart(Testing.app(), 'plone');
+    const plone = new Plone(chart, 'plone', ploneOpts);
+    new PloneVinylCache(chart, 'cache', { plone, ...cacheOpts });
+    return synthVinylCache(chart).spec.vcl.snippets.vclRecvRouting;
+  }
+
+  test('Volto default routes the API and blobs to the backend with a VHM rewrite', () => {
+    const vcl = routing({})!;
+    // Like cloud-vinyl's own default hint for a shard director.
+    expect(vcl).toContain('set req.backend_hint = plone_backend.backend(by=URL);');
+    expect(vcl).toContain('set req.backend_hint = plone_frontend.backend(by=URL);');
+    expect(vcl).toMatch(/req\.url ~ "\^\/\\\+\\\+api\\\+\\\+"/);
+    expect(vcl).toMatch(/@@\(images\|download\|display-file\)/);
+    expect(vcl).toContain('"/Plone/VirtualHostRoot" + req.url');
+    expect(vcl).not.toMatch(/__PLONE_/);
+  });
+
+  test.each([{ director: 'round_robin' }, { director: 'hash' }, { shardHealthy: 'ALL' }])(
+    'Volto default resolves the backends by URL whatever the director options: %j', (cacheOpts) => {
+      // spec.director is cloud-vinyl's cluster-wide director. Backends without
+      // their own director are always shard directors with defaults.
+      const vcl = routing({}, cacheOpts)!;
+      expect(vcl).toContain('set req.backend_hint = plone_backend.backend(by=URL);');
+      expect(vcl).toContain('set req.backend_hint = plone_frontend.backend(by=URL);');
+    });
+
+  test('Volto default uses the site id of the Plone construct', () => {
+    const vcl = routing({ siteId: 'my-site_2.0' })!;
+    expect(vcl).toContain('"/my-site_2.0/VirtualHostRoot" + req.url');
+  });
+
+  test('no default when a custom vclRecvSnippet is set', () => {
+    expect(routing({}, { vclRecvSnippet: '# custom recv' })).toBeUndefined();
+  });
+
+  test('explicit vclRecvRoutingSnippet replaces the default', () => {
+    expect(routing({}, { vclRecvRoutingSnippet: '# own routing' })).toBe('# own routing');
+  });
+
+  test('explicit vclRecvRoutingSnippet is kept next to a custom vclRecvSnippet', () => {
+    expect(routing({}, { vclRecvSnippet: '# custom recv', vclRecvRoutingSnippet: '# own routing' })).toBe('# own routing');
+  });
+
+  test('no default for Blicca', () => {
+    expect(routing({ variant: PloneVariant.BLICCA })).toBeUndefined();
+  });
+
+  test('rejects a site id that cannot go into a VCL string', () => {
+    expect(() => routing({ siteId: 'Plo"ne' })).toThrow(/siteId/);
+  });
+
+  test('a site id unsafe for VCL is fine with an explicit routing snippet', () => {
+    expect(routing({ siteId: 'Plo"ne' }, { vclRecvRoutingSnippet: '# own routing' })).toBe('# own routing');
+  });
 });
