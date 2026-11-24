@@ -139,11 +139,23 @@ export interface VinylCacheSpec {
   readonly esi?: VinylCacheSpecEsi;
 
   /**
-   * image is the container image for the Varnish pods.
+   * flavor selects the cache daemon family: varnish (Varnish Cache) or
+   * vinyl (Vinyl Cache). Defaults to varnish.
+   *
+   * @default varnish.
+   * @schema VinylCacheSpec#flavor
+   */
+  readonly flavor?: VinylCacheSpecFlavor;
+
+  /**
+   * image optionally overrides the container image of the cache daemon. It
+   * replaces only the daemon image: the exporter and tracing sidecars still
+   * follow flavor and version. When empty, the daemon image comes from the
+   * runtime catalog.
    *
    * @schema VinylCacheSpec#image
    */
-  readonly image: string;
+  readonly image?: string;
 
   /**
    * invalidation configures cache invalidation methods (PURGE, BAN, xkey).
@@ -175,6 +187,8 @@ export interface VinylCacheSpec {
 
   /**
    * replicas is the desired number of Varnish pods in the cluster.
+   * 0 switches the cache off on purpose (phase Stopped); the StatefulSet
+   * and the other resources stay in place.
    *
    * @schema VinylCacheSpec#replicas
    */
@@ -257,6 +271,17 @@ export interface VinylCacheSpec {
   readonly vcl?: VinylCacheSpecVcl;
 
   /**
+   * version is the daemon version to run, for example "9.1.0". It must be
+   * listed in the operator's runtime catalog for the chosen flavor. When
+   * empty, the catalog's default version for the flavor is used. That default
+   * is resolved at reconcile time and not written back to this field, so it
+   * follows the chart's default; pin version to stay on a given release.
+   *
+   * @schema VinylCacheSpec#version
+   */
+  readonly version?: string;
+
+  /**
    * volumeClaimTemplates are appended verbatim to the generated StatefulSet's
    * spec.volumeClaimTemplates. Each template yields one PVC per replica
    * (named <claim>-<statefulset>-<ord>) that persists across pod restarts
@@ -281,6 +306,7 @@ export function toJson_VinylCacheSpec(obj: VinylCacheSpec | undefined): Record<s
     'debounce': toJson_VinylCacheSpecDebounce(obj.debounce),
     'director': toJson_VinylCacheSpecDirector(obj.director),
     'esi': toJson_VinylCacheSpecEsi(obj.esi),
+    'flavor': obj.flavor,
     'image': obj.image,
     'invalidation': toJson_VinylCacheSpecInvalidation(obj.invalidation),
     'monitoring': toJson_VinylCacheSpecMonitoring(obj.monitoring),
@@ -294,6 +320,7 @@ export function toJson_VinylCacheSpec(obj: VinylCacheSpec | undefined): Record<s
     'tracing': toJson_VinylCacheSpecTracing(obj.tracing),
     'varnishParameters': ((obj.varnishParameters) === undefined) ? undefined : (Object.entries(obj.varnishParameters).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
     'vcl': toJson_VinylCacheSpecVcl(obj.vcl),
+    'version': obj.version,
     'volumeClaimTemplates': obj.volumeClaimTemplates?.map(y => toJson_VinylCacheSpecVolumeClaimTemplates(y)),
   };
   // filter undefined values
@@ -560,6 +587,20 @@ export function toJson_VinylCacheSpecEsi(obj: VinylCacheSpecEsi | undefined): Re
 /* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
 
 /**
+ * flavor selects the cache daemon family: varnish (Varnish Cache) or
+ * vinyl (Vinyl Cache). Defaults to varnish.
+ *
+ * @default varnish.
+ * @schema VinylCacheSpecFlavor
+ */
+export enum VinylCacheSpecFlavor {
+  /** varnish */
+  VARNISH = "varnish",
+  /** vinyl */
+  VINYL = "vinyl",
+}
+
+/**
  * invalidation configures cache invalidation methods (PURGE, BAN, xkey).
  *
  * @schema VinylCacheSpecInvalidation
@@ -664,6 +705,9 @@ export function toJson_VinylCacheSpecMonitoring(obj: VinylCacheSpecMonitoring | 
 export interface VinylCacheSpecPod {
   /**
    * affinity configures pod affinity and anti-affinity scheduling rules.
+   * When affinity.podAntiAffinity is unset, the operator fills it in from
+   * spec.pod.podAntiAffinity and the operator-wide default; nodeAffinity and
+   * podAffinity are passed through as given.
    *
    * @schema VinylCacheSpecPod#affinity
    */
@@ -701,6 +745,17 @@ export interface VinylCacheSpecPod {
    * @schema VinylCacheSpecPod#nodeSelector
    */
   readonly nodeSelector?: { [key: string]: string };
+
+  /**
+   * podAntiAffinity overrides the operator-wide default that spreads the
+   * pods of this VinylCache across topology domains. Each field that is set
+   * replaces the operator default; unset fields fall back to it. It has no
+   * effect when affinity.podAntiAffinity is set, and the admission webhook
+   * rejects setting both.
+   *
+   * @schema VinylCacheSpecPod#podAntiAffinity
+   */
+  readonly podAntiAffinity?: VinylCacheSpecPodPodAntiAffinity;
 
   /**
    * priorityClassName is the name of the PriorityClass for Varnish pods.
@@ -753,6 +808,7 @@ export function toJson_VinylCacheSpecPod(obj: VinylCacheSpecPod | undefined): Re
     'env': obj.env?.map(y => toJson_VinylCacheSpecPodEnv(y)),
     'labels': ((obj.labels) === undefined) ? undefined : (Object.entries(obj.labels).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
     'nodeSelector': ((obj.nodeSelector) === undefined) ? undefined : (Object.entries(obj.nodeSelector).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    'podAntiAffinity': toJson_VinylCacheSpecPodPodAntiAffinity(obj.podAntiAffinity),
     'priorityClassName': obj.priorityClassName,
     'tolerations': obj.tolerations?.map(y => toJson_VinylCacheSpecPodTolerations(y)),
     'volumeMounts': obj.volumeMounts?.map(y => toJson_VinylCacheSpecPodVolumeMounts(y)),
@@ -957,7 +1013,10 @@ export interface VinylCacheSpecStorage {
   readonly name: string;
 
   /**
-   * path is the filesystem path for file-type storage.
+   * path is the filesystem path for file-type storage. Leave it empty to
+   * let the operator provision an emptyDir volume of size (plus a small
+   * margin), mount it at /var/lib/vinyl-storage/<name> and request the
+   * matching ephemeral-storage. With a path, mount your own volume there.
    *
    * @schema VinylCacheSpecStorage#path
    */
@@ -1190,14 +1249,6 @@ export interface VinylCacheSpecBackendsConnectionParameters {
   readonly firstByteTimeout?: string;
 
   /**
-   * idleTimeout is the maximum time an idle connection may be reused. Should be less
-   * than the backend's keep-alive timeout to avoid 503 races.
-   *
-   * @schema VinylCacheSpecBackendsConnectionParameters#idleTimeout
-   */
-  readonly idleTimeout?: string;
-
-  /**
    * maxConnections is the maximum number of concurrent connections to the backend.
    *
    * @schema VinylCacheSpecBackendsConnectionParameters#maxConnections
@@ -1215,7 +1266,6 @@ export function toJson_VinylCacheSpecBackendsConnectionParameters(obj: VinylCach
     'betweenBytesTimeout': obj.betweenBytesTimeout,
     'connectTimeout': obj.connectTimeout,
     'firstByteTimeout': obj.firstByteTimeout,
-    'idleTimeout': obj.idleTimeout,
     'maxConnections': obj.maxConnections,
   };
   // filter undefined values
@@ -1295,8 +1345,9 @@ export interface VinylCacheSpecBackendsProbe {
 
   /**
    * threshold is the minimum number of successful probes within the window for the backend
-   * to be considered healthy.
+   * to be considered healthy. Defaults to 3; must not exceed window.
    *
+   * @default 3; must not exceed window.
    * @schema VinylCacheSpecBackendsProbe#threshold
    */
   readonly threshold?: number;
@@ -1316,8 +1367,10 @@ export interface VinylCacheSpecBackendsProbe {
   readonly url?: string;
 
   /**
-   * window is the number of most recent probes to consider for threshold evaluation.
+   * window is the number of most recent probes to consider for threshold
+   * evaluation. Defaults to 5; varnishd allows at most 64.
    *
+   * @default 5; varnishd allows at most 64.
    * @schema VinylCacheSpecBackendsProbe#window
    */
   readonly window?: number;
@@ -1470,7 +1523,10 @@ export function toJson_VinylCacheSpecClusterRetry(obj: VinylCacheSpecClusterRetr
  */
 export interface VinylCacheSpecDirectorHash {
   /**
-   * header is the request header name used as the hash key.
+   * header is the request header whose value is the hash key. Without it
+   * the request URL is hashed. It is rendered as req.http.<header>, so it
+   * must be a name VCL accepts there: a letter, then letters, digits, "-"
+   * or "_" (verified with varnishd 8.0 and 9.1).
    *
    * @schema VinylCacheSpecDirectorHash#header
    */
@@ -1509,9 +1565,12 @@ export interface VinylCacheSpecDirectorShard {
   readonly by?: VinylCacheSpecDirectorShardBy;
 
   /**
-   * healthy controls which backends the director considers when selecting a shard.
-   * "CHOSEN" (default) only considers the chosen backend healthy; "ALL" requires all
-   * backends to be healthy.
+   * healthy is the health policy of the shard director's backend selection.
+   * "CHOSEN" (vmod default) returns a healthy backend if possible; backends
+   * skipped while selecting an alternative are not health-checked. "ALL"
+   * also checks health during alternative selection, so alt=1 is the next
+   * healthy backend. It applies to the default route of un-snippeted
+   * requests and to the cluster-peer director.
    *
    * @schema VinylCacheSpecDirectorShard#healthy
    */
@@ -1737,10 +1796,9 @@ export interface VinylCacheSpecMonitoringExporter {
   readonly enabled?: boolean;
 
   /**
-   * image overrides the exporter image. Defaults to
-   * ghcr.io/bluedynamics/varnish-exporter:1.6.1-varnish9.1.0.
+   * image overrides the exporter image of the runtime catalog entry that
+   * matches spec.flavor and spec.version.
    *
-   * @default ghcr.io/bluedynamics/varnish-exporter:1.6.1-varnish9.1.0.
    * @schema VinylCacheSpecMonitoringExporter#image
    */
   readonly image?: VinylCacheSpecMonitoringExporterImage;
@@ -1790,6 +1848,13 @@ export interface VinylCacheSpecMonitoringPrometheusRules {
    * @schema VinylCacheSpecMonitoringPrometheusRules#enabled
    */
   readonly enabled?: boolean;
+
+  /**
+   * lowHitRatio tunes the VinylCacheLowHitRatio alert of this cache's rule.
+   *
+   * @schema VinylCacheSpecMonitoringPrometheusRules#lowHitRatio
+   */
+  readonly lowHitRatio?: VinylCacheSpecMonitoringPrometheusRulesLowHitRatio;
 }
 
 /**
@@ -1800,6 +1865,7 @@ export function toJson_VinylCacheSpecMonitoringPrometheusRules(obj: VinylCacheSp
   if (obj === undefined) { return undefined; }
   const result = {
     'enabled': obj.enabled,
+    'lowHitRatio': toJson_VinylCacheSpecMonitoringPrometheusRulesLowHitRatio(obj.lowHitRatio),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -1845,6 +1911,9 @@ export function toJson_VinylCacheSpecMonitoringServiceMonitor(obj: VinylCacheSpe
 
 /**
  * affinity configures pod affinity and anti-affinity scheduling rules.
+ * When affinity.podAntiAffinity is unset, the operator fills it in from
+ * spec.pod.podAntiAffinity and the operator-wide default; nodeAffinity and
+ * podAffinity are passed through as given.
  *
  * @schema VinylCacheSpecPodAffinity
  */
@@ -1935,6 +2004,59 @@ export function toJson_VinylCacheSpecPodEnv(obj: VinylCacheSpecPodEnv | undefine
     'name': obj.name,
     'value': obj.value,
     'valueFrom': toJson_VinylCacheSpecPodEnvValueFrom(obj.valueFrom),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * podAntiAffinity overrides the operator-wide default that spreads the
+ * pods of this VinylCache across topology domains. Each field that is set
+ * replaces the operator default; unset fields fall back to it. It has no
+ * effect when affinity.podAntiAffinity is set, and the admission webhook
+ * rejects setting both.
+ *
+ * @schema VinylCacheSpecPodPodAntiAffinity
+ */
+export interface VinylCacheSpecPodPodAntiAffinity {
+  /**
+   * topologyKey is the node label whose values define the domains to spread
+   * across, e.g. kubernetes.io/hostname or topology.kubernetes.io/zone.
+   *
+   * @schema VinylCacheSpecPodPodAntiAffinity#topologyKey
+   */
+  readonly topologyKey?: string;
+
+  /**
+   * type selects the rule. "preferred" asks the scheduler to spread the pods
+   * but still schedules them together when it has to; "required" leaves a
+   * pod Pending rather than placing it next to another one of the same
+   * cache; "none" generates no rule.
+   *
+   * @schema VinylCacheSpecPodPodAntiAffinity#type
+   */
+  readonly type?: VinylCacheSpecPodPodAntiAffinityType;
+
+  /**
+   * weight is the scheduling weight of a preferred rule, 1 to 100. It is
+   * ignored for the other types.
+   *
+   * @schema VinylCacheSpecPodPodAntiAffinity#weight
+   */
+  readonly weight?: number;
+}
+
+/**
+ * Converts an object of type 'VinylCacheSpecPodPodAntiAffinity' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheSpecPodPodAntiAffinity(obj: VinylCacheSpecPodPodAntiAffinity | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'topologyKey': obj.topologyKey,
+    'type': obj.type,
+    'weight': obj.weight,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -2778,11 +2900,25 @@ export interface VinylCacheSpecVclSnippets {
   readonly vclPurge?: string;
 
   /**
-   * vclRecv is inserted into vcl_recv after generated routing logic, before return().
+   * vclRecv is inserted into vcl_recv after methods other than GET and HEAD
+   * have been passed, before return(hash). It only sees GET and HEAD
+   * requests; route all methods in vclRecvRouting.
    *
    * @schema VinylCacheSpecVclSnippets#vclRecv
    */
   readonly vclRecv?: string;
+
+  /**
+   * vclRecvRouting is inserted into vcl_recv after PURGE/BAN handling, the
+   * cluster hop and the default backend hint, and before methods other than
+   * GET and HEAD are passed, so it sees requests of every method except
+   * PURGE and BAN. Use it to choose the backend and rewrite the URL, so that
+   * writes are routed like reads. In cluster mode it runs on the owner hop
+   * only.
+   *
+   * @schema VinylCacheSpecVclSnippets#vclRecvRouting
+   */
+  readonly vclRecvRouting?: string;
 
   /**
    * vclSynth is inserted into vcl_synth.
@@ -2813,6 +2949,7 @@ export function toJson_VinylCacheSpecVclSnippets(obj: VinylCacheSpecVclSnippets 
     'vclPipe': obj.vclPipe,
     'vclPurge': obj.vclPurge,
     'vclRecv': obj.vclRecv,
+    'vclRecvRouting': obj.vclRecvRouting,
     'vclSynth': obj.vclSynth,
   };
   // filter undefined values
@@ -3106,7 +3243,10 @@ export function toJson_VinylCacheSpecVolumeClaimTemplatesStatus(obj: VinylCacheS
  */
 export interface VinylCacheSpecBackendsDirectorHash {
   /**
-   * header is the request header name used as the hash key.
+   * header is the request header whose value is the hash key. Without it
+   * the request URL is hashed. It is rendered as req.http.<header>, so it
+   * must be a name VCL accepts there: a letter, then letters, digits, "-"
+   * or "_" (verified with varnishd 8.0 and 9.1).
    *
    * @schema VinylCacheSpecBackendsDirectorHash#header
    */
@@ -3145,9 +3285,12 @@ export interface VinylCacheSpecBackendsDirectorShard {
   readonly by?: VinylCacheSpecBackendsDirectorShardBy;
 
   /**
-   * healthy controls which backends the director considers when selecting a shard.
-   * "CHOSEN" (default) only considers the chosen backend healthy; "ALL" requires all
-   * backends to be healthy.
+   * healthy is the health policy of the shard director's backend selection.
+   * "CHOSEN" (vmod default) returns a healthy backend if possible; backends
+   * skipped while selecting an alternative are not health-checked. "ALL"
+   * also checks health during alternative selection, so alt=1 is the next
+   * healthy backend. It applies to the default route of un-snippeted
+   * requests and to the cluster-peer director.
    *
    * @schema VinylCacheSpecBackendsDirectorShard#healthy
    */
@@ -3240,9 +3383,12 @@ export enum VinylCacheSpecDirectorShardBy {
 }
 
 /**
- * healthy controls which backends the director considers when selecting a shard.
- * "CHOSEN" (default) only considers the chosen backend healthy; "ALL" requires all
- * backends to be healthy.
+ * healthy is the health policy of the shard director's backend selection.
+ * "CHOSEN" (vmod default) returns a healthy backend if possible; backends
+ * skipped while selecting an alternative are not health-checked. "ALL"
+ * also checks health during alternative selection, so alt=1 is the next
+ * healthy backend. It applies to the default route of un-snippeted
+ * requests and to the cluster-peer director.
  *
  * @schema VinylCacheSpecDirectorShardHealthy
  */
@@ -3254,10 +3400,9 @@ export enum VinylCacheSpecDirectorShardHealthy {
 }
 
 /**
- * image overrides the exporter image. Defaults to
- * ghcr.io/bluedynamics/varnish-exporter:1.6.1-varnish9.1.0.
+ * image overrides the exporter image of the runtime catalog entry that
+ * matches spec.flavor and spec.version.
  *
- * @default ghcr.io/bluedynamics/varnish-exporter:1.6.1-varnish9.1.0.
  * @schema VinylCacheSpecMonitoringExporterImage
  */
 export interface VinylCacheSpecMonitoringExporterImage {
@@ -3335,6 +3480,45 @@ export function toJson_VinylCacheSpecMonitoringExporterResources(obj: VinylCache
     'claims': obj.claims?.map(y => toJson_VinylCacheSpecMonitoringExporterResourcesClaims(y)),
     'limits': ((obj.limits) === undefined) ? undefined : (Object.entries(obj.limits).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
     'requests': ((obj.requests) === undefined) ? undefined : (Object.entries(obj.requests).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * lowHitRatio tunes the VinylCacheLowHitRatio alert of this cache's rule.
+ *
+ * @schema VinylCacheSpecMonitoringPrometheusRulesLowHitRatio
+ */
+export interface VinylCacheSpecMonitoringPrometheusRulesLowHitRatio {
+  /**
+   * for is how long the ratio must stay below the threshold before the
+   * alert fires, as a Prometheus duration (e.g. "30s", "15m", "1h30m", "1d").
+   * Not a Go duration: Prometheus also knows d, w and y. Default: 15m.
+   *
+   * @schema VinylCacheSpecMonitoringPrometheusRulesLowHitRatio#for
+   */
+  readonly for?: string;
+
+  /**
+   * threshold is the hit ratio below which the alert fires, evaluated per
+   * pod. Greater than 0 and at most 1. Default: 0.5.
+   *
+   * @schema VinylCacheSpecMonitoringPrometheusRulesLowHitRatio#threshold
+   */
+  readonly threshold?: number;
+}
+
+/**
+ * Converts an object of type 'VinylCacheSpecMonitoringPrometheusRulesLowHitRatio' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheSpecMonitoringPrometheusRulesLowHitRatio(obj: VinylCacheSpecMonitoringPrometheusRulesLowHitRatio | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'for': obj.for,
+    'threshold': obj.threshold,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -3551,6 +3735,23 @@ export function toJson_VinylCacheSpecPodEnvValueFrom(obj: VinylCacheSpecPodEnvVa
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
 }
 /* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * type selects the rule. "preferred" asks the scheduler to spread the pods
+ * but still schedules them together when it has to; "required" leaves a
+ * pod Pending rather than placing it next to another one of the same
+ * cache; "none" generates no rule.
+ *
+ * @schema VinylCacheSpecPodPodAntiAffinityType
+ */
+export enum VinylCacheSpecPodPodAntiAffinityType {
+  /** preferred */
+  PREFERRED = "preferred",
+  /** required */
+  REQUIRED = "required",
+  /** none */
+  NONE = "none",
+}
 
 /**
  * awsElasticBlockStore represents an AWS Disk resource that is attached to a
@@ -5902,9 +6103,12 @@ export enum VinylCacheSpecBackendsDirectorShardBy {
 }
 
 /**
- * healthy controls which backends the director considers when selecting a shard.
- * "CHOSEN" (default) only considers the chosen backend healthy; "ALL" requires all
- * backends to be healthy.
+ * healthy is the health policy of the shard director's backend selection.
+ * "CHOSEN" (vmod default) returns a healthy backend if possible; backends
+ * skipped while selecting an alternative are not health-checked. "ALL"
+ * also checks health during alternative selection, so alt=1 is the next
+ * healthy backend. It applies to the default route of un-snippeted
+ * requests and to the cluster-peer director.
  *
  * @schema VinylCacheSpecBackendsDirectorShardHealthy
  */
@@ -9910,11 +10114,23 @@ export interface VinylCacheV1Alpha1Spec {
   readonly esi?: VinylCacheV1Alpha1SpecEsi;
 
   /**
-   * image is the container image for the Varnish pods.
+   * flavor selects the cache daemon family: varnish (Varnish Cache) or
+   * vinyl (Vinyl Cache). Defaults to varnish.
+   *
+   * @default varnish.
+   * @schema VinylCacheV1Alpha1Spec#flavor
+   */
+  readonly flavor?: VinylCacheV1Alpha1SpecFlavor;
+
+  /**
+   * image optionally overrides the container image of the cache daemon. It
+   * replaces only the daemon image: the exporter and tracing sidecars still
+   * follow flavor and version. When empty, the daemon image comes from the
+   * runtime catalog.
    *
    * @schema VinylCacheV1Alpha1Spec#image
    */
-  readonly image: string;
+  readonly image?: string;
 
   /**
    * invalidation configures cache invalidation methods (PURGE, BAN, xkey).
@@ -9946,6 +10162,8 @@ export interface VinylCacheV1Alpha1Spec {
 
   /**
    * replicas is the desired number of Varnish pods in the cluster.
+   * 0 switches the cache off on purpose (phase Stopped); the StatefulSet
+   * and the other resources stay in place.
    *
    * @schema VinylCacheV1Alpha1Spec#replicas
    */
@@ -10028,6 +10246,17 @@ export interface VinylCacheV1Alpha1Spec {
   readonly vcl?: VinylCacheV1Alpha1SpecVcl;
 
   /**
+   * version is the daemon version to run, for example "9.1.0". It must be
+   * listed in the operator's runtime catalog for the chosen flavor. When
+   * empty, the catalog's default version for the flavor is used. That default
+   * is resolved at reconcile time and not written back to this field, so it
+   * follows the chart's default; pin version to stay on a given release.
+   *
+   * @schema VinylCacheV1Alpha1Spec#version
+   */
+  readonly version?: string;
+
+  /**
    * volumeClaimTemplates are appended verbatim to the generated StatefulSet's
    * spec.volumeClaimTemplates. Each template yields one PVC per replica
    * (named <claim>-<statefulset>-<ord>) that persists across pod restarts
@@ -10052,6 +10281,7 @@ export function toJson_VinylCacheV1Alpha1Spec(obj: VinylCacheV1Alpha1Spec | unde
     'debounce': toJson_VinylCacheV1Alpha1SpecDebounce(obj.debounce),
     'director': toJson_VinylCacheV1Alpha1SpecDirector(obj.director),
     'esi': toJson_VinylCacheV1Alpha1SpecEsi(obj.esi),
+    'flavor': obj.flavor,
     'image': obj.image,
     'invalidation': toJson_VinylCacheV1Alpha1SpecInvalidation(obj.invalidation),
     'monitoring': toJson_VinylCacheV1Alpha1SpecMonitoring(obj.monitoring),
@@ -10065,6 +10295,7 @@ export function toJson_VinylCacheV1Alpha1Spec(obj: VinylCacheV1Alpha1Spec | unde
     'tracing': toJson_VinylCacheV1Alpha1SpecTracing(obj.tracing),
     'varnishParameters': ((obj.varnishParameters) === undefined) ? undefined : (Object.entries(obj.varnishParameters).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
     'vcl': toJson_VinylCacheV1Alpha1SpecVcl(obj.vcl),
+    'version': obj.version,
     'volumeClaimTemplates': obj.volumeClaimTemplates?.map(y => toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplates(y)),
   };
   // filter undefined values
@@ -10331,6 +10562,20 @@ export function toJson_VinylCacheV1Alpha1SpecEsi(obj: VinylCacheV1Alpha1SpecEsi 
 /* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
 
 /**
+ * flavor selects the cache daemon family: varnish (Varnish Cache) or
+ * vinyl (Vinyl Cache). Defaults to varnish.
+ *
+ * @default varnish.
+ * @schema VinylCacheV1Alpha1SpecFlavor
+ */
+export enum VinylCacheV1Alpha1SpecFlavor {
+  /** varnish */
+  VARNISH = "varnish",
+  /** vinyl */
+  VINYL = "vinyl",
+}
+
+/**
  * invalidation configures cache invalidation methods (PURGE, BAN, xkey).
  *
  * @schema VinylCacheV1Alpha1SpecInvalidation
@@ -10435,6 +10680,9 @@ export function toJson_VinylCacheV1Alpha1SpecMonitoring(obj: VinylCacheV1Alpha1S
 export interface VinylCacheV1Alpha1SpecPod {
   /**
    * affinity configures pod affinity and anti-affinity scheduling rules.
+   * When affinity.podAntiAffinity is unset, the operator fills it in from
+   * spec.pod.podAntiAffinity and the operator-wide default; nodeAffinity and
+   * podAffinity are passed through as given.
    *
    * @schema VinylCacheV1Alpha1SpecPod#affinity
    */
@@ -10472,6 +10720,17 @@ export interface VinylCacheV1Alpha1SpecPod {
    * @schema VinylCacheV1Alpha1SpecPod#nodeSelector
    */
   readonly nodeSelector?: { [key: string]: string };
+
+  /**
+   * podAntiAffinity overrides the operator-wide default that spreads the
+   * pods of this VinylCache across topology domains. Each field that is set
+   * replaces the operator default; unset fields fall back to it. It has no
+   * effect when affinity.podAntiAffinity is set, and the admission webhook
+   * rejects setting both.
+   *
+   * @schema VinylCacheV1Alpha1SpecPod#podAntiAffinity
+   */
+  readonly podAntiAffinity?: VinylCacheV1Alpha1SpecPodPodAntiAffinity;
 
   /**
    * priorityClassName is the name of the PriorityClass for Varnish pods.
@@ -10524,6 +10783,7 @@ export function toJson_VinylCacheV1Alpha1SpecPod(obj: VinylCacheV1Alpha1SpecPod 
     'env': obj.env?.map(y => toJson_VinylCacheV1Alpha1SpecPodEnv(y)),
     'labels': ((obj.labels) === undefined) ? undefined : (Object.entries(obj.labels).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
     'nodeSelector': ((obj.nodeSelector) === undefined) ? undefined : (Object.entries(obj.nodeSelector).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {})),
+    'podAntiAffinity': toJson_VinylCacheV1Alpha1SpecPodPodAntiAffinity(obj.podAntiAffinity),
     'priorityClassName': obj.priorityClassName,
     'tolerations': obj.tolerations?.map(y => toJson_VinylCacheV1Alpha1SpecPodTolerations(y)),
     'volumeMounts': obj.volumeMounts?.map(y => toJson_VinylCacheV1Alpha1SpecPodVolumeMounts(y)),
@@ -10728,7 +10988,10 @@ export interface VinylCacheV1Alpha1SpecStorage {
   readonly name: string;
 
   /**
-   * path is the filesystem path for file-type storage.
+   * path is the filesystem path for file-type storage. Leave it empty to
+   * let the operator provision an emptyDir volume of size (plus a small
+   * margin), mount it at /var/lib/vinyl-storage/<name> and request the
+   * matching ephemeral-storage. With a path, mount your own volume there.
    *
    * @schema VinylCacheV1Alpha1SpecStorage#path
    */
@@ -10961,14 +11224,6 @@ export interface VinylCacheV1Alpha1SpecBackendsConnectionParameters {
   readonly firstByteTimeout?: string;
 
   /**
-   * idleTimeout is the maximum time an idle connection may be reused. Should be less
-   * than the backend's keep-alive timeout to avoid 503 races.
-   *
-   * @schema VinylCacheV1Alpha1SpecBackendsConnectionParameters#idleTimeout
-   */
-  readonly idleTimeout?: string;
-
-  /**
    * maxConnections is the maximum number of concurrent connections to the backend.
    *
    * @schema VinylCacheV1Alpha1SpecBackendsConnectionParameters#maxConnections
@@ -10986,7 +11241,6 @@ export function toJson_VinylCacheV1Alpha1SpecBackendsConnectionParameters(obj: V
     'betweenBytesTimeout': obj.betweenBytesTimeout,
     'connectTimeout': obj.connectTimeout,
     'firstByteTimeout': obj.firstByteTimeout,
-    'idleTimeout': obj.idleTimeout,
     'maxConnections': obj.maxConnections,
   };
   // filter undefined values
@@ -11066,8 +11320,9 @@ export interface VinylCacheV1Alpha1SpecBackendsProbe {
 
   /**
    * threshold is the minimum number of successful probes within the window for the backend
-   * to be considered healthy.
+   * to be considered healthy. Defaults to 3; must not exceed window.
    *
+   * @default 3; must not exceed window.
    * @schema VinylCacheV1Alpha1SpecBackendsProbe#threshold
    */
   readonly threshold?: number;
@@ -11087,8 +11342,10 @@ export interface VinylCacheV1Alpha1SpecBackendsProbe {
   readonly url?: string;
 
   /**
-   * window is the number of most recent probes to consider for threshold evaluation.
+   * window is the number of most recent probes to consider for threshold
+   * evaluation. Defaults to 5; varnishd allows at most 64.
    *
+   * @default 5; varnishd allows at most 64.
    * @schema VinylCacheV1Alpha1SpecBackendsProbe#window
    */
   readonly window?: number;
@@ -11241,7 +11498,10 @@ export function toJson_VinylCacheV1Alpha1SpecClusterRetry(obj: VinylCacheV1Alpha
  */
 export interface VinylCacheV1Alpha1SpecDirectorHash {
   /**
-   * header is the request header name used as the hash key.
+   * header is the request header whose value is the hash key. Without it
+   * the request URL is hashed. It is rendered as req.http.<header>, so it
+   * must be a name VCL accepts there: a letter, then letters, digits, "-"
+   * or "_" (verified with varnishd 8.0 and 9.1).
    *
    * @schema VinylCacheV1Alpha1SpecDirectorHash#header
    */
@@ -11280,9 +11540,12 @@ export interface VinylCacheV1Alpha1SpecDirectorShard {
   readonly by?: VinylCacheV1Alpha1SpecDirectorShardBy;
 
   /**
-   * healthy controls which backends the director considers when selecting a shard.
-   * "CHOSEN" (default) only considers the chosen backend healthy; "ALL" requires all
-   * backends to be healthy.
+   * healthy is the health policy of the shard director's backend selection.
+   * "CHOSEN" (vmod default) returns a healthy backend if possible; backends
+   * skipped while selecting an alternative are not health-checked. "ALL"
+   * also checks health during alternative selection, so alt=1 is the next
+   * healthy backend. It applies to the default route of un-snippeted
+   * requests and to the cluster-peer director.
    *
    * @schema VinylCacheV1Alpha1SpecDirectorShard#healthy
    */
@@ -11508,10 +11771,9 @@ export interface VinylCacheV1Alpha1SpecMonitoringExporter {
   readonly enabled?: boolean;
 
   /**
-   * image overrides the exporter image. Defaults to
-   * ghcr.io/bluedynamics/varnish-exporter:1.6.1-varnish9.1.0.
+   * image overrides the exporter image of the runtime catalog entry that
+   * matches spec.flavor and spec.version.
    *
-   * @default ghcr.io/bluedynamics/varnish-exporter:1.6.1-varnish9.1.0.
    * @schema VinylCacheV1Alpha1SpecMonitoringExporter#image
    */
   readonly image?: VinylCacheV1Alpha1SpecMonitoringExporterImage;
@@ -11561,6 +11823,13 @@ export interface VinylCacheV1Alpha1SpecMonitoringPrometheusRules {
    * @schema VinylCacheV1Alpha1SpecMonitoringPrometheusRules#enabled
    */
   readonly enabled?: boolean;
+
+  /**
+   * lowHitRatio tunes the VinylCacheLowHitRatio alert of this cache's rule.
+   *
+   * @schema VinylCacheV1Alpha1SpecMonitoringPrometheusRules#lowHitRatio
+   */
+  readonly lowHitRatio?: VinylCacheV1Alpha1SpecMonitoringPrometheusRulesLowHitRatio;
 }
 
 /**
@@ -11571,6 +11840,7 @@ export function toJson_VinylCacheV1Alpha1SpecMonitoringPrometheusRules(obj: Viny
   if (obj === undefined) { return undefined; }
   const result = {
     'enabled': obj.enabled,
+    'lowHitRatio': toJson_VinylCacheV1Alpha1SpecMonitoringPrometheusRulesLowHitRatio(obj.lowHitRatio),
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -11616,6 +11886,9 @@ export function toJson_VinylCacheV1Alpha1SpecMonitoringServiceMonitor(obj: Vinyl
 
 /**
  * affinity configures pod affinity and anti-affinity scheduling rules.
+ * When affinity.podAntiAffinity is unset, the operator fills it in from
+ * spec.pod.podAntiAffinity and the operator-wide default; nodeAffinity and
+ * podAffinity are passed through as given.
  *
  * @schema VinylCacheV1Alpha1SpecPodAffinity
  */
@@ -11706,6 +11979,59 @@ export function toJson_VinylCacheV1Alpha1SpecPodEnv(obj: VinylCacheV1Alpha1SpecP
     'name': obj.name,
     'value': obj.value,
     'valueFrom': toJson_VinylCacheV1Alpha1SpecPodEnvValueFrom(obj.valueFrom),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * podAntiAffinity overrides the operator-wide default that spreads the
+ * pods of this VinylCache across topology domains. Each field that is set
+ * replaces the operator default; unset fields fall back to it. It has no
+ * effect when affinity.podAntiAffinity is set, and the admission webhook
+ * rejects setting both.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodPodAntiAffinity
+ */
+export interface VinylCacheV1Alpha1SpecPodPodAntiAffinity {
+  /**
+   * topologyKey is the node label whose values define the domains to spread
+   * across, e.g. kubernetes.io/hostname or topology.kubernetes.io/zone.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodPodAntiAffinity#topologyKey
+   */
+  readonly topologyKey?: string;
+
+  /**
+   * type selects the rule. "preferred" asks the scheduler to spread the pods
+   * but still schedules them together when it has to; "required" leaves a
+   * pod Pending rather than placing it next to another one of the same
+   * cache; "none" generates no rule.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodPodAntiAffinity#type
+   */
+  readonly type?: VinylCacheV1Alpha1SpecPodPodAntiAffinityType;
+
+  /**
+   * weight is the scheduling weight of a preferred rule, 1 to 100. It is
+   * ignored for the other types.
+   *
+   * @schema VinylCacheV1Alpha1SpecPodPodAntiAffinity#weight
+   */
+  readonly weight?: number;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecPodPodAntiAffinity' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecPodPodAntiAffinity(obj: VinylCacheV1Alpha1SpecPodPodAntiAffinity | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'topologyKey': obj.topologyKey,
+    'type': obj.type,
+    'weight': obj.weight,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -12549,11 +12875,25 @@ export interface VinylCacheV1Alpha1SpecVclSnippets {
   readonly vclPurge?: string;
 
   /**
-   * vclRecv is inserted into vcl_recv after generated routing logic, before return().
+   * vclRecv is inserted into vcl_recv after methods other than GET and HEAD
+   * have been passed, before return(hash). It only sees GET and HEAD
+   * requests; route all methods in vclRecvRouting.
    *
    * @schema VinylCacheV1Alpha1SpecVclSnippets#vclRecv
    */
   readonly vclRecv?: string;
+
+  /**
+   * vclRecvRouting is inserted into vcl_recv after PURGE/BAN handling, the
+   * cluster hop and the default backend hint, and before methods other than
+   * GET and HEAD are passed, so it sees requests of every method except
+   * PURGE and BAN. Use it to choose the backend and rewrite the URL, so that
+   * writes are routed like reads. In cluster mode it runs on the owner hop
+   * only.
+   *
+   * @schema VinylCacheV1Alpha1SpecVclSnippets#vclRecvRouting
+   */
+  readonly vclRecvRouting?: string;
 
   /**
    * vclSynth is inserted into vcl_synth.
@@ -12584,6 +12924,7 @@ export function toJson_VinylCacheV1Alpha1SpecVclSnippets(obj: VinylCacheV1Alpha1
     'vclPipe': obj.vclPipe,
     'vclPurge': obj.vclPurge,
     'vclRecv': obj.vclRecv,
+    'vclRecvRouting': obj.vclRecvRouting,
     'vclSynth': obj.vclSynth,
   };
   // filter undefined values
@@ -12877,7 +13218,10 @@ export function toJson_VinylCacheV1Alpha1SpecVolumeClaimTemplatesStatus(obj: Vin
  */
 export interface VinylCacheV1Alpha1SpecBackendsDirectorHash {
   /**
-   * header is the request header name used as the hash key.
+   * header is the request header whose value is the hash key. Without it
+   * the request URL is hashed. It is rendered as req.http.<header>, so it
+   * must be a name VCL accepts there: a letter, then letters, digits, "-"
+   * or "_" (verified with varnishd 8.0 and 9.1).
    *
    * @schema VinylCacheV1Alpha1SpecBackendsDirectorHash#header
    */
@@ -12916,9 +13260,12 @@ export interface VinylCacheV1Alpha1SpecBackendsDirectorShard {
   readonly by?: VinylCacheV1Alpha1SpecBackendsDirectorShardBy;
 
   /**
-   * healthy controls which backends the director considers when selecting a shard.
-   * "CHOSEN" (default) only considers the chosen backend healthy; "ALL" requires all
-   * backends to be healthy.
+   * healthy is the health policy of the shard director's backend selection.
+   * "CHOSEN" (vmod default) returns a healthy backend if possible; backends
+   * skipped while selecting an alternative are not health-checked. "ALL"
+   * also checks health during alternative selection, so alt=1 is the next
+   * healthy backend. It applies to the default route of un-snippeted
+   * requests and to the cluster-peer director.
    *
    * @schema VinylCacheV1Alpha1SpecBackendsDirectorShard#healthy
    */
@@ -13011,9 +13358,12 @@ export enum VinylCacheV1Alpha1SpecDirectorShardBy {
 }
 
 /**
- * healthy controls which backends the director considers when selecting a shard.
- * "CHOSEN" (default) only considers the chosen backend healthy; "ALL" requires all
- * backends to be healthy.
+ * healthy is the health policy of the shard director's backend selection.
+ * "CHOSEN" (vmod default) returns a healthy backend if possible; backends
+ * skipped while selecting an alternative are not health-checked. "ALL"
+ * also checks health during alternative selection, so alt=1 is the next
+ * healthy backend. It applies to the default route of un-snippeted
+ * requests and to the cluster-peer director.
  *
  * @schema VinylCacheV1Alpha1SpecDirectorShardHealthy
  */
@@ -13025,10 +13375,9 @@ export enum VinylCacheV1Alpha1SpecDirectorShardHealthy {
 }
 
 /**
- * image overrides the exporter image. Defaults to
- * ghcr.io/bluedynamics/varnish-exporter:1.6.1-varnish9.1.0.
+ * image overrides the exporter image of the runtime catalog entry that
+ * matches spec.flavor and spec.version.
  *
- * @default ghcr.io/bluedynamics/varnish-exporter:1.6.1-varnish9.1.0.
  * @schema VinylCacheV1Alpha1SpecMonitoringExporterImage
  */
 export interface VinylCacheV1Alpha1SpecMonitoringExporterImage {
@@ -13106,6 +13455,45 @@ export function toJson_VinylCacheV1Alpha1SpecMonitoringExporterResources(obj: Vi
     'claims': obj.claims?.map(y => toJson_VinylCacheV1Alpha1SpecMonitoringExporterResourcesClaims(y)),
     'limits': ((obj.limits) === undefined) ? undefined : (Object.entries(obj.limits).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
     'requests': ((obj.requests) === undefined) ? undefined : (Object.entries(obj.requests).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1]?.value }), {})),
+  };
+  // filter undefined values
+  return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
+}
+/* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * lowHitRatio tunes the VinylCacheLowHitRatio alert of this cache's rule.
+ *
+ * @schema VinylCacheV1Alpha1SpecMonitoringPrometheusRulesLowHitRatio
+ */
+export interface VinylCacheV1Alpha1SpecMonitoringPrometheusRulesLowHitRatio {
+  /**
+   * for is how long the ratio must stay below the threshold before the
+   * alert fires, as a Prometheus duration (e.g. "30s", "15m", "1h30m", "1d").
+   * Not a Go duration: Prometheus also knows d, w and y. Default: 15m.
+   *
+   * @schema VinylCacheV1Alpha1SpecMonitoringPrometheusRulesLowHitRatio#for
+   */
+  readonly for?: string;
+
+  /**
+   * threshold is the hit ratio below which the alert fires, evaluated per
+   * pod. Greater than 0 and at most 1. Default: 0.5.
+   *
+   * @schema VinylCacheV1Alpha1SpecMonitoringPrometheusRulesLowHitRatio#threshold
+   */
+  readonly threshold?: number;
+}
+
+/**
+ * Converts an object of type 'VinylCacheV1Alpha1SpecMonitoringPrometheusRulesLowHitRatio' to JSON representation.
+ */
+/* eslint-disable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+export function toJson_VinylCacheV1Alpha1SpecMonitoringPrometheusRulesLowHitRatio(obj: VinylCacheV1Alpha1SpecMonitoringPrometheusRulesLowHitRatio | undefined): Record<string, any> | undefined {
+  if (obj === undefined) { return undefined; }
+  const result = {
+    'for': obj.for,
+    'threshold': obj.threshold,
   };
   // filter undefined values
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
@@ -13322,6 +13710,23 @@ export function toJson_VinylCacheV1Alpha1SpecPodEnvValueFrom(obj: VinylCacheV1Al
   return Object.entries(result).reduce((r, i) => (i[1] === undefined) ? r : ({ ...r, [i[0]]: i[1] }), {});
 }
 /* eslint-enable max-len, @stylistic/max-len, quote-props, @stylistic/quote-props */
+
+/**
+ * type selects the rule. "preferred" asks the scheduler to spread the pods
+ * but still schedules them together when it has to; "required" leaves a
+ * pod Pending rather than placing it next to another one of the same
+ * cache; "none" generates no rule.
+ *
+ * @schema VinylCacheV1Alpha1SpecPodPodAntiAffinityType
+ */
+export enum VinylCacheV1Alpha1SpecPodPodAntiAffinityType {
+  /** preferred */
+  PREFERRED = "preferred",
+  /** required */
+  REQUIRED = "required",
+  /** none */
+  NONE = "none",
+}
 
 /**
  * awsElasticBlockStore represents an AWS Disk resource that is attached to a
@@ -15673,9 +16078,12 @@ export enum VinylCacheV1Alpha1SpecBackendsDirectorShardBy {
 }
 
 /**
- * healthy controls which backends the director considers when selecting a shard.
- * "CHOSEN" (default) only considers the chosen backend healthy; "ALL" requires all
- * backends to be healthy.
+ * healthy is the health policy of the shard director's backend selection.
+ * "CHOSEN" (vmod default) returns a healthy backend if possible; backends
+ * skipped while selecting an alternative are not health-checked. "ALL"
+ * also checks health during alternative selection, so alt=1 is the next
+ * healthy backend. It applies to the default route of un-snippeted
+ * requests and to the cluster-peer director.
  *
  * @schema VinylCacheV1Alpha1SpecBackendsDirectorShardHealthy
  */

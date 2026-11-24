@@ -17,7 +17,7 @@ import {
   VinylCacheSpecTracingResourcesLimits,
   VinylCacheSpecTracingResourcesRequests,
 } from './imports/vinyl.bluedynamics.eu';
-import { Plone } from './plone';
+import { Plone, PloneVariant } from './plone';
 
 /**
  * Health probe configuration for a VinylCache backend.
@@ -379,9 +379,31 @@ export interface PloneVinylCacheOptions {
   /**
    * Custom VCL snippet for vcl_recv subroutine.
    * Replaces the default Plone recv snippet.
+   *
+   * cloud-vinyl runs it for GET and HEAD only. Route requests in
+   * `vclRecvRoutingSnippet` instead, otherwise POST, PUT, PATCH, DELETE and
+   * OPTIONS go to the first backend without your rewrites.
    * @default - uses built-in plone-vinyl-recv.vcl
    */
   readonly vclRecvSnippet?: string;
+
+  /**
+   * VCL snippet for routing in vcl_recv (`spec.vcl.snippets.vclRecvRouting`).
+   *
+   * cloud-vinyl runs it for every request method except PURGE and BAN, before
+   * its GET/HEAD check, so set the backend and rewrite URLs here.
+   * Address a backend through its director as `<name>.backend(by=URL)`,
+   * e.g. `plone_backend.backend(by=URL)`: backends without their own director
+   * are shard directors in cloud-vinyl.
+   *
+   * Requires the operator and CRD of cloud-vinyl 1.2.0 or later. An older CRD
+   * drops the field without an error.
+   * @default - for the Volto variant without a custom `vclRecvSnippet`: the
+   * built-in plone-vinyl-recv-routing-volto.vcl, which sends `/++api++` and
+   * blob URLs to `plone_backend` with a VirtualHostMonster rewrite for
+   * `plone.siteId` and everything else to `plone_frontend`. Otherwise none.
+   */
+  readonly vclRecvRoutingSnippet?: string;
 
   /**
    * Custom VCL snippet for vcl_backend_response subroutine.
@@ -549,6 +571,18 @@ function quantities<T>(cpu: string | undefined, memory: string | undefined, from
 }
 
 /**
+ * Loads the built-in Volto routing snippet for the given Plone site id.
+ */
+function defaultVoltoRouting(siteId: string): string {
+  // The id ends up inside a VCL string literal.
+  if (!/^[A-Za-z0-9._-]+$/.test(siteId)) {
+    throw new Error(`plone.siteId "${siteId}" cannot go into the default vclRecvRoutingSnippet; use only [A-Za-z0-9._-] or pass vclRecvRoutingSnippet`);
+  }
+  return fs.readFileSync(path.join(__dirname, 'config', 'plone-vinyl-recv-routing-volto.vcl'), 'utf8')
+    .split('__PLONE_SITE_ID__').join(siteId);
+}
+
+/**
  * PloneVinylCache construct for deploying Varnish Cache via cloud-vinyl operator.
  *
  * Creates a VinylCache custom resource with Plone backend/frontend services
@@ -654,6 +688,12 @@ export class PloneVinylCache extends Construct {
       fs.readFileSync(path.join(__dirname, 'config', 'plone-vinyl-recv.vcl'), 'utf8');
     const vclBackendResponse = options.vclBackendResponseSnippet ??
       fs.readFileSync(path.join(__dirname, 'config', 'plone-vinyl-backend-response.vcl'), 'utf8');
+    // No default next to a custom vclRecvSnippet: its own routing would see the
+    // already rewritten URL and send API requests to the frontend.
+    const vclRecvRouting = options.vclRecvRoutingSnippet ??
+      (options.plone.variant === PloneVariant.VOLTO && options.vclRecvSnippet === undefined
+        ? defaultVoltoRouting(options.plone.siteId)
+        : undefined);
 
     // Build backends from Plone services
     const backends: VinylCacheSpecBackends[] = [
@@ -728,6 +768,7 @@ export class PloneVinylCache extends Construct {
         esi: options.esi !== undefined ? { enabled: options.esi } : undefined,
         vcl: {
           snippets: {
+            vclRecvRouting: vclRecvRouting,
             vclRecv: vclRecv,
             vclBackendResponse: vclBackendResponse,
             vclDeliver: options.vclDeliverSnippet,

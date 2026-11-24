@@ -66,7 +66,7 @@ project.addTask('import:servicemonitor', {
 });
 
 // Pinned to a release, so the import matches the operator users install.
-const cloudVinylVersion = 'v1.0.0-rc.2';
+const cloudVinylVersion = 'v1.2.0';
 project.addTask('import:vinylcache', {
   description: `Import cloud-vinyl VinylCache CRD (${cloudVinylVersion})`,
   exec: `cdk8s import https://raw.githubusercontent.com/bluedynamics/cloud-vinyl/${cloudVinylVersion}/config/crd/bases/vinyl.bluedynamics.eu_vinylcaches.yaml --language typescript --output src/imports/`,
