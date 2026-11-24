@@ -23,6 +23,11 @@ tsconfig.tsbuildinfo
 /.eslintrc.json
 /projenrc/tsconfig.json
 !.jsii
+/.claude/
+/CLAUDE.md
+/docs/
+/documentation/
+/examples/
 /.gitattributes
 /.projenrc.ts
 /projenrc

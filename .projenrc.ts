@@ -72,6 +72,24 @@ project.addTask('import:vinylcache', {
   exec: `cdk8s import https://raw.githubusercontent.com/bluedynamics/cloud-vinyl/${cloudVinylVersion}/config/crd/bases/vinyl.bluedynamics.eu_vinylcaches.yaml --language typescript --output src/imports/`,
 });
 
+// PloneVinylCache and PloneHttpcache read their default VCL next to the
+// compiled module at synth time; jsii only emits .js and .d.ts into lib/ (#251).
+project.postCompileTask.exec('mkdir -p lib/config && cp src/config/*.vcl lib/config/');
+
+// Keep repo-only material out of the npm tarball (and the Python package,
+// which bundles it).
+for (const pattern of ['/.claude/', '/CLAUDE.md', '/docs/', '/documentation/', '/examples/']) {
+  project.addPackageIgnore(pattern);
+}
+
+// The Jest tests run against src/ and cannot see what the npm tarball lacks.
+// Construct the classes from the packed module after packaging (#251).
+const packedTest = project.addTask('test:packed', {
+  description: 'Smoke test against the packed npm module',
+  exec: 'node test/packed/smoke.js',
+});
+project.packageTask.spawn(packedTest);
+
 // // Fix upgrade workflow permissions for PR job
 // const upgradeMain = project.tryFindObjectFile('.github/workflows/upgrade-main.yml');
 // if (upgradeMain) {
