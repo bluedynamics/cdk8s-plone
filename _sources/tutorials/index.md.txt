@@ -1,0 +1,53 @@
+---
+myst:
+  html_meta:
+    "description": "Learning-oriented tutorials that guide you through using cdk8s-plone to deploy Plone CMS on Kubernetes."
+    "property=og:description": "Learning-oriented tutorials that guide you through using cdk8s-plone to deploy Plone CMS on Kubernetes."
+    "property=og:title": "Tutorials"
+    "keywords": "Plone, cdk8s, Kubernetes, tutorials, getting started"
+---
+
+# Tutorials
+
+**Learning-oriented guides that take you through a series of steps to complete a project.**
+
+Tutorials are lessons that help you gain practical skills and familiarity with cdk8s-plone. They are designed to be followed step-by-step and will get you up and running.
+
+## What you'll learn
+
+The quick start teaches you how to:
+
+- Define a Plone deployment with the `Plone` construct
+- Synthesize Kubernetes manifests with `cdk8s synth`
+- Apply the manifests and reach the running site
+
+For tasks beyond the first deployment, such as configuring a database, caching, or scaling, see the {doc}`/how-to/index`.
+
+## Available tutorials
+
+```{toctree}
+---
+maxdepth: 1
+titlesonly: true
+---
+01-quick-start
+```
+
+## Before you start
+
+These tutorials assume you have:
+- Basic familiarity with Kubernetes concepts
+- Node.js 18+ and npm installed
+- A Kubernetes cluster (local or remote)
+- kubectl configured to access your cluster
+- Basic TypeScript knowledge
+
+If you're new to CDK8S, we recommend reading the [CDK8S documentation](https://cdk8s.io/) first to understand how constructs work.
+
+---
+
+**Looking for practical guidance?** Check out the [How-To Guides](../how-to/index.md) for specific solutions.
+
+**Need technical details?** See the [Reference](../reference/index.md) section for API documentation.
+
+**Want to understand the architecture?** Read the [Explanation](../explanation/index.md) section for concepts and design decisions.

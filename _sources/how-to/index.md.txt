@@ -1,0 +1,85 @@
+---
+myst:
+  html_meta:
+    "description": "Goal-oriented how-to guides for solving specific cdk8s-plone deployment and configuration problems."
+    "property=og:description": "Goal-oriented how-to guides for solving specific cdk8s-plone deployment and configuration problems."
+    "property=og:title": "How-to guides"
+    "keywords": "Plone, cdk8s, Kubernetes, how-to, deployment, configuration"
+---
+
+# How-to guides
+
+**Goal-oriented guides showing you how to solve specific problems with cdk8s-plone.**
+
+How-to guides are recipes that take you through the steps involved in addressing specific tasks and problems. They are more advanced than tutorials and assume you have some knowledge of how cdk8s-plone works.
+
+## Prerequisites
+
+**Set up required infrastructure before deploying Plone:**
+
+```{toctree}
+---
+maxdepth: 1
+titlesonly: true
+---
+setup-prerequisites
+```
+
+## Deployment
+
+**Deploy complete Plone examples to your Kubernetes cluster:**
+
+```{toctree}
+---
+maxdepth: 1
+titlesonly: true
+---
+deploy-volto
+deploy-blicca
+deploy-with-httpcache
+deploy-with-vinyl-cache
+```
+
+## Configuration
+
+```{toctree}
+---
+maxdepth: 1
+titlesonly: true
+---
+configure-env-and-secrets
+configure-security-context
+schedule-pods
+configure-ingress-tls
+```
+
+## Operations and maintenance
+
+```{toctree}
+---
+maxdepth: 1
+titlesonly: true
+---
+enable-prometheus-monitoring
+scale-and-high-availability
+upgrade-and-rollout
+backup-and-restore
+```
+
+## Troubleshooting
+
+```{toctree}
+---
+maxdepth: 1
+titlesonly: true
+---
+troubleshooting
+```
+
+---
+
+**New to cdk8s-plone?** Start with the [Tutorials](../tutorials/index.md) for step-by-step lessons.
+
+**Need technical specifications?** See the [Reference](../reference/index.md) section for API documentation.
+
+**Want to understand concepts?** Read the [Explanation](../explanation/index.md) section for architecture and design decisions.
