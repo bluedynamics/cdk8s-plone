@@ -39,7 +39,7 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
       - name: Generate token
         id: generate_token
-        uses: actions/create-github-app-token@v3.3.0
+        uses: actions/create-github-app-token@v3.4.0
         with:
           app-id: ${{ secrets.PROJEN_APP_ID }}
           private-key: ${{ secrets.PROJEN_APP_PRIVATE_KEY }}
